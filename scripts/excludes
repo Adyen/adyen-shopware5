@@ -1,0 +1,8 @@
+.git
+.htpasswd
+index.php
+.env
+media/
+var/import/
+var/log/
+web/sitemap
