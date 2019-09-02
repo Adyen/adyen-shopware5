@@ -5,7 +5,8 @@ pipeline {
         PROJECTHOST = '178.62.189.7'
         ENV = 'shopware53'
         PROJECT = 'Adyen Plugin'
-        PROJECT_ROOT = '/var/www/shopware53/custom/plugins/MeteorAdyen/'
+        PLUGIN_ROOT = '/var/www/shopware53/custom/plugins/MeteorAdyen/'
+        PROJECT_ROOT = '/var/www/shopware53'
         LINK = 'https://outlook.office.com/webhook/24b403ec-e5bd-401b-9802-c92a01347bfd@49c3d703-3579-47bf-a888-7c913fbdced9/IncomingWebhook/6cfc8d2fe5cf4b63929fa890cc0a73c7/b8e98a02-1737-4600-99b3-b613e03a60dc'
     }
     parameters {

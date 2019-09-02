@@ -3,7 +3,7 @@ set -e
 
 echo "Syncing files"
 cd "$WORKSPACE" || exit
-rsync -avzphl --delete --exclude-from="scripts/excludes" --chmod=u+rwx,g+rwx,o-rx "." "$SSHUSER@$PROJECTHOST:$PROJECT_ROOT/"
+rsync -avzphl --delete --exclude-from="scripts/excludes" --chmod=u+rwx,g+rwx,o-rx "." "$SSHUSER@$PROJECTHOST:$PLUGIN_ROOT"
 
 echo "Running Shopware migrations"
 ssh "$SSHUSER@$PROJECTHOST" "$PROJECT_ROOT/bin/console sw:migration:migrate"
