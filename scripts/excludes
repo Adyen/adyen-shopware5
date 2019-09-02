@@ -6,3 +6,5 @@ media/
 var/import/
 var/log/
 web/sitemap
+scripts/
+Jenkinsfile-*
