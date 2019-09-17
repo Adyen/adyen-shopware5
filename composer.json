@@ -1,0 +1,5 @@
+{
+    "require": {
+        "adyen/php-api-library": "^3.1"
+    }
+}
