@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/config.xsd">
+    <elements>
+        <element required="true" type="select" scope="shop">
+            <name>environment</name>
+            <label lang="en">Environment</label>
+            <store>
+                <option>
+                    <value>0</value>
+                    <label lang="en">Test</label>
+                </option>
+                <option>
+                    <value>1</value>
+                    <label lang="en">Live</label>
+                </option>
+            </store>
+        </element>
+        <element required="true" type="text" scope="shop">
+            <name>merchant_account</name>
+            <label lang="en">Merchant account</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+            <name>js_components_originkey</name>
+            <label lang="en">JS components: originKey</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+            <name>js_components_3DS2_challenge_image_size</name>
+            <label lang="en">JS components: 3DS2 Challenge image size</label>
+            <value>01</value>
+        </element>
+        <element required="true" type="text" scope="shop">
+            <name>api_key</name>
+            <label lang="en">API: key</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+            <name>api_url_prefix</name>
+            <label lang="en">API: URL prefix</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+            <name>notification_hmac</name>
+            <label lang="en">Notification: HMAC</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+            <name>notification_auth_username</name>
+            <label lang="en">Notification: Auth username</label>
+        </element>
+        <element required="true" type="boolean" scope="shop">
+            <name>debug_logging</name>
+            <label lang="en">Debug logging</label>
+            <value>true</value>
+        </element>
+    </elements>
+</config>

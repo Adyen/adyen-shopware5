@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
-namespace EushCustomerLogin\Service;
-
+namespace MeteorAdyen\Service;
+/**
+ * Class DataConversion
+ * @package MeteorAdyen\Service
+ */
 class DataConversion
 {
     /**

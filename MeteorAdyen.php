@@ -11,6 +11,7 @@ use Shopware\Models\Payment\Payment;
 
 class MeteorAdyen extends Plugin
 {
+    const NAME = 'MeteorAdyen';
     const PAYMENT_METHOD_CARD = 'meteor_adyen_card';
 
     /**

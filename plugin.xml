@@ -7,6 +7,11 @@
     <version>0.0.1</version>
     <copyright>(c) Meteor</copyright>
     <author>Meteor</author>
+    <link>https://meteor.be</link>
 
     <compatibility minVersion="5.3"/>
+
+    <changelog version="1.0.0">
+        <changes lang="en">First version</changes>
+    </changelog>
 </plugin>
