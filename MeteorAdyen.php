@@ -2,12 +2,17 @@
 
 namespace MeteorAdyen;
 
+use ParagonIE\Halite\Alerts\CannotPerformOperation;
+use ParagonIE\Halite\Alerts\InvalidKey;
+use ParagonIE\Halite\KeyFactory;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
+use Shopware\Components\Plugin\PaymentInstaller;
 use Shopware\Models\Payment\Payment;
+
 
 class MeteorAdyen extends Plugin
 {
@@ -16,10 +21,18 @@ class MeteorAdyen extends Plugin
 
     /**
      * @param InstallContext $context
+     * @throws CannotPerformOperation
+     * @throws InvalidKey
      */
     public function install(InstallContext $context)
     {
-        /** @var \Shopware\Components\Plugin\PaymentInstaller $installer */
+        $this->installPaymentMethodes($context);
+        $this->generateEncryptionKey();
+    }
+
+    private function installPaymentMethodes(InstallContext $context)
+    {
+        /** @var PaymentInstaller $installer */
         $installer = $this->container->get('shopware.plugin_payment_installer');
 
         $options = [
@@ -35,6 +48,18 @@ class MeteorAdyen extends Plugin
                 . '</div>'
         ];
         $installer->createOrUpdate($context->getPlugin(), $options);
+    }
+
+    /**
+     * Generate EncryptionKey to encrypt sensitive data in database
+     *
+     * @throws CannotPerformOperation
+     * @throws InvalidKey
+     */
+    private function generateEncryptionKey()
+    {
+        $enc_key = KeyFactory::generateEncryptionKey();
+        KeyFactory::save($enc_key, $this->getPath() . '/encryption.key');
     }
 
     /**
@@ -74,4 +99,24 @@ class MeteorAdyen extends Plugin
         }
         $em->flush();
     }
+
+    /**
+     * @return bool
+     */
+    public static function isPackage(): bool
+    {
+        return file_exists(self::getPackageVendorAutoload());
+    }
+
+    /**
+     * @return string
+     */
+    public static function getPackageVendorAutoload(): string
+    {
+        return __DIR__ . '/vendor/autoload.php';
+    }
+}
+
+if (MeteorAdyen::isPackage()) {
+    require_once MeteorAdyen::getPackageVendorAutoload();
 }

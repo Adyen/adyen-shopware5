@@ -1,5 +1,20 @@
 {
+    "name": "vendor-name/project-name",
+    "description": "Adyen plugin Shopware 5",
+    "version": "0.0.1",
+    "type": "shopware-plugin",
+    "keywords": ["adyen", "payment", "payment platform"],
+    "homepage": "http://meteor.be",
+    "license": "MIT",
+    "require-dev": {
+        "shopware/shopware": "5.3.7"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
-        "adyen/php-api-library": "^3.1"
+        "php": "^7.1",
+        "ext-json": "*",
+        "adyen/php-api-library": "^4.0",
+        "paragonie/halite": "^4"
     }
 }
