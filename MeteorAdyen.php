@@ -11,13 +11,12 @@ use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\PaymentInstaller;
-use Shopware\Models\Payment\Payment;
 
 
 class MeteorAdyen extends Plugin
 {
     const NAME = 'MeteorAdyen';
-    const PAYMENT_METHOD_CARD = 'meteor_adyen_card';
+    const ADYEN_GENERAL_PAYMENT_METHOD = 'adyen_general_payment_methode';
 
     /**
      * @param InstallContext $context
@@ -26,28 +25,77 @@ class MeteorAdyen extends Plugin
      */
     public function install(InstallContext $context)
     {
-        $this->installPaymentMethodes($context);
         $this->generateEncryptionKey();
     }
 
-    private function installPaymentMethodes(InstallContext $context)
+    /**
+     * @param UninstallContext $context
+     */
+    public function uninstall(UninstallContext $context)
+    {
+        $this->deactivatePaymentMethodes();
+    }
+
+    /**
+     * @param DeactivateContext $context
+     */
+    public function deactivate(DeactivateContext $context)
+    {
+        $this->deactivatePaymentMethodes();
+    }
+
+    /**
+     * @param ActivateContext $context
+     */
+    public function activate(ActivateContext $context)
     {
         /** @var PaymentInstaller $installer */
         $installer = $this->container->get('shopware.plugin_payment_installer');
 
+        $paymentOptions[] = $this->getPaymentOptions();
+
+        foreach ($paymentOptions as $key => $options) {
+            $installer->createOrUpdate($context->getPlugin(), $options);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    private function getPaymentOptions()
+    {
         $options = [
-            'name' => self::PAYMENT_METHOD_CARD,
-            'description' => 'Credit Cards',
+            'name' => self::ADYEN_GENERAL_PAYMENT_METHOD,
+            'description' => 'Adyen payment methodes',
             'action' => 'PaymentCard',
-            'active' => 0,
+            'active' => 1,
             'position' => 0,
             'additionalDescription' =>
-                '<img src="https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/card.svg"/>'
+                '<img src="' . $this->getPath() . 'plugin.png' . '"/>'
                 . '<div id="payment_desc">'
-                . '  Pay save and secured by invoice with our example payment provider.'
+                . 'General Adyen payment method.'
                 . '</div>'
         ];
-        $installer->createOrUpdate($context->getPlugin(), $options);
+
+        return $options;
+    }
+
+    /**
+     * Deactivate all Adyen payment methods
+     */
+    private function deactivatePaymentMethodes()
+    {
+        $em = $this->container->get('models');
+        $qb = $em->createQueryBuilder();
+
+        $query = $qb->update('Shopware\Models\Payment\Payment', 'p')
+            ->set('p.active', '?1')
+            ->where($qb->expr()->like('p.name', '?2'))
+            ->setParameter(1, false)
+            ->setParameter(2, self::ADYEN_GENERAL_PAYMENT_METHOD)
+            ->getQuery();
+
+        $query->execute();
     }
 
     /**
@@ -60,44 +108,6 @@ class MeteorAdyen extends Plugin
     {
         $enc_key = KeyFactory::generateEncryptionKey();
         KeyFactory::save($enc_key, $this->getPath() . '/encryption.key');
-    }
-
-    /**
-     * @param UninstallContext $context
-     */
-    public function uninstall(UninstallContext $context)
-    {
-        $this->setActiveFlag($context->getPlugin()->getPayments(), false);
-    }
-
-    /**
-     * @param DeactivateContext $context
-     */
-    public function deactivate(DeactivateContext $context)
-    {
-        $this->setActiveFlag($context->getPlugin()->getPayments(), false);
-    }
-
-    /**
-     * @param ActivateContext $context
-     */
-    public function activate(ActivateContext $context)
-    {
-        $this->setActiveFlag($context->getPlugin()->getPayments(), true);
-    }
-
-    /**
-     * @param Payment[] $payments
-     * @param $active bool
-     */
-    private function setActiveFlag($payments, $active)
-    {
-        $em = $this->container->get('models');
-
-        foreach ($payments as $payment) {
-            $payment->setActive($active);
-        }
-        $em->flush();
     }
 
     /**

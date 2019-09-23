@@ -30,23 +30,23 @@
             <store>
                 <option>
                     <value>01</value>
-                    <label lang="en">01</label>
+                    <label lang="en">250px x 400px</label>
                 </option>
                 <option>
                     <value>02</value>
-                    <label lang="en">02</label>
+                    <label lang="en">390px x 400px</label>
                 </option>
                 <option>
                     <value>03</value>
-                    <label lang="en">03</label>
+                    <label lang="en">500px x 600px</label>
                 </option>
                 <option>
                     <value>04</value>
-                    <label lang="en">04</label>
+                    <label lang="en">600px x 400px</label>
                 </option>
                 <option>
                     <value>05</value>
-                    <label lang="en">05</label>
+                    <label lang="en">100% x 100%</label>
                 </option>
             </store>
         </element>
