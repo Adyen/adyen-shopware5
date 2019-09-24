@@ -2,8 +2,8 @@ pipeline {
     agent { label 'jenkins-slave' }
     environment {
         SSHUSER = 'phprobuild'
-        PROJECTHOST = '178.62.189.7'
-        ENV = 'shopware53'
+        PROJECTHOST = '178.62.187.13'
+        ENV = 'ACC 53'
         PROJECT = 'Adyen Plugin'
         PLUGIN_ROOT = '/var/www/shopware53/custom/plugins/MeteorAdyen/'
         PROJECT_ROOT = '/var/www/shopware53'

@@ -1,0 +1,66 @@
+pipeline {
+    agent { label 'jenkins-slave' }
+    environment {
+        SSHUSER = 'phprobuild'
+        PROJECTHOST = '178.62.189.7'
+        ENV = 'DEV 56'
+        PROJECT = 'Adyen Plugin'
+        PLUGIN_ROOT = '/var/www/shopware56/custom/plugins/MeteorAdyen/'
+        PROJECT_ROOT = '/var/www/shopware56'
+        LINK = 'https://outlook.office.com/webhook/24b403ec-e5bd-401b-9802-c92a01347bfd@49c3d703-3579-47bf-a888-7c913fbdced9/IncomingWebhook/6cfc8d2fe5cf4b63929fa890cc0a73c7/b8e98a02-1737-4600-99b3-b613e03a60dc'
+    }
+    parameters {
+        booleanParam(name: 'DRYRUN', defaultValue: false, description: '')
+        booleanParam(name: 'BLACKFIRE', defaultValue: true, description: '')
+    }
+        stages {
+            stage('PREPARE') {
+            steps {
+                wrap([$class: 'BuildUser']) {
+                    sh './scripts/notify-start.sh'
+                    bitbucketStatusNotify(buildState: 'INPROGRESS', buildName: 'meteor-shop5-module-adyen')
+                }
+            }
+        }
+        stage('DRYRUN') {
+            when {
+                expression { params.DRYRUN ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
+            }
+            steps {
+                wrap([$class: 'BuildUser']) {
+                    sh './scripts/dryrun.sh'
+                }
+            }
+        }
+        stage('DEPLOY') {
+            when {
+                expression { params.DRYRUN ==~ /(?i)(N|NO|F|FALSE|OFF)/ }
+            }
+            steps {
+                wrap([$class: 'BuildUser']) {
+                    sh './scripts/deploy.sh'
+                }
+            }
+        }
+        stage('BLACKFIRE') {
+            when {
+                 expression { params.BLACKFIRE ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
+            }
+            steps {
+                wrap([$class: 'BuildUser']) {
+                    sh './scripts/blackfire.sh'
+                }
+            }
+        }
+    }
+    post {
+        success {
+            sh "./scripts/notify-success.sh"
+            bitbucketStatusNotify(buildState: 'SUCCESSFUL', buildName: 'meteor-shop5-module-adyen')
+        }
+        failure {
+            sh "./scripts/notify-failure.sh"
+            bitbucketStatusNotify(buildState: 'FAILED', buildName: 'meteor-shop5-module-adyen')
+        }
+    }
+}
