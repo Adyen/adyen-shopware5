@@ -7,12 +7,12 @@
             <label lang="en">Environment</label>
             <store>
                 <option>
-                    <value>0</value>
-                    <label lang="en">Test</label>
+                    <value>TEST</value>
+                    <label lang="en">TEST</label>
                 </option>
                 <option>
-                    <value>1</value>
-                    <label lang="en">Live</label>
+                    <value>LIVE</value>
+                    <label lang="en">LIVE</label>
                 </option>
             </store>
         </element>

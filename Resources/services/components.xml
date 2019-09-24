@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <!-- Components -->
+        <service id="meteor_adyen.components.data_conversion" class="MeteorAdyen\Components\DataConversion"></service>
+
+        <service id="meteor_adyen.components.configuration" class="MeteorAdyen\Components\Configuration">
+            <argument type="service" id="shopware.plugin.cached_config_reader"/>
+        </service>
+        <service id="meteor_adyen.components.adyen.apifactory" class="MeteorAdyen\Components\Adyen\ApiFactory">
+            <argument type="service" id="meteor_adyen.components.configuration"/>
+        </service>
+        <service id="meteor_adyen.components.adyen.payment.method" class="MeteorAdyen\Components\Adyen\PaymentMethodService">
+            <argument type="service" id="meteor_adyen.components.adyen.apifactory"/>
+            <argument type="service" id="meteor_adyen.components.configuration"/>
+        </service>
+    </services>
+</container>

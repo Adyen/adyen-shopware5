@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MeteorAdyen\Service;
+namespace MeteorAdyen\Components;
+
 /**
  * Class DataConversion
- * @package MeteorAdyen\Service
+ * @package MeteorAdyen\Components
  */
 class DataConversion
 {

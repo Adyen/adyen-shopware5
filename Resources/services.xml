@@ -2,9 +2,8 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-    <services>
-        <service id="meteor_adyen.service.data_conversion" class="MeteorAdyen\Service\DataConversion">
-            <argument id="models" type="service"/>
-        </service>
-    </services>
+    <imports>
+        <import resource="services/components.xml"/>
+        <import resource="services/subscribers.xml"/>
+    </imports>
 </container>
