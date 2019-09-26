@@ -15,19 +15,14 @@ use MeteorAdyen\Components\Configuration;
 class PaymentMethodService
 {
     /**
-     * @var ApiFactory
-     */
-    protected $apiFactory;
-
-    /**
      * @var \Adyen\Client
      */
-    protected $apiClient;
+    private $apiClient;
 
     /**
      * @var ConfigurationService
      */
-    protected $configuration;
+    private $configuration;
 
     /**
      * PaymentMethodService constructor.
@@ -40,7 +35,6 @@ class PaymentMethodService
         Configuration $configuration
     )
     {
-        $this->apiFactory = $apiFactory;
         $this->apiClient = $apiFactory->create();
         $this->configuration = $configuration;
     }

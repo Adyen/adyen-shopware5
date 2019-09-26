@@ -15,8 +15,8 @@ use Shopware\Models\Shop\Shop;
  */
 class Configuration
 {
-    const TEST = 'TEST';
-    const LIVE = 'LIVE';
+    const ENV_TEST = 'TEST';
+    const ENV_LIVE = 'LIVE';
 
     /**
      * @var CachedConfigReader
@@ -40,7 +40,7 @@ class Configuration
      */
     public function getEnvironment($shop = false): string
     {
-        if ($this->getConfig('environment', $shop) === self::TEST) {
+        if ($this->getConfig('environment', $shop) === self::ENV_TEST) {
             return Environment::TEST;
         }
 

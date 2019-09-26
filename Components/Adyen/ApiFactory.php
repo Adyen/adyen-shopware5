@@ -16,10 +16,10 @@ class ApiFactory
     /**
      * @var ConfigurationService
      */
-    protected $configuration;
+    private $configuration;
 
     /** @var Client */
-    protected $apiClient;
+    private $apiClient;
 
     /**
      * PaymentMethodService constructor.
