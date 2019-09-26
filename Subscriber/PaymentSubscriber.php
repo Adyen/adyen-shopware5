@@ -21,6 +21,10 @@ class PaymentSubscriber implements SubscriberInterface
      */
     protected $paymentMethodService;
 
+    /**
+     * PaymentSubscriber constructor.
+     * @param PaymentMethodService $paymentMethodService
+     */
     public function __construct(
         PaymentMethodService $paymentMethodService
     )
