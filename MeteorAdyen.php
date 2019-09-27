@@ -12,7 +12,6 @@ use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\PaymentInstaller;
 
-
 class MeteorAdyen extends Plugin
 {
     const NAME = 'MeteorAdyen';
@@ -55,7 +54,7 @@ class MeteorAdyen extends Plugin
         $paymentOptions[] = $this->getPaymentOptions();
 
         foreach ($paymentOptions as $key => $options) {
-            $installer->createOrUpdate($context->getPlugin(), $options);
+            //$installer->createOrUpdate($context->getPlugin(), $options);
         }
     }
 

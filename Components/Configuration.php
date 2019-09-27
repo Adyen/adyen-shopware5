@@ -145,6 +145,15 @@ class Configuration
 
     /**
      * @param bool $shop
+     * @return string
+     */
+    public function getNotificationAuthPassword($shop = false): string
+    {
+        return (string)$this->getConfig('notification_auth_password', $shop);
+    }
+
+    /**
+     * @param bool $shop
      * @return int
      */
     public function getDebugLogging($shop = false): bool

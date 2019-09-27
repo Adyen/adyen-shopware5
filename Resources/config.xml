@@ -64,7 +64,11 @@
         </element>
         <element required="true" type="text" scope="shop">
             <name>notification_auth_username</name>
-            <label lang="en">Notification: Auth username</label>
+            <label lang="en">Notification: Auth Username</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+            <name>notification_auth_password</name>
+            <label lang="en">Notification: Auth Password</label>
         </element>
         <element required="true" type="boolean" scope="shop">
             <name>debug_logging</name>
