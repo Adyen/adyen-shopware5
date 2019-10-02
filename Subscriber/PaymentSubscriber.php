@@ -60,7 +60,7 @@ class PaymentSubscriber implements SubscriberInterface
 
         foreach ($adyenMethods['paymentMethods'] as $adyenMethod) {
             $shopwareMethods[] = [
-                'id' => $adyenMethod['type'],
+                'id' => "adyen_" . $adyenMethod['type'],
                 'name' => $adyenMethod['type'],
                 'description' => $adyenMethod['name'],
             ];

@@ -13,5 +13,11 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.components.adyen.payment.method"/>
         </service>
+
+        <service id="meteor_adyen.subscriber.checkout" class="MeteorAdyen\Subscriber\CheckoutSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="meteor_adyen.components.configuration"/>
+            <argument type="service" id="meteor_adyen.components.adyen.payment.method"/>
+        </service>
     </services>
 </container>
