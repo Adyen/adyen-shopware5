@@ -16,7 +16,62 @@ class Shopware_Controllers_Frontend_Notification
             return;
         }
 
-        //TODO: Implement notification logic
+        $notifications = $this->getNotificationItems();
+
+        if (!$this->checkHMAC($notifications)) {
+            $this->View()->assign(['notificationResponse' => "[wrong hmac]"]);
+            return;
+        }
+
+        if (!$this->saveNotifications($notifications)) {
+            $this->View()->assign(['notificationResponse' => "[notification save error]"]);
+            return;
+        }
+
+        $this->View()->assign(['notificationResponse' => "[accepted]"]);
+    }
+
+    /**
+     * @return array
+     */
+    private function getNotificationItems() {
+        $jsonbody = json_decode($this->Request()->getContent(), true);
+        $notificationItems = $jsonbody['notificationItems'];
+
+        return $notificationItems;
+    }
+
+    /**
+     * @param $notifications
+     * @return bool
+     * @throws \Adyen\AdyenException
+     */
+    private function checkHMAC($notifications)
+    {
+        /** @var Configuration $configuration */
+        $configuration = $this->get('meteor_adyen.components.configuration');
+        $adyenUtils = new \Adyen\Util\HmacSignature();
+
+        foreach ($notifications as $notificationItem) {
+            $params = $notificationItem['NotificationRequestItem'];
+            $hmacCheck = $adyenUtils->isValidNotificationHMAC($configuration->getNotificationHmac(), $params);
+            if (!$hmacCheck) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function saveNotifications(array $notifications)
+    {
+        /** @var Enlight_Event_EventManager $eventManager */
+        $eventManager = $this->get('events');
+        $notifications = $eventManager->filter(
+            'MeteorAdyen_Notification_saveNotifications',
+            $notifications
+        );
+
+
     }
 
     /**
