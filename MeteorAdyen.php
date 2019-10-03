@@ -16,7 +16,7 @@ use Shopware\Components\Plugin\PaymentInstaller;
 class MeteorAdyen extends Plugin
 {
     const NAME = 'MeteorAdyen';
-    const ADYEN_GENERAL_PAYMENT_METHOD = 'adyen_general_payment_methode';
+    const ADYEN_GENERAL_PAYMENT_METHOD = 'adyen_general_payment_method';
 
     /**
      * @param InstallContext $context
@@ -33,7 +33,7 @@ class MeteorAdyen extends Plugin
      */
     public function uninstall(UninstallContext $context)
     {
-        $this->deactivatePaymentMethodes();
+        $this->deactivatePaymentMethods();
     }
 
     /**
@@ -41,7 +41,7 @@ class MeteorAdyen extends Plugin
      */
     public function deactivate(DeactivateContext $context)
     {
-        $this->deactivatePaymentMethodes();
+        $this->deactivatePaymentMethods();
     }
 
     /**
@@ -66,15 +66,10 @@ class MeteorAdyen extends Plugin
     {
         $options = [
             'name' => self::ADYEN_GENERAL_PAYMENT_METHOD,
-            'description' => 'Adyen payment methodes',
+            'description' => 'Adyen payment methods',
             'action' => 'PaymentCard',
             'active' => 1,
             'position' => 0,
-            'additionalDescription' =>
-                '<img src="' . $this->getPath() . 'plugin.png' . '"/>'
-                . '<div id="payment_desc">'
-                . 'General Adyen payment method.'
-                . '</div>'
         ];
 
         return $options;
@@ -83,7 +78,7 @@ class MeteorAdyen extends Plugin
     /**
      * Deactivate all Adyen payment methods
      */
-    private function deactivatePaymentMethodes()
+    private function deactivatePaymentMethods()
     {
         $em = $this->container->get('models');
         $qb = $em->createQueryBuilder();

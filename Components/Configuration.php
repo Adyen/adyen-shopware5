@@ -1,18 +1,23 @@
 <?php
+
 declare(strict_types=1);
 
-namespace MeteorAdyen\Service;
+namespace MeteorAdyen\Components;
 
+use Adyen\Environment;
 use MeteorAdyen\MeteorAdyen;
 use Shopware\Components\Plugin\CachedConfigReader;
 use Shopware\Models\Shop\Shop;
 
 /**
  * Class Configuration
- * @package MeteorAdyen\Service
+ * @package MeteorAdyen\Components
  */
 class Configuration
 {
+    const ENV_TEST = 'TEST';
+    const ENV_LIVE = 'LIVE';
+
     /**
      * @var CachedConfigReader
      */
@@ -27,6 +32,37 @@ class Configuration
     )
     {
         $this->cachedConfigReader = $cachedConfigReader;
+    }
+
+    /**
+     * @param bool $shop
+     * @return string
+     */
+    public function getEnvironment($shop = false): string
+    {
+        if ($this->getConfig('environment', $shop) === self::ENV_TEST) {
+            return Environment::TEST;
+        }
+
+        return Environment::LIVE;
+    }
+
+    /**
+     * @param bool $shop
+     * @return bool
+     */
+    public function isTestModus($shop = false): bool
+    {
+        return $this->getEnvironment($shop) === Environment::TEST;
+    }
+
+    /**
+     * @param bool|Shop $shop
+     * @return string
+     */
+    public function getMerchantAccount($shop = false): string
+    {
+        return (string)$this->getConfig('merchant_account', $shop);
     }
 
     /**
@@ -51,15 +87,6 @@ class Configuration
         }
 
         return null;
-    }
-
-    /**
-     * @param bool|Shop $shop
-     * @return string
-     */
-    public function getMerchantAccount($shop = false): string
-    {
-        return (string)$this->getConfig('merchant_account', $shop);
     }
 
     /**
@@ -114,6 +141,15 @@ class Configuration
     public function getNotificationAuthUsername($shop = false): string
     {
         return (string)$this->getConfig('notification_auth_username', $shop);
+    }
+
+    /**
+     * @param bool $shop
+     * @return string
+     */
+    public function getNotificationAuthPassword($shop = false): string
+    {
+        return (string)$this->getConfig('notification_auth_password', $shop);
     }
 
     /**
