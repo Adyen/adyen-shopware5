@@ -1,22 +1,40 @@
 <?php
 
-
 use MeteorAdyen\Components\Configuration;
+use Shopware\Components\CSRFWhitelistAware;
 
-class Shopware_Controllers_Frontend_Notification extends Enlight_Controller_Action
+class Shopware_Controllers_Frontend_Notification
+    extends Shopware_Controllers_Frontend_Payment
+    implements CSRFWhitelistAware
 {
+    /**
+     * /notification
+     */
+    public function indexAction()
+    {
+        if (!$this->checkAuthentication()) {
+            return;
+        }
+
+        //TODO: Implement notification logic
+    }
+
+    /**
+     * Whitelist notifyAction
+     */
+    public function getWhitelistedCSRFActions()
+    {
+        return ['index'];
+    }
+
     /**
      * @throws Exception
      */
     public function preDispatch()
     {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
-
     }
 
-    /**
-     *
-     */
     public function postDispatch()
     {
         $data = $this->View()->getAssign();
@@ -54,15 +72,5 @@ class Shopware_Controllers_Frontend_Notification extends Enlight_Controller_Acti
         }
 
         return true;
-    }
-
-    public function indexAction()
-    {
-        if (!$this->checkAuthentication()) {
-            return;
-        }
-
-        $view = $this->View();
-        $view->assign('dinges', 'fkdjf');
     }
 }
