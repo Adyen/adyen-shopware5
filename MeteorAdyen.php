@@ -67,9 +67,10 @@ class MeteorAdyen extends Plugin
         $options = [
             'name' => self::ADYEN_GENERAL_PAYMENT_METHOD,
             'description' => 'Adyen payment methods',
-            'action' => 'PaymentCard',
+            'action' => null,
             'active' => 1,
             'position' => 0,
+            'additionalDescription' => ''
         ];
 
         return $options;
