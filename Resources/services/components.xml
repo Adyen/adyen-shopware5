@@ -5,7 +5,10 @@
     <services>
         <!-- Components -->
         <service id="meteor_adyen.components.data_conversion" class="MeteorAdyen\Components\DataConversion"/>
-
+        <service id="meteor_adyen.components.notification_processor" class="MeteorAdyen\Components\NotificationProcessor">
+            <argument type="tagged" tag="meteor.adyen.notificationprocessor" />
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
+        </service>
         <service id="meteor_adyen.components.configuration" class="MeteorAdyen\Components\Configuration">
             <argument type="service" id="shopware.plugin.cached_config_reader"/>
         </service>
@@ -20,6 +23,13 @@
                  class="MeteorAdyen\Components\Builder\NotificationBuilder">
             <argument type="service" id="meteor_adyen.components.data_conversion"/>
             <argument type="service" id="models"/>
+        </service>
+
+        <!-- Notification Processors -->
+        <service id="meteor_adyen.components.notification_processor.authorisation"
+                 class="MeteorAdyen\Components\NotificationProcessor\Authorisation">
+            <tag name="meteor.adyen.notificationprocessor"/>
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
         </service>
     </services>
 </container>
