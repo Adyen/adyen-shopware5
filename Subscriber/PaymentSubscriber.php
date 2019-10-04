@@ -50,11 +50,9 @@ class PaymentSubscriber implements SubscriberInterface
     {
         $shopwareMethods = $args->getReturn();
 
-        foreach ($shopwareMethods as $k => $method) {
-            if ($method['name'] === MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
-                unset($shopwareMethods[$k]);
-            }
-        }
+        $shopwareMethods = array_filter($shopwareMethods, function ($method) {
+            return $method['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD;
+        });
 
         $adyenMethods = $this->paymentMethodService->getPaymentMethods();
 

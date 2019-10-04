@@ -41,11 +41,11 @@ class Configuration
      */
     public function getEnvironment($shop = false): string
     {
-        if ($this->getConfig('environment', $shop) === self::ENV_TEST) {
-            return Environment::TEST;
+        if ($this->getConfig('environment', $shop) === self::ENV_LIVE) {
+            return Environment::LIVE;
         }
 
-        return Environment::LIVE;
+        return Environment::TEST;
     }
 
     /**

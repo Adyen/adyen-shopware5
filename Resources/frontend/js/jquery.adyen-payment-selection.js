@@ -1,13 +1,17 @@
-;(function ($, undefined) {
+;(function ($) {
     'use strict';
 
-    $.plugin('adyen', {
+    $(function () {
+        StateManager.addPlugin('.adyen-config', 'adyen-payment-selection');
+    });
+
+    $.plugin('adyen-payment-selection', {
         /**
          * Plugin default options.
          */
         defaults: {
             adyenOriginkey: '',
-            adyenEnvironment: 'live',
+            adyenEnvironment: 'test',
             adyenPaymentMethodsResponse: {},
             adyenPaymentMethodPrefix: 'adyen_',
             /**
@@ -81,22 +85,17 @@
                 environment: me.opts.adyenEnvironment,
                 originKey: me.opts.adyenOriginkey,
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
-                onChange: me.handleOnChange(),
+                onChange: me.handleOnChange,
             };
         },
         getPaymentMethodByType(type) {
-            var me = this,
-                result = null;
+            var me = this;
 
             var type = type.split(me.opts.adyenPaymentMethodPrefix).pop();
-            $.each(me.opts.adyenPaymentMethodsResponse['paymentMethods'], function (i, paymentMethod) {
-                if (paymentMethod.type === type) {
-                    result = paymentMethod;
-                    return;
-                }
-            });
 
-            return result;
+            return me.opts.adyenPaymentMethodsResponse['paymentMethods'].find(function (paymentMethod) {
+                return paymentMethod.type === type
+            });
         },
         setCheckout: function () {
             var me = this;
@@ -113,8 +112,4 @@
 
     });
 
-    $(function () {
-        StateManager.addPlugin('.adyen-config', 'adyen');
-    });
-
-})(jQuery, window);
+})(jQuery);
