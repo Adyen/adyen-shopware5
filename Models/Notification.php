@@ -2,11 +2,12 @@
 
 namespace MeteorAdyen\Models;
 
+use Doctrine\ORM\Mapping AS ORM;
 use Shopware\Components\Model\ModelEntity;
 use Shopware\Models\Order\Order;
 
 /**
- * @ORM\Entity(repositoryClass="Repository")
+ * @ORM\Entity
  * @ORM\Table(name="adyen_order_notification")
  */
 class Notification extends ModelEntity
@@ -71,7 +72,7 @@ class Notification extends ModelEntity
 
     /**
      * @var float
-     * @ORM\Column(name="amount_value", type="decimal")
+     * @ORM\Column(name="amount_value", type="decimal", precision=19, scale=4)
      */
     private $amountValue;
 
@@ -88,46 +89,12 @@ class Notification extends ModelEntity
     private $errorDetails;
 
     /**
-     * Notification constructor.
-     * @param int $id
-     * @param Order|null $orderId
-     * @param string $pspReference
-     * @param \DateTime $createdAt
-     * @param \DateTime $updatedAt
-     * @param string $status
-     * @param string $eventCode
-     * @param bool $success
-     * @param string $merchantAccountCode
-     * @param float $amountValue
-     * @param string $amountCurrency
-     * @param string $errorDetails
+     * Notification constructor
      */
-    public function __construct(
-        int $id,
-        Order $orderId,
-        string $pspReference,
-        \DateTime $createdAt,
-        \DateTime $updatedAt,
-        string $status,
-        string $eventCode,
-        bool $success,
-        string $merchantAccountCode,
-        float $amountValue,
-        string $amountCurrency,
-        string $errorDetails
-    ) {
-        $this->id = $id;
-        $this->orderId = $orderId;
-        $this->pspReference = $pspReference;
-        $this->createdAt = $createdAt;
-        $this->updatedAt = $updatedAt;
-        $this->status = $status;
-        $this->eventCode = $eventCode;
-        $this->success = $success;
-        $this->merchantAccountCode = $merchantAccountCode;
-        $this->amountValue = $amountValue;
-        $this->amountCurrency = $amountCurrency;
-        $this->errorDetails = $errorDetails;
+    public function __construct()
+    {
+        $this->setCreatedAt(new \DateTime('now'));
+        $this->setUpdatedAt(new \DateTime('now'));
     }
 
     /**

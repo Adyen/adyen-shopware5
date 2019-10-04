@@ -13,5 +13,14 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.components.adyen.payment.method"/>
         </service>
+        <service id="meteor_adyen.subscriber.notification.save_notification" class="MeteorAdyen\Subscriber\Notification\SaveNotification">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="meteor_adyen.components.builder.notification_builder"/>
+            <argument type="service" id="models"/>
+        </service>
+        <service id="meteor_adyen.subscriber.notification.log_incoming_notification" class="MeteorAdyen\Subscriber\Notification\LogIncomingNotification">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
+        </service>
     </services>
 </container>

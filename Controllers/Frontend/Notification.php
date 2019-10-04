@@ -1,6 +1,7 @@
 <?php
 
 use MeteorAdyen\Components\Configuration;
+use MeteorAdyen\Models\Event;
 use Shopware\Components\CSRFWhitelistAware;
 
 class Shopware_Controllers_Frontend_Notification
@@ -8,7 +9,14 @@ class Shopware_Controllers_Frontend_Notification
     implements CSRFWhitelistAware
 {
     /**
-     * /notification
+     * @var \Shopware\Components\ContainerAwareEventManager
+     */
+    private $events;
+
+    /**
+     * POST: /notification
+     * @throws Enlight_Event_Exception
+     * @throws \Adyen\AdyenException
      */
     public function indexAction()
     {
@@ -19,7 +27,7 @@ class Shopware_Controllers_Frontend_Notification
         $notifications = $this->getNotificationItems();
 
         if (!$this->checkHMAC($notifications)) {
-            $this->View()->assign(['notificationResponse' => "[wrong hmac]"]);
+            $this->View()->assign(['notificationResponse' => "[wrong hmac detected]"]);
             return;
         }
 
@@ -32,11 +40,19 @@ class Shopware_Controllers_Frontend_Notification
     }
 
     /**
-     * @return array
+     * @return mixed
+     * @throws Enlight_Event_Exception
      */
     private function getNotificationItems() {
         $jsonbody = json_decode($this->Request()->getContent(), true);
         $notificationItems = $jsonbody['notificationItems'];
+
+        $this->events->notify(
+            Event::NOTIFICATION_RECEIVE,
+            [
+                'items' => $notificationItems
+            ]
+        );
 
         return $notificationItems;
     }
@@ -62,16 +78,23 @@ class Shopware_Controllers_Frontend_Notification
         return true;
     }
 
+    /**
+     * @param array $notifications
+     * @return Enlight_Event_EventArgs|null
+     * @throws Enlight_Event_Exception
+     */
     private function saveNotifications(array $notifications)
     {
-        /** @var Enlight_Event_EventManager $eventManager */
-        $eventManager = $this->get('events');
-        $notifications = $eventManager->filter(
-            'MeteorAdyen_Notification_saveNotifications',
+        $notifications = $this->events->filter(
+            Event::NOTIFICATION_SAVE_FILTER_NOTIFICATIONS,
             $notifications
         );
-
-
+        return $this->events->notify(
+            Event::NOTIFICATION_ON_SAVE_NOTIFICATIONS,
+            [
+                'params' => $notifications
+            ]
+        );
     }
 
     /**
@@ -88,6 +111,9 @@ class Shopware_Controllers_Frontend_Notification
     public function preDispatch()
     {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
+        /** @var Enlight_Event_EventManager $eventManager */
+        $this->events = $this->get('events');
     }
 
     public function postDispatch()

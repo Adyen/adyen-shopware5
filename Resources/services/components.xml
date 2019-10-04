@@ -4,7 +4,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <!-- Components -->
-        <service id="meteor_adyen.components.data_conversion" class="MeteorAdyen\Components\DataConversion"></service>
+        <service id="meteor_adyen.components.data_conversion" class="MeteorAdyen\Components\DataConversion"/>
 
         <service id="meteor_adyen.components.configuration" class="MeteorAdyen\Components\Configuration">
             <argument type="service" id="shopware.plugin.cached_config_reader"/>
@@ -15,6 +15,11 @@
         <service id="meteor_adyen.components.adyen.payment.method" class="MeteorAdyen\Components\Adyen\PaymentMethodService">
             <argument type="service" id="meteor_adyen.components.adyen.apifactory"/>
             <argument type="service" id="meteor_adyen.components.configuration"/>
+        </service>
+        <service id="meteor_adyen.components.builder.notification_builder"
+                 class="MeteorAdyen\Components\Builder\NotificationBuilder">
+            <argument type="service" id="meteor_adyen.components.data_conversion"/>
+            <argument type="service" id="models"/>
         </service>
     </services>
 </container>
