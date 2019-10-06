@@ -9,7 +9,7 @@
     <author>Meteor</author>
     <link>https://meteor.be</link>
 
-    <compatibility minVersion="5.3"/>
+    <compatibility minVersion="5.3.7"/>
 
     <changelog version="1.0.0">
         <changes lang="en">First version</changes>

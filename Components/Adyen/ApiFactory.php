@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace MeteorAdyen\Components\Adyen;
 
+use Adyen\AdyenException;
 use Adyen\Client;
 use MeteorAdyen\Components\Configuration;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class ApiFactory
@@ -26,15 +28,16 @@ class ApiFactory
      * @param Configuration $configuration
      */
     public function __construct(
-        Configuration $configuration
-    )
-    {
+        Configuration $configuration,
+        LoggerInterface $logger
+    ) {
         $this->configuration = $configuration;
+        $this->logger = $logger;
     }
 
     /**
      * @return Client
-     * @throws \Adyen\AdyenException
+     * @throws AdyenException
      */
     public function create()
     {
@@ -42,8 +45,38 @@ class ApiFactory
             $this->apiClient = new Client();
             $this->apiClient->setXApiKey($this->configuration->getApiKey());
             $this->apiClient->setEnvironment($this->configuration->getEnvironment());
+            $this->apiClient->setLogger($this->getLogger());
         }
 
         return $this->apiClient;
+    }
+
+    /**
+     * @return Logger|LoggerInterface
+     */
+    public function getLogger()
+    {
+        if (!isset($this->logger)) {
+            $this->logger = $this->createDefaultLogger();
+        }
+
+        return $this->logger;
+    }
+
+    /**
+     * @return Logger
+     */
+    private function createDefaultLogger()
+    {
+        $logger = new Logger('adyen-php-api-library');
+
+        $logLevel = Logger::ERROR;
+        if ($this->configuration->getDebugLogging()) {
+            $logLevel = Logger::DEBUG;
+        }
+
+        $logger->pushHandler(new StreamHandler('php://stderr', $logLevel));
+
+        return $logger;
     }
 }

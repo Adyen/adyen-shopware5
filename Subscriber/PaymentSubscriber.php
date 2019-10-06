@@ -27,8 +27,7 @@ class PaymentSubscriber implements SubscriberInterface
      */
     public function __construct(
         PaymentMethodService $paymentMethodService
-    )
-    {
+    ) {
         $this->paymentMethodService = $paymentMethodService;
     }
 
@@ -50,17 +49,15 @@ class PaymentSubscriber implements SubscriberInterface
     {
         $shopwareMethods = $args->getReturn();
 
-        foreach ($shopwareMethods as $k => $method) {
-            if ($method['name'] === MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
-                unset($shopwareMethods[$k]);
-            }
-        }
+        $shopwareMethods = array_filter($shopwareMethods, function ($method) {
+            return $method['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD;
+        });
 
         $adyenMethods = $this->paymentMethodService->getPaymentMethods();
 
         foreach ($adyenMethods['paymentMethods'] as $adyenMethod) {
             $shopwareMethods[] = [
-                'id' => $adyenMethod['type'],
+                'id' => "adyen_" . $adyenMethod['type'],
                 'name' => $adyenMethod['type'],
                 'description' => $adyenMethod['name'],
             ];

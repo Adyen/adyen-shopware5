@@ -17,6 +17,7 @@ class Configuration
 {
     const ENV_TEST = 'TEST';
     const ENV_LIVE = 'LIVE';
+    const PAYMENT_PREFIX = 'adyen_';
 
     /**
      * @var CachedConfigReader
@@ -29,8 +30,7 @@ class Configuration
      */
     public function __construct(
         CachedConfigReader $cachedConfigReader
-    )
-    {
+    ) {
         $this->cachedConfigReader = $cachedConfigReader;
     }
 
@@ -40,11 +40,11 @@ class Configuration
      */
     public function getEnvironment($shop = false): string
     {
-        if ($this->getConfig('environment', $shop) === self::ENV_TEST) {
-            return Environment::TEST;
+        if ($this->getConfig('environment', $shop) === self::ENV_LIVE) {
+            return Environment::LIVE;
         }
 
-        return Environment::LIVE;
+        return Environment::TEST;
     }
 
     /**
@@ -129,6 +129,15 @@ class Configuration
      * @param bool|Shop $shop
      * @return string
      */
+    public function getOriginKey($shop = false): string
+    {
+        return (string)$this->getConfig('origin_key', $shop);
+    }
+
+    /**
+     * @param bool|Shop $shop
+     * @return string
+     */
     public function getNotificationHmac($shop = false): string
     {
         return (string)$this->getConfig('notification_hmac', $shop);
@@ -150,5 +159,13 @@ class Configuration
     public function getDebugLogging($shop = false): bool
     {
         return (bool)$this->getConfig('debug_logging', $shop);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethodPrefix(): string
+    {
+        return (string)self::PAYMENT_PREFIX;
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MeteorAdyen\Components\Adyen;
 
 use Adyen\AdyenException;
+use Adyen\Client;
 use Adyen\Service\Checkout;
 use MeteorAdyen\Components\Configuration;
 
@@ -15,7 +16,7 @@ use MeteorAdyen\Components\Configuration;
 class PaymentMethodService
 {
     /**
-     * @var \Adyen\Client
+     * @var Client
      */
     private $apiClient;
 
@@ -33,8 +34,7 @@ class PaymentMethodService
     public function __construct(
         ApiFactory $apiFactory,
         Configuration $configuration
-    )
-    {
+    ) {
         $this->apiClient = $apiFactory->create();
         $this->configuration = $configuration;
     }
