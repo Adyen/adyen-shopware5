@@ -4,6 +4,7 @@ namespace MeteorAdyen\Models\Enum;
 
 /**
  * Class NotificationStatus
+ * @package MeteorAdyen\Models\Enum
  */
 class NotificationStatus
 {
