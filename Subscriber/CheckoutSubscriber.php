@@ -6,8 +6,10 @@ namespace MeteorAdyen\Subscriber;
 
 use Adyen\AdyenException;
 use Enlight\Event\SubscriberInterface;
+use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\Configuration;
+use Shopware_Controllers_Frontend_Checkout;
 
 /**
  * Class CheckoutSubscriber
@@ -29,8 +31,7 @@ class CheckoutSubscriber implements SubscriberInterface
     public function __construct(
         Configuration $configuration,
         PaymentMethodService $paymentMethodService
-    )
-    {
+    ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
     }
@@ -46,12 +47,12 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param \Enlight_Event_EventArgs $args
+     * @param Enlight_Event_EventArgs $args
      * @throws AdyenException
      */
-    public function onCheckout(\Enlight_Event_EventArgs $args)
+    public function onCheckout(Enlight_Event_EventArgs $args)
     {
-        /** @var \Shopware_Controllers_Frontend_Checkout $subject */
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
         $subject = $args->getSubject();
 
         if (!in_array($subject->Request()->getActionName(), ['shippingPayment'])) {

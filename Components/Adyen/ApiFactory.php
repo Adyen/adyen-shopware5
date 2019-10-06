@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MeteorAdyen\Components\Adyen;
 
+use Adyen\AdyenException;
 use Adyen\Client;
 use MeteorAdyen\Components\Configuration;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -30,15 +30,14 @@ class ApiFactory
     public function __construct(
         Configuration $configuration,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->configuration = $configuration;
         $this->logger = $logger;
     }
 
     /**
      * @return Client
-     * @throws \Adyen\AdyenException
+     * @throws AdyenException
      */
     public function create()
     {

@@ -30,8 +30,7 @@ class Configuration
      */
     public function __construct(
         CachedConfigReader $cachedConfigReader
-    )
-    {
+    ) {
         $this->cachedConfigReader = $cachedConfigReader;
     }
 

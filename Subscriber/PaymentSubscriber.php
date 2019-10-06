@@ -27,8 +27,7 @@ class PaymentSubscriber implements SubscriberInterface
      */
     public function __construct(
         PaymentMethodService $paymentMethodService
-    )
-    {
+    ) {
         $this->paymentMethodService = $paymentMethodService;
     }
 
