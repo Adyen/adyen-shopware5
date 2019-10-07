@@ -30,6 +30,8 @@
                  class="MeteorAdyen\Components\NotificationProcessor\Authorisation">
             <tag name="meteor.adyen.notificationprocessor"/>
             <argument type="service" id="meteor_adyen.logger.notifications"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="events"/>
         </service>
     </services>
 </container>
