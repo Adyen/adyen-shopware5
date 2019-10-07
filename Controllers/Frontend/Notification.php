@@ -1,7 +1,10 @@
 <?php
 
+use Adyen\AdyenException;
+use Adyen\Util\HmacSignature;
 use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Models\Event;
+use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Components\CSRFWhitelistAware;
 
 class Shopware_Controllers_Frontend_Notification
@@ -9,14 +12,14 @@ class Shopware_Controllers_Frontend_Notification
     implements CSRFWhitelistAware
 {
     /**
-     * @var \Shopware\Components\ContainerAwareEventManager
+     * @var ContainerAwareEventManager
      */
     private $events;
 
     /**
      * POST: /notification
      * @throws Enlight_Event_Exception
-     * @throws \Adyen\AdyenException
+     * @throws AdyenException
      */
     public function indexAction()
     {
@@ -43,7 +46,8 @@ class Shopware_Controllers_Frontend_Notification
      * @return mixed
      * @throws Enlight_Event_Exception
      */
-    private function getNotificationItems() {
+    private function getNotificationItems()
+    {
         $jsonbody = json_decode($this->Request()->getContent(), true);
         $notificationItems = $jsonbody['notificationItems'];
 
@@ -60,13 +64,13 @@ class Shopware_Controllers_Frontend_Notification
     /**
      * @param $notifications
      * @return bool
-     * @throws \Adyen\AdyenException
+     * @throws AdyenException
      */
     private function checkHMAC($notifications)
     {
         /** @var Configuration $configuration */
         $configuration = $this->get('meteor_adyen.components.configuration');
-        $adyenUtils = new \Adyen\Util\HmacSignature();
+        $adyenUtils = new HmacSignature();
 
         foreach ($notifications as $notificationItem) {
             $params = $notificationItem['NotificationRequestItem'];

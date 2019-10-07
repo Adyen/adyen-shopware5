@@ -30,7 +30,7 @@ class Notification extends ModelEntity
 
     /**
      * @var string
-     * @ORM\Column(name="psp_reference", type="integer")
+     * @ORM\Column(name="psp_reference", type="text")
      */
     private $pspReference;
 
