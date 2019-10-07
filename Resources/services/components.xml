@@ -19,6 +19,10 @@
             <argument type="service" id="meteor_adyen.components.adyen.apifactory"/>
             <argument type="service" id="meteor_adyen.components.configuration"/>
         </service>
+        <service id="meteor_adyen.components.notification_manager"
+                 class="MeteorAdyen\Components\NotificationManager">
+            <argument type="service" id="models"/>
+        </service>
         <service id="meteor_adyen.components.builder.notification_builder"
                  class="MeteorAdyen\Components\Builder\NotificationBuilder">
             <argument type="service" id="meteor_adyen.components.data_conversion"/>

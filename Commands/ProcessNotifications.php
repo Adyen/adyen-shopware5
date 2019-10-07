@@ -2,10 +2,10 @@
 
 namespace MeteorAdyen\Commands;
 
+use Doctrine\ORM\NoResultException;
+use MeteorAdyen\Components\NotificationManager;
 use MeteorAdyen\Components\NotificationProcessor;
-use MeteorAdyen\Models\Notification;
 use Shopware\Commands\ShopwareCommand;
-use Shopware\Components\Model\ModelManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -16,9 +16,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProcessNotifications extends ShopwareCommand
 {
     /**
-     * @var ModelManager
+     * @var NotificationManager
      */
-    private $models;
+    private $notificationManager;
     /**
      * @var NotificationProcessor
      */
@@ -26,14 +26,14 @@ class ProcessNotifications extends ShopwareCommand
 
     /**
      * ProcessNotifications constructor.
-     * @param ModelManager $models
+     * @param NotificationManager $notificationManager
      * @param NotificationProcessor $notificationProcessor
      */
     public function __construct(
-        ModelManager $models,
+        NotificationManager $notificationManager,
         NotificationProcessor $notificationProcessor
     ) {
-        $this->models = $models;
+        $this->notificationManager = $notificationManager;
         $this->notificationProcessor = $notificationProcessor;
 
         parent::__construct();
@@ -51,31 +51,43 @@ class ProcessNotifications extends ShopwareCommand
                 'number',
                 'no',
                 \Symfony\Component\Console\Input\InputOption::VALUE_OPTIONAL,
-                'Number of notifications to process. Defaults to 1.',
-                1
+                'Number of notifications to process. Defaults to 20.',
+                20
             )
         ;
     }
 
     /**
      * {@inheritdoc}
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $number = $input->getOption('number');
 
-        $repository = $this->models->getRepository(Notification::class);
-        $qb = $repository->createQueryBuilder('getNotification');
-        $qb->select()
-            ->orderBy('getNotification.id', 'ASC');
-        /** @var Notification $notification */
-        $notification = $qb->getQuery()->getResult();
-
-        if (!$notification) {
-            // not found
-            return;
+        for ($i = 0; $i < $number; $i++) {
+            if(!$this->processNotification($output)) {
+                break;
+            }
         }
 
-        $this->notificationProcessor->process($notification[0]);
+        $output->writeln('Done.');
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return bool
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    private function processNotification(OutputInterface $output)
+    {
+        try {
+            $notification = $this->notificationManager->getNextNotificationToHandle();
+        } catch (NoResultException $exception) {
+            $output->writeln('No notifications left to process. Exiting.');
+            return false;
+        }
+        $this->notificationProcessor->process($notification);
+        return true;
     }
 }

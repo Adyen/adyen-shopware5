@@ -2,33 +2,38 @@
 
 namespace MeteorAdyen\Subscriber\Cronjob;
 
+use Doctrine\ORM\NoResultException;
+use MeteorAdyen\Components\NotificationManager;
 use MeteorAdyen\Components\NotificationProcessor;
-use MeteorAdyen\Models\Notification;
-use Shopware\Components\Model\ModelManager;
 
+/**
+ * Class ProcessNotifications
+ * @package MeteorAdyen\Subscriber\Cronjob
+ */
 class ProcessNotifications implements \Enlight\Event\SubscriberInterface
 {
+    const NUMBER_OF_NOTIFICATIONS_TO_HANDLE = 20;
+
     /**
      * @var NotificationProcessor
      */
     private $notificationProcessor;
-
     /**
-     * @var ModelManager
+     * @var NotificationManager
      */
-    private $modelManager;
+    private $notificationManager;
 
     /**
      * ProcessNotifications constructor.
      * @param NotificationProcessor $notificationProcessor
-     * @param ModelManager $modelManager
+     * @param NotificationManager $notificationManager
      */
     public function __construct(
         NotificationProcessor $notificationProcessor,
-        ModelManager $modelManager
+        NotificationManager $notificationManager
     ) {
         $this->notificationProcessor = $notificationProcessor;
-        $this->modelManager = $modelManager;
+        $this->notificationManager = $notificationManager;
     }
 
     public static function getSubscribedEvents()
@@ -38,22 +43,19 @@ class ProcessNotifications implements \Enlight\Event\SubscriberInterface
         ];
     }
 
+    /**
+     * @param \Shopware_Components_Cron_CronJob $job
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
     public function runCronjob(\Shopware_Components_Cron_CronJob $job)
     {
-        $repository = $this->modelManager->getRepository(Notification::class);
-        $qb = $repository->createQueryBuilder('getNotification');
-        $qb->select()
-            ->orderBy('getNotification.id', 'ASC');
-        /** @var Notification $notification */
-        $notification = $qb->getQuery()->getResult();
-
-        var_dump($notification);
-
-        if (!$notification) {
-            // not found
-            return;
+        for ($i = 0; $i = self::NUMBER_OF_NOTIFICATIONS_TO_HANDLE; $i++) {
+            try {
+                $notification = $this->notificationManager->getNextNotificationToHandle();
+            } catch (NoResultException $exception) {
+                return;
+            }
+            $this->notificationProcessor->process($notification);
         }
-
-        $this->notificationProcessor->process($notification);
     }
 }
