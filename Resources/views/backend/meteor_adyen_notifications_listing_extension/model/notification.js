@@ -23,5 +23,16 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.model.Notific
         { name : 'orderId', type: 'int' },
     ],
 
+    associations: [
+        {
+            relation: 'ManyToOne',
+            field: 'orderId',
+            type: 'hasMany',
+            model: 'Shopware.apps.Order.model.Order',
+            name: 'getOrder',
+            associationKey: 'id'
+        },
+    ]
+
 });
 

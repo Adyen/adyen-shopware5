@@ -8,10 +8,28 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Not
     configure: function() {
         return {
             addButton: false,
-            deleteButton: false
+            deleteButton: false,
+            columns: {
+                'pspReference': { },
+                'createdAt': { },
+                'updatedAt': { },
+                'status': { },
+                'eventCode': { },
+                'success': { },
+                'merchantAccountCode': { },
+                'amountValue': { },
+                'amountCurrency': { },
+                'errorDetails': { },
+                'orderId': {
+                    renderer: this.orderIdRenderer
+                },
+            }
         };
     },
 
+    orderIdRenderer: function(value, styles, row) {
+        return row.raw.order.number;
+    },
 
     /**
      * Contains all snippets for the view component
@@ -34,69 +52,6 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Not
         successTitle: '{s name=message/save/success_title}Successful{/s}',
         failureTitle: '{s name=message/save/error_title}Error{/s}',
         orderDoesNotExistAnymore: '{s name=order_does_not_exist_anymore}This order does not exist anymore{/s}',
-    },
-
-    /**
-     * Creates the grid columns
-     *
-     * @return [array] grid columns
-     */
-    getColumns:function () {
-        var me = this;
-
-        return [
-            {
-                header: me.snippets.columns.pspReference,
-                dataIndex: 'pspReference',
-                flex: 1
-            },
-            {
-                header: me.snippets.columns.createdAt,
-                dataIndex: 'createdAt',
-                flex: 1
-            },
-            {
-                header: me.snippets.columns.updatedAt,
-                dataIndex: 'updatedAt',
-                flex: 1
-            },
-            {
-                header: me.snippets.columns.status,
-                dataIndex: 'status',
-                flex: 1
-            },
-            {
-                header: me.snippets.columns.eventCode,
-                dataIndex: 'eventCode',
-                flex: 1
-            },
-            {
-                header: me.snippets.columns.success,
-                dataIndex: 'success',
-                flex: 1
-            },
-            {
-                header: me.snippets.columns.merchantAccountCode,
-                dataIndex: 'merchantAccountCode',
-                flex: 1
-            },
-            {
-                header: me.snippets.columns.amountValue,
-                dataIndex: 'amountValue',
-                flex: 1
-            },
-            {
-                header: me.snippets.columns.amountCurrency,
-                dataIndex: 'amountCurrency',
-                flex: 1
-            },
-            {
-                header: me.snippets.columns.errorDetails,
-                dataIndex: 'errorDetails',
-                flex: 1
-            },
-            me.createActionColumn()
-        ];
     },
 
     createActionColumn: function() {
