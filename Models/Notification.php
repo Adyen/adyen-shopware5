@@ -22,15 +22,21 @@ class Notification extends ModelEntity
     private $id;
 
     /**
-     * @var Order|null
-     * @ORM\ManyToOne(targetEntity="Shopware\Models\Order\Order", cascade={"remove"})
-     * @ORM\JoinColumn(name="order_id", referencedColumnName="id", nullable=true)
+     * @var int
+     * @ORM\Column(name="order_id", type="integer")
      */
     private $orderId;
 
     /**
+     * @var Order|null
+     * @ORM\ManyToOne(targetEntity="Shopware\Models\Order\Order", cascade={"remove"})
+     * @ORM\JoinColumn(name="order_id", referencedColumnName="id", nullable=true)
+     */
+    private $order;
+
+    /**
      * @var string
-     * @ORM\Column(name="psp_reference", type="integer")
+     * @ORM\Column(name="psp_reference", type="text")
      */
     private $pspReference;
 
@@ -118,16 +124,34 @@ class Notification extends ModelEntity
     /**
      * @return Order|null
      */
-    public function getOrderId(): Order
+    public function getOrder(): Order
+    {
+        return $this->order;
+    }
+
+    /**
+     * @param Order|null $order
+     * @return Notification
+     */
+    public function setOrder(Order $order): Notification
+    {
+        $this->order = $order;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrderId(): int
     {
         return $this->orderId;
     }
 
     /**
-     * @param Order|null $orderId
+     * @param int $orderId
      * @return Notification
      */
-    public function setOrderId(Order $orderId): Notification
+    public function setOrderId(int $orderId): Notification
     {
         $this->orderId = $orderId;
         return $this;

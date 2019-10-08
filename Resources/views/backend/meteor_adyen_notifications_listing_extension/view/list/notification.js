@@ -126,7 +126,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Not
                     name: 'Shopware.apps.Order',
                     action: 'detail',
                     params: {
-                        orderId: record.orderId
+                        orderId: record.data.orderId
                     }
                 });
             }
