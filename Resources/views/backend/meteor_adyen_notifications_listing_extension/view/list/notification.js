@@ -5,6 +5,14 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Not
     alias:  'widget.product-listing-grid',
     region: 'center',
 
+    configure: function() {
+        return {
+            addButton: false,
+            deleteButton: false
+        };
+    },
+
+
     /**
      * Contains all snippets for the view component
      * @object

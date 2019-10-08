@@ -22,5 +22,6 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.model.Notific
         { name : 'errorDetails', type: 'string' },
         { name : 'orderId', type: 'int' },
     ],
+
 });
 

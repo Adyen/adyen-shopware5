@@ -12,6 +12,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension', {
     views: [
         'list.Window',
         'list.Notification',
+        'list.extensions.NotificationFilter',
     ],
 
     models: [

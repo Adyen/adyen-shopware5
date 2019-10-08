@@ -9,6 +9,10 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Win
         return {
             listingGrid: 'Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Notification',
             listingStore: 'Shopware.apps.MeteorAdyenNotificationsListingExtension.store.Notification',
+
+            extensions: [
+                { xtype: 'notification-listing-filter-panel' }
+            ]
         };
     }
 });
