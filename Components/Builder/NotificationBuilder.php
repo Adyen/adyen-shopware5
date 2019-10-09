@@ -56,8 +56,7 @@ class NotificationBuilder
         if (isset($params['merchantReference'])) {
             /** @var Order $order */
             $order = $this->orderRepository->findOneBy(['number' => $params['merchantReference']]);
-
-            $notification->setOrderId($order);
+            $notification->setOrder($order);
         }
         if (isset($params['pspReference'])) {
             $notification->setPspReference($params['pspReference']);
