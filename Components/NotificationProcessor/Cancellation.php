@@ -10,12 +10,12 @@ use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Models\Order\Status;
 
 /**
- * Class Authorisation
+ * Class Cancellation
  * @package MeteorAdyen\Components\NotificationProcessor
  */
-class Authorisation implements NotificationProcessorInterface
+class Cancellation implements NotificationProcessorInterface
 {
-    const EVENT_CODE = 'AUTHORISATION';
+    const EVENT_CODE = 'CANCELLATION';
 
     /**
      * @var LoggerInterface
@@ -31,7 +31,7 @@ class Authorisation implements NotificationProcessorInterface
     private $paymentStatusUpdate;
 
     /**
-     * Authorisation constructor.
+     * Cancellation constructor.
      * @param LoggerInterface $logger
      * @param ContainerAwareEventManager $eventManager
      * @param PaymentStatusUpdate $paymentStatusUpdate
@@ -77,17 +77,18 @@ class Authorisation implements NotificationProcessorInterface
             return;
         }
 
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_AUTHORISATION,
+        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_CANCELLATION,
             [
                 'order' => $order,
                 'notification' => $notification
             ]
         );
 
-        $status = $notification->isSuccess() ?
-            Status::PAYMENT_STATE_THE_CREDIT_HAS_BEEN_ACCEPTED :
-            Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED;
-
-        $this->paymentStatusUpdate->updatePaymentStatus($order, $status);
+        if ($notification->isSuccess()) {
+            $this->paymentStatusUpdate->updatePaymentStatus(
+                $order,
+                Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED
+            );
+        }
     }
 }
