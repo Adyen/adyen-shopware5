@@ -2,20 +2,18 @@
 
 namespace MeteorAdyen\Components\NotificationProcessor;
 
-use MeteorAdyen\Components\PaymentStatusUpdate;
 use MeteorAdyen\Models\Event;
 use MeteorAdyen\Models\Notification;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
-use Shopware\Models\Order\Status;
 
 /**
- * Class Authorisation
+ * Class CaptureFailed
  * @package MeteorAdyen\Components\NotificationProcessor
  */
-class Authorisation implements NotificationProcessorInterface
+class CaptureFailed implements NotificationProcessorInterface
 {
-    const EVENT_CODE = 'AUTHORISATION';
+    const EVENT_CODE = 'CAPTURE_FAILED';
 
     /**
      * @var LoggerInterface
@@ -25,25 +23,18 @@ class Authorisation implements NotificationProcessorInterface
      * @var ContainerAwareEventManager
      */
     private $eventManager;
-    /**
-     * @var PaymentStatusUpdate
-     */
-    private $paymentStatusUpdate;
 
     /**
      * Authorisation constructor.
      * @param LoggerInterface $logger
      * @param ContainerAwareEventManager $eventManager
-     * @param PaymentStatusUpdate $paymentStatusUpdate
      */
     public function __construct(
         LoggerInterface $logger,
-        ContainerAwareEventManager $eventManager,
-        PaymentStatusUpdate $paymentStatusUpdate
+        ContainerAwareEventManager $eventManager
     ) {
         $this->logger = $logger;
         $this->eventManager = $eventManager;
-        $this->paymentStatusUpdate = $paymentStatusUpdate->setLogger($this->logger);
     }
 
     /**
@@ -54,16 +45,13 @@ class Authorisation implements NotificationProcessorInterface
      */
     public function supports(Notification $notification): bool
     {
-        return strtoupper($notification->getEventCode()) === self::EVENT_CODE;
+        return strtoupper($notification->getEventCode()) == self::EVENT_CODE;
     }
 
     /**
      * Actual processing of the notification
      *
      * @param Notification $notification
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
      * @throws \Enlight_Event_Exception
      */
     public function process(Notification $notification)
@@ -77,17 +65,11 @@ class Authorisation implements NotificationProcessorInterface
             return;
         }
 
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_AUTHORISATION,
+        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_CAPTURE_FAILED,
             [
                 'order' => $order,
                 'notification' => $notification
             ]
         );
-
-        $status = $notification->isSuccess() ?
-            Status::PAYMENT_STATE_THE_CREDIT_HAS_BEEN_ACCEPTED :
-            Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED;
-
-        $this->paymentStatusUpdate->updatePaymentStatus($order, $status);
     }
 }

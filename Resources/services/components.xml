@@ -23,6 +23,10 @@
                  class="MeteorAdyen\Components\NotificationManager">
             <argument type="service" id="models"/>
         </service>
+        <service id="meteor_adyen.components.payment_status_update"
+                 class="MeteorAdyen\Components\PaymentStatusUpdate">
+            <argument type="service" id="models"/>
+        </service>
         <service id="meteor_adyen.components.builder.notification_builder"
                  class="MeteorAdyen\Components\Builder\NotificationBuilder">
             <argument type="service" id="meteor_adyen.components.data_conversion"/>
@@ -34,7 +38,27 @@
                  class="MeteorAdyen\Components\NotificationProcessor\Authorisation">
             <tag name="meteor.adyen.notificationprocessor"/>
             <argument type="service" id="meteor_adyen.logger.notifications"/>
-            <argument type="service" id="models"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="meteor_adyen.components.payment_status_update"/>
+        </service>
+        <service id="meteor_adyen.components.notification_processor.cancellation"
+                 class="MeteorAdyen\Components\NotificationProcessor\Cancellation">
+            <tag name="meteor.adyen.notificationprocessor"/>
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="meteor_adyen.components.payment_status_update"/>
+        </service>
+        <service id="meteor_adyen.components.notification_processor.capture"
+                 class="MeteorAdyen\Components\NotificationProcessor\Capture">
+            <tag name="meteor.adyen.notificationprocessor"/>
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="meteor_adyen.components.payment_status_update"/>
+        </service>
+        <service id="meteor_adyen.components.notification_processor.capture_failed"
+                 class="MeteorAdyen\Components\NotificationProcessor\CaptureFailed">
+            <tag name="meteor.adyen.notificationprocessor"/>
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
             <argument type="service" id="events"/>
         </service>
     </services>

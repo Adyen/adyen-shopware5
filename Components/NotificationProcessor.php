@@ -64,8 +64,8 @@ class NotificationProcessor
     }
 
     /**
-     * Convert tagged handlers to array
-     * The magic happens in the DI
+     * Convert tagged handlers to array and check if they are actually Notification Processors
+     * The real magic happens in the DI
      *
      * @param $handlers
      * @return NotificationProcessorInterface[]
@@ -73,7 +73,11 @@ class NotificationProcessor
      */
     private function findTaggedHandlers($handlers)
     {
-        return iterator_to_array($handlers, false);
+        $handlers = iterator_to_array($handlers, false);
+        $handlers = array_filter($handlers, function($handler) {
+            return $handler instanceof NotificationProcessorInterface;
+        });
+        return $handlers;
     }
 
     /**

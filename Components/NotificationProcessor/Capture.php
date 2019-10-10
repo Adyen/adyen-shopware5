@@ -6,16 +6,18 @@ use MeteorAdyen\Components\PaymentStatusUpdate;
 use MeteorAdyen\Models\Event;
 use MeteorAdyen\Models\Notification;
 use Psr\Log\LoggerInterface;
+use Shopware\Components\Api\Resource;
 use Shopware\Components\ContainerAwareEventManager;
+use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Status;
 
 /**
- * Class Authorisation
+ * Class Capture
  * @package MeteorAdyen\Components\NotificationProcessor
  */
-class Authorisation implements NotificationProcessorInterface
+class Capture implements NotificationProcessorInterface
 {
-    const EVENT_CODE = 'AUTHORISATION';
+    const EVENT_CODE = 'CAPTURE';
 
     /**
      * @var LoggerInterface
@@ -30,8 +32,9 @@ class Authorisation implements NotificationProcessorInterface
      */
     private $paymentStatusUpdate;
 
+
     /**
-     * Authorisation constructor.
+     * Capture constructor.
      * @param LoggerInterface $logger
      * @param ContainerAwareEventManager $eventManager
      * @param PaymentStatusUpdate $paymentStatusUpdate
@@ -54,12 +57,11 @@ class Authorisation implements NotificationProcessorInterface
      */
     public function supports(Notification $notification): bool
     {
-        return strtoupper($notification->getEventCode()) === self::EVENT_CODE;
+        return strtoupper($notification->getEventCode()) == self::EVENT_CODE;
     }
 
     /**
      * Actual processing of the notification
-     *
      * @param Notification $notification
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -77,17 +79,18 @@ class Authorisation implements NotificationProcessorInterface
             return;
         }
 
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_AUTHORISATION,
+        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_CAPTURE,
             [
                 'order' => $order,
                 'notification' => $notification
             ]
         );
 
-        $status = $notification->isSuccess() ?
-            Status::PAYMENT_STATE_THE_CREDIT_HAS_BEEN_ACCEPTED :
-            Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED;
-
-        $this->paymentStatusUpdate->updatePaymentStatus($order, $status);
+        if ($notification->isSuccess()) {
+            $this->paymentStatusUpdate->updatePaymentStatus(
+                $order,
+                Status::PAYMENT_STATE_THE_CREDIT_HAS_BEEN_ACCEPTED
+            );
+        }
     }
 }
