@@ -2,6 +2,8 @@
 
 namespace MeteorAdyen;
 
+use Doctrine\ORM\Tools\SchemaTool;
+use MeteorAdyen\Models\Notification;
 use ParagonIE\Halite\Alerts\CannotPerformOperation;
 use ParagonIE\Halite\Alerts\InvalidKey;
 use ParagonIE\Halite\KeyFactory;
@@ -26,6 +28,7 @@ class MeteorAdyen extends Plugin
     public function install(InstallContext $context)
     {
         $this->generateEncryptionKey();
+        $this->createNotificationModel();
     }
 
     /**
@@ -34,6 +37,7 @@ class MeteorAdyen extends Plugin
     public function uninstall(UninstallContext $context)
     {
         $this->deactivatePaymentMethods();
+        $this->removeNotificationModel($context);
     }
 
     /**
@@ -104,6 +108,32 @@ class MeteorAdyen extends Plugin
     {
         $enc_key = KeyFactory::generateEncryptionKey();
         KeyFactory::save($enc_key, $this->getPath() . '/encryption.key');
+    }
+
+    private function createNotificationModel()
+    {
+        $entityManager = $this->container->get('models');
+        $schemaTool = new SchemaTool($entityManager);
+        $schemaTool->updateSchema(
+            [
+                $entityManager->getClassMetadata(Notification::class)
+
+            ],
+            true);
+    }
+
+    /**
+     * @param UninstallContext $uninstallContext
+     */
+    private function removeNotificationModel(UninstallContext $uninstallContext)
+    {
+        if ($uninstallContext->keepUserData()) {
+            return;
+        }
+
+        $entityManager = $this->container->get('models');
+        $schemaTool = new SchemaTool($entityManager);
+        $schemaTool->dropSchema([$entityManager->getClassMetadata(Notification::class)]);
     }
 
     /**
