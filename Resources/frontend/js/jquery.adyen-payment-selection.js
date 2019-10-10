@@ -2,7 +2,7 @@
     'use strict';
 
     $(function () {
-        StateManager.addPlugin('.adyen-config', 'adyen-payment-selection');
+        StateManager.addPlugin('.adyen-payment-selection', 'adyen-payment-selection');
     });
 
     $.plugin('adyen-payment-selection', {

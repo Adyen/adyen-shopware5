@@ -2,9 +2,9 @@
     'use strict';
 
     $(function () {
-        //todo: attach to dom
-        StateManager.addPlugin('', 'adyen-finish-order');
+        StateManager.addPlugin('.is--act-confirm', 'adyen-finish-order');
     });
+
 
     $.plugin('adyen-finish-order', {
         /**
@@ -12,7 +12,18 @@
          */
         defaults: {},
         init: function () {
+            var me = this;
+
+
+            me.eventListeners();
         },
+        eventListeners: function () {
+            var me = this;
+
+            $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
+            $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
+        },
+
     });
 
 })(jQuery);
