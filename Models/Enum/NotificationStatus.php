@@ -6,6 +6,7 @@ use ReflectionClass;
 
 /**
  * Class NotificationStatus
+ * @package MeteorAdyen\Models\Enum
  */
 class NotificationStatus
 {
