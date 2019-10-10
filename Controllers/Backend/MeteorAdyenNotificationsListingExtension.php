@@ -9,6 +9,11 @@ class Shopware_Controllers_Backend_MeteorAdyenNotificationsListingExtension
     protected $model = Notification::class;
     protected $alias = 'notification';
 
+    /**
+     * Joins order to notification in list query
+     *
+     * @return \Shopware\Components\Model\QueryBuilder
+     */
     protected function getListQuery()
     {
         $builder = parent::getListQuery();
@@ -19,6 +24,12 @@ class Shopware_Controllers_Backend_MeteorAdyenNotificationsListingExtension
         return $builder;
     }
 
+    /**
+     * Joins order to notification in detail query
+     *
+     * @param int $id
+     * @return \Shopware\Components\Model\QueryBuilder
+     */
     protected function getDetailQuery($id)
     {
         $builder = parent::getDetailQuery($id);
@@ -29,6 +40,9 @@ class Shopware_Controllers_Backend_MeteorAdyenNotificationsListingExtension
         return $builder;
     }
 
+    /**
+     * Returns distinct Event Codes in json array
+     */
     public function getEventCodesAction()
     {
         $eventCodes = $this->getManager()->createQueryBuilder()
@@ -41,6 +55,9 @@ class Shopware_Controllers_Backend_MeteorAdyenNotificationsListingExtension
         $this->view->assign('eventCodes', $eventCodes);
     }
 
+    /**
+     * Returns all NotificationStatusses in json array
+     */
     public function getNotificationStatussesAction()
     {
         $statusses = array_map(function ($status) {
