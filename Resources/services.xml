@@ -7,6 +7,5 @@
         <import resource="services/components.xml"/>
         <import resource="services/loggers.xml"/>
         <import resource="services/subscribers.xml"/>
-        <import resource="services/logger.xml"/>
     </imports>
 </container>
