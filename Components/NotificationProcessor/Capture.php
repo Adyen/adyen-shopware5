@@ -57,7 +57,7 @@ class Capture implements NotificationProcessorInterface
      */
     public function supports(Notification $notification): bool
     {
-        return strtoupper($notification->getEventCode()) == self::EVENT_CODE;
+        return strtoupper($notification->getEventCode()) === self::EVENT_CODE;
     }
 
     /**
