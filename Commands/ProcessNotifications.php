@@ -5,6 +5,7 @@ namespace MeteorAdyen\Commands;
 use Doctrine\ORM\NoResultException;
 use MeteorAdyen\Components\NotificationManager;
 use MeteorAdyen\Components\NotificationProcessor;
+use MeteorAdyen\Subscriber\Cronjob\ProcessNotifications as ProcessNotificationsCronjob;
 use Shopware\Commands\ShopwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -51,8 +52,9 @@ class ProcessNotifications extends ShopwareCommand
                 'number',
                 'no',
                 \Symfony\Component\Console\Input\InputOption::VALUE_OPTIONAL,
-                'Number of notifications to process. Defaults to 20.',
-                20
+                'Number of notifications to process. Defaults to ' .
+                ProcessNotificationsCronjob::NUMBER_OF_NOTIFICATIONS_TO_HANDLE .  '.',
+                ProcessNotificationsCronjob::NUMBER_OF_NOTIFICATIONS_TO_HANDLE
             )
         ;
     }

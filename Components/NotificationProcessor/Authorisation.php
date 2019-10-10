@@ -51,7 +51,7 @@ class Authorisation implements NotificationProcessorInterface
      */
     public function supports(Notification $notification): bool
     {
-        return strtolower($notification->getEventCode()) == self::EVENT_CODE;
+        return strtolower($notification->getEventCode()) === self::EVENT_CODE;
     }
 
     /**
