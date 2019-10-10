@@ -41,6 +41,8 @@
         init: function () {
             var me = this;
 
+            me.sessionStorage = StorageManager.getStorage('session');
+
             me.applyDataAttributes();
             me.eventListeners();
             me.setConfig();
@@ -87,7 +89,7 @@
                 environment: me.opts.adyenEnvironment,
                 originKey: me.opts.adyenOriginkey,
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
-                onChange: me.handleOnChange,
+                onChange: $.proxy(me.handleOnChange, me),
             };
         },
         getCurrentComponentId: function (currentSelectedPaymentId) {
@@ -112,9 +114,18 @@
 
             me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
-        handleOnChange: function (state, component) {
-        },
+        handleOnChange: function (state) {
+            var me = this;
 
+            if (state.isValid && state.data && state.data.paymentMethod) {
+                me.setPayment(state);
+            }
+        },
+        setPayment: function (state) {
+            var me = this;
+
+            me.sessionStorage.setItem('paymentMethod', JSON.stringify(state.data));
+        },
     });
 
 })(jQuery);
