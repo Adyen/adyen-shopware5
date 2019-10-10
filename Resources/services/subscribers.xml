@@ -17,6 +17,8 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.components.configuration"/>
             <argument type="service" id="meteor_adyen.components.adyen.payment.method"/>
+            <argument type="service" id="session"/>
+            <argument type="service" id="models"/>
         </service>
         <service id="meteor_adyen.subscriber.notification.save_notification" class="MeteorAdyen\Subscriber\Notification\SaveNotification">
             <tag name="shopware.event_subscriber"/>

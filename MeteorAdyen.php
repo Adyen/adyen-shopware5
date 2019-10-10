@@ -7,6 +7,7 @@ use MeteorAdyen\Models\Notification;
 use ParagonIE\Halite\Alerts\CannotPerformOperation;
 use ParagonIE\Halite\Alerts\InvalidKey;
 use ParagonIE\Halite\KeyFactory;
+use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
@@ -28,6 +29,7 @@ class MeteorAdyen extends Plugin
     public function install(InstallContext $context)
     {
         $this->generateEncryptionKey();
+        $this->createFreeTextFields();
         $this->createNotificationModel();
     }
 
@@ -37,6 +39,7 @@ class MeteorAdyen extends Plugin
     public function uninstall(UninstallContext $context)
     {
         $this->deactivatePaymentMethods();
+        $this->removeFreeTextFields($context);
         $this->removeNotificationModel($context);
     }
 
@@ -108,6 +111,30 @@ class MeteorAdyen extends Plugin
     {
         $enc_key = KeyFactory::generateEncryptionKey();
         KeyFactory::save($enc_key, $this->getPath() . '/encryption.key');
+    }
+
+    private function createFreeTextFields()
+    {
+        $crudService = $this->container->get('shopware_attribute.crud_service');
+        $crudService->update(
+            's_user_attributes',
+            'meteor_adyen_payment_method',
+            TypeMapping::TYPE_STRING,
+            [
+                'displayInBackend' => true,
+                'label' => 'Adyen Payment Method'
+            ]
+        );
+    }
+
+    private function removeFreeTextFields(UninstallContext $uninstallContext)
+    {
+        if ($uninstallContext->keepUserData()) {
+            return;
+        }
+
+        $crudService = $this->container->get('shopware_attribute.crud_service');
+        $crudService->delete('s_user_attributes', 'meteor_adyen_payment_method');
     }
 
     private function createNotificationModel()
