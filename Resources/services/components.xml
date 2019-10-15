@@ -29,9 +29,8 @@
                  class="MeteorAdyen\Components\PaymentStatusUpdate">
             <argument type="service" id="models"/>
         </service>
-        <service id="meteor_adyen.components.user_payment_service"
-                 class="MeteorAdyen\Components\UserPaymentService">
-            <argument type="service" id="session"/>
+        <service id="meteor_adyen.components.payment_method_service"
+                 class="MeteorAdyen\Components\PaymentMethodService">
             <argument type="service" id="models"/>
         </service>
         <service id="meteor_adyen.components.builder.notification_builder"

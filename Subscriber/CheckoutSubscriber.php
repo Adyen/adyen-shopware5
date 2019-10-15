@@ -10,6 +10,7 @@ use Enlight_Components_Session_Namespace;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\Configuration;
+use MeteorAdyen\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use MeteorAdyen\Components\UserPaymentService;
 use MeteorAdyen\MeteorAdyen;
 use Shopware\Components\Model\ModelManager;
@@ -41,22 +42,29 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var ModelManager
      */
     private $modelManager;
+    /**
+     * @var ShopwarePaymentMethodService
+     */
+    private $shopwarePaymentMethodService;
 
     /**
      * CheckoutSubscriber constructor.
      * @param Configuration $configuration
      * @param PaymentMethodService $paymentMethodService
+     * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
      * @param Enlight_Components_Session_Namespace $session
      * @param ModelManager $modelManager
      */
     public function __construct(
         Configuration $configuration,
         PaymentMethodService $paymentMethodService,
+        ShopwarePaymentMethodService $shopwarePaymentMethodService,
         Enlight_Components_Session_Namespace $session,
         ModelManager $modelManager
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
+        $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
         $this->session = $session;
         $this->modelManager = $modelManager;
     }
@@ -69,14 +77,14 @@ class CheckoutSubscriber implements SubscriberInterface
         return [
             'Enlight_Controller_Action_PreDispatch_Frontend_Checkout' => 'CheckoutFrontendPreDispatch',
             'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'CheckoutFrontendPostDispatch',
-            'sAdmin::sUpdatePayment::after' => 'sAdminSUpdatePayment'
+            'sAdmin::sUpdatePayment::after' => 'sAdminSUpdatePayment',
         ];
     }
 
     public function sAdminSUpdatePayment(\Enlight_Hook_HookArgs $args)
     {
         $paymentId = $args->get('paymentId');
-        if ($paymentId !== $this->getAdyenPaymentId()) {
+        if ($paymentId !== $this->shopwarePaymentMethodService->getAdyenPaymentId()) {
             return;
         }
 
@@ -103,6 +111,9 @@ class CheckoutSubscriber implements SubscriberInterface
     {
         $this->rewritePaymentData($args);
         $this->addAdyenConfig($args);
+
+        $this->rewriteConfirmPaymentInfo($args);
+        $this->rewriteFinishPaymentInfo($args);
     }
 
     /**
@@ -141,25 +152,104 @@ class CheckoutSubscriber implements SubscriberInterface
         if (!$formData['payment']) {
             return;
         }
-        if ($formData['payment'] != $this->getAdyenPaymentId()) {
+        if ($formData['payment'] != $this->shopwarePaymentMethodService->getAdyenPaymentId()) {
             return;
         }
         $formData['payment'] = $this->getSelectedAdyenMethod();
         $subject->View()->assign('sFormData', $formData);
     }
 
+    private function rewriteConfirmPaymentInfo(Enlight_Event_EventArgs $args)
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
+        $subject = $args->getSubject();
+
+        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+            return;
+        }
+
+        $userData = $subject->View()->getAssign('sUserData');
+        if (!$userData['additional'] ||
+            !$userData['additional']['payment'] ||
+            $userData['additional']['payment']['name'] != MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
+            return;
+        }
+
+        $selectedAdyen = $this->getSelectedAdyenMethod(false);
+        $adyenMethodName = $this->getAdyenPaymentDescriptionByType($selectedAdyen);
+
+        if (!$adyenMethodName || empty($adyenMethodName)) {
+            return;
+        }
+
+        $userData['additional']['payment']['description'] = $adyenMethodName;
+        $subject->View()->assign('sUserData', $userData);
+    }
+
+    /**
+     * @param Enlight_Event_EventArgs $args
+     * @throws AdyenException
+     */
+    private function rewriteFinishPaymentInfo(Enlight_Event_EventArgs $args)
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
+        $subject = $args->getSubject();
+
+        if (!in_array($subject->Request()->getActionName(), ['finish'])) {
+            return;
+        }
+
+        $sPayment = $subject->View()->getAssign('sPayment');
+        if ($sPayment['name'] != MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
+            return;
+        }
+
+        $selectedAdyen = $this->getSelectedAdyenMethod(false);
+        $adyenMethodName = $this->getAdyenPaymentDescriptionByType($selectedAdyen);
+
+        if (!$adyenMethodName || empty($adyenMethodName)) {
+            return;
+        }
+
+        $sPayment['description'] = $adyenMethodName;
+        $subject->View()->assign('sPayment', $sPayment);
+    }
+
+    /**
+     * @param $type
+     * @return mixed
+     * @throws AdyenException
+     */
+    private function getAdyenPaymentDescriptionByType($type)
+    {
+        $adyenMethods = $this->paymentMethodService->getPaymentMethods();
+        $adyenMethod = null;
+
+        foreach ($adyenMethods['paymentMethods'] as $paymentMethod) {
+            if ($paymentMethod['type'] === $type) {
+                return $paymentMethod['name'];
+            }
+        }
+    }
+
+    /**
+     * @param Enlight_Event_EventArgs $args
+     */
     private function rewritePostPayment(Enlight_Event_EventArgs $args)
     {
         /** @var Shopware_Controllers_Frontend_Checkout $subject */
         $subject = $args->getSubject();
 
-        if (!in_array($subject->Request()->getActionName(), ['saveShippingPayment'])) {
+        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
             return;
         }
 
         $payment = $subject->Request()->get('payment');
-        if (substr($payment, 0, 6) === 'adyen_') {
-            $paymentId = $this->getAdyenPaymentId();
+        if (!$payment || !is_string($payment)) {
+            return;
+        }
+        if ($this->isAdyenMethod($payment)) {
+            $paymentId = $this->shopwarePaymentMethodService->getAdyenPaymentId();
             $adyenPayment = substr($payment, 6);
 
             $subject->Request()->setParams([
@@ -172,31 +262,21 @@ class CheckoutSubscriber implements SubscriberInterface
         }
     }
 
-    private function getAdyenPaymentId()
+    private function isAdyenMethod($payment)
     {
-        $q = $this->modelManager->getDBALQueryBuilder()
-            ->select(['id'])
-            ->from('s_core_paymentmeans', 'p')
-            ->where('name = :name')
-            ->setParameter('name', MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD)
-            ->setMaxResults(1)
-            ->execute()
-            ->fetchColumn();
-        return (int)$q;
+        return substr($payment, 0, 6) === 'adyen_';
     }
 
-    private function getSelectedAdyenMethod()
+    /**
+     * @param bool $prependAdyen
+     * @return string
+     */
+    private function getSelectedAdyenMethod($prependAdyen = true)
     {
         $userId = $this->session->offsetGet('sUserId');
         if (empty($userId)) {
             return 'false';
         }
-
-        $qb = $this->modelManager->getDBALQueryBuilder();
-        $qb->select('a.meteor_adyen_payment_method')
-            ->from('s_user_attributes', 'a')
-            ->where('a.userId = :customerId')
-            ->setParameter('customerId', $userId);
-        return 'adyen_' . $qb->execute()->fetchColumn();
+        return $this->shopwarePaymentMethodService->getSelectedAdyenMethod((int) $userId, $prependAdyen);
     }
 }
