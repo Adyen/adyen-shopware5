@@ -39,6 +39,7 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var ModelManager
      */
     private $modelManager;
+
     /**
      * @var ShopwarePaymentMethodService
      */

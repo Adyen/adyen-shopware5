@@ -10,6 +10,10 @@ use MeteorAdyen\Components\Adyen\PaymentMethodService as AdyenPaymentMethodServi
 use MeteorAdyen\MeteorAdyen;
 use Shopware\Components\Model\ModelManager;
 
+/**
+ * Class PaymentMethodService
+ * @package MeteorAdyen\Components
+ */
 class PaymentMethodService
 {
     /**
@@ -107,7 +111,7 @@ class PaymentMethodService
 
     /**
      * @param $type
-     * @return mixed
+     * @return string
      * @throws AdyenException
      */
     public function getAdyenPaymentDescriptionByType($type)
@@ -120,5 +124,6 @@ class PaymentMethodService
                 return $paymentMethod['name'];
             }
         }
+        return '';
     }
 }

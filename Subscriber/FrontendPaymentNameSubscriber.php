@@ -3,6 +3,7 @@
 namespace MeteorAdyen\Subscriber;
 
 use Adyen\AdyenException;
+use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use MeteorAdyen\MeteorAdyen;
@@ -13,7 +14,7 @@ use Shopware_Controllers_Frontend_Checkout;
  * Class FrontendPaymentNameSubscriber
  * @package MeteorAdyen\Subscriber
  */
-class FrontendPaymentNameSubscriber
+class FrontendPaymentNameSubscriber implements SubscriberInterface
 {
     /**
      * @var ShopwarePaymentMethodService

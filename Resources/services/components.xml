@@ -33,6 +33,7 @@
                  class="MeteorAdyen\Components\PaymentMethodService">
             <argument type="service" id="models"/>
             <argument type="service" id="session"/>
+            <argument type="service" id="meteor_adyen.components.adyen.payment.method"/>
         </service>
         <service id="meteor_adyen.components.builder.notification_builder"
                  class="MeteorAdyen\Components\Builder\NotificationBuilder">
