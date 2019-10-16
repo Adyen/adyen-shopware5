@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MeteorAdyen\Components;
 
+use Adyen\AdyenException;
+use Enlight_Components_Session_Namespace;
+use MeteorAdyen\Components\Adyen\PaymentMethodService as AdyenPaymentMethodService;
 use MeteorAdyen\MeteorAdyen;
 use Shopware\Components\Model\ModelManager;
 
@@ -15,6 +18,16 @@ class PaymentMethodService
     private $modelManager;
 
     /**
+     * @var Enlight_Components_Session_Namespace
+     */
+    private $session;
+
+    /**
+     * @var AdyenPaymentMethodService
+     */
+    private $adyenPaymentMethodService;
+
+    /**
      * @var int
      */
     private $adyenId;
@@ -22,10 +35,17 @@ class PaymentMethodService
     /**
      * PaymentMethodService constructor.
      * @param ModelManager $modelManager
+     * @param Enlight_Components_Session_Namespace $session
+     * @param AdyenPaymentMethodService $adyenPaymentMethodService
      */
-    public function __construct(ModelManager $modelManager)
-    {
+    public function __construct(
+        ModelManager $modelManager,
+        Enlight_Components_Session_Namespace $session,
+        AdyenPaymentMethodService $adyenPaymentMethodService
+    ) {
         $this->modelManager = $modelManager;
+        $this->session = $session;
+        $this->adyenPaymentMethodService = $adyenPaymentMethodService;
     }
 
     /**
@@ -49,11 +69,24 @@ class PaymentMethodService
     }
 
     /**
+     * @param bool $prependAdyen
+     * @return string
+     */
+    public function getActiveUserAdyenMethod($prependAdyen = true)
+    {
+        $userId = $this->session->offsetGet('sUserId');
+        if (empty($userId)) {
+            return 'false';
+        }
+        return $this->getUserAdyenMethod((int) $userId, $prependAdyen);
+    }
+
+    /**
      * @param int $userId
      * @param bool $prependAdyen
      * @return string
      */
-    public function getSelectedAdyenMethod(int $userId, $prependAdyen = true)
+    public function getUserAdyenMethod(int $userId, $prependAdyen = true)
     {
         $qb = $this->modelManager->getDBALQueryBuilder();
         $qb->select('a.meteor_adyen_payment_method')
@@ -61,5 +94,31 @@ class PaymentMethodService
             ->where('a.userId = :customerId')
             ->setParameter('customerId', $userId);
         return ($prependAdyen ? 'adyen_' : '') . $qb->execute()->fetchColumn();
+    }
+
+    /**
+     * @param $payment
+     * @return bool
+     */
+    public function isAdyenMethod($payment)
+    {
+        return substr($payment, 0, 6) === 'adyen_';
+    }
+
+    /**
+     * @param $type
+     * @return mixed
+     * @throws AdyenException
+     */
+    public function getAdyenPaymentDescriptionByType($type)
+    {
+        $adyenMethods = $this->adyenPaymentMethodService->getPaymentMethods();
+        $adyenMethod = null;
+
+        foreach ($adyenMethods['paymentMethods'] as $paymentMethod) {
+            if ($paymentMethod['type'] === $type) {
+                return $paymentMethod['name'];
+            }
+        }
     }
 }
