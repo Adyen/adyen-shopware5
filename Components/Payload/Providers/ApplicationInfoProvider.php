@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace MeteorAdyen\Models\Providers;
+namespace MeteorAdyen\Models\Payload\Providers;
+
+use MeteorAdyen\Models\ShopwareInfo;
 
 /**
  * Class ApplicationInfoProvider
@@ -15,7 +17,7 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
      * ApplicationInfoProvider constructor.
      * @param $info
      */
-    public function __construct($info)
+    public function __construct(ShopwareInfo $info)
     {
         $this->info = $info;
     }
@@ -26,11 +28,16 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
      */
     public function provide(PayContext $context): array
     {
-        // TODO: Implement provide() method.
         return [
             'applicationInfo' => [
+                "adyenPaymentSource" => [
+                    "name" => $this->info->getPluginName(),
+                    "version" => $this->info->getPluginVersion(),
+                ],
                 'externalPlatform' => [
-                    'version' => $this->info->getShopwareVersion(),
+                    'name' => $this->info->getShopwareName(),
+                    'version' => $this->info->getPluginVersion(),
+                    'integrator' => $this->info->getIntegrator(),
                 ],
             ],
         ];

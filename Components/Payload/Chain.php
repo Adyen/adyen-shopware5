@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MeteorAdyen\Models;
+namespace MeteorAdyen\Models\Payload;
 
 /**
  * Class Chain

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MeteorAdyen\Models\Providers;
+namespace MeteorAdyen\Models\Payload\Providers;
 
 /**
  * Class ApplicationInfoProvider
@@ -23,5 +23,6 @@ class ShopperInfoProvider implements PaymentPayloadProvider
     public function provide(PayContext $context): array
     {
         // TODO: Implement provide() method.
+        return [];
     }
 }
