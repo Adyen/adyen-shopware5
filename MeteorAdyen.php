@@ -4,6 +4,7 @@ namespace MeteorAdyen;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use MeteorAdyen\Models\Notification;
+use MeteorAdyen\Models\PaymentInfo;
 use ParagonIE\Halite\Alerts\CannotPerformOperation;
 use ParagonIE\Halite\Alerts\InvalidKey;
 use ParagonIE\Halite\KeyFactory;
@@ -30,7 +31,10 @@ class MeteorAdyen extends Plugin
     {
         $this->generateEncryptionKey();
         $this->createFreeTextFields();
-        $this->createNotificationModel();
+
+        $tool = new SchemaTool($this->container->get('models'));
+        $classes = $this->getModelMetaData();
+        $tool->updateSchema($classes, true);
     }
 
     /**
@@ -40,7 +44,10 @@ class MeteorAdyen extends Plugin
     {
         $this->deactivatePaymentMethods();
         $this->removeFreeTextFields($context);
-        $this->removeNotificationModel($context);
+
+        $tool = new SchemaTool($this->container->get('models'));
+        $classes = $this->getModelMetaData();
+        $tool->dropSchema($classes);
     }
 
     /**
@@ -101,18 +108,6 @@ class MeteorAdyen extends Plugin
         $query->execute();
     }
 
-    /**
-     * Generate EncryptionKey to encrypt sensitive data in database
-     *
-     * @throws CannotPerformOperation
-     * @throws InvalidKey
-     */
-    private function generateEncryptionKey()
-    {
-        $enc_key = KeyFactory::generateEncryptionKey();
-        KeyFactory::save($enc_key, $this->getPath() . '/encryption.key');
-    }
-
     private function createFreeTextFields()
     {
         $crudService = $this->container->get('shopware_attribute.crud_service');
@@ -137,30 +132,30 @@ class MeteorAdyen extends Plugin
         $crudService->delete('s_user_attributes', 'meteor_adyen_payment_method');
     }
 
-    private function createNotificationModel()
-    {
-        $entityManager = $this->container->get('models');
-        $schemaTool = new SchemaTool($entityManager);
-        $schemaTool->updateSchema(
-            [
-                $entityManager->getClassMetadata(Notification::class)
 
-            ],
-            true);
+    /**
+     * Generate EncryptionKey to encrypt sensitive data in database
+     *
+     * @throws CannotPerformOperation
+     * @throws InvalidKey
+     */
+    private function generateEncryptionKey()
+    {
+        $enc_key = KeyFactory::generateEncryptionKey();
+        KeyFactory::save($enc_key, $this->getPath() . '/encryption.key');
     }
 
     /**
-     * @param UninstallContext $uninstallContext
+     * @return array
      */
-    private function removeNotificationModel(UninstallContext $uninstallContext)
+    private function getModelMetaData(): array
     {
-        if ($uninstallContext->keepUserData()) {
-            return;
-        }
-
         $entityManager = $this->container->get('models');
-        $schemaTool = new SchemaTool($entityManager);
-        $schemaTool->dropSchema([$entityManager->getClassMetadata(Notification::class)]);
+
+        return [
+            $entityManager->getClassMetadata(Notification::class),
+            $entityManager->getClassMetadata(PaymentInfo::class),
+        ];
     }
 
     /**

@@ -2,7 +2,7 @@
     'use strict';
 
     $(function () {
-        StateManager.addPlugin('.adyen-config', 'adyen-payment-selection');
+        StateManager.addPlugin('.adyen-payment-selection', 'adyen-payment-selection');
     });
 
     $.plugin('adyen-payment-selection', {
@@ -53,7 +53,7 @@
         init: function () {
             var me = this;
 
-            console.log('loaded v1');
+            me.sessionStorage = StorageManager.getStorage('session');
 
             me.applyDataAttributes();
             me.eventListeners();
@@ -102,7 +102,7 @@
                 environment: me.opts.adyenEnvironment,
                 originKey: me.opts.adyenOriginkey,
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
-                onChange: me.handleOnChange,
+                onChange: $.proxy(me.handleOnChange, me),
             };
         },
         getCurrentComponentId: function (currentSelectedPaymentId) {
@@ -127,8 +127,14 @@
             console.log(me.currentSelectedPaymentId);
             me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
-        handleOnChange: function () {
+        handleOnChange: function (state) {
             var me = this;
+
+
+
+            if (state.isValid && state.data && state.data.paymentMethod) {
+                me.setPayment(state);
+            }
 
             if (me.changeInfosButton) {
                 me.changeInfosButton.remove();
@@ -157,8 +163,13 @@
                 .on('click', $.proxy(me.updatePaymentInfo, me));
             paymentMethodContainer.find(me.opts.methodLabelSelector).append(me.changeInfosButton);
         },
+        setPayment: function (state) {
+            var me = this;
 
-        updatePaymentInfo: function() {
+            me.sessionStorage.setItem('paymentMethod', JSON.stringify(state.data));
+        },
+
+        updatePaymentInfo: function () {
             var me = this;
 
             var paymentMethod = $(me.opts.formSelector).find('input[name=payment]:checked');
