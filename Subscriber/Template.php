@@ -39,12 +39,30 @@ class Template implements SubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'Enlight_Controller_Action_PreDispatch' => 'onPreDispatch'
+            'Enlight_Controller_Action_PreDispatch' => 'onPreDispatch',
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'onBackendOrderPostDispatch',
         ];
     }
 
     public function onPreDispatch()
     {
         $this->templateManager->addTemplateDir($this->pluginDirectory . '/Resources/views');
+    }
+
+    public function onBackendOrderPostDispatch(\Enlight_Event_EventArgs $args)
+    {
+        /** @var \Shopware_Controllers_Backend_Order $controller */
+        $controller = $args->getSubject();
+
+        $view = $controller->View();
+        $request = $controller->Request();
+
+        if ($request->getActionName() == 'index') {
+            $view->extendsTemplate('backend/meteor_adyen_order/app.js');
+        }
+
+        if ($request->getActionName() == 'load') {
+            $view->extendsTemplate('backend/meteor_adyen_order/view/detail/window.js');
+        }
     }
 }
