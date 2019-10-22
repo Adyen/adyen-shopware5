@@ -1,6 +1,6 @@
 //
 
-Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Transaction', {
+Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionDetails', {
     extend: 'Ext.container.Container',
     title: 'Transaction',
     record: null,
@@ -12,7 +12,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Transaction', {
             me.createDetailsContainer()
         ];
 
-        me.store.on( 'load', function(store, records, options ) {
+        me.store.on('load', function(store, records, options ) {
             me.record = store.first();
             me.detailsPanel.loadRecord(me.record);
         });

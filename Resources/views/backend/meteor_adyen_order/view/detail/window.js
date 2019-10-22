@@ -12,6 +12,9 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Window', {
         me.callParent();
     },
 
+    /**
+     * Overwrite to add adyen transaction tab if necessary
+     */
     createTabPanel: function() {
         var me = this,
             result = me.callParent();
@@ -20,10 +23,57 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Window', {
             return result;
         }
 
-        me.adyenTransactionTab = Ext.create('Shopware.apps.MeteorAdyenOrder.view.tab.Transaction');
-        result.add(me.adyenTransactionTab.createTab(me));
+        //me.adyenTransactionTab = Ext.create('Shopware.apps.MeteorAdyenOrder.view.tab.Transaction');
+        result.add(me.createAdyenTab());
 
         return result;
+    },
+
+    /**
+     * Generate Adyen Tab
+     */
+    createAdyenTab: function() {
+        var me = this;
+        var transactionStore = Ext.create('Shopware.apps.MeteorAdyenNotificationsListingExtension.store.Notification');
+
+        me.transactionDetails = Ext.create('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionDetails', {
+            store: transactionStore,
+            layout: {
+                type: 'vbox',
+                align: 'stretch'
+            },
+            region: 'north'
+        });
+
+        me.transactionTabsDetail = Ext.create('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionTabs', {
+            region: 'center',
+            store: transactionStore,
+            record: me.record
+        });
+
+        me.adyenTransactionTab = Ext.create('Ext.container.Container', {
+            title: 'Adyen Transactions',
+            layout: 'border',
+            items: [
+                me.transactionDetails,
+                me.transactionTabsDetail
+            ]
+        });
+
+        me.adyenTransactionTab.addListener('activate', function() {
+            transactionStore.load({
+                params: {
+                    filter: JSON.stringify([{
+                        property: "orderId",
+                        value: me.record.get('id'),
+                        operator: null,
+                        expression: '='
+                    }])
+                }
+            });
+        }, me);
+
+        return me.adyenTransactionTab;
     }
 });
 //{/block}
