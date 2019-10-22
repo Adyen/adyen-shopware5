@@ -2,40 +2,19 @@
 
 Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Transaction', {
     extend: 'Ext.container.Container',
-    padding: 10,
     title: 'Transaction',
+    record: null,
 
     initComponent: function() {
         var me = this;
 
-        var transactionStore = Ext.data.StoreManager.get("Shopware.apps.MeteorAdyenNotificationsListingExtension.store.Notification");
-        if (!transactionStore) {
-            transactionStore = Ext.create("Shopware.apps.MeteorAdyenNotificationsListingExtension.store.Notification");
-        }
-        this.transactionStore = transactionStore;
-        var transaction = this.transactionStore.load({
-            params: {
-                filter: JSON.stringify([
-                    {
-                        property: "orderId",
-                        value: 91,
-                        operator: null,
-                        expression: "="
-                    }
-                ])
-            },
-            callback: function(records, operation, success) {
-                console.log(records);
-                var transaction = records[0];
-                console.log(transaction.raw);
+        me.items  =  [
+            me.createDetailsContainer()
+        ];
 
-                me.items  =  [
-                    me.createDetailsContainer()
-                ];
-
-                me.detailsForm.loadRecord(transaction.raw);
-            },
-            scope: this
+        me.store.on( 'load', function(store, records, options ) {
+            me.record = store.first();
+            me.detailsPanel.loadRecord(me.record);
         });
 
         me.callParent(arguments);
@@ -48,7 +27,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Transaction', {
     createDetailsContainer: function () {
         var me = this;
 
-        me.detailsForm = Ext.create('Ext.form.Panel', {
+        me.detailsPanel = Ext.create('Ext.form.Panel', {
             title: 'Transaction details',
             titleAlign: 'left',
             bodyPadding: 10,
@@ -61,7 +40,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Transaction', {
                 me.createInnerDetailContainer()
             ]
         });
-        return me.detailsForm;
+        return me.detailsPanel;
     },
 
     /**
@@ -108,7 +87,12 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Transaction', {
     createLeftDetailElements: function () {
         var me = this, fields;
         fields = [
-            { name: 'shop[name]', fieldLabel: 'shop'},
+            { name: 'pspReference', fieldLabel: 'PSP Reference'},
+            { name: 'createdAt', fieldLabel: 'Created at'},
+            { name: 'updatedAt', fieldLabel: 'Updated at'},
+            { name: 'eventCode', fieldLabel: 'Event code'},
+            { name: 'merchantAccountCode', fieldLabel: 'Merchant'},
+
         ];
         return fields;
     },
@@ -123,7 +107,11 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Transaction', {
         var me = this;
 
         return [
-            { name: 'referer', fieldLabel: 'referer'},
+            { name: 'amountValue', fieldLabel: 'Amount'},
+            { name: 'amountCurrency', fieldLabel: 'Currency'},
+            { name: 'status', fieldLabel: 'Status'},
+            { name: 'success', fieldLabel: 'Success'},
+            { name: 'errorDetails', fieldLabel: 'Error Details'},
         ];
     },
 
