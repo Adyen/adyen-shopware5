@@ -66,7 +66,25 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.refunds.Detail', {
             text: 'Full refund',
             cls: 'primary',
             handler: function() {
-                console.log('Refund');
+                me.up('window').setLoading(true);
+
+                Ext.Ajax.request({
+                    url: '{url controller="MeteorAdyenRefund" action="refund"}',
+                    params: {
+                        orderId: me.record.get('id')
+                    },
+                    success: function(response) {
+                        var json = JSON.parse(response.responseText);
+                        me.up('window').setLoading(false);
+                        Ext.Msg.alert(
+                            'Adyen Refund',
+                            'A refund with Reference ID '
+                            + json.refundReference
+                            + ' has been created. Check again in a few minutes to see if it has succeeded.',
+                            Ext.emptyFn
+                        );
+                    }
+                });
             }
         });
 

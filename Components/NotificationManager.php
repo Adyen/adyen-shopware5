@@ -19,6 +19,12 @@ class NotificationManager
     private $modelManager;
 
     /**
+     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     */
+    private $notificationRepository;
+
+
+    /**
      * NotificationManager constructor.
      * @param ModelManager $modelManager
      */
@@ -26,6 +32,7 @@ class NotificationManager
         ModelManager $modelManager
     ) {
         $this->modelManager = $modelManager;
+        $this->notificationRepository = $modelManager->getRepository(Notification::class);
     }
 
     /**
@@ -48,5 +55,25 @@ class NotificationManager
         $builder->getQuery()->execute();
 
         return $notification;
+    }
+
+    /**
+     * @param int $orderId
+     * @return Notification
+     */
+    public function getLastNotificationForOrderId(int $orderId)
+    {
+        try {
+            $lastNotification = $this->notificationRepository->createQueryBuilder('n')
+                ->where('n.orderId = :orderId')
+                ->setMaxResults(1)
+                ->orderBy('n.createdAt', 'ASC')
+                ->setParameter('orderId', $orderId)
+                ->getQuery()
+                ->getSingleResult();
+            return $lastNotification;
+        } catch (NoResultException $ex) {
+            return null;
+        }
     }
 }

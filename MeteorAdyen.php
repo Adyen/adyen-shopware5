@@ -4,6 +4,7 @@ namespace MeteorAdyen;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use MeteorAdyen\Models\Notification;
+use MeteorAdyen\Models\Refund;
 use ParagonIE\Halite\Alerts\CannotPerformOperation;
 use ParagonIE\Halite\Alerts\InvalidKey;
 use ParagonIE\Halite\KeyFactory;
@@ -29,6 +30,7 @@ class MeteorAdyen extends Plugin
     {
         $this->generateEncryptionKey();
         $this->createNotificationModel();
+        $this->createRefundModel();
     }
 
     /**
@@ -38,6 +40,7 @@ class MeteorAdyen extends Plugin
     {
         $this->deactivatePaymentMethods();
         $this->removeNotificationModel($context);
+        $this->removeRefundModel($context);
     }
 
     /**
@@ -134,6 +137,32 @@ class MeteorAdyen extends Plugin
         $entityManager = $this->container->get('models');
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->dropSchema([$entityManager->getClassMetadata(Notification::class)]);
+    }
+
+    private function createRefundModel()
+    {
+        $entityManager = $this->container->get('models');
+        $schemaTool = new SchemaTool($entityManager);
+        $schemaTool->updateSchema(
+            [
+                $entityManager->getClassMetadata(Refund::class)
+
+            ],
+            true);
+    }
+
+    /**
+     * @param UninstallContext $uninstallContext
+     */
+    private function removeRefundModel(UninstallContext $uninstallContext)
+    {
+        if ($uninstallContext->keepUserData()) {
+            return;
+        }
+
+        $entityManager = $this->container->get('models');
+        $schemaTool = new SchemaTool($entityManager);
+        $schemaTool->dropSchema([$entityManager->getClassMetadata(Refund::class)]);
     }
 
     /**

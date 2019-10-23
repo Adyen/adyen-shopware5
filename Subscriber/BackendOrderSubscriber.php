@@ -10,6 +10,7 @@ use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\Configuration;
+use MeteorAdyen\Components\NotificationManager;
 use MeteorAdyen\Components\NotificationProcessor\NotificationProcessorInterface;
 use MeteorAdyen\MeteorAdyen;
 use MeteorAdyen\Models\Notification;
@@ -35,13 +36,22 @@ class BackendOrderSubscriber implements SubscriberInterface
     private $notificationRepository;
 
     /**
+     * @var NotificationManager
+     */
+    private $notificationManager;
+
+    /**
      * BackendOrderSubscriber constructor.
+     * @param ModelManager $modelManager
+     * @param NotificationManager $notificationManager
      */
     public function __construct(
-        ModelManager $modelManager
+        ModelManager $modelManager,
+        NotificationManager $notificationManager
     ) {
         $this->modelManager = $modelManager;
         $this->notificationRepository = $this->modelManager->getRepository(Notification::class);
+        $this->notificationManager = $notificationManager;
     }
 
     /**
@@ -95,7 +105,7 @@ class BackendOrderSubscriber implements SubscriberInterface
             }
 
             // adyenRefundable
-            $lastNotification = $this->getLastNotification($order['id']);
+            $lastNotification = $this->notificationManager->getLastNotificationForOrderId($order['id']);
             if ($lastNotification) {
                 $order['adyenNotification'] = $lastNotification;
                 $order['adyenRefundable'] = in_array($lastNotification->getEventCode(), [
@@ -107,23 +117,5 @@ class BackendOrderSubscriber implements SubscriberInterface
         }
     }
 
-    /**
-     * @param $orderId
-     * @return Notification
-     */
-    private function getLastNotification($orderId)
-    {
-        try {
-            $lastNotification = $this->notificationRepository->createQueryBuilder('n')
-                ->where('n.orderId = :orderId')
-                ->setMaxResults(1)
-                ->orderBy('n.createdAt', 'ASC')
-                ->setParameter('orderId', $orderId)
-                ->getQuery()
-                ->getSingleResult();
-            return $lastNotification;
-        } catch (NoResultException $ex) {
-            return null;
-        }
-    }
+
 }
