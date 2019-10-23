@@ -17,4 +17,7 @@ class Event
     const NOTIFICATION_PROCESS_CANCELLATION = 'MeteorAdyen_Notification_Process_Cancellation';
     const NOTIFICATION_PROCESS_CAPTURE = 'MeteorAdyen_Notification_Process_Capture';
     const NOTIFICATION_PROCESS_CAPTURE_FAILED = 'MeteorAdyen_Notification_Process_CaptureFailed';
+    const NOTIFICATION_PROCESS_REFUND = 'MeteorAdyen_Notification_Process_Refund';
+    const NOTIFICATION_PROCESS_REFUND_FAILED = 'MeteorAdyen_Notification_Process_RefundFailed';
+    const NOTIFICATION_PROCESS_REFUNDED_REVERSED = 'MeteorAdyen_Notification_Process_RefundedReversed';
 }
