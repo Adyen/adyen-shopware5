@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MeteorAdyen\Subscriber;
 
 use Adyen\AdyenException;
+use Doctrine\ORM\NoResultException;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
@@ -13,6 +14,7 @@ use MeteorAdyen\Components\NotificationProcessor\NotificationProcessorInterface;
 use MeteorAdyen\MeteorAdyen;
 use MeteorAdyen\Models\Notification;
 use Shopware\Components\Model\ModelManager;
+use Shopware\Models\Order\Status;
 use Shopware_Controllers_Backend_Order;
 use Shopware_Controllers_Frontend_Checkout;
 
@@ -77,13 +79,51 @@ class BackendOrderSubscriber implements SubscriberInterface
     private function addTransactionData(array &$data)
     {
         foreach ($data as &$order) {
+            $order['adyenTransaction'] = null;
+            $order['adyenNotification'] = null;
+            $order['adyenRefundable'] = false;
+
             if ($order['payment']['name'] != MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
                 continue;
             }
+
+            // adyenTransaction
+            // TODO: Replace with transaction instead of notification
             $transaction = $this->notificationRepository->findOneBy(['orderId' => $order['id']]);
             if ($transaction) {
                 $order['adyenTransaction'] = $transaction;
             }
+
+            // adyenRefundable
+            $lastNotification = $this->getLastNotification($order['id']);
+            if ($lastNotification) {
+                $order['adyenNotification'] = $lastNotification;
+                $order['adyenRefundable'] = in_array($lastNotification->getEventCode(), [
+                    'AUTHORISATION',
+                    'CAPTURE',
+                ]);
+            }
+
+        }
+    }
+
+    /**
+     * @param $orderId
+     * @return Notification
+     */
+    private function getLastNotification($orderId)
+    {
+        try {
+            $lastNotification = $this->notificationRepository->createQueryBuilder('n')
+                ->where('n.orderId = :orderId')
+                ->setMaxResults(1)
+                ->orderBy('n.createdAt', 'ASC')
+                ->setParameter('orderId', $orderId)
+                ->getQuery()
+                ->getSingleResult();
+            return $lastNotification;
+        } catch (NoResultException $ex) {
+            return null;
         }
     }
 }

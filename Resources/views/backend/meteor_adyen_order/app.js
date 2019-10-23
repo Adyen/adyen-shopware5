@@ -6,4 +6,5 @@
 //      {include file="backend/meteor_adyen_order/view/detail/tabs/refunds.js"}
 //      {include file="backend/meteor_adyen_order/view/detail/tabs/notifications/list.js"}
 //      {include file="backend/meteor_adyen_order/view/detail/tabs/notifications/detail.js"}
+//      {include file="backend/meteor_adyen_order/view/detail/tabs/refunds/detail.js"}
 //{/block}

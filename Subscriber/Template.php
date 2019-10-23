@@ -63,6 +63,7 @@ class Template implements SubscriberInterface
 
         if ($request->getActionName() == 'load') {
             $view->extendsTemplate('backend/meteor_adyen_order/view/detail/window.js');
+            $view->extendsTemplate('backend/meteor_adyen_order/model/order.js');
         }
     }
 }

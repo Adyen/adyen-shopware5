@@ -9,6 +9,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Window', {
 
     initComponent: function() {
         var me = this;
+        console.log(me.record);
         me.callParent();
     },
 
@@ -23,7 +24,6 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Window', {
             return result;
         }
 
-        //me.adyenTransactionTab = Ext.create('Shopware.apps.MeteorAdyenOrder.view.tab.Transaction');
         result.add(me.createAdyenTab());
 
         return result;
@@ -34,6 +34,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Window', {
      */
     createAdyenTab: function() {
         var me = this;
+
         var transactionStore = Ext.create('Shopware.apps.MeteorAdyenNotificationsListingExtension.store.Notification');
 
         me.transactionDetails = Ext.create('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionDetails', {

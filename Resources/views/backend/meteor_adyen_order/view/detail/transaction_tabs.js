@@ -43,6 +43,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionTabs', {
             title: 'Refunds',
             record: me.record,
             store: me.store,
+            disabled: !me.record.get('adyenRefundable')
         });
         return me.tabRefunds;
     },
