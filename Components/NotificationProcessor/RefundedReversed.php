@@ -10,7 +10,7 @@ use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Models\Order\Status;
 
 /**
- * Class RefundFailed
+ * Class RefundedReversed
  * @package MeteorAdyen\Components\NotificationProcessor
  */
 class RefundedReversed implements NotificationProcessorInterface
