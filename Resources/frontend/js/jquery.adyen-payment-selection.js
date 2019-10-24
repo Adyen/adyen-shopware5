@@ -13,6 +13,13 @@
             adyenOriginkey: '',
             adyenEnvironment: 'test',
             adyenPaymentMethodsResponse: {},
+
+            /**
+             * Selector for the payment method form submit button element.
+             *
+             * @type {String}
+             */
+            paymentMethodFormSubmitSelector: 'button[type=submit]',
         },
 
         /**
@@ -77,6 +84,7 @@
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
 
                 me.handleComponent(payment.type);
+                $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', true);
             }
         },
         setConfig: function () {
@@ -87,7 +95,7 @@
                 environment: me.opts.adyenEnvironment,
                 originKey: me.opts.adyenOriginkey,
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
-                onChange: me.handleOnChange,
+                onChange: $.proxy(me.handleOnChange, me),
             };
         },
         getCurrentComponentId: function (currentSelectedPaymentId) {
@@ -113,8 +121,10 @@
             me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleOnChange: function (state, component) {
-        },
+            var me = this;
 
+            $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', !state.isValid);
+        },
     });
 
 })(jQuery);
