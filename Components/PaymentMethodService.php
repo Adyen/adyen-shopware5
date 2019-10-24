@@ -8,7 +8,9 @@ use Adyen\AdyenException;
 use Enlight_Components_Session_Namespace;
 use MeteorAdyen\Components\Adyen\PaymentMethodService as AdyenPaymentMethodService;
 use MeteorAdyen\MeteorAdyen;
+use MeteorAdyen\Models\PaymentMethodInfo;
 use Shopware\Components\Model\ModelManager;
+use Shopware_Components_Snippet_Manager;
 
 /**
  * Class PaymentMethodService
@@ -25,6 +27,11 @@ class PaymentMethodService
      * @var Enlight_Components_Session_Namespace
      */
     private $session;
+
+    /**
+     * @var Shopware_Components_Snippet_Manager
+     */
+    private $snippetManager;
 
     /**
      * @var AdyenPaymentMethodService
@@ -45,10 +52,12 @@ class PaymentMethodService
     public function __construct(
         ModelManager $modelManager,
         Enlight_Components_Session_Namespace $session,
+        Shopware_Components_Snippet_Manager $snippetManager,
         AdyenPaymentMethodService $adyenPaymentMethodService
     ) {
         $this->modelManager = $modelManager;
         $this->session = $session;
+        $this->snippetManager = $snippetManager;
         $this->adyenPaymentMethodService = $adyenPaymentMethodService;
     }
 
@@ -111,19 +120,30 @@ class PaymentMethodService
 
     /**
      * @param $type
-     * @return string
+     * @return PaymentMethodInfo
      * @throws AdyenException
      */
-    public function getAdyenPaymentDescriptionByType($type)
+    public function getAdyenPaymentInfoByType($type)
     {
         $adyenMethods = $this->adyenPaymentMethodService->getPaymentMethods();
-        $adyenMethod = null;
 
         foreach ($adyenMethods['paymentMethods'] as $paymentMethod) {
             if ($paymentMethod['type'] === $type) {
-                return $paymentMethod['name'];
+                $name = $this->snippetManager
+                    ->getNamespace('meteor_adyen/method/name')
+                    ->get($type, $paymentMethod['name'], true);
+                $description = $this->snippetManager
+                    ->getNamespace('meteor_adyen/method/description')
+                    ->get($type);
+
+                $paymentMethodInfo = (new PaymentMethodInfo())->setName($name);
+                if ($description) {
+                    $paymentMethodInfo->setDescription($description);
+                }
+
+                return $paymentMethodInfo;
             }
         }
-        return '';
+        return new PaymentMethodInfo();
     }
 }

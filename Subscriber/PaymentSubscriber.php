@@ -78,10 +78,12 @@ class PaymentSubscriber implements SubscriberInterface
         $adyenMethods = $this->paymentMethodService->getPaymentMethods();
 
         foreach ($adyenMethods['paymentMethods'] as $adyenMethod) {
+            $paymentMethodInfo = $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($adyenMethod['type']);
             $shopwareMethods[] = [
                 'id' => "adyen_" . $adyenMethod['type'],
                 'name' => $adyenMethod['type'],
-                'description' => $adyenMethod['name'],
+                'description' => $paymentMethodInfo->getName(),
+                'additionaldescription' => $paymentMethodInfo->getDescription(),
             ];
         }
 
