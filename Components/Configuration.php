@@ -93,15 +93,6 @@ class Configuration
      * @param bool|Shop $shop
      * @return string
      */
-    public function getJsComponentsOriginKey($shop = false): string
-    {
-        return (string)$this->getConfig('js_components_originkey', $shop);
-    }
-
-    /**
-     * @param bool|Shop $shop
-     * @return string
-     */
     public function getJsComponents3DS2ChallengeImageSize($shop = false): string
     {
         return (string)$this->getConfig('js_components_3DS2_challenge_image_size', $shop);

@@ -20,10 +20,6 @@
             <name>merchant_account</name>
             <label lang="en">Merchant account</label>
         </element>
-        <element required="true" type="text" scope="shop">
-            <name>js_components_originkey</name>
-            <label lang="en">JS components: originKey</label>
-        </element>
         <element required="true" type="select" scope="shop">
             <name>js_components_3DS2_challenge_image_size</name>
             <label lang="en">JS components: 3DS2 Challenge image size</label>
