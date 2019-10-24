@@ -154,6 +154,15 @@ class PaymentMethodService
     public function getAdyenImage($adyenMethod)
     {
         $type = $adyenMethod['type'];
+        return $this->getAdyenImageByType($type);
+    }
+
+    /**
+     * @param $adyenMethod
+     * @return string
+     */
+    public function getAdyenImageByType($type)
+    {
         if ($type === 'scheme') {
             $type = 'card';
         }

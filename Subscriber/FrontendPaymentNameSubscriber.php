@@ -77,13 +77,15 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
             return;
         }
 
-        $adyenMethodName = $this->getSelectedAdyenMethodName();
+        $adyenType = $this->shopwarePaymentMethodService->getActiveUserAdyenMethod(false);
+        $adyenMethodName = $this->getSelectedAdyenMethodName($adyenType);
         if (!$adyenMethodName || empty($adyenMethodName->getName())) {
             return;
         }
 
         $userData['additional']['payment']['description'] = $adyenMethodName->getName();
         $userData['additional']['payment']['additionaldescription'] = $adyenMethodName->getDescription();
+        $userData['additional']['payment']['image'] = $this->shopwarePaymentMethodService->getAdyenImageByType($adyenType);
 
         $subject->View()->assign('sUserData', $userData);
     }
@@ -105,24 +107,26 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
             return;
         }
 
-        $adyenMethodName = $this->getSelectedAdyenMethodName();
+        $adyenType = $this->shopwarePaymentMethodService->getActiveUserAdyenMethod(false);
+        $adyenMethodName = $this->getSelectedAdyenMethodName($adyenType);
         if (!$adyenMethodName || empty($adyenMethodName->getName())) {
             return;
         }
 
         $sPayment['description'] = $adyenMethodName->getName();
         $sPayment['additionaldescription'] = $adyenMethodName->getDescription();
+        $sPayment['image'] = $this->shopwarePaymentMethodService->getAdyenImageByType($adyenType);
         $subject->View()->assign('sPayment', $sPayment);
     }
 
     /**
+     * @param $adyenType
      * @return \MeteorAdyen\Models\PaymentMethodInfo|null
      */
-    private function getSelectedAdyenMethodName()
+    private function getSelectedAdyenMethodName($adyenType)
     {
         try {
-            $selectedAdyen = $this->shopwarePaymentMethodService->getActiveUserAdyenMethod(false);
-            return $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($selectedAdyen);
+            return $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($adyenType);
         } catch (AdyenException $ex) {
             $this->logger->notice('Fail loading Adyen description', ['ex' => $ex]);
             return null;
