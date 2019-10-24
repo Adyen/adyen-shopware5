@@ -57,11 +57,11 @@ class Template implements SubscriberInterface
         $view = $controller->View();
         $request = $controller->Request();
 
-        if ($request->getActionName() == 'index') {
+        if ($request->getActionName() === 'index') {
             $view->extendsTemplate('backend/meteor_adyen_order/app.js');
         }
 
-        if ($request->getActionName() == 'load') {
+        if ($request->getActionName() === 'load') {
             $view->extendsTemplate('backend/meteor_adyen_order/view/detail/window.js');
         }
     }

@@ -77,7 +77,7 @@ class BackendOrderSubscriber implements SubscriberInterface
     private function addTransactionData(array &$data)
     {
         foreach ($data as &$order) {
-            if ($order['payment']['name'] != MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
+            if ($order['payment']['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
                 continue;
             }
             $transaction = $this->notificationRepository->findOneBy(['orderId' => $order['id']]);
