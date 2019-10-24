@@ -84,6 +84,7 @@ class PaymentSubscriber implements SubscriberInterface
                 'name' => $adyenMethod['type'],
                 'description' => $paymentMethodInfo->getName(),
                 'additionaldescription' => $paymentMethodInfo->getDescription(),
+                'image' => $this->shopwarePaymentMethodService->getAdyenImage($adyenMethod),
             ];
         }
 

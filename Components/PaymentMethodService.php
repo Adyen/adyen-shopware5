@@ -146,4 +146,17 @@ class PaymentMethodService
         }
         return new PaymentMethodInfo();
     }
+
+    /**
+     * @param $adyenMethod
+     * @return string
+     */
+    public function getAdyenImage($adyenMethod)
+    {
+        $type = $adyenMethod['type'];
+        if ($type === 'scheme') {
+            $type = 'card';
+        }
+        return sprintf('https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/%s.svg', $type);
+    }
 }
