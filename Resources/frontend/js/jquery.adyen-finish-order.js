@@ -9,9 +9,15 @@
             placeOrderSelector: '.table--actions button[type=submit]',
             confirmFormSelector: '#confirm--form',
             mountRedirectSelector: '.is--act-confirm',
-            ajaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment', // TODO refactor
-            ajaxIdentifyShopperUrl: '/frontend/adyen/ajaxIdentifyShopper', // TODO refactor
-            ajaxChallengeShopperUrl: '/frontend/adyen/ajaxChallengeShopper', // TODO refactor
+            AdyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
+            AdyenAjaxIdentifyShopperUrl: '/frontend/adyen/ajaxIdentifyShopper',
+            AdyenAjaxChallengeShopperUrl: '/frontend/adyen/ajaxChallengeShopper',
+            AdyenSnippets: {
+                errorTransactionCancelled: 'Your transaction was cancelled by the Payment Service Provider.',
+                errorTransactionProcessing: 'An error occured while processing your payment.',
+                errorTransactionRefused: 'Your transaction was refused by the Payment Service Provider.',
+                errorTransactionUnknown: 'Your transaction was cancelled due to an unknown reason.',
+            },
         },
         adyenConfiguration: {},
         adyenCheckout: null,
@@ -40,6 +46,7 @@
             var me = this;
 
             event.preventDefault();
+            me.clearAdyenError();
 
             if (me.sessionStorage.getItem('paymentMethod')) {
                 var data = {
@@ -51,7 +58,7 @@
                 $.ajax({
                     method: "POST",
                     dataType: 'json',
-                    url: me.opts.ajaxDoPaymentUrl,
+                    url: me.opts.AdyenAjaxDoPaymentUrl,
                     data: data,
                     success: function (response) {
                         me.handlePaymentData(response);
@@ -65,6 +72,8 @@
 
         handlePaymentData: function (data) {
             var me = this;
+
+            console.log(data);
 
             switch (data.resultCode) {
                 case 'Authorised':
@@ -94,24 +103,23 @@
             var me = this;
 
             $(me.opts.placeOrderSelector).parent().append('<div id="AdyenIdentifyShopperThreeDS2"/>');
-            var threeDS2IdentifyShopper = me.adyenCheckout
+            me.adyenCheckout
                 .create('threeDS2DeviceFingerprint', {
                     fingerprintToken: data.authentication['threeds2.fingerprintToken'],
                     onComplete: function(fingerprintData) {
                         $.ajax({
                             method: "POST",
                             dataType: 'json',
-                            url: me.opts.ajaxIdentifyShopperUrl,
+                            url: me.opts.AdyenAjaxIdentifyShopperUrl,
                             data: fingerprintData.data.details,
                             success: function (response) {
-                                console.log('success', response);
                                 me.handlePaymentData(response);
                             },
                         });
-                    }, // Called whenever a result is available, regardless if the outcome is successful or not.
+                    },
                     onError: function(error) {
                         console.error(error);
-                    } // Gets triggered on error.
+                    }
                 })
                 .mount('#AdyenIdentifyShopperThreeDS2');
         },
@@ -124,7 +132,7 @@
                 closeOnOverlay: false,
                 additionalClass: 'adyen-challenge-shopper'
             });
-            var threeDS2Challenge = me.adyenCheckout
+            me.adyenCheckout
                 .create('threeDS2Challenge', {
                     challengeToken: data.authentication['threeds2.challengeToken'],
                     onComplete: function(challengeData) {
@@ -132,17 +140,17 @@
                         $.ajax({
                             method: "POST",
                             dataType: 'json',
-                            url: me.opts.ajaxChallengeShopperUrl,
+                            url: me.opts.AdyenAjaxChallengeShopperUrl,
                             data: challengeData.data.details,
                             success: function (response) {
                                 me.handlePaymentData(response);
                             },
                         });
-                    }, // Called whenever a result is available, regardless if the outcome is successful or not.
+                    },
                     onError: function(error) {
                         console.log(error);
-                    }, // Gets triggered on error.
-                    size: '05' // Defaults to '01'
+                    },
+                    size: '05'
                 })
                 .mount('#AdyenChallengeShopperThreeDS2');
         },
@@ -156,26 +164,36 @@
 
         handlePaymentDataError: function (data) {
             var me = this;
-            var message = 'Your transaction was cancelled due to an unknown reason.';
             switch (data.resultCode) {
                 case 'Cancelled':
-                    message = 'Your transaction was cancelled by the Payment Service Provider.';
+                    this.addAdyenError(me.opts.AdyenSnippets.errorTransactionCancelled);
                     break;
                 case 'Error':
-                    message = 'An error occured while processing your payment. ' + data.refusalReason;
+                    this.addAdyenError(me.opts.AdyenSnippets.errorTransactionProcessing);
                     break;
                 case 'Refused':
-                    message = 'Your transaction was refused by the Payment Service Provider. ' + data.refusalReason;
+                    this.addAdyenError(me.opts.AdyenSnippets.errorTransactionRefused);
+                    break;
+                default:
+                    this.addAdyenError(me.opts.AdyenSnippets.errorTransactionUnknown);
                     break;
             }
+        },
+
+        addAdyenError: function (message) {
+            var me = this;
             $.publish('plugin/MeteorAdyenCheckoutError/addError', message);
             $.publish('plugin/MeteorAdyenCheckoutError/scrollToErrors');
 
-            me.$el.find(me.opts.placeOrderSelector)
+            $(me.opts.placeOrderSelector)
                 .removeAttr('disabled')
                 .removeClass('disabled')
                 .find('.js--loading')
                 .remove();
+        },
+
+        clearAdyenError: function() {
+            $.publish('plugin/MeteorAdyenCheckoutError/cleanErrors');
         },
 
         setConfig: function () {

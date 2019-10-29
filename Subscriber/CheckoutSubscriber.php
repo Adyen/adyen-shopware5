@@ -95,6 +95,7 @@ class CheckoutSubscriber implements SubscriberInterface
     {
         $this->rewritePaymentData($args);
         $this->addAdyenConfig($args);
+        $this->addAdyenSnippets($args);
     }
 
     /**
@@ -143,6 +144,44 @@ class CheckoutSubscriber implements SubscriberInterface
         ];
 
         $subject->View()->assign('sAdyenConfig', $adyenConfig);
+    }
+
+    /**
+     * @param Enlight_Event_EventArgs $args
+     */
+    private function addAdyenSnippets(Enlight_Event_EventArgs $args)
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
+        $subject = $args->getSubject();
+
+        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+            return;
+        }
+
+        $snippets = [];
+        $errorSnippets = Shopware()->Snippets()->getNamespace('meteor_adyen/checkout/error');
+        $snippets['errorTransactionCancelled'] = $errorSnippets->get(
+            'errorTransactionCancelled',
+            'Your transaction was cancelled by the Payment Service Provider.',
+            true
+        );
+        $snippets['errorTransactionProcessing'] = $errorSnippets->get(
+            'errorTransactionProcessing',
+            'An error occured while processing your payment.',
+            true
+        );
+        $snippets['errorTransactionRefused'] = $errorSnippets->get(
+            'errorTransactionRefused',
+            'Your transaction was refused by the Payment Service Provider.',
+            true
+        );
+        $snippets['errorTransactionUnknown'] = $errorSnippets->get(
+            'errorTransactionUnknown',
+            'Your transaction was cancelled due to an unknown reason.',
+            true
+        );
+
+        $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
     }
 
     /**
@@ -198,5 +237,4 @@ class CheckoutSubscriber implements SubscriberInterface
             $this->session->offsetSet('adyenPayment', $adyenPayment);
         }
     }
-
 }
