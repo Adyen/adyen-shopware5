@@ -43,7 +43,7 @@ class AdyenManager
     /**
      * @return Order|null
      */
-    public function fetchOrderIdForCurrentSession(): ?Order
+    public function fetchOrderForCurrentSession(): ?Order
     {
         $order = $this->modelManager->getRepository(Order::class)
             ->findOneBy(['temporaryId' => $this->session->get('sessionId')]);

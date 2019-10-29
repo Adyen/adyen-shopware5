@@ -8,6 +8,7 @@ use MeteorAdyen\Components\Payload\Providers\OrderInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\PaymentMethodProvider;
 use MeteorAdyen\Components\Payload\Providers\ShopperInfoProvider;
 use MeteorAdyen\Models\Payload\Providers\ApplicationInfoProvider;
+use Shopware\Models\Order\Order;
 
 /**
  * Class Shopware_Controllers_Frontend_Adyen
@@ -40,13 +41,14 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
         $shopperInfo = $this->getShopperInfo();
         $origin = $this->Request()->getPost('origin');
 
-        $context = new PaymentContext();
-        $context->setBrowserInfo($browserInfo);
-        $context->setOrder($this->adyenManager->fetchOrderIdForCurrentSession());
-        $context->setBasket($this->adyenManager->getBasket());
-        $context->setPaymentInfo($paymentInfo);
-        $context->setShopperInfo($shopperInfo);
-        $context->setOrigin($origin);
+        $context = new PaymentContext(
+            $paymentInfo,
+            $this->adyenManager->fetchOrderForCurrentSession(),
+            $this->adyenManager->getBasket(),
+            $browserInfo,
+            $shopperInfo,
+            $origin
+        );
 
         $chain = new Chain(
             new ApplicationInfoProvider(),
@@ -65,37 +67,33 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
 
         $this->Response()->setBody(json_encode($paymentInfo));
     }
-
+    
     public function ajaxIdentifyShopperAction()
     {
-        $this->Request()->setHeader('Content-Type', 'application/json');
-        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
-
-        $fingerprint = $this->Request()->getPost('threeds2_fingerprint');
-
-        $payload = [
-            'paymentData' => $this->adyenManager->getPaymentDataSession(),
-            'details' => [
-                'threeds2.fingerprint' => $fingerprint
-            ]
-        ];
-
-        $checkout = $this->adyenCheckout->getCheckout();
-        $paymentInfo = $checkout->paymentsDetails($payload);
-        $this->Response()->setBody(json_encode($paymentInfo));
+        $this->paymentDetails('threeds2_fingerprint', 'threeds2.fingerprint');
     }
 
     public function ajaxChallengeShopperAction()
     {
+        $this->paymentDetails('threeds2_challengeResult', 'threeds2.challengeResult');
+    }
+
+    /**
+     * @param $post
+     * @param $detail
+     * @throws \Adyen\AdyenException
+     */
+    private function paymentDetails($post, $detail)
+    {
         $this->Request()->setHeader('Content-Type', 'application/json');
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
-        $challengeResult = $this->Request()->getPost('threeds2_challengeResult');
+        $postData = $this->Request()->getPost($post);
 
         $payload = [
             'paymentData' => $this->adyenManager->getPaymentDataSession(),
             'details' => [
-                'threeds2.challengeResult' => $challengeResult
+                $detail => $postData
             ]
         ];
 

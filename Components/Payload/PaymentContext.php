@@ -12,17 +12,60 @@ use Shopware\Models\Order\Order;
  */
 class PaymentContext
 {
+    /**
+     * @var array
+     */
     private $paymentInfo;
 
+    /**
+     * @var Order
+     */
     private $order;
 
+    /**
+     * @var sBasket
+     */
     private $basket;
 
+    /**
+     * @var array
+     */
     private $browserInfo;
 
+    /**
+     * @var array
+     */
     private $shopperInfo;
 
+    /**
+     * @var string
+     */
     private $origin;
+
+    /**
+     * PaymentContext constructor.
+     * @param array $paymentInfo
+     * @param Order $order
+     * @param sBasket $basket
+     * @param array $browserInfo
+     * @param array $shopperInfo
+     * @param string $origin
+     */
+    public function __construct(
+        array $paymentInfo,
+        Order $order,
+        sBasket $basket,
+        array $browserInfo,
+        array $shopperInfo,
+        string $origin
+    ) {
+        $this->paymentInfo = $paymentInfo;
+        $this->order = $order;
+        $this->basket = $basket;
+        $this->browserInfo = $browserInfo;
+        $this->shopperInfo = $shopperInfo;
+        $this->origin = $origin;
+    }
 
     /**
      * @return array
@@ -30,15 +73,6 @@ class PaymentContext
     public function getPaymentInfo(): array
     {
         return $this->paymentInfo;
-    }
-
-    /**
-     * @param $paymentInfo
-     * @return array
-     */
-    public function setPaymentInfo($paymentInfo): void
-    {
-        $this->paymentInfo = $paymentInfo;
     }
 
     /**
@@ -50,28 +84,11 @@ class PaymentContext
     }
 
     /**
-     * @param $order
-     * @return Order
-     */
-    public function setOrder($order): void
-    {
-        $this->order = $order;
-    }
-
-    /**
      * @return sBasket
      */
     public function getBasket(): sBasket
     {
         return $this->basket;
-    }
-
-    /**
-     * @param $basket
-     */
-    public function setBasket($basket): void
-    {
-        $this->basket = $basket;
     }
 
     /**
@@ -83,14 +100,6 @@ class PaymentContext
     }
 
     /**
-     * @param $browserInfo
-     */
-    public function setBrowserInfo($browserInfo): void
-    {
-        $this->browserInfo = $browserInfo;
-    }
-
-    /**
      * @return array
      */
     public function getShopperInfo(): array
@@ -99,26 +108,10 @@ class PaymentContext
     }
 
     /**
-     * @param array $shopperInfo
-     */
-    public function setShopperInfo($shopperInfo): void
-    {
-        $this->shopperInfo = $shopperInfo;
-    }
-
-    /**
      * @return string
      */
     public function getOrigin(): string
     {
         return $this->origin;
-    }
-
-    /**
-     * @param string $origin
-     */
-    public function setOrigin($origin): void
-    {
-        $this->origin = $origin;
     }
 }

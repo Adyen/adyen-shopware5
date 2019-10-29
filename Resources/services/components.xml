@@ -49,9 +49,6 @@
         <service id="meteor_adyen.components.payload.chain" class="MeteorAdyen\Components\Payload\Chain">
             <argument type="service" id="models"/>
         </service>
-        <service id="meteor_adyen.components.payload.payment_context" class="MeteorAdyen\Components\Payload\PaymentContext">
-            <argument type="service" id="models"/>
-        </service>
         <service id="meteor_adyen.components.payload.payment_payload_provider" class="MeteorAdyen\Components\Payload\PaymentPayloadProvider">
             <argument type="service" id="models"/>
         </service>
