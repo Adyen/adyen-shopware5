@@ -49,6 +49,8 @@
         adyenConfiguration: {},
         adyenCheckout: null,
         changeInfosButton: null,
+        paymentMethodSession: 'paymentMethod',
+        adyenConfigSession: 'adyenConfig',
 
         init: function () {
             var me = this;
@@ -79,6 +81,7 @@
 
             //Return when no adyen payment
             if (me.currentSelectedPaymentType.indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
+                me.sessionStorage.removeItem(me.paymentMethodSession);
                 return;
             }
 
@@ -104,6 +107,8 @@
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
                 onChange: $.proxy(me.handleOnChange, me),
             };
+
+            me.saveAdyenConfigInSession(me.adyenConfiguration);
         },
         getCurrentComponentId: function (currentSelectedPaymentId) {
             return 'component-' + currentSelectedPaymentId;
@@ -129,8 +134,6 @@
         },
         handleOnChange: function (state) {
             var me = this;
-
-
 
             if (state.isValid && state.data && state.data.paymentMethod) {
                 me.setPayment(state);
@@ -163,12 +166,6 @@
                 .on('click', $.proxy(me.updatePaymentInfo, me));
             paymentMethodContainer.find(me.opts.methodLabelSelector).append(me.changeInfosButton);
         },
-        setPayment: function (state) {
-            var me = this;
-
-            me.sessionStorage.setItem('paymentMethod', JSON.stringify(state.data));
-        },
-
         updatePaymentInfo: function () {
             var me = this;
 
@@ -189,6 +186,23 @@
                     me.changeInfosButton = null;
                 }
             }
+        },
+        setPayment: function (state) {
+            var me = this;
+
+            me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
+        },
+        saveAdyenConfigInSession: function (adyenConfiguration) {
+            var me = this;
+
+            var data = {
+                locale: adyenConfiguration.locale,
+                environment: adyenConfiguration.environment,
+                originKey: adyenConfiguration.originKey,
+                paymentMethodsResponse: adyenConfiguration.paymentMethodsResponse
+            };
+
+            me.sessionStorage.setItem(me.adyenConfigSession, JSON.stringify(data));
         },
     });
 

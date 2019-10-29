@@ -1,28 +1,33 @@
 <?php
 declare(strict_types=1);
 
-namespace MeteorAdyen\Models\Payload\Providers;
+namespace MeteorAdyen\Components\Payload\Providers;
+
+use Adyen\Util\Currency;
+use MeteorAdyen\Components\Payload\PaymentContext;
+use MeteorAdyen\Components\Payload\PaymentPayloadProvider;
 
 /**
  * Class OrderInfoProvider
- * @package MeteorAdyen\Models\Payload\Providers
+ * @package MeteorAdyen\Components\Payload\Providers
  */
 class OrderInfoProvider implements PaymentPayloadProvider
 {
     /**
-     * OrderInfoProvider constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
-     * @param PayContext $context
+     * @param PaymentContext $context
      * @return array
      */
-    public function provide(PayContext $context): array
+    public function provide(PaymentContext $context): array
     {
-        // TODO: Implement provide() method.
-        return [];
+        $adyenCurrency = new Currency();
+        $currencyCode = $context->getOrder()->getCurrency();
+
+        return [
+            'amount' => [
+                "currency" => $currencyCode,
+                "value" => $adyenCurrency->sanitize($context->getOrder()->getInvoiceAmount(), $currencyCode),
+            ],
+            'reference' => $context->getOrder()->getId(),
+        ];
     }
 }

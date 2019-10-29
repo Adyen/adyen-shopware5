@@ -60,4 +60,13 @@ class PaymentMethodService
             "channel" => "Web"
         ]);
     }
+
+    /**
+     * @return Checkout
+     * @throws AdyenException
+     */
+    public function getCheckout()
+    {
+        return new Checkout($this->apiClient);
+    }
 }

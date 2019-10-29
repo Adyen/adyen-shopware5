@@ -1,17 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace MeteorAdyen\Models\Payload;
+namespace MeteorAdyen\Components\Payload;
 
 /**
  * Interface PaymentPayloadProvider
- * @package MeteorAdyen\Models
+ * @package MeteorAdyen\Components
  */
 interface PaymentPayloadProvider
 {
     /**
-     * @param PayContext $context
+     * @param PaymentContext $context
      * @return array
      */
-    public function provide(PayContext $context): array;
+    public function provide(PaymentContext $context): array;
 }

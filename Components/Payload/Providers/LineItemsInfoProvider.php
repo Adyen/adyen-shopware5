@@ -1,28 +1,45 @@
 <?php
 declare(strict_types=1);
 
-namespace MeteorAdyen\Models\Payload\Providers;
+namespace MeteorAdyen\Components\Payload\Providers;
+
+use Enlight_Event_Exception;
+use Enlight_Exception;
+use MeteorAdyen\Components\Payload\PaymentContext;
+use MeteorAdyen\Components\Payload\PaymentPayloadProvider;
+use Zend_Db_Adapter_Exception;
 
 /**
  * Class LineItemsInfoProvider
- * @package MeteorAdyen\Models\Payload\Providers
+ * @package MeteorAdyen\Components\Payload\Providers
  */
 class LineItemsInfoProvider implements PaymentPayloadProvider
 {
     /**
-     * LineItemsInfoProvider constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
-     * @param PayContext $context
      * @return array
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
      */
-    public function provide(PayContext $context): array
+    public function provide(PaymentContext $context): array
     {
-        // TODO: Implement provide() method.
-        return [];
+        $basket = $context->getBasket()->sGetBasket();
+
+        return [
+            'lineItems' => json_encode(array_map(
+                function ($item) {
+                    return [
+                        'quantity' => $item['quantity'],
+                        'amountExcludingTax' => $item['netprice'],
+                        'taxPercentage' => $item['tax_rate'],
+                        'description' => $item['articlename'],
+                        'id' => $item['id'],
+                        'taxAmount' => $item['tax'],
+                        'amountIncludingTax' => $item['amount'],
+                        'taxCategory' => $item[''],
+                    ];
+                }, $basket['content']
+            ))
+        ];
     }
 }

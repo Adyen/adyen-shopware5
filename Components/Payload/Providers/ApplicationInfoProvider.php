@@ -3,41 +3,44 @@ declare(strict_types=1);
 
 namespace MeteorAdyen\Models\Payload\Providers;
 
-use MeteorAdyen\Models\ShopwareInfo;
+use MeteorAdyen\Components\Payload\PaymentContext;
+use MeteorAdyen\Components\Payload\PaymentPayloadProvider;
 
 /**
  * Class ApplicationInfoProvider
- * @package MeteorAdyen\Models
+ * @package MeteorAdyen\Components
  */
 class ApplicationInfoProvider implements PaymentPayloadProvider
 {
-    private $info;
-
     /**
-     * ApplicationInfoProvider constructor.
-     * @param $info
-     */
-    public function __construct(ShopwareInfo $info)
-    {
-        $this->info = $info;
-    }
-
-    /**
-     * @param PayContext $context
+     * @param PaymentContext $context
      * @return array
      */
-    public function provide(PayContext $context): array
+    public function provide(PaymentContext $context): array
     {
+        $returnUrl = Shopware()->Router()->assemble([
+            'controller' => 'process',
+            'action' => 'return',
+        ]);
+
         return [
+            'additionalData' => [
+                'executeThreeD' => true,
+                'allow3DS2' => true,
+            ],
+            "channel" => "Web",
+            'origin' => "",
+            'returnUrl' => $returnUrl,
+            'merchantAccount' => 'Meteor-test',
             'applicationInfo' => [
-                "adyenPaymentSource" => [
-                    "name" => $this->info->getPluginName(),
-                    "version" => $this->info->getPluginVersion(),
+                'adyenPaymentSource' => [
+                    'name' => 'adyen-shopware',
+                    'version' => '0.0.1',
                 ],
                 'externalPlatform' => [
-                    'name' => $this->info->getShopwareName(),
-                    'version' => $this->info->getPluginVersion(),
-                    'integrator' => $this->info->getIntegrator(),
+                    'name' => 'Shopware',
+                    'version' => '5.6',
+                    'integrator' => 'Meteor',
                 ],
             ],
         ];

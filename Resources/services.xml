@@ -6,6 +6,7 @@
         <import resource="services/commands.xml"/>
         <import resource="services/components.xml"/>
         <import resource="services/loggers.xml"/>
+        <import resource="services/managers.xml"/>
         <import resource="services/subscribers.xml"/>
     </imports>
 </container>

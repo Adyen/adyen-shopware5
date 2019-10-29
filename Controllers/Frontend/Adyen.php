@@ -1,37 +1,63 @@
 <?php
 
+use MeteorAdyen\Components\Manager\AdyenManager;
+use MeteorAdyen\Components\Payload\Chain;
+use MeteorAdyen\Components\Payload\PaymentContext;
+use MeteorAdyen\Components\Payload\Providers\BrowserInfoProvider;
+use MeteorAdyen\Components\Payload\Providers\OrderInfoProvider;
+use MeteorAdyen\Components\Payload\Providers\PaymentMethodProvider;
+use MeteorAdyen\Models\Payload\Providers\ApplicationInfoProvider;
+
+/**
+ * Class Shopware_Controllers_Frontend_Adyen
+ */
 class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
 {
-    public function index()
+    /**
+     * @var AdyenManager
+     */
+    private $adyenManager;
+
+    /**
+     * @var \MeteorAdyen\Components\Adyen\PaymentMethodService
+     */
+    private $adyenCheckout;
+
+    public function preDispatch()
     {
-        die('hello');
+        $this->adyenManager = $this->get('meteor_adyen.components.manager.adyen_manager');
+        $this->adyenCheckout = $this->get('meteor_adyen.components.adyen.payment.method');
     }
 
     public function ajaxDoPaymentAction()
     {
-        // $this->Request()->setHeader('Content-Type', 'application/json');
-        // $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+        $this->Request()->setHeader('Content-Type', 'application/json');
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
-        $paymentMethod = json_decode($this->Request()->getPost('paymentMethod'));
+        $paymentInfo = json_decode($this->Request()->getPost('paymentMethod') ?? '{}', true);
+        $browserInfo = $this->Request()->getPost('browserInfo');
 
-        $params = array(
-            "amount" => array(
-                "currency" => "EUR",
-                "value" => 1000
-            ),
-            "reference" => "YOUR_ORDER_NUMBER",
-            "paymentMethod" => $paymentMethod,
-            "returnUrl" => "https://your-company.com/checkout?shopperOrder=12xy..",
-            "merchantAccount" => "YOUR_MERCHANT_ACCOUNT"
+        $context = new PaymentContext();
+        $context->setBrowserInfo($browserInfo);
+        $context->setOrder($this->adyenManager->fetchOrderIdForCurrentSession());
+        $context->setBasket($this->adyenManager->getBasket());
+        $context->setPaymentInfo($paymentInfo);
+
+        $chain = new Chain(
+            new ApplicationInfoProvider(),
+            // new ShopperInfoProvider()
+            new OrderInfoProvider(),
+            new PaymentMethodProvider(),
+            // new LineItemsInfoProvider(),
+            new BrowserInfoProvider()
         );
 
-        $result = $service->payments($params);
+        $payload = $chain->provide($context);
+        $checkout = $this->adyenCheckout->getCheckout();
+        $paymentInfo = $checkout->payments($payload);
 
+        $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
 
-        $this->Response()->setBody(json_encode(
-            [
-                'success' => true,
-            ]
-        ));
+        $this->Response()->setBody(json_encode($paymentInfo));
     }
 }
