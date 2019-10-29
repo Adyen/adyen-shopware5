@@ -42,19 +42,12 @@ class NotificationManager
     public function getNextNotificationToHandle()
     {
         $builder = $this->modelManager->getRepository(Notification::class)->createQueryBuilder('n');
-        $builder->where('n.status = :status')
-            ->orderBy('n.id', 'ASC')
+        $builder->where("n.status = 'received' OR n.status = 'retry'")
+            ->orderBy('n.updatedAt', 'ASC')
             ->setParameter('status', 'received')
             ->setMaxResults(1);
 
-        /** @var Notification $notification */
-        $notification = $builder->getQuery()->getSingleResult();
-
-        $builder = $this->modelManager->getRepository(Notification::class)->createQueryBuilder('n')->update();
-        $builder->set('n.status', "'" . NotificationStatus::STATUS_HANDLED . "'");
-        $builder->getQuery()->execute();
-
-        return $notification;
+        return $builder->getQuery()->getSingleResult();
     }
 
     /**
