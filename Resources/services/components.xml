@@ -104,5 +104,26 @@
             <argument type="service" id="meteor_adyen.logger.notifications"/>
             <argument type="service" id="events"/>
         </service>
+        <service id="meteor_adyen.components.notification_processor.refund"
+                 class="MeteorAdyen\Components\NotificationProcessor\Refund">
+            <tag name="meteor.adyen.notificationprocessor"/>
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="meteor_adyen.components.payment_status_update"/>
+        </service>
+        <service id="meteor_adyen.components.notification_processor.refund_failed"
+                 class="MeteorAdyen\Components\NotificationProcessor\RefundFailed">
+            <tag name="meteor.adyen.notificationprocessor"/>
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="meteor_adyen.components.payment_status_update"/>
+        </service>
+        <service id="meteor_adyen.components.notification_processor.refunded_reversed"
+                 class="MeteorAdyen\Components\NotificationProcessor\RefundedReversed">
+            <tag name="meteor.adyen.notificationprocessor"/>
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="meteor_adyen.components.payment_status_update"/>
+        </service>
     </services>
 </container>
