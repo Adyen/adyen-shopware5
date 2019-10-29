@@ -20,6 +20,8 @@ class PaymentContext
 
     private $browserInfo;
 
+    private $shopperInfo;
+
     /**
      * @return array
      */
@@ -84,5 +86,21 @@ class PaymentContext
     public function setBrowserInfo($browserInfo): void
     {
         $this->browserInfo = $browserInfo;
+    }
+
+    /**
+     * @return array
+     */
+    public function getShopperInfo(): array
+    {
+        return $this->shopperInfo;
+    }
+
+    /**
+     * @param array $shopperInfo
+     */
+    public function setShopperInfo($shopperInfo): void
+    {
+        $this->shopperInfo = $shopperInfo;
     }
 }

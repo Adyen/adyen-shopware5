@@ -6,6 +6,7 @@ use MeteorAdyen\Components\Payload\PaymentContext;
 use MeteorAdyen\Components\Payload\Providers\BrowserInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\OrderInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\PaymentMethodProvider;
+use MeteorAdyen\Components\Payload\Providers\ShopperInfoProvider;
 use MeteorAdyen\Models\Payload\Providers\ApplicationInfoProvider;
 
 /**
@@ -36,16 +37,18 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
 
         $paymentInfo = json_decode($this->Request()->getPost('paymentMethod') ?? '{}', true);
         $browserInfo = $this->Request()->getPost('browserInfo');
+        $shopperInfo = $this->getShopperInfo();
 
         $context = new PaymentContext();
         $context->setBrowserInfo($browserInfo);
         $context->setOrder($this->adyenManager->fetchOrderIdForCurrentSession());
         $context->setBasket($this->adyenManager->getBasket());
         $context->setPaymentInfo($paymentInfo);
+        $context->setShopperInfo($shopperInfo);
 
         $chain = new Chain(
             new ApplicationInfoProvider(),
-            // new ShopperInfoProvider()
+            new ShopperInfoProvider(),
             new OrderInfoProvider(),
             new PaymentMethodProvider(),
             // new LineItemsInfoProvider(),
@@ -59,5 +62,12 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
         $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
 
         $this->Response()->setBody(json_encode($paymentInfo));
+    }
+
+    private function getShopperInfo()
+    {
+        return [
+            'shopperIP' => $this->request->getClientIp()
+        ];
     }
 }
