@@ -37,6 +37,8 @@
         currentSelectedPaymentType: '',
         adyenConfiguration: {},
         adyenCheckout: null,
+        paymentMethodSession: 'paymentMethod',
+        adyenConfigSession: 'adyenConfig',
 
         init: function () {
             var me = this;
@@ -66,6 +68,8 @@
 
             //Return when no adyen payment
             if (me.currentSelectedPaymentType.indexOf(me.adyenPaymentMethodPrefix) === -1) {
+                me.sessionStorage.removeItem(me.paymentMethodSession);
+
                 return;
             }
 
@@ -91,6 +95,8 @@
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
                 onChange: $.proxy(me.handleOnChange, me),
             };
+
+            me.saveAdyenConfigInSession(me.adyenConfiguration);
         },
         getCurrentComponentId: function (currentSelectedPaymentId) {
             return 'component-' + currentSelectedPaymentId;
@@ -124,7 +130,19 @@
         setPayment: function (state) {
             var me = this;
 
-            me.sessionStorage.setItem('paymentMethod', JSON.stringify(state.data));
+            me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
+        },
+        saveAdyenConfigInSession: function (adyenConfiguration) {
+            var me = this;
+
+            var data = {
+                locale: adyenConfiguration.locale,
+                environment: adyenConfiguration.environment,
+                originKey: adyenConfiguration.originKey,
+                paymentMethodsResponse: adyenConfiguration.paymentMethodsResponse
+            };
+
+            me.sessionStorage.setItem(me.adyenConfigSession, JSON.stringify(data));
         },
     });
 

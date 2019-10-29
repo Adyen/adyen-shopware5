@@ -1,28 +1,25 @@
 <?php
 declare(strict_types=1);
 
-namespace MeteorAdyen\Models\Payload\Providers;
+namespace MeteorAdyen\Components\Payload\Providers;
+
+use MeteorAdyen\Components\Payload\PaymentContext;
+use MeteorAdyen\Components\Payload\PaymentPayloadProvider;
 
 /**
  * Class PaymentMethodProvider
- * @package MeteorAdyen\Models\Payload\Providers
+ * @package MeteorAdyen\Components\Payload\Providers
  */
 class PaymentMethodProvider implements PaymentPayloadProvider
 {
     /**
-     * PaymentMethodProvider constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
-     * @param PayContext $context
+     * @param PaymentContext $context
      * @return array
      */
-    public function provide(PayContext $context): array
+    public function provide(PaymentContext $context): array
     {
-        // TODO: Implement provide() method.
-        return [];
+        return [
+            'paymentMethod' => $context->getPaymentInfo(),
+        ];
     }
 }

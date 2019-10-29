@@ -1,11 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace MeteorAdyen\Models\Payload\Providers;
+namespace MeteorAdyen\Components\Payload\Providers;
+
+use MeteorAdyen\Components\Payload\PaymentContext;
+use MeteorAdyen\Components\Payload\PaymentPayloadProvider;
 
 /**
  * Class ApplicationInfoProvider
- * @package MeteorAdyen\Models
+ * @package MeteorAdyen\Components
  */
 class ShopperInfoProvider implements PaymentPayloadProvider
 {
@@ -17,10 +20,10 @@ class ShopperInfoProvider implements PaymentPayloadProvider
     }
 
     /**
-     * @param PayContext $context
+     * @param PaymentContext $context
      * @return array
      */
-    public function provide(PayContext $context): array
+    public function provide(PaymentContext $context): array
     {
         // TODO: Implement provide() method.
         return [];

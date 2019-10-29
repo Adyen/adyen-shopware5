@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MeteorAdyen\Components;
 
 use Adyen\Environment;
+use Doctrine\DBAL\Connection;
 use MeteorAdyen\MeteorAdyen;
 use Shopware\Components\Plugin\CachedConfigReader;
 use Shopware\Models\Shop\Shop;
@@ -24,14 +25,19 @@ class Configuration
      */
     private $cachedConfigReader;
 
+    /** @var Connection */
+    private $connection;
     /**
      * Configuration constructor.
      * @param CachedConfigReader $cachedConfigReader
+     * @param Connection $connection
      */
     public function __construct(
-        CachedConfigReader $cachedConfigReader
+        CachedConfigReader $cachedConfigReader,
+        Connection $connection
     ) {
         $this->cachedConfigReader = $cachedConfigReader;
+        $this->connection = $connection;
     }
 
     /**
@@ -176,5 +182,18 @@ class Configuration
     public function getPaymentMethodPrefix(): string
     {
         return (string)self::PAYMENT_PREFIX;
+    }
+
+    /**
+     * @return int
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function getCurrentPluginVersion(): int
+    {
+        $sql = 'SELECT version FROM s_core_plugins WHERE plugin_name = ? ORDER BY version DESC';
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([MeteorAdyen::NAME]);
+
+        return (int)$stmt->fetchColumn();
     }
 }

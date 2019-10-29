@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace MeteorAdyen\Models\Payload;
+namespace MeteorAdyen\Components\Payload;
 
 /**
  * Class Chain
- * @package MeteorAdyen\Models
+ * @package MeteorAdyen\Components
  */
 class Chain implements PaymentPayloadProvider
 {
@@ -25,10 +25,10 @@ class Chain implements PaymentPayloadProvider
     }
 
     /**
-     * @param PayContext $context
+     * @param PaymentContext $context
      * @return array
      */
-    public function provide(PayContext $context): array
+    public function provide(PaymentContext $context): array
     {
         return array_reduce(
             $this->providers,
