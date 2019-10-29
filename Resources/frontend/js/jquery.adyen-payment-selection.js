@@ -129,7 +129,6 @@
         handleComponent: function (type) {
             var me = this;
 
-            console.log(me.currentSelectedPaymentId);
             me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleOnChange: function (state) {
@@ -159,7 +158,6 @@
             me.currentSelectedPaymentId = paymentMethod.attr('id');
             me.currentSelectedPaymentType = paymentMethod.val();
 
-            console.log(me.currentSelectedPaymentId);
             me.changeInfosButton = $('<a/>')
                 .addClass(me.opts.classChangePaymentInfo)
                 .html('Update your payment information')

@@ -73,7 +73,7 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
         $userData = $subject->View()->getAssign('sUserData');
         if (!$userData['additional'] ||
             !$userData['additional']['payment'] ||
-            $userData['additional']['payment']['name'] != MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
+            $userData['additional']['payment']['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
             return;
         }
 
@@ -99,7 +99,7 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
         }
 
         $sPayment = $subject->View()->getAssign('sPayment');
-        if ($sPayment['name'] != MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
+        if ($sPayment['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
             return;
         }
 

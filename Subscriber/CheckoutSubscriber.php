@@ -161,7 +161,7 @@ class CheckoutSubscriber implements SubscriberInterface
         if (!$formData['payment']) {
             return;
         }
-        if ($formData['payment'] != $this->shopwarePaymentMethodService->getAdyenPaymentId()) {
+        if ((int)$formData['payment'] !== $this->shopwarePaymentMethodService->getAdyenPaymentId()) {
             return;
         }
         $formData['payment'] = $this->shopwarePaymentMethodService->getActiveUserAdyenMethod();
