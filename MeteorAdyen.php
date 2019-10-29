@@ -5,6 +5,7 @@ namespace MeteorAdyen;
 use Doctrine\ORM\Tools\SchemaTool;
 use MeteorAdyen\Models\Notification;
 use MeteorAdyen\Models\PaymentInfo;
+use MeteorAdyen\Models\Refund;
 use ParagonIE\Halite\Alerts\CannotPerformOperation;
 use ParagonIE\Halite\Alerts\InvalidKey;
 use ParagonIE\Halite\KeyFactory;
@@ -155,6 +156,7 @@ class MeteorAdyen extends Plugin
         return [
             $entityManager->getClassMetadata(Notification::class),
             $entityManager->getClassMetadata(PaymentInfo::class),
+            $entityManager->getClassMetadata(Refund::class),
         ];
     }
 

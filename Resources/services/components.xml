@@ -22,6 +22,12 @@
             <argument type="service" id="meteor_adyen.components.adyen.apifactory"/>
             <argument type="service" id="meteor_adyen.components.configuration"/>
         </service>
+        <service id="meteor_adyen.components.adyen.refund_service"
+                 class="MeteorAdyen\Components\Adyen\RefundService">
+            <argument type="service" id="meteor_adyen.components.adyen.apifactory"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="meteor_adyen.components.notification_manager"/>
+        </service>
         <service id="meteor_adyen.components.notification_manager"
                  class="MeteorAdyen\Components\NotificationManager">
             <argument type="service" id="models"/>

@@ -14,6 +14,11 @@
             <argument type="service" id="meteor_adyen.components.adyen.payment.method"/>
             <argument type="service" id="meteor_adyen.components.payment_method_service"/>
         </service>
+        <service id="meteor_adyen.subscriber.backend_order_subscriber" class="MeteorAdyen\Subscriber\BackendOrderSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="meteor_adyen.components.notification_manager"/>
+        </service>
         <service id="meteor_adyen.subscriber.checkout" class="MeteorAdyen\Subscriber\CheckoutSubscriber">
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.components.configuration"/>
