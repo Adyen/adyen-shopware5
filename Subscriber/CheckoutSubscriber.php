@@ -12,6 +12,7 @@ use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use Shopware\Components\Model\ModelManager;
+use Shopware_Components_Snippet_Manager;
 use Shopware_Controllers_Frontend_Checkout;
 
 /**
@@ -46,6 +47,11 @@ class CheckoutSubscriber implements SubscriberInterface
     private $shopwarePaymentMethodService;
 
     /**
+     * @var Shopware_Components_Snippet_Manager
+     */
+    private $snippets;
+
+    /**
      * CheckoutSubscriber constructor.
      * @param Configuration $configuration
      * @param PaymentMethodService $paymentMethodService
@@ -58,13 +64,15 @@ class CheckoutSubscriber implements SubscriberInterface
         PaymentMethodService $paymentMethodService,
         ShopwarePaymentMethodService $shopwarePaymentMethodService,
         Enlight_Components_Session_Namespace $session,
-        ModelManager $modelManager
+        ModelManager $modelManager,
+        Shopware_Components_Snippet_Manager $snippets
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
         $this->session = $session;
         $this->modelManager = $modelManager;
+        $this->snippets = $snippets;
     }
 
     /**
@@ -158,8 +166,9 @@ class CheckoutSubscriber implements SubscriberInterface
             return;
         }
 
+        $errorSnippets = $this->snippets->getNamespace('meteor_adyen/checkout/error');
+        
         $snippets = [];
-        $errorSnippets = Shopware()->Snippets()->getNamespace('meteor_adyen/checkout/error');
         $snippets['errorTransactionCancelled'] = $errorSnippets->get(
             'errorTransactionCancelled',
             'Your transaction was cancelled by the Payment Service Provider.',
