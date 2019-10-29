@@ -29,7 +29,7 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
                 'allow3DS2' => true,
             ],
             "channel" => "Web",
-            'origin' => "",
+            'origin' => $context->getOrigin(),
             'returnUrl' => $returnUrl,
             'merchantAccount' => 'Meteor-test',
             'applicationInfo' => [

@@ -5,3 +5,8 @@
 
     {$smarty.block.parent}
 {/block}
+
+{block name='frontend_checkout_confirm_error_messages'}
+    <div data-adyen-checkout-error="true"></div>
+    {$smarty.block.parent}
+{/block}

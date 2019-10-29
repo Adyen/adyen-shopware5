@@ -38,6 +38,7 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
         $paymentInfo = json_decode($this->Request()->getPost('paymentMethod') ?? '{}', true);
         $browserInfo = $this->Request()->getPost('browserInfo');
         $shopperInfo = $this->getShopperInfo();
+        $origin = $this->Request()->getPost('origin');
 
         $context = new PaymentContext();
         $context->setBrowserInfo($browserInfo);
@@ -45,6 +46,7 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
         $context->setBasket($this->adyenManager->getBasket());
         $context->setPaymentInfo($paymentInfo);
         $context->setShopperInfo($shopperInfo);
+        $context->setOrigin($origin);
 
         $chain = new Chain(
             new ApplicationInfoProvider(),
@@ -64,6 +66,47 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
         $this->Response()->setBody(json_encode($paymentInfo));
     }
 
+    public function ajaxIdentifyShopperAction()
+    {
+        $this->Request()->setHeader('Content-Type', 'application/json');
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
+        $fingerprint = $this->Request()->getPost('threeds2_fingerprint');
+
+        $payload = [
+            'paymentData' => $this->adyenManager->getPaymentDataSession(),
+            'details' => [
+                'threeds2.fingerprint' => $fingerprint
+            ]
+        ];
+
+        $checkout = $this->adyenCheckout->getCheckout();
+        $paymentInfo = $checkout->paymentsDetails($payload);
+        $this->Response()->setBody(json_encode($paymentInfo));
+    }
+
+    public function ajaxChallengeShopperAction()
+    {
+        $this->Request()->setHeader('Content-Type', 'application/json');
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
+        $challengeResult = $this->Request()->getPost('threeds2_challengeResult');
+
+        $payload = [
+            'paymentData' => $this->adyenManager->getPaymentDataSession(),
+            'details' => [
+                'threeds2.challengeResult' => $challengeResult
+            ]
+        ];
+
+        $checkout = $this->adyenCheckout->getCheckout();
+        $paymentInfo = $checkout->paymentsDetails($payload);
+        $this->Response()->setBody(json_encode($paymentInfo));
+    }
+
+    /**
+     * @return array
+     */
     private function getShopperInfo()
     {
         return [

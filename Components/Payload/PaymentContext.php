@@ -22,6 +22,8 @@ class PaymentContext
 
     private $shopperInfo;
 
+    private $origin;
+
     /**
      * @return array
      */
@@ -102,5 +104,21 @@ class PaymentContext
     public function setShopperInfo($shopperInfo): void
     {
         $this->shopperInfo = $shopperInfo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrigin(): string
+    {
+        return $this->origin;
+    }
+
+    /**
+     * @param string $origin
+     */
+    public function setOrigin($origin): void
+    {
+        $this->origin = $origin;
     }
 }
