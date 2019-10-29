@@ -104,6 +104,20 @@
             <argument type="service" id="meteor_adyen.logger.notifications"/>
             <argument type="service" id="events"/>
         </service>
+        <service id="meteor_adyen.components.notification_processor.chargeback"
+                 class="MeteorAdyen\Components\NotificationProcessor\Chargeback">
+            <tag name="meteor.adyen.notificationprocessor"/>
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="meteor_adyen.components.payment_status_update"/>
+        </service>
+        <service id="meteor_adyen.components.notification_processor.chargeback_reversed"
+                 class="MeteorAdyen\Components\NotificationProcessor\ChargebackReversed">
+            <tag name="meteor.adyen.notificationprocessor"/>
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="meteor_adyen.components.payment_status_update"/>
+        </service>
         <service id="meteor_adyen.components.notification_processor.refund"
                  class="MeteorAdyen\Components\NotificationProcessor\Refund">
             <tag name="meteor.adyen.notificationprocessor"/>
