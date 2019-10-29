@@ -93,7 +93,7 @@ class BackendOrderSubscriber implements SubscriberInterface
             $order['adyenNotification'] = null;
             $order['adyenRefundable'] = false;
 
-            if ($order['payment']['name'] != MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
+            if ($order['payment']['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
                 continue;
             }
 
