@@ -37,13 +37,14 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
         $paymentInfo = json_decode($this->Request()->getPost('paymentMethod') ?? '{}', true);
+        $order = $this->adyenManager->fetchOrderForCurrentSession();
         $browserInfo = $this->Request()->getPost('browserInfo');
         $shopperInfo = $this->getShopperInfo();
         $origin = $this->Request()->getPost('origin');
 
         $context = new PaymentContext(
             $paymentInfo,
-            $this->adyenManager->fetchOrderForCurrentSession(),
+            $order,
             $this->adyenManager->getBasket(),
             $browserInfo,
             $shopperInfo,
@@ -61,7 +62,7 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
 
         $payload = $chain->provide($context);
         $checkout = $this->adyenCheckout->getCheckout();
-        $paymentInfo = $checkout->payments($payload);
+        $paymentInfo = $checkout->payments($payload, ['idempotencyKey' => $order->getAttribute()->getMeteorAdyenIdempotencyKey()]);
 
         $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
 
