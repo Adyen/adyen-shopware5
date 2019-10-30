@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MeteorAdyen\Components\NotificationProcessor;
 
 use MeteorAdyen\Models\Notification;
+use MeteorAdyen\Models\NotificationException;
 
 /**
  * Interface NotificationProcessorInterface
@@ -24,6 +25,7 @@ interface NotificationProcessorInterface
      * Actual processing of the notification
      *
      * @param Notification $notification
+     * @throws NotificationException
      * @return void
      */
     public function process(Notification $notification);

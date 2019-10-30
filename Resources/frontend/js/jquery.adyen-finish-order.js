@@ -52,7 +52,7 @@
                 if(!$(me.opts.confirmFormSelector)[0].checkValidity()) {
                     return;
                 }
-                
+
                 $.loadingIndicator.open();
 
                 var data = {

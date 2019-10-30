@@ -8,6 +8,8 @@
         <service id="meteor_adyen.components.notification_processor" class="MeteorAdyen\Components\NotificationProcessor">
             <argument type="tagged" tag="meteor.adyen.notificationprocessor"/>
             <argument type="service" id="meteor_adyen.logger.notifications"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="events"/>
         </service>
         <service id="meteor_adyen.components.configuration" class="MeteorAdyen\Components\Configuration">
             <argument type="service" id="shopware.plugin.cached_config_reader"/>
@@ -32,6 +34,10 @@
                  class="MeteorAdyen\Components\NotificationManager">
             <argument type="service" id="models"/>
         </service>
+        <service id="meteor_adyen.components.fifo_notification_loader"
+                 class="MeteorAdyen\Components\FifoNotificationLoader">
+            <argument type="service" id="meteor_adyen.components.notification_manager"/>
+        </service>
         <service id="meteor_adyen.components.payment_status_update" class="MeteorAdyen\Components\PaymentStatusUpdate">
             <argument type="service" id="models"/>
         </service>
@@ -43,7 +49,6 @@
 
         </service>
         <service id="meteor_adyen.components.builder.notification_builder" class="MeteorAdyen\Components\Builder\NotificationBuilder">
-            <argument type="service" id="meteor_adyen.components.data_conversion"/>
             <argument type="service" id="models"/>
         </service>
 

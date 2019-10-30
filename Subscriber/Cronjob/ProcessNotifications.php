@@ -3,6 +3,7 @@
 namespace MeteorAdyen\Subscriber\Cronjob;
 
 use Doctrine\ORM\NoResultException;
+use MeteorAdyen\Components\FifoNotificationLoader;
 use MeteorAdyen\Components\NotificationManager;
 use MeteorAdyen\Components\NotificationProcessor;
 
@@ -15,25 +16,25 @@ class ProcessNotifications implements \Enlight\Event\SubscriberInterface
     const NUMBER_OF_NOTIFICATIONS_TO_HANDLE = 20;
 
     /**
+     * @var FifoNotificationLoader
+     */
+    private $loader;
+    /**
      * @var NotificationProcessor
      */
     private $notificationProcessor;
-    /**
-     * @var NotificationManager
-     */
-    private $notificationManager;
 
     /**
      * ProcessNotifications constructor.
+     * @param FifoNotificationLoader $fifoNotificationLoader
      * @param NotificationProcessor $notificationProcessor
-     * @param NotificationManager $notificationManager
      */
     public function __construct(
-        NotificationProcessor $notificationProcessor,
-        NotificationManager $notificationManager
+        FifoNotificationLoader $fifoNotificationLoader,
+        NotificationProcessor $notificationProcessor
     ) {
+        $this->loader = $fifoNotificationLoader;
         $this->notificationProcessor = $notificationProcessor;
-        $this->notificationManager = $notificationManager;
     }
 
     public static function getSubscribedEvents()
@@ -45,17 +46,13 @@ class ProcessNotifications implements \Enlight\Event\SubscriberInterface
 
     /**
      * @param \Shopware_Components_Cron_CronJob $job
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Enlight_Event_Exception
      */
     public function runCronjob(\Shopware_Components_Cron_CronJob $job)
     {
-        for ($i = 0; $i = self::NUMBER_OF_NOTIFICATIONS_TO_HANDLE; $i++) {
-            try {
-                $notification = $this->notificationManager->getNextNotificationToHandle();
-            } catch (NoResultException $exception) {
-                return;
-            }
-            $this->notificationProcessor->process($notification);
-        }
+        $this->notificationProcessor->processMany(
+            $this->loader->load(self::NUMBER_OF_NOTIFICATIONS_TO_HANDLE)
+        );
     }
 }
