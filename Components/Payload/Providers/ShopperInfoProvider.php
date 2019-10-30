@@ -18,7 +18,8 @@ class ShopperInfoProvider implements PaymentPayloadProvider
      */
     public function provide(PaymentContext $context): array
     {
-        // TODO: Implement provide() method.
-        return [];
+        return [
+            'shopperIP' => $context->getShopperInfo()['shopperIP']
+        ];
     }
 }

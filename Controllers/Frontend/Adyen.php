@@ -6,7 +6,9 @@ use MeteorAdyen\Components\Payload\PaymentContext;
 use MeteorAdyen\Components\Payload\Providers\BrowserInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\OrderInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\PaymentMethodProvider;
+use MeteorAdyen\Components\Payload\Providers\ShopperInfoProvider;
 use MeteorAdyen\Models\Payload\Providers\ApplicationInfoProvider;
+use Shopware\Models\Order\Order;
 
 /**
  * Class Shopware_Controllers_Frontend_Adyen
@@ -35,17 +37,23 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
         $paymentInfo = json_decode($this->Request()->getPost('paymentMethod') ?? '{}', true);
+        $order = $this->adyenManager->fetchOrderForCurrentSession();
         $browserInfo = $this->Request()->getPost('browserInfo');
+        $shopperInfo = $this->getShopperInfo();
+        $origin = $this->Request()->getPost('origin');
 
-        $context = new PaymentContext();
-        $context->setBrowserInfo($browserInfo);
-        $context->setOrder($this->adyenManager->fetchOrderIdForCurrentSession());
-        $context->setBasket($this->adyenManager->getBasket());
-        $context->setPaymentInfo($paymentInfo);
+        $context = new PaymentContext(
+            $paymentInfo,
+            $order,
+            $this->adyenManager->getBasket(),
+            $browserInfo,
+            $shopperInfo,
+            $origin
+        );
 
         $chain = new Chain(
             new ApplicationInfoProvider(),
-            // new ShopperInfoProvider()
+            new ShopperInfoProvider(),
             new OrderInfoProvider(),
             new PaymentMethodProvider(),
             // new LineItemsInfoProvider(),
@@ -54,10 +62,54 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
 
         $payload = $chain->provide($context);
         $checkout = $this->adyenCheckout->getCheckout();
-        $paymentInfo = $checkout->payments($payload);
+        $paymentInfo = $checkout->payments($payload, ['idempotencyKey' => $order->getAttribute()->getMeteorAdyenIdempotencyKey()]);
 
         $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
 
         $this->Response()->setBody(json_encode($paymentInfo));
+    }
+    
+    public function ajaxIdentifyShopperAction()
+    {
+        $this->paymentDetails('threeds2_fingerprint', 'threeds2.fingerprint');
+    }
+
+    public function ajaxChallengeShopperAction()
+    {
+        $this->paymentDetails('threeds2_challengeResult', 'threeds2.challengeResult');
+    }
+
+    /**
+     * @param $post
+     * @param $detail
+     * @throws \Adyen\AdyenException
+     */
+    private function paymentDetails($post, $detail)
+    {
+        $this->Request()->setHeader('Content-Type', 'application/json');
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
+        $postData = $this->Request()->getPost($post);
+
+        $payload = [
+            'paymentData' => $this->adyenManager->getPaymentDataSession(),
+            'details' => [
+                $detail => $postData
+            ]
+        ];
+
+        $checkout = $this->adyenCheckout->getCheckout();
+        $paymentInfo = $checkout->paymentsDetails($payload);
+        $this->Response()->setBody(json_encode($paymentInfo));
+    }
+
+    /**
+     * @return array
+     */
+    private function getShopperInfo()
+    {
+        return [
+            'shopperIP' => $this->request->getClientIp()
+        ];
     }
 }

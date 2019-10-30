@@ -1,10 +1,6 @@
 ;(function ($) {
     'use strict';
 
-    $(function () {
-        StateManager.addPlugin('.adyen-payment-selection', 'adyen-payment-selection');
-    });
-
     $.plugin('adyen-payment-selection', {
         /**
          * Plugin default options.

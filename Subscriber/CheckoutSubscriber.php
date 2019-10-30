@@ -12,6 +12,7 @@ use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use Shopware\Components\Model\ModelManager;
+use Shopware_Components_Snippet_Manager;
 use Shopware_Controllers_Frontend_Checkout;
 
 /**
@@ -46,6 +47,11 @@ class CheckoutSubscriber implements SubscriberInterface
     private $shopwarePaymentMethodService;
 
     /**
+     * @var Shopware_Components_Snippet_Manager
+     */
+    private $snippets;
+
+    /**
      * CheckoutSubscriber constructor.
      * @param Configuration $configuration
      * @param PaymentMethodService $paymentMethodService
@@ -58,13 +64,15 @@ class CheckoutSubscriber implements SubscriberInterface
         PaymentMethodService $paymentMethodService,
         ShopwarePaymentMethodService $shopwarePaymentMethodService,
         Enlight_Components_Session_Namespace $session,
-        ModelManager $modelManager
+        ModelManager $modelManager,
+        Shopware_Components_Snippet_Manager $snippets
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
         $this->session = $session;
         $this->modelManager = $modelManager;
+        $this->snippets = $snippets;
     }
 
     /**
@@ -95,6 +103,7 @@ class CheckoutSubscriber implements SubscriberInterface
     {
         $this->rewritePaymentData($args);
         $this->addAdyenConfig($args);
+        $this->addAdyenSnippets($args);
     }
 
     /**
@@ -154,6 +163,45 @@ class CheckoutSubscriber implements SubscriberInterface
     /**
      * @param Enlight_Event_EventArgs $args
      */
+    private function addAdyenSnippets(Enlight_Event_EventArgs $args)
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
+        $subject = $args->getSubject();
+
+        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+            return;
+        }
+
+        $errorSnippets = $this->snippets->getNamespace('meteor_adyen/checkout/error');
+        
+        $snippets = [];
+        $snippets['errorTransactionCancelled'] = $errorSnippets->get(
+            'errorTransactionCancelled',
+            'Your transaction was cancelled by the Payment Service Provider.',
+            true
+        );
+        $snippets['errorTransactionProcessing'] = $errorSnippets->get(
+            'errorTransactionProcessing',
+            'An error occured while processing your payment.',
+            true
+        );
+        $snippets['errorTransactionRefused'] = $errorSnippets->get(
+            'errorTransactionRefused',
+            'Your transaction was refused by the Payment Service Provider.',
+            true
+        );
+        $snippets['errorTransactionUnknown'] = $errorSnippets->get(
+            'errorTransactionUnknown',
+            'Your transaction was cancelled due to an unknown reason.',
+            true
+        );
+
+        $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
+    }
+
+    /**
+     * @param Enlight_Event_EventArgs $args
+     */
     private function rewritePaymentData(Enlight_Event_EventArgs $args)
     {
         /** @var Shopware_Controllers_Frontend_Checkout $subject */
@@ -204,5 +252,4 @@ class CheckoutSubscriber implements SubscriberInterface
             $this->session->offsetSet('adyenPayment', $adyenPayment);
         }
     }
-
 }

@@ -43,10 +43,20 @@ class AdyenManager
     /**
      * @return Order|null
      */
-    public function fetchOrderIdForCurrentSession(): ?Order
+    public function fetchOrderForCurrentSession(): ?Order
     {
         $order = $this->modelManager->getRepository(Order::class)
             ->findOneBy(['temporaryId' => $this->session->get('sessionId')]);
+
+        if ($order && empty($order->getAttribute()->getMeteorAdyenIdempotencyKey())) {
+            $uuid = \Adyen\Util\Uuid::generateV4();
+            $orderAttribute = $order->getAttribute();
+            $orderAttribute->setMeteorAdyenIdempotencyKey($uuid);
+            $order->setAttribute($orderAttribute);
+
+            $this->modelManager->persist($order);
+            $this->modelManager->flush();
+        }
 
         return $order;
     }
