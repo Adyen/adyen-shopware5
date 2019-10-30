@@ -42,6 +42,12 @@
              * Classname for 'Update Payment informations' button
              */
             classChangePaymentInfo: 'method--change-info',
+            /**
+             * Selector for the payment method form submit button element.
+             *
+             * @type {String}
+             */
+            paymentMethodFormSubmitSelector: 'button[type=submit]',
         },
 
         currentSelectedPaymentId: '',
@@ -95,6 +101,7 @@
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
 
                 me.handleComponent(payment.type);
+                $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', true);
             }
         },
         setConfig: function () {
@@ -133,6 +140,8 @@
         },
         handleOnChange: function (state) {
             var me = this;
+
+            $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', !state.isValid);
 
             if (state.isValid && state.data && state.data.paymentMethod) {
                 me.setPayment(state);
