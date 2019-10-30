@@ -56,7 +56,7 @@ class PaymentMethodService
     {
         $checkout = new Checkout($this->apiClient);
 
-        $cacheKey = $this->getCacheKey($countryCode, $currency, (string)$value);
+        $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string)$value ?? '');
         if ($cache && isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
         }
