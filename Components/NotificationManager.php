@@ -2,6 +2,9 @@
 
 namespace MeteorAdyen\Components;
 
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use MeteorAdyen\Models\Enum\NotificationStatus;
 use MeteorAdyen\Models\Notification;
@@ -19,7 +22,7 @@ class NotificationManager
     private $modelManager;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var ObjectRepository|EntityRepository
      */
     private $notificationRepository;
 
@@ -36,15 +39,15 @@ class NotificationManager
     }
 
     /**
-     * @return Notification
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @return mixed
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getNextNotificationToHandle()
     {
         $builder = $this->modelManager->getRepository(Notification::class)->createQueryBuilder('n');
         $builder->where("n.status = 'received' OR n.status = 'retry'")
             ->orderBy('n.updatedAt', 'ASC')
-            ->setParameter('status', 'received')
             ->setMaxResults(1);
 
         return $builder->getQuery()->getSingleResult();
@@ -52,7 +55,8 @@ class NotificationManager
 
     /**
      * @param int $orderId
-     * @return Notification
+     * @return mixed|null
+     * @throws NonUniqueResultException
      */
     public function getLastNotificationForOrderId(int $orderId)
     {

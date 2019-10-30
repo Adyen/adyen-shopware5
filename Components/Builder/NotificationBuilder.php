@@ -15,10 +15,6 @@ use Shopware\Models\Order\Order;
 class NotificationBuilder
 {
     /**
-     * @var Currency
-     */
-    private $currency;
-    /**
      * @var ModelManager
      */
     private $modelManager;
@@ -26,19 +22,21 @@ class NotificationBuilder
      * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository|\Shopware\Models\Order\Repository
      */
     private $orderRepository;
+    /**
+     * @var Currency
+     */
+    private $currency;
 
     /**
      * NotificationBuilder constructor.
-     * @param Currency $currency
      * @param ModelManager $modelManager
      */
     public function __construct(
-        Currency $currency,
         ModelManager $modelManager
     ) {
-        $this->currency = $currency;
         $this->modelManager = $modelManager;
         $this->orderRepository = $modelManager->getRepository(Order::class);
+        $this->currency = new Currency();
     }
 
     /**
@@ -74,7 +72,7 @@ class NotificationBuilder
             $value = $params['amount']['value'];
             $currency = $params['amount']['currency'];
 
-            $value = $this->currency->formatAmount($value, $currency);
+            $value = $this->currency->sanitize($value, $currency);
 
             $notification->setAmountValue($value);
             $notification->setAmountCurrency($params['amount']['currency']);

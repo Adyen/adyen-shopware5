@@ -6,7 +6,7 @@
         <!-- Console commands -->
         <service class="MeteorAdyen\Commands\ProcessNotifications" id="meteor_adyen.commands.process_notifications">
             <tag name="console.command" />
-            <argument type="service" id="meteor_adyen.components.notification_manager"/>
+            <argument type="service" id="meteor_adyen.components.fifo_notification_loader"/>
             <argument type="service" id="meteor_adyen.components.notification_processor"/>
         </service>
     </services>

@@ -9,9 +9,11 @@ use MeteorAdyen\Components\NotificationProcessor\NotificationProcessorInterface;
 use MeteorAdyen\Models\Enum\NotificationStatus;
 use MeteorAdyen\Models\Event;
 use MeteorAdyen\Models\Notification;
+use MeteorAdyen\Models\NotificationException;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Components\Model\ModelManager;
+use Traversable;
 
 /**
  * Class NotificationProcessor
@@ -57,6 +59,17 @@ class NotificationProcessor
     }
 
     /**
+     * @param Traversable|Notification[] $notifications
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Enlight_Event_Exception
+     */
+    public function processMany(Traversable $notifications) {
+        foreach ($notifications as $notification) {
+            $this->process($notification);
+        }
+    }
+
+    /**
      * Process the notification
      *
      * @param Notification $notification
@@ -94,11 +107,26 @@ class NotificationProcessor
             return;
         }
 
+        $status = NotificationStatus::STATUS_HANDLED;
         foreach ($handlers as $handler) {
-            $handler->process($notification);
+            try {
+                $handler->process($notification);
+            } catch (NotificationException $exception) {
+                $status = NotificationStatus::STATUS_ERROR;
+                $this->logger->notice('NotificationException', [
+                    'message' => $exception->getMessage(),
+                    'notificationId' => $exception->getNotification()->getId()
+                ]);
+            } catch (\Exception $exception) {
+                $status = NotificationStatus::STATUS_FATAL;
+                $this->logger->notice('General Exception', [
+                    'exception' => $exception,
+                    'notificationId' => $notification->getId()
+                ]);
+            }
         }
 
-        $notification->setStatus(NotificationStatus::STATUS_HANDLED);
+        $notification->setStatus($status);
         $this->modelManager->persist($notification);
     }
 
