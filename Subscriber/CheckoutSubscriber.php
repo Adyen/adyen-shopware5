@@ -134,11 +134,17 @@ class CheckoutSubscriber implements SubscriberInterface
         if (!in_array($subject->Request()->getActionName(), ['shippingPayment'])) {
             return;
         }
+        $view = $subject->View();
+
+        $countrycode = $view->getAssign('sUserData')['additional']['country']['countryiso'];
+        $currency = $view->getAssign('sBasket')['sCurrencyName'];
+        $value = $view->getAssign('sBasket')['AmountNumeric'];
+        $paymentMethods = $this->paymentMethodService->getPaymentMethods($countrycode, $currency, $value);
 
         $adyenConfig = [
             "originKey" => $this->configuration->getOriginKey(),
             "environment" => $this->configuration->getEnvironment(),
-            "paymentMethods" => json_encode($this->paymentMethodService->getPaymentMethods()),
+            "paymentMethods" => json_encode($paymentMethods),
             "paymentMethodPrefix" => $this->configuration->getPaymentMethodPrefix(),
         ];
 
