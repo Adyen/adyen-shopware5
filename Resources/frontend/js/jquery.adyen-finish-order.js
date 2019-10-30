@@ -43,6 +43,12 @@
             event.preventDefault();
 
             if (me.sessionStorage.getItem('paymentMethod')) {
+                if(!$(me.opts.confirmFormSelector)[0].checkValidity()) {
+                    return;
+                }
+
+
+                $.loadingIndicator.open();
 
                 var data = {
                     'paymentMethod': me.getPaymentMethod(),
@@ -111,6 +117,7 @@
         },
         handleOnAdditionalDetails: function (state, component) {
             //todo show popup
+            $.loadingIndicator.close();
             console.log('got additional data', {state: state, component: component});
         },
 
