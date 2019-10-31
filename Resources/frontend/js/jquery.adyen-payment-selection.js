@@ -91,7 +91,6 @@
 
             //When details is set load the component
             if (typeof payment.details !== "undefined") {
-                console.log(payment);
                 $('#' + me.currentSelectedPaymentId)
                     .closest(me.opts.paymentMethodSelector)
                     .find(me.opts.methodeBankdataSelector)

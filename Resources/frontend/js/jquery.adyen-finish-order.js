@@ -9,6 +9,7 @@
             placeOrderSelector: '.table--actions button[type=submit]',
             confirmFormSelector: '#confirm--form',
             mountRedirectSelector: '.is--act-confirm',
+            AdyenType: '',
             AdyenGoogleConfig: {},
             AdyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             AdyenAjaxIdentifyShopperUrl: '/frontend/adyen/ajaxIdentifyShopper',
@@ -194,7 +195,7 @@
         handleCheckoutButton: function() {
             var me = this;
 
-            if (me.opts.AdyenGoogleConfig !== {}) {
+            if (me.opts.AdyenType === 'paywithgoogle') {
                 me.replaceCheckoutButtonForGooglePay();
             }
         },

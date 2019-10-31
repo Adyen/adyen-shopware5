@@ -22,6 +22,9 @@
     data-AdyenAjaxIdentifyShopperUrl="{url module='frontend' controller='adyen' action='ajaxIdentifyShopper'}"
     data-AdyenAjaxChallengeShopperUrl="{url module='frontend' controller='adyen' action='ajaxChallengeShopper'}"
     {if $mAdyenSnippets}data-AdyenSnippets="{$mAdyenSnippets}"{/if}
+    {if $sUserData.additional.payment.type}
+        data-AdyenType="{$sUserData.additional.payment.type}"
+    {/if}
     {if $sAdyenGoogleConfig}
         data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
     {/if}

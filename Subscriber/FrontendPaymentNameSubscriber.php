@@ -86,6 +86,7 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
         $userData['additional']['payment']['description'] = $adyenMethodName->getName();
         $userData['additional']['payment']['additionaldescription'] = $adyenMethodName->getDescription();
         $userData['additional']['payment']['image'] = $this->shopwarePaymentMethodService->getAdyenImageByType($adyenType);
+        $userData['additional']['payment']['type'] = $adyenType;
 
         $subject->View()->assign('sUserData', $userData);
     }
