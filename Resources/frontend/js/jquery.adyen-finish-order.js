@@ -9,6 +9,7 @@
             placeOrderSelector: '.table--actions button[type=submit]',
             confirmFormSelector: '#confirm--form',
             mountRedirectSelector: '.is--act-confirm',
+            AdyenGoogleConfig: {},
             AdyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             AdyenAjaxIdentifyShopperUrl: '/frontend/adyen/ajaxIdentifyShopper',
             AdyenAjaxChallengeShopperUrl: '/frontend/adyen/ajaxChallengeShopper',
@@ -19,6 +20,7 @@
                 errorTransactionUnknown: 'Your transaction was cancelled due to an unknown reason.',
             },
         },
+        paymentMethodSession: 'paymentMethod',
         adyenConfiguration: {},
         adyenCheckout: null,
 
@@ -31,6 +33,7 @@
             me.eventListeners();
             me.setConfig();
             me.setCheckout();
+            me.handleCheckoutButton();
         },
 
         eventListeners: function () {
@@ -45,10 +48,13 @@
         onPlaceOrder: function (event) {
             var me = this;
 
-            event.preventDefault();
+            if (typeof event !== 'undefined') {
+                event.preventDefault();
+            }
+
             me.clearAdyenError();
 
-            if (me.sessionStorage.getItem('paymentMethod')) {
+            if (me.sessionStorage.getItem(me.paymentMethodSession)) {
                 if(!$(me.opts.confirmFormSelector)[0].checkValidity()) {
                     return;
                 }
@@ -186,6 +192,38 @@
             }
         },
 
+        handleCheckoutButton: function() {
+            var me = this;
+
+            console.log('(google config)', me.opts.AdyenGoogleConfig);
+            if (me.opts.AdyenGoogleConfig !== {}) {
+                var orderButton = $(me.opts.placeOrderSelector);
+                orderButton.parent().append(
+                    $('<div />')
+                        .attr('id', 'AdyenGooglePayButton')
+                        .addClass('right')
+                );
+                orderButton.remove();
+
+                me.opts.AdyenGoogleConfig.onSubmit = function(state, component) {
+                    me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
+                    me.onPlaceOrder();
+                };
+
+                //me._on('#AdyenGooglePayButton button.gpay-button', 'click', $.proxy(me.handleGoogleClick, me));
+
+                var googlepay = me.adyenCheckout.create("paywithgoogle", me.opts.AdyenGoogleConfig);
+                googlepay
+                    .isAvailable()
+                    .then(() => {
+                        googlepay.mount("#AdyenGooglePayButton");
+                    })
+                    .catch(e => {
+                        
+                    });
+            }
+        },
+
         addAdyenError: function (message) {
             var me = this;
             $.publish('plugin/MeteorAdyenCheckoutError/addError', message);
@@ -225,7 +263,7 @@
         getPaymentMethod: function () {
             var me = this;
 
-            return me.sessionStorage.getItem('paymentMethod');
+            return me.sessionStorage.getItem(me.paymentMethodSession);
         },
 
         getAdyenConfigSession: function () {

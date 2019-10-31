@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace MeteorAdyen\Subscriber;
 
 use Adyen\AdyenException;
+use Adyen\Util\Currency;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Components\PaymentMethodService as ShopwarePaymentMethodService;
+use MeteorAdyen\MeteorAdyen;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Components_Snippet_Manager;
 use Shopware_Controllers_Frontend_Checkout;
@@ -104,6 +106,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->rewritePaymentData($args);
         $this->addAdyenConfig($args);
         $this->addAdyenSnippets($args);
+        $this->addAdyenGooglePay($args);
     }
 
     /**
@@ -158,23 +161,6 @@ class CheckoutSubscriber implements SubscriberInterface
         ];
 
         $subject->View()->assign('sAdyenConfig', $adyenConfig);
-
-        if ($this->hasMethod('paywithgoogle', $paymentMethods)) {
-            $adyenGoogleConfig = [
-                'environment' => 'TEST',
-                'currencyCode' => 'EUR',
-                'amount' => 1000,
-                'configuration' => [
-                    'gatewayMerchantId' => $this->configuration->getMerchantAccount(),
-                    'merchantName' => Shopware()->Shop()->getName()
-                ],
-            ];
-            if ($this->configuration->getEnvironment() == Configuration::ENV_LIVE) {
-                $adyenGoogleConfig['environment'] = 'PRODUCTION';
-                $adyenGoogleConfig['configuration']['merchantIdentifier'] = ''; // TODO: Configurable merchant identifier
-            }
-            $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
-        }
     }
 
     /**
@@ -270,12 +256,55 @@ class CheckoutSubscriber implements SubscriberInterface
         }
     }
 
+    private function addAdyenGooglePay(Enlight_Event_EventArgs $args)
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
+        $subject = $args->getSubject();
+
+        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+            return;
+        }
+
+        $userData = $subject->View()->getAssign('sUserData');
+        if (!$userData['additional'] ||
+            !$userData['additional']['payment'] ||
+            $userData['additional']['payment']['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
+            return;
+        }
+
+        $basket = $subject->View()->getAssign('sBasket');
+        if (!$basket) {
+            return;
+        }
+
+        if ($this->shopwarePaymentMethodService->getActiveUserAdyenMethod(false) !== 'paywithgoogle') {
+            return;
+        }
+
+        $currencyUtil = new Currency();
+        $adyenGoogleConfig = [
+            'environment' => 'TEST',
+            'showPayButton' => true,
+            'currencyCode' => $basket['sCurrencyName'],
+            'amount' => $currencyUtil->sanitize($basket['AmountNumeric'], $basket['sCurrencyName']),
+            'configuration' => [
+                'gatewayMerchantId' => $this->configuration->getMerchantAccount(),
+                'merchantName' => Shopware()->Shop()->getName()
+            ],
+        ];
+        if ($this->configuration->getEnvironment() == Configuration::ENV_LIVE) {
+            $adyenGoogleConfig['environment'] = 'PRODUCTION';
+            $adyenGoogleConfig['configuration']['merchantIdentifier'] = ''; // TODO: Configurable merchant identifier
+        }
+        $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
+    }
+
     /**
      * @param $method
-     * @param $methods
+     * @param array $methods
      * @return bool
      */
-    private function hasMethod($method, $methods)
+    private function hasMethod($method, array $methods)
     {
         foreach ($methods['paymentMethods'] as $paymentMethod) {
             if ($paymentMethod['type'] == $method) {

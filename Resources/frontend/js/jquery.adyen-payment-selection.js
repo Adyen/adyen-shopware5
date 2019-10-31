@@ -9,7 +9,6 @@
             adyenOriginkey: '',
             adyenEnvironment: 'test',
             adyenPaymentMethodsResponse: {},
-            adyenGoogleConfig: {},
             formSelector: '#shippingPaymentForm',
             /**
              * Prefix to identify adyen payment methods
@@ -92,6 +91,7 @@
 
             //When details is set load the component
             if (typeof payment.details !== "undefined") {
+                console.log(payment);
                 $('#' + me.currentSelectedPaymentId)
                     .closest(me.opts.paymentMethodSelector)
                     .find(me.opts.methodeBankdataSelector)
@@ -135,27 +135,20 @@
 
             switch (type) {
                 case 'paywithgoogle':
-                    me.handleComponentPayWithGoogle();
+                    me.handleComponentPayWithGoogle(type);
                     break;
                 default:
-                    me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
+                    me.handleComponentGeneral(type);
                     break;
             }
         },
-        handleComponentPayWithGoogle: function() {
+        handleComponentGeneral: function(type) {
             var me = this;
-            console.log(me.opts.adyenGoogleConfig);
-
-            var googlepay = me.adyenCheckout.create("paywithgoogle", me.opts.adyenGoogleConfig);
-            googlepay
-                .isAvailable()
-                .then(() => {
-                    googlepay.mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
-                    
-                })
-                .catch(e => {
-                    alert('unavailable');
-                });
+            me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
+        },
+        handleComponentPayWithGoogle: function(type) {
+            var me = this;
+            $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', false);
         },
         handleOnChange: function (state) {
             var me = this;
