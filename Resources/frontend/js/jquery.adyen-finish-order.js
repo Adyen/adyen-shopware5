@@ -18,6 +18,7 @@
                 errorTransactionProcessing: 'An error occured while processing your payment.',
                 errorTransactionRefused: 'Your transaction was refused by the Payment Service Provider.',
                 errorTransactionUnknown: 'Your transaction was cancelled due to an unknown reason.',
+                errorGooglePayNotAvailable: 'Google Pay is currently not available.',
             },
         },
         paymentMethodSession: 'paymentMethod',
@@ -84,8 +85,6 @@
 
         handlePaymentData: function (data) {
             var me = this;
-
-            console.log(data);
 
             switch (data.resultCode) {
                 case 'Authorised':
@@ -195,33 +194,36 @@
         handleCheckoutButton: function() {
             var me = this;
 
-            console.log('(google config)', me.opts.AdyenGoogleConfig);
             if (me.opts.AdyenGoogleConfig !== {}) {
-                var orderButton = $(me.opts.placeOrderSelector);
-                orderButton.parent().append(
-                    $('<div />')
-                        .attr('id', 'AdyenGooglePayButton')
-                        .addClass('right')
-                );
-                orderButton.remove();
-
-                me.opts.AdyenGoogleConfig.onSubmit = function(state, component) {
-                    me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
-                    me.onPlaceOrder();
-                };
-
-                //me._on('#AdyenGooglePayButton button.gpay-button', 'click', $.proxy(me.handleGoogleClick, me));
-
-                var googlepay = me.adyenCheckout.create("paywithgoogle", me.opts.AdyenGoogleConfig);
-                googlepay
-                    .isAvailable()
-                    .then(() => {
-                        googlepay.mount("#AdyenGooglePayButton");
-                    })
-                    .catch(e => {
-                        
-                    });
+                me.replaceCheckoutButtonForGooglePay();
             }
+        },
+
+        replaceCheckoutButtonForGooglePay: function() {
+            var me = this;
+
+            var orderButton = $(me.opts.placeOrderSelector);
+            orderButton.parent().append(
+                $('<div />')
+                    .attr('id', 'AdyenGooglePayButton')
+                    .addClass('right')
+            );
+            orderButton.remove();
+
+            me.opts.AdyenGoogleConfig.onSubmit = function(state, component) {
+                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
+                me.onPlaceOrder();
+            };
+
+            var googlepay = me.adyenCheckout.create("paywithgoogle", me.opts.AdyenGoogleConfig);
+            googlepay
+                .isAvailable()
+                .then(function () {
+                    googlepay.mount("#AdyenGooglePayButton");
+                })
+                .catch(function (e) {
+                    this.addAdyenError(me.opts.AdyenSnippets.errorGooglePayNotAvailable);
+                });
         },
 
         addAdyenError: function (message) {
