@@ -9,6 +9,7 @@
             adyenOriginkey: '',
             adyenEnvironment: 'test',
             adyenPaymentMethodsResponse: {},
+            adyenGoogleConfig: {},
             formSelector: '#shippingPaymentForm',
             /**
              * Prefix to identify adyen payment methods
@@ -96,8 +97,8 @@
                     .find(me.opts.methodeBankdataSelector)
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
 
-                me.handleComponent(payment.type);
                 $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', true);
+                me.handleComponent(payment.type);
             }
         },
         setConfig: function () {
@@ -132,7 +133,29 @@
         handleComponent: function (type) {
             var me = this;
 
-            me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
+            switch (type) {
+                case 'paywithgoogle':
+                    me.handleComponentPayWithGoogle();
+                    break;
+                default:
+                    me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
+                    break;
+            }
+        },
+        handleComponentPayWithGoogle: function() {
+            var me = this;
+            console.log(me.opts.adyenGoogleConfig);
+
+            var googlepay = me.adyenCheckout.create("paywithgoogle", me.opts.adyenGoogleConfig);
+            googlepay
+                .isAvailable()
+                .then(() => {
+                    googlepay.mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
+                    
+                })
+                .catch(e => {
+                    alert('unavailable');
+                });
         },
         handleOnChange: function (state) {
             var me = this;

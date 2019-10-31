@@ -7,6 +7,9 @@
         <div data-adyenOriginKey='{$sAdyenConfig.originKey}'
              data-adyenEnvironment='{$sAdyenConfig.environment}'
              data-adyenPaymentMethodsResponse='{$sAdyenConfig.paymentMethods}'
+            {if $sAdyenGoogleConfig}
+                data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
+            {/if}
              class="adyen-payment-selection">
         </div>
     {/if}

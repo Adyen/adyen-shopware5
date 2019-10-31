@@ -158,6 +158,23 @@ class CheckoutSubscriber implements SubscriberInterface
         ];
 
         $subject->View()->assign('sAdyenConfig', $adyenConfig);
+
+        if ($this->hasMethod('paywithgoogle', $paymentMethods)) {
+            $adyenGoogleConfig = [
+                'environment' => 'TEST',
+                'currencyCode' => 'EUR',
+                'amount' => 1000,
+                'configuration' => [
+                    'gatewayMerchantId' => $this->configuration->getMerchantAccount(),
+                    'merchantName' => Shopware()->Shop()->getName()
+                ],
+            ];
+            if ($this->configuration->getEnvironment() == Configuration::ENV_LIVE) {
+                $adyenGoogleConfig['environment'] = 'PRODUCTION';
+                $adyenGoogleConfig['configuration']['merchantIdentifier'] = ''; // TODO: Configurable merchant identifier
+            }
+            $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
+        }
     }
 
     /**
@@ -251,5 +268,20 @@ class CheckoutSubscriber implements SubscriberInterface
             $subject->Request()->setPost('adyenPayment', $adyenPayment);
             $this->session->offsetSet('adyenPayment', $adyenPayment);
         }
+    }
+
+    /**
+     * @param $method
+     * @param $methods
+     * @return bool
+     */
+    private function hasMethod($method, $methods)
+    {
+        foreach ($methods['paymentMethods'] as $paymentMethod) {
+            if ($paymentMethod['type'] == $method) {
+                return true;
+            }
+        }
+        return false;
     }
 }
