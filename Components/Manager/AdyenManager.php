@@ -32,12 +32,10 @@ class AdyenManager
 
     public function __construct(
         EntityManagerInterface $modelManager,
-        Enlight_Components_Session_Namespace $session,
-        Shopware_Components_Modules $modules
+        Enlight_Components_Session_Namespace $session
     ) {
         $this->modelManager = $modelManager;
         $this->session = $session;
-        $this->modules = $modules;
     }
 
     /**
@@ -66,7 +64,7 @@ class AdyenManager
      */
     public function getBasket(): sBasket
     {
-        return $this->modules->Basket();
+        return Shopware()->Modules()->Basket();
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MeteorAdyen\Models\Payload\Providers;
+namespace MeteorAdyen\Components\Payload\Providers;
 
 use MeteorAdyen\Components\Payload\PaymentContext;
 use MeteorAdyen\Components\Payload\PaymentPayloadProvider;

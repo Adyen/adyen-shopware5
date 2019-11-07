@@ -3,11 +3,11 @@
 use MeteorAdyen\Components\Manager\AdyenManager;
 use MeteorAdyen\Components\Payload\Chain;
 use MeteorAdyen\Components\Payload\PaymentContext;
+use MeteorAdyen\Components\Payload\Providers\ApplicationInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\BrowserInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\OrderInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\PaymentMethodProvider;
 use MeteorAdyen\Components\Payload\Providers\ShopperInfoProvider;
-use MeteorAdyen\Models\Payload\Providers\ApplicationInfoProvider;
 use Shopware\Models\Order\Order;
 
 /**

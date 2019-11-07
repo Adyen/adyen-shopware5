@@ -6,7 +6,6 @@
         <service id="meteor_adyen.components.manager.adyen_manager" class="MeteorAdyen\Components\Manager\AdyenManager">
             <argument type="service" id="models"/>
             <argument type="service" id="session"/>
-            <argument type="service" id="modules"/>
         </service>
     </services>
 </container>
