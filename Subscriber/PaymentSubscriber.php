@@ -8,9 +8,9 @@ use Adyen\AdyenException;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
+use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use MeteorAdyen\MeteorAdyen;
-use Shopware\Components\Model\ModelManager;
 
 /**
  * Class PaymentSubscriber
@@ -28,11 +28,6 @@ class PaymentSubscriber implements SubscriberInterface
     private $shopwarePaymentMethodService;
 
     /**
-     * @var bool
-     */
-    private $isDisabled;
-
-    /**
      * PaymentSubscriber constructor.
      * @param PaymentMethodService $paymentMethodService
      * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
@@ -43,7 +38,6 @@ class PaymentSubscriber implements SubscriberInterface
     ) {
         $this->paymentMethodService = $paymentMethodService;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
-        $this->isDisabled = false;
     }
 
     public static function getSubscribedEvents()
@@ -75,13 +69,17 @@ class PaymentSubscriber implements SubscriberInterface
             return $method['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD;
         });
 
-        $adyenMethods = $this->paymentMethodService->getPaymentMethods();
+        $countryCode = Shopware()->Session()->sOrderVariables['sUserData']['additional']['country']['countryiso'];
+        $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
+        $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
+
+        $adyenMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
         $adyenMethods['paymentMethods'] = array_reverse($adyenMethods['paymentMethods']);
 
         foreach ($adyenMethods['paymentMethods'] as $adyenMethod) {
             $paymentMethodInfo = $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($adyenMethod['type']);
             array_unshift($shopwareMethods, [
-                'id' => "adyen_" . $adyenMethod['type'],
+                'id' => Configuration::PAYMENT_PREFIX . $adyenMethod['type'],
                 'name' => $adyenMethod['type'],
                 'description' => $paymentMethodInfo->getName(),
                 'additionaldescription' => $paymentMethodInfo->getDescription(),
