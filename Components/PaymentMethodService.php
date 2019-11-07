@@ -106,7 +106,7 @@ class PaymentMethodService
             ->from('s_user_attributes', 'a')
             ->where('a.userId = :customerId')
             ->setParameter('customerId', $userId);
-        return ($prependAdyen ? 'adyen_' : '') . $qb->execute()->fetchColumn();
+        return ($prependAdyen ? Configuration::PAYMENT_PREFIX : '') . $qb->execute()->fetchColumn();
     }
 
     /**
@@ -115,7 +115,7 @@ class PaymentMethodService
      */
     public function isAdyenMethod($payment)
     {
-        return substr($payment, 0, 6) === 'adyen_';
+        return substr($payment, 0, 6) === Configuration::PAYMENT_PREFIX;
     }
 
     /**

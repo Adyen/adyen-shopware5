@@ -52,14 +52,14 @@ class PaymentMethodService
      * @return array
      * @throws AdyenException
      */
-    public function getPaymentMethods($countryCode = "BE", $currency = "EUR", $value = 100, $cache = true): array
+    public function getPaymentMethods($countryCode = null, $currency = null, $value= null, $cache = true): array
     {
-        $checkout = new Checkout($this->apiClient);
-
         $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string)$value ?? '');
         if ($cache && isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
         }
+
+        $checkout = new Checkout($this->apiClient);
 
         $paymentMethods = $checkout->paymentMethods([
             "merchantAccount" => $this->configuration->getMerchantAccount(),

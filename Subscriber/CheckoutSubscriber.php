@@ -145,10 +145,10 @@ class CheckoutSubscriber implements SubscriberInterface
         }
         $view = $subject->View();
 
-        $countrycode = $view->getAssign('sUserData')['additional']['country']['countryiso'];
+        $countryCode = $view->getAssign('sUserData')['additional']['country']['countryiso'];
         $currency = $view->getAssign('sBasket')['sCurrencyName'];
         $value = $view->getAssign('sBasket')['AmountNumeric'];
-        $paymentMethods = $this->paymentMethodService->getPaymentMethods($countrycode, $currency, $value);
+        $paymentMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
 
         $adyenConfig = [
             "originKey" => $this->configuration->getOriginKey(),
