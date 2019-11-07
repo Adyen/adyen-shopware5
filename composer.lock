@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ce6f9412b9603cab4448f8d1aaf58b9f",
+    "content-hash": "bdc9a89ee557c96921c741c6a8b18f5d",
     "packages": [
         {
             "name": "adyen/php-api-library",
-            "version": "4.1.0",
+            "version": "4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Adyen/adyen-php-api-library.git",
-                "reference": "d461d912e3dfbada0a9a68b6ed32612cfb557560"
+                "reference": "3cba36d874e4c45329304289423b1ef1eb0ba265"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Adyen/adyen-php-api-library/zipball/d461d912e3dfbada0a9a68b6ed32612cfb557560",
-                "reference": "d461d912e3dfbada0a9a68b6ed32612cfb557560",
+                "url": "https://api.github.com/repos/Adyen/adyen-php-api-library/zipball/3cba36d874e4c45329304289423b1ef1eb0ba265",
+                "reference": "3cba36d874e4c45329304289423b1ef1eb0ba265",
                 "shasum": ""
             },
             "require": {
@@ -48,7 +48,7 @@
             "keywords": [
                 "adyen"
             ],
-            "time": "2019-10-02T11:29:07+00:00"
+            "time": "2019-11-05T13:25:29+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -6493,7 +6493,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.1",
+        "php": "^7.0",
         "ext-json": "*"
     },
     "platform-dev": []

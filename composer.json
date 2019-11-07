@@ -13,9 +13,9 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.1",
+        "php": "^7.0",
         "ext-json": "*",
-        "adyen/php-api-library": "^4.1",
+        "adyen/php-api-library": "^4.2",
         "paragonie/halite": "^4.6",
         "symfony/dotenv": "^4.3"
     }
