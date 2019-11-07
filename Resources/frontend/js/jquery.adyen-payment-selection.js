@@ -140,7 +140,7 @@
             $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', !state.isValid);
 
             if (state.isValid && state.data && state.data.paymentMethod) {
-                me.setPayment(state);
+                me.setPaymentSession(state);
             }
 
             if (me.changeInfosButton) {
@@ -172,6 +172,8 @@
         updatePaymentInfo: function () {
             var me = this;
 
+            me.removePaymentSession();
+
             var paymentMethod = $(me.opts.formSelector).find('input[name=payment]:checked');
             var payment = me.getPaymentMethodByType(paymentMethod.val());
 
@@ -190,10 +192,15 @@
                 }
             }
         },
-        setPayment: function (state) {
+        setPaymentSession: function (state) {
             var me = this;
 
             me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
+        },
+        removePaymentSession: function () {
+            var me = this;
+
+            me.sessionStorage.removeItem(me.paymentMethodSession);
         },
         saveAdyenConfigInSession: function (adyenConfiguration) {
             var me = this;
