@@ -160,6 +160,12 @@
                 return;
             }
 
+            //Return when redirect
+            var payment = me.getPaymentMethodByType(paymentMethod.val());
+            if (typeof payment.details === "undefined") {
+                return;
+            }
+
             me.currentSelectedPaymentId = paymentMethod.attr('id');
             me.currentSelectedPaymentType = paymentMethod.val();
 
@@ -173,6 +179,7 @@
             var me = this;
 
             me.removePaymentSession();
+            $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', true);
 
             var paymentMethod = $(me.opts.formSelector).find('input[name=payment]:checked');
             var payment = me.getPaymentMethodByType(paymentMethod.val());
