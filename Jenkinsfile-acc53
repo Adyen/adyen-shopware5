@@ -4,6 +4,7 @@ pipeline {
         SSHUSER = 'phprobuild'
         PROJECTHOST = '178.62.187.13'
         ENV = 'ACC 53'
+        PHP = 'php7.0-fpm'
         PROJECT = 'Adyen Plugin'
         PLUGIN_ROOT = '/var/www/shopware53/custom/plugins/MeteorAdyen/'
         PROJECT_ROOT = '/var/www/shopware53'

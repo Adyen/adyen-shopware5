@@ -14,7 +14,7 @@ ssh "$SSHUSER@$PROJECTHOST" "$PROJECT_ROOT/bin/console sw:theme:cache:generate"
 echo "Cleaning caches"
 ssh "$SSHUSER@$PROJECTHOST" "$PROJECT_ROOT/bin/console sw:cache:clear"
 
-ssh "$SSHUSER@$PROJECTHOST" "sudo systemctl restart php7.2-fpm"
+ssh "$SSHUSER@$PROJECTHOST" "sudo systemctl restart $PHP"
 echo "All Done!"
 
 
