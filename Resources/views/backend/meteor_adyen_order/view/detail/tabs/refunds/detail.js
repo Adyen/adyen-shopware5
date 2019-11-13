@@ -12,7 +12,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.refunds.Detail', {
     autoScroll: true,
     ui: 'footer',
 
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
         me.items = me.createItems();
         me.dockedItems = me.createDock();
@@ -22,7 +22,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.refunds.Detail', {
         console.log(me.record);
     },
 
-    createItems: function() {
+    createItems: function () {
         var me = this,
             fields = [];
 
@@ -57,7 +57,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.refunds.Detail', {
         return fields;
     },
 
-    createDock: function() {
+    createDock: function () {
         var me = this,
             items = [];
 
@@ -65,7 +65,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.refunds.Detail', {
             type: 'button',
             text: 'Full refund',
             cls: 'primary',
-            handler: function() {
+            handler: function () {
                 me.up('window').setLoading(true);
 
                 Ext.Ajax.request({
@@ -73,7 +73,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.refunds.Detail', {
                     params: {
                         orderId: me.record.get('id')
                     },
-                    success: function(response) {
+                    success: function (response) {
                         var json = JSON.parse(response.responseText);
                         me.up('window').setLoading(false);
                         Ext.Msg.alert(

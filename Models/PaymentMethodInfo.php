@@ -21,7 +21,8 @@ class PaymentMethodInfo
      * @param string $name
      * @param string $description
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->name = '';
         $this->description = '';
     }

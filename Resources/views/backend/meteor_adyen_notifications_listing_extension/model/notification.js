@@ -2,7 +2,7 @@
 Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.model.Notification', {
     extend: 'Shopware.data.Model',
 
-    configure: function() {
+    configure: function () {
         return {
             controller: 'MeteorAdyenNotificationsListingExtension',
         };
@@ -31,7 +31,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.model.Notific
             model: 'Shopware.apps.Order.model.Order',
             name: 'getOrder',
             associationKey: 'id'
-        },
+    },
     ]
 
 });

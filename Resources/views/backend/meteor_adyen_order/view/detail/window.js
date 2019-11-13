@@ -7,7 +7,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Window', {
      */
     override: 'Shopware.apps.Order.view.detail.Window',
 
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
         console.log(me.record);
         me.callParent();
@@ -16,11 +16,11 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Window', {
     /**
      * Overwrite to add adyen transaction tab if necessary
      */
-    createTabPanel: function() {
+    createTabPanel: function () {
         var me = this,
             result = me.callParent();
 
-        if(!me.record.raw.adyenTransaction) {
+        if (!me.record.raw.adyenTransaction) {
             return result;
         }
 
@@ -32,7 +32,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Window', {
     /**
      * Generate Adyen Tab
      */
-    createAdyenTab: function() {
+    createAdyenTab: function () {
         var me = this;
 
         var transactionStore = Ext.create('Shopware.apps.MeteorAdyenNotificationsListingExtension.store.Notification');
@@ -61,7 +61,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Window', {
             ]
         });
 
-        me.adyenTransactionTab.addListener('activate', function() {
+        me.adyenTransactionTab.addListener('activate', function () {
             transactionStore.load({
                 params: {
                     filter: JSON.stringify([{

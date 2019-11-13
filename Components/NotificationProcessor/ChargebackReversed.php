@@ -77,7 +77,8 @@ class ChargebackReversed implements NotificationProcessorInterface
             return;
         }
 
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_CHARGEBACK_REVERSED,
+        $this->eventManager->notify(
+            Event::NOTIFICATION_PROCESS_CHARGEBACK_REVERSED,
             [
                 'order' => $order,
                 'notification' => $notification

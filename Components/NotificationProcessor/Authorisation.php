@@ -69,7 +69,8 @@ class Authorisation implements NotificationProcessorInterface
     public function process(Notification $notification)
     {
         $order = $notification->getOrder();
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_AUTHORISATION,
+        $this->eventManager->notify(
+            Event::NOTIFICATION_PROCESS_AUTHORISATION,
             [
                 'order' => $order,
                 'notification' => $notification

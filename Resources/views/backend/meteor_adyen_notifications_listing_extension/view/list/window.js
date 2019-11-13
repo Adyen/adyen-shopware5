@@ -5,7 +5,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Win
     height: 450,
     title : '{s name=window_title}Notification listing{/s}',
 
-    configure: function() {
+    configure: function () {
         return {
             listingGrid: 'Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Notification',
             listingStore: 'Shopware.apps.MeteorAdyenNotificationsListingExtension.store.Notification',

@@ -70,7 +70,8 @@ class RefundedReversed implements NotificationProcessorInterface
     {
         $order = $notification->getOrder();
 
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_REFUNDED_REVERSED,
+        $this->eventManager->notify(
+            Event::NOTIFICATION_PROCESS_REFUNDED_REVERSED,
             [
                 'order' => $order,
                 'notification' => $notification

@@ -3,7 +3,7 @@
 Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.notifications.List', {
     extend: 'Ext.grid.Panel',
 
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
 
         me.columns = me.getColumns();
@@ -13,7 +13,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.notifications.List',
             direction: 'DESC'
         }]);
 
-        me.getSelectionModel().on('selectionchange', function(row, selected, options) {
+        me.getSelectionModel().on('selectionchange', function (row, selected, options) {
             me.notifications.detailView.loadRecord(selected[0]);
             me.notifications.detailView.enable();
         });
@@ -21,7 +21,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.notifications.List',
         me.callParent(arguments);
     },
 
-    getColumns: function() {
+    getColumns: function () {
         return [{
             header: 'Date & time',
             dataIndex: 'createdAt',

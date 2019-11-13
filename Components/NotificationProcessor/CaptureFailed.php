@@ -58,7 +58,8 @@ class CaptureFailed implements NotificationProcessorInterface
     {
         $order = $notification->getOrder();
 
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_CAPTURE_FAILED,
+        $this->eventManager->notify(
+            Event::NOTIFICATION_PROCESS_CAPTURE_FAILED,
             [
                 'order' => $order,
                 'notification' => $notification

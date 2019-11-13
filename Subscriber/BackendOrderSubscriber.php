@@ -113,9 +113,6 @@ class BackendOrderSubscriber implements SubscriberInterface
                     'CAPTURE',
                 ]);
             }
-
         }
     }
-
-
 }

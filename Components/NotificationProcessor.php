@@ -63,7 +63,8 @@ class NotificationProcessor
      * @throws \Doctrine\ORM\ORMException
      * @throws \Enlight_Event_Exception
      */
-    public function processMany(Traversable $notifications) {
+    public function processMany(Traversable $notifications)
+    {
         foreach ($notifications as $notification) {
             $this->process($notification);
         }
@@ -84,12 +85,14 @@ class NotificationProcessor
             $notification->setStatus(NotificationStatus::STATUS_FATAL);
             $this->modelManager->persist($notification);
 
-            $this->logger->notice('No notification handler found',
+            $this->logger->notice(
+                'No notification handler found',
                 [
                     'eventCode' => $notification->getEventCode(),
                     'pspReference' => $notification->getPspReference(),
                     'status' => $notification->getStatus()
-                ]);
+                ]
+            );
             return;
         }
 
@@ -141,7 +144,7 @@ class NotificationProcessor
     private function findTaggedHandlers($handlers)
     {
         $handlers = iterator_to_array($handlers, false);
-        $handlers = array_filter($handlers, function($handler) {
+        $handlers = array_filter($handlers, function ($handler) {
             return $handler instanceof NotificationProcessorInterface;
         });
         return $handlers;

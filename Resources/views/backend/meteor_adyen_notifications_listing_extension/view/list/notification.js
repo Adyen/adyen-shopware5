@@ -5,7 +5,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Not
     alias:  'widget.product-listing-grid',
     region: 'center',
 
-    configure: function() {
+    configure: function () {
         return {
             addButton: false,
             deleteButton: false,
@@ -27,7 +27,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Not
         };
     },
 
-    orderIdRenderer: function(value, styles, row) {
+    orderIdRenderer: function (value, styles, row) {
         return row.raw.order.number;
     },
 
@@ -54,7 +54,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Not
         orderDoesNotExistAnymore: '{s name=order_does_not_exist_anymore}This order does not exist anymore{/s}',
     },
 
-    createActionColumn: function() {
+    createActionColumn: function () {
         var me = this;
 
         return Ext.create('Ext.grid.column.Action', {

@@ -7,9 +7,7 @@ use MeteorAdyen\Models\Event;
 use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Components\CSRFWhitelistAware;
 
-class Shopware_Controllers_Frontend_Notification
-    extends Shopware_Controllers_Frontend_Payment
-    implements CSRFWhitelistAware
+class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
     /**
      * @var ContainerAwareEventManager

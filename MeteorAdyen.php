@@ -17,7 +17,10 @@ use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\PaymentInstaller;
 
-
+/**
+ * Class MeteorAdyen
+ * @package MeteorAdyen
+ */
 class MeteorAdyen extends Plugin
 {
     const NAME = 'MeteorAdyen';

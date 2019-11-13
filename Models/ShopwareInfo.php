@@ -7,8 +7,8 @@ use Shopware;
 
 class ShopwareInfo
 {
-    CONST INTEGRATOR = 'Meteor';
-    CONST SHOPWARE = 'Shopware';
+    const INTEGRATOR = 'Meteor';
+    const SHOPWARE = 'Shopware';
 
     /**
      * @return string
@@ -49,5 +49,4 @@ class ShopwareInfo
     {
         return MeteorAdyen::NAME;
     }
-
 }

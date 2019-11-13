@@ -3,7 +3,7 @@
 Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.controller.Main', {
     extend: 'Enlight.app.Controller',
 
-    init: function() {
+    init: function () {
         var me = this;
 
         me.mainWindow = me.getView('list.Window').create({ }).show();

@@ -70,7 +70,8 @@ class RefundFailed implements NotificationProcessorInterface
     {
         $order = $notification->getOrder();
 
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_REFUND_FAILED,
+        $this->eventManager->notify(
+            Event::NOTIFICATION_PROCESS_REFUND_FAILED,
             [
                 'order' => $order,
                 'notification' => $notification
