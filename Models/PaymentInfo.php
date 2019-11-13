@@ -83,8 +83,9 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param int $id
+     * @return PaymentInfo
      */
-    public function setId(int $id): void
+    public function setId(int $id): PaymentInfo
     {
         $this->id = $id;
     }
@@ -99,24 +100,27 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param int $orderId
+     * @return PaymentInfo
      */
-    public function setOrderId(int $orderId): void
+    public function setOrderId(int $orderId): PaymentInfo
     {
         $this->orderId = $orderId;
     }
 
+
     /**
      * @return Order|null
      */
-    public function getOrder(): ?Order
+    public function getOrder()
     {
         return $this->order;
     }
 
     /**
      * @param Order|null $order
+     * @return PaymentInfo
      */
-    public function setOrder(?Order $order): void
+    public function setOrder(Order $order = null): PaymentInfo
     {
         $this->order = $order;
     }
@@ -131,8 +135,9 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param string $pspReference
+     * @return PaymentInfo
      */
-    public function setPspReference(string $pspReference): void
+    public function setPspReference(string $pspReference): PaymentInfo
     {
         $this->pspReference = $pspReference;
     }
@@ -147,8 +152,9 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param \DateTime $createdAt
+     * @return PaymentInfo
      */
-    public function setCreatedAt(\DateTime $createdAt): void
+    public function setCreatedAt(\DateTime $createdAt): PaymentInfo
     {
         $this->createdAt = $createdAt;
     }
@@ -163,8 +169,9 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param \DateTime $updatedAt
+     * @return PaymentInfo
      */
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(\DateTime $updatedAt): PaymentInfo
     {
         $this->updatedAt = $updatedAt;
     }
@@ -179,8 +186,9 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param string $resultCode
+     * @return PaymentInfo
      */
-    public function setResultCode(string $resultCode): void
+    public function setResultCode(string $resultCode): PaymentInfo
     {
         $this->resultCode = $resultCode;
     }
@@ -195,8 +203,9 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param string $idempotencyKey
+     * @return PaymentInfo
      */
-    public function setIdempotencyKey(string $idempotencyKey): void
+    public function setIdempotencyKey(string $idempotencyKey): PaymentInfo
     {
         $this->idempotencyKey = $idempotencyKey;
     }
