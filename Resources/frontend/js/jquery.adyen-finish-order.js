@@ -9,12 +9,13 @@
             placeOrderSelector: '.table--actions button[type=submit]',
             confirmFormSelector: '#confirm--form',
             mountRedirectSelector: '.is--act-confirm',
-            AdyenType: '',
-            AdyenGoogleConfig: {},
-            AdyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
-            AdyenAjaxIdentifyShopperUrl: '/frontend/adyen/ajaxIdentifyShopper',
-            AdyenAjaxChallengeShopperUrl: '/frontend/adyen/ajaxChallengeShopper',
-            AdyenSnippets: {
+            adyenType: '',
+            adyen3ds2challengeimagesize: '',
+            adyenGoogleConfig: {},
+            adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
+            adyenAjaxIdentifyShopperUrl: '/frontend/adyen/ajaxIdentifyShopper',
+            adyenAjaxChallengeShopperUrl: '/frontend/adyen/ajaxChallengeShopper',
+            adyenSnippets: {
                 errorTransactionCancelled: 'Your transaction was cancelled by the Payment Service Provider.',
                 errorTransactionProcessing: 'An error occured while processing your payment.',
                 errorTransactionRefused: 'Your transaction was refused by the Payment Service Provider.',
@@ -72,7 +73,7 @@
                 $.ajax({
                     method: "POST",
                     dataType: 'json',
-                    url: me.opts.AdyenAjaxDoPaymentUrl,
+                    url: me.opts.adyenAjaxDoPaymentUrl,
                     data: data,
                     success: function (response) {
                         me.handlePaymentData(response);
@@ -121,7 +122,7 @@
                         $.ajax({
                             method: "POST",
                             dataType: 'json',
-                            url: me.opts.AdyenAjaxIdentifyShopperUrl,
+                            url: me.opts.adyenAjaxIdentifyShopperUrl,
                             data: fingerprintData.data.details,
                             success: function (response) {
                                 me.handlePaymentData(response);
@@ -151,7 +152,7 @@
                         $.ajax({
                             method: "POST",
                             dataType: 'json',
-                            url: me.opts.AdyenAjaxChallengeShopperUrl,
+                            url: me.opts.adyenAjaxChallengeShopperUrl,
                             data: challengeData.data.details,
                             success: function (response) {
                                 me.handlePaymentData(response);
@@ -161,7 +162,7 @@
                     onError: function (error) {
                         console.log(error);
                     },
-                    size: '05'
+                    size: me.getThreeDS2ChallengeSize(),
                 })
                 .mount('#AdyenChallengeShopperThreeDS2');
         },
@@ -177,24 +178,23 @@
             var me = this;
             switch (data.resultCode) {
                 case 'Cancelled':
-                    this.addAdyenError(me.opts.AdyenSnippets.errorTransactionCancelled);
+                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionCancelled);
                     break;
                 case 'Error':
-                    this.addAdyenError(me.opts.AdyenSnippets.errorTransactionProcessing);
+                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionProcessing);
                     break;
                 case 'Refused':
-                    this.addAdyenError(me.opts.AdyenSnippets.errorTransactionRefused);
+                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionRefused);
                     break;
                 default:
-                    this.addAdyenError(me.opts.AdyenSnippets.errorTransactionUnknown);
+                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionUnknown);
                     break;
             }
         },
-
         handleCheckoutButton: function () {
             var me = this;
 
-            if (me.opts.AdyenType === 'paywithgoogle') {
+            if (me.opts.adyenType === 'paywithgoogle') {
                 me.replaceCheckoutButtonForGooglePay();
             }
         },
@@ -210,22 +210,26 @@
             );
             orderButton.remove();
 
-            me.opts.AdyenGoogleConfig.onSubmit = function (state, component) {
+            me.opts.adyenGoogleConfig.onSubmit = function (state, component) {
                 me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
                 me.onPlaceOrder();
             };
 
-            var googlepay = me.adyenCheckout.create("paywithgoogle", me.opts.AdyenGoogleConfig);
+            var googlepay = me.adyenCheckout.create("paywithgoogle", me.opts.adyenGoogleConfig);
             googlepay
                 .isAvailable()
                 .then(function () {
                     googlepay.mount("#AdyenGooglePayButton");
                 })
                 .catch(function (e) {
-                    this.addAdyenError(me.opts.AdyenSnippets.errorGooglePayNotAvailable);
+                    this.addAdyenError(me.opts.adyenSnippets.errorGooglePayNotAvailable);
                 });
         },
+        getThreeDS2ChallengeSize: function () {
+            var me = this;
 
+            return '0' + me.opts.adyen3ds2challengeimagesize;
+        },
         addAdyenError: function (message) {
             var me = this;
             $.publish('plugin/MeteorAdyenCheckoutError/addError', message);
