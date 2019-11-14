@@ -96,8 +96,8 @@
                     .find(me.opts.methodeBankdataSelector)
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
 
-                me.handleComponent(payment.type);
                 $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', true);
+                me.handleComponent(payment.type);
             }
         },
         setConfig: function () {
@@ -132,7 +132,22 @@
         handleComponent: function (type) {
             var me = this;
 
+            switch (type) {
+                case 'paywithgoogle':
+                    me.handleComponentPayWithGoogle(type);
+                    break;
+                default:
+                    me.handleComponentGeneral(type);
+                    break;
+            }
+        },
+        handleComponentGeneral: function(type) {
+            var me = this;
             me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
+        },
+        handleComponentPayWithGoogle: function(type) {
+            var me = this;
+            $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', false);
         },
         handleOnChange: function (state) {
             var me = this;
