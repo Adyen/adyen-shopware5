@@ -38,7 +38,8 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
                         'amountIncludingTax' => $item['amount'],
                         'taxCategory' => $item[''],
                     ];
-                }, $basket['content']
+                },
+                $basket['content']
             ))
         ];
     }

@@ -72,7 +72,8 @@ class Capture implements NotificationProcessorInterface
     {
         $order = $notification->getOrder();
 
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_CAPTURE,
+        $this->eventManager->notify(
+            Event::NOTIFICATION_PROCESS_CAPTURE,
             [
                 'order' => $order,
                 'notification' => $notification

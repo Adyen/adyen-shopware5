@@ -49,7 +49,7 @@
             me.clearAdyenError();
 
             if (me.sessionStorage.getItem('paymentMethod')) {
-                if(!$(me.opts.confirmFormSelector)[0].checkValidity()) {
+                if (!$(me.opts.confirmFormSelector)[0].checkValidity()) {
                     return;
                 }
 
@@ -70,7 +70,6 @@
                         me.handlePaymentData(response);
                     },
                 });
-
             } else {
                 $(me.opts.confirmFormSelector).submit();
             }
@@ -112,7 +111,7 @@
             me.adyenCheckout
                 .create('threeDS2DeviceFingerprint', {
                     fingerprintToken: data.authentication['threeds2.fingerprintToken'],
-                    onComplete: function(fingerprintData) {
+                    onComplete: function (fingerprintData) {
                         $.ajax({
                             method: "POST",
                             dataType: 'json',
@@ -123,9 +122,9 @@
                             },
                         });
                     },
-                    onError: function(error) {
-                        console.error(error);
-                    }
+                onError: function (error) {
+                    console.error(error);
+                }
                 })
                 .mount('#AdyenIdentifyShopperThreeDS2');
         },
@@ -141,7 +140,7 @@
             me.adyenCheckout
                 .create('threeDS2Challenge', {
                     challengeToken: data.authentication['threeds2.challengeToken'],
-                    onComplete: function(challengeData) {
+                    onComplete: function (challengeData) {
                         modal.close();
                         $.ajax({
                             method: "POST",
@@ -153,10 +152,10 @@
                             },
                         });
                     },
-                    onError: function(error) {
-                        console.log(error);
-                    },
-                    size: '05'
+                onError: function (error) {
+                    console.log(error);
+                },
+                size: '05'
                 })
                 .mount('#AdyenChallengeShopperThreeDS2');
         },
@@ -198,7 +197,7 @@
                 .remove();
         },
 
-        clearAdyenError: function() {
+        clearAdyenError: function () {
             $.publish('plugin/MeteorAdyenCheckoutError/cleanErrors');
         },
 

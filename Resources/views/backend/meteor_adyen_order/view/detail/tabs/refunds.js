@@ -3,13 +3,13 @@
 Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.Refunds', {
     extend: 'Ext.container.Container',
 
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
         me.items = me.createItems();
         me.callParent(arguments);
     },
 
-    createItems: function() {
+    createItems: function () {
         var me = this;
 
         return [

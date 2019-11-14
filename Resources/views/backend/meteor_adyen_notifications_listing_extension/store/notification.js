@@ -2,7 +2,7 @@
 Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.store.Notification', {
     extend:'Shopware.store.Listing',
 
-    configure: function() {
+    configure: function () {
         return {
             controller: 'MeteorAdyenNotificationsListingExtension'
         };

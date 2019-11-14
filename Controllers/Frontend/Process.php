@@ -6,9 +6,7 @@ use Shopware\Components\CSRFWhitelistAware;
 /**
  * Class Redirect
  */
-class Shopware_Controllers_Frontend_Process
-    extends Shopware_Controllers_Frontend_Payment
-    implements CSRFWhitelistAware
+class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
     /**
      * @var AdyenManager
@@ -66,7 +64,6 @@ class Shopware_Controllers_Frontend_Process
         try {
             $checkout = $this->adyenCheckout->getCheckout();
             $response = $checkout->paymentsDetails($request);
-
         } catch (\Adyen\AdyenException $e) {
             $response['error'] = $e->getMessage();
         }

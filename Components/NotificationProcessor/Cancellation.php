@@ -70,7 +70,8 @@ class Cancellation implements NotificationProcessorInterface
     {
         $order = $notification->getOrder();
 
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_CANCELLATION,
+        $this->eventManager->notify(
+            Event::NOTIFICATION_PROCESS_CANCELLATION,
             [
                 'order' => $order,
                 'notification' => $notification

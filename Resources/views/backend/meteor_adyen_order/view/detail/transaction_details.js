@@ -5,14 +5,14 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionDetails', {
     title: 'Transaction',
     record: null,
 
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
 
         me.items  =  [
             me.createDetailsContainer()
         ];
 
-        me.store.on('load', function(store, records, options ) {
+        me.store.on('load', function (store, records, options ) {
             me.record = store.first();
             me.detailsPanel.loadRecord(me.record);
         });

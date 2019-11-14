@@ -6,13 +6,13 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.Notifications', {
     layout: 'border',
     formActions: {},
 
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
         me.items = me.getNotifications();
         me.callParent(arguments);
     },
 
-    getNotifications: function() {
+    getNotifications: function () {
         var me = this;
 
         return [
@@ -27,7 +27,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.Notifications', {
         ];
     },
 
-    getWidgetList: function() {
+    getWidgetList: function () {
         var me = this;
 
         me.listView = Ext.create('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.notifications.List', {
@@ -39,7 +39,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.Notifications', {
         return me.listView;
     },
 
-    getWidgetDetail: function() {
+    getWidgetDetail: function () {
         var me = this;
 
         me.detailView = Ext.create('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.notifications.Detail', {

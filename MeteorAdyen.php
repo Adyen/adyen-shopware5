@@ -3,34 +3,68 @@
 namespace MeteorAdyen;
 
 use Doctrine\ORM\Tools\SchemaTool;
+use Exception;
+use MeteorAdyen\Components\CompilerPass\NotificationProcessorCompilerPass;
 use MeteorAdyen\Models\Notification;
 use MeteorAdyen\Models\PaymentInfo;
 use MeteorAdyen\Models\Refund;
-use ParagonIE\Halite\Alerts\CannotPerformOperation;
-use ParagonIE\Halite\Alerts\InvalidKey;
-use ParagonIE\Halite\KeyFactory;
 use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
+use Shopware\Components\Logger;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\PaymentInstaller;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-
+/**
+ * Class MeteorAdyen
+ * @package MeteorAdyen
+ */
 class MeteorAdyen extends Plugin
 {
     const NAME = 'MeteorAdyen';
     const ADYEN_GENERAL_PAYMENT_METHOD = 'adyen_general_payment_method';
 
     /**
+     * @return bool
+     */
+    public static function isPackage(): bool
+    {
+        return file_exists(self::getPackageVendorAutoload());
+    }
+
+    /**
+     * @return string
+     */
+    public static function getPackageVendorAutoload(): string
+    {
+        return __DIR__ . '/vendor/autoload.php';
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @throws Exception
+     */
+    public function build(ContainerBuilder $container)
+    {
+        $container->addCompilerPass(new NotificationProcessorCompilerPass());
+
+        parent::build($container);
+
+        //set default logger level for 5.4
+        if (!$container->hasParameter('kernel.default_error_level')) {
+            $container->setParameter('kernel.default_error_level', Logger::ERROR);
+        }
+    }
+
+    /**
      * @param InstallContext $context
-     * @throws CannotPerformOperation
-     * @throws InvalidKey
+     * @throws Exception
      */
     public function install(InstallContext $context)
     {
-        $this->generateEncryptionKey();
         $this->createFreeTextFields();
 
         $tool = new SchemaTool($this->container->get('models'));
@@ -39,7 +73,47 @@ class MeteorAdyen extends Plugin
     }
 
     /**
+     * @throws Exception
+     */
+    private function createFreeTextFields()
+    {
+        $crudService = $this->container->get('shopware_attribute.crud_service');
+        $crudService->update(
+            's_user_attributes',
+            'meteor_adyen_payment_method',
+            TypeMapping::TYPE_STRING,
+            [
+                'displayInBackend' => true,
+                'label' => 'Adyen Payment Method'
+            ]
+        );
+        $crudService->update(
+            's_order_attributes',
+            'meteor_adyen_idempotency_key',
+            TypeMapping::TYPE_STRING,
+            [
+                'displayInBackend' => false
+            ]
+        );
+    }
+
+    /**
+     * @return array
+     */
+    private function getModelMetaData(): array
+    {
+        $entityManager = $this->container->get('models');
+
+        return [
+            $entityManager->getClassMetadata(Notification::class),
+            $entityManager->getClassMetadata(PaymentInfo::class),
+            $entityManager->getClassMetadata(Refund::class),
+        ];
+    }
+
+    /**
      * @param UninstallContext $context
+     * @throws Exception
      */
     public function uninstall(UninstallContext $context)
     {
@@ -49,6 +123,38 @@ class MeteorAdyen extends Plugin
         $tool = new SchemaTool($this->container->get('models'));
         $classes = $this->getModelMetaData();
         $tool->dropSchema($classes);
+    }
+
+    /**
+     * Deactivate all Adyen payment methods
+     */
+    private function deactivatePaymentMethods()
+    {
+        $em = $this->container->get('models');
+        $qb = $em->createQueryBuilder();
+
+        $query = $qb->update('Shopware\Models\Payment\Payment', 'p')
+            ->set('p.active', '?1')
+            ->where($qb->expr()->like('p.name', '?2'))
+            ->setParameter(1, false)
+            ->setParameter(2, self::ADYEN_GENERAL_PAYMENT_METHOD)
+            ->getQuery();
+
+        $query->execute();
+    }
+
+    /**
+     * @param UninstallContext $uninstallContext
+     * @throws Exception
+     */
+    private function removeFreeTextFields(UninstallContext $uninstallContext)
+    {
+        if ($uninstallContext->keepUserData()) {
+            return;
+        }
+
+        $crudService = $this->container->get('shopware_attribute.crud_service');
+        $crudService->delete('s_user_attributes', 'meteor_adyen_payment_method');
     }
 
     /**
@@ -89,99 +195,6 @@ class MeteorAdyen extends Plugin
         ];
 
         return $options;
-    }
-
-    /**
-     * Deactivate all Adyen payment methods
-     */
-    private function deactivatePaymentMethods()
-    {
-        $em = $this->container->get('models');
-        $qb = $em->createQueryBuilder();
-
-        $query = $qb->update('Shopware\Models\Payment\Payment', 'p')
-            ->set('p.active', '?1')
-            ->where($qb->expr()->like('p.name', '?2'))
-            ->setParameter(1, false)
-            ->setParameter(2, self::ADYEN_GENERAL_PAYMENT_METHOD)
-            ->getQuery();
-
-        $query->execute();
-    }
-
-    private function createFreeTextFields()
-    {
-        $crudService = $this->container->get('shopware_attribute.crud_service');
-        $crudService->update(
-            's_user_attributes',
-            'meteor_adyen_payment_method',
-            TypeMapping::TYPE_STRING,
-            [
-                'displayInBackend' => true,
-                'label' => 'Adyen Payment Method'
-            ]
-        );
-        $crudService->update(
-            's_order_attributes',
-            'meteor_adyen_idempotency_key',
-            TypeMapping::TYPE_STRING,
-            [
-                'displayInBackend' => false
-            ]
-        );
-    }
-
-    private function removeFreeTextFields(UninstallContext $uninstallContext)
-    {
-        if ($uninstallContext->keepUserData()) {
-            return;
-        }
-
-        $crudService = $this->container->get('shopware_attribute.crud_service');
-        $crudService->delete('s_user_attributes', 'meteor_adyen_payment_method');
-    }
-
-
-    /**
-     * Generate EncryptionKey to encrypt sensitive data in database
-     *
-     * @throws CannotPerformOperation
-     * @throws InvalidKey
-     */
-    private function generateEncryptionKey()
-    {
-        $enc_key = KeyFactory::generateEncryptionKey();
-        KeyFactory::save($enc_key, $this->getPath() . '/encryption.key');
-    }
-
-    /**
-     * @return array
-     */
-    private function getModelMetaData(): array
-    {
-        $entityManager = $this->container->get('models');
-
-        return [
-            $entityManager->getClassMetadata(Notification::class),
-            $entityManager->getClassMetadata(PaymentInfo::class),
-            $entityManager->getClassMetadata(Refund::class),
-        ];
-    }
-
-    /**
-     * @return bool
-     */
-    public static function isPackage(): bool
-    {
-        return file_exists(self::getPackageVendorAutoload());
-    }
-
-    /**
-     * @return string
-     */
-    public static function getPackageVendorAutoload(): string
-    {
-        return __DIR__ . '/vendor/autoload.php';
     }
 }
 

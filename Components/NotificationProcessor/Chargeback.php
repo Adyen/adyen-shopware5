@@ -77,7 +77,8 @@ class Chargeback implements NotificationProcessorInterface
             return;
         }
 
-        $this->eventManager->notify(Event::NOTIFICATION_PROCESS_CHARGEBACK,
+        $this->eventManager->notify(
+            Event::NOTIFICATION_PROCESS_CHARGEBACK,
             [
                 'order' => $order,
                 'notification' => $notification

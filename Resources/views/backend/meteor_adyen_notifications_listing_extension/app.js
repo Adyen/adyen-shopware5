@@ -23,7 +23,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension', {
         'Notification',
     ],
 
-    launch: function() {
+    launch: function () {
         return this.getController('Main').mainWindow;
     }
 });

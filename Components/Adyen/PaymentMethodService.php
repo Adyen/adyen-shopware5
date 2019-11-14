@@ -52,7 +52,7 @@ class PaymentMethodService
      * @return array
      * @throws AdyenException
      */
-    public function getPaymentMethods($countryCode = null, $currency = null, $value= null, $cache = true): array
+    public function getPaymentMethods($countryCode = null, $currency = null, $value = null, $cache = true): array
     {
         $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string)$value ?? '');
         if ($cache && isset($this->cache[$cacheKey])) {
@@ -81,7 +81,8 @@ class PaymentMethodService
      * @param string ...$keys
      * @return string
      */
-    private function getCacheKey(string ...$keys) {
+    private function getCacheKey(string ...$keys)
+    {
         return md5(implode(',', $keys));
     }
 

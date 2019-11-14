@@ -19,7 +19,7 @@ class Chain implements PaymentPayloadProvider
      * @param PaymentPayloadProvider ...$providers
      */
     public function __construct(
-        PaymentPayloadProvider ... $providers
+        PaymentPayloadProvider ...$providers
     ) {
         $this->providers = $providers;
     }

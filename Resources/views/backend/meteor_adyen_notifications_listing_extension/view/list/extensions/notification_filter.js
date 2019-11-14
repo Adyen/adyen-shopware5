@@ -4,7 +4,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.ext
     width: 270,
     controller: 'MeteorAdyenNotificationsListingExtension',
 
-    configure: function() {
+    configure: function () {
         var me = this;
 
         return {
@@ -31,7 +31,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.ext
                             'status'
                         ]
                     }),
-                    fieldLabel: '{s name="column/status"}Status{/s}',
+                fieldLabel: '{s name="column/status"}Status{/s}',
                 },
                 eventCode: {
                     xtype: 'combobox',
@@ -51,7 +51,7 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.ext
                             'eventCode'
                         ]
                     }),
-                    fieldLabel: '{s name="column/eventCode"}Event Code{/s}',
+                fieldLabel: '{s name="column/eventCode"}Event Code{/s}',
                 },
             }
         };

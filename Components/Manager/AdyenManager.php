@@ -39,9 +39,9 @@ class AdyenManager
     }
 
     /**
-     * @return Order|null
+     * @return object|Order|null
      */
-    public function fetchOrderForCurrentSession(): ?Order
+    public function fetchOrderForCurrentSession()
     {
         $order = $this->modelManager->getRepository(Order::class)
             ->findOneBy(['temporaryId' => $this->session->get('sessionId')]);
@@ -70,7 +70,7 @@ class AdyenManager
     /**
      * @param $paymentData
      */
-    public function storePaymentDataInSession($paymentData): void
+    public function storePaymentDataInSession($paymentData)
     {
         $this->session->offsetSet('adyenPaymentData', $paymentData);
     }

@@ -48,7 +48,7 @@
         /**
          * Initialise event listeners for error handling
          */
-        eventListeners: function() {
+        eventListeners: function () {
             var me = this;
             $.subscribe(me.getEventName('plugin/MeteorAdyenCheckoutError/addError'), $.proxy(me.onAddError, me));
             $.subscribe(me.getEventName('plugin/MeteorAdyenCheckoutError/cleanErrors'), $.proxy(me.onCleanErrors, me));
@@ -74,7 +74,7 @@
             me.$el.children().remove();
         },
 
-        onScrollTo: function() {
+        onScrollTo: function () {
             var me = this;
             window.scroll(0, me.$el.offset().top - (window.innerHeight/2));
         },

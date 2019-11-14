@@ -7,7 +7,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionTabs', {
     bodyBorder: false,
     tabBarPosition: 'bottom',
 
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
         me.callParent(arguments);
 
@@ -18,7 +18,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionTabs', {
         styleHtmlContent: true
     },
 
-    createItems: function() {
+    createItems: function () {
         var me = this;
         me.add(me.createNotificationsTab());
         me.add(me.createRefundsTab());
@@ -27,7 +27,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionTabs', {
         me.setActiveTab(0);
     },
 
-    createNotificationsTab: function() {
+    createNotificationsTab: function () {
         var me = this;
         me.tabNotifications = Ext.create('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.Notifications', {
             title: 'Notifications',
@@ -37,7 +37,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionTabs', {
         return me.tabNotifications;
     },
 
-    createRefundsTab: function() {
+    createRefundsTab: function () {
         var me = this;
         me.tabRefunds = Ext.create('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.Refunds', {
             title: 'Refunds',

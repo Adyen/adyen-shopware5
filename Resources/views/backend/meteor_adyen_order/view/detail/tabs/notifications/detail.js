@@ -4,7 +4,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.notifications.Detail
     extend: 'Ext.form.Panel',
     layout: 'anchor',
 
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
 
         me.items = me.getItems();
@@ -15,7 +15,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.notifications.Detail
         }
     },
 
-    getItems: function() {
+    getItems: function () {
         return [Ext.create('Ext.container.Container', {
             columnWidth: 0.5,
             padding: 10,

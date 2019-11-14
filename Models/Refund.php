@@ -4,7 +4,7 @@
 namespace MeteorAdyen\Models;
 
 use Shopware\Models\Order\Order;
-use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\ORM\Mapping as ORM;
 use Shopware\Components\Model\ModelEntity;
 
 /**
