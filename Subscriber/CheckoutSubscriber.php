@@ -292,7 +292,7 @@ class CheckoutSubscriber implements SubscriberInterface
                 'merchantName' => Shopware()->Shop()->getName()
             ],
         ];
-        if ($this->configuration->getEnvironment() == Configuration::ENV_LIVE) {
+        if ($this->configuration->getEnvironment() === Configuration::ENV_LIVE) {
             $adyenGoogleConfig['environment'] = 'PRODUCTION';
             $adyenGoogleConfig['configuration']['merchantIdentifier'] = ''; // TODO: Configurable merchant identifier
         }
@@ -307,7 +307,7 @@ class CheckoutSubscriber implements SubscriberInterface
     private function hasMethod($method, array $methods)
     {
         foreach ($methods['paymentMethods'] as $paymentMethod) {
-            if ($paymentMethod['type'] == $method) {
+            if ($paymentMethod['type'] === $method) {
                 return true;
             }
         }
