@@ -1,10 +1,6 @@
 ;(function ($) {
     'use strict';
 
-    $(function () {
-        StateManager.addPlugin('.adyen-config', 'adyen-payment-selection');
-    });
-
     $.plugin('adyen-payment-selection', {
         /**
          * Plugin default options.
@@ -13,38 +9,61 @@
             adyenOriginkey: '',
             adyenEnvironment: 'test',
             adyenPaymentMethodsResponse: {},
+            formSelector: '#shippingPaymentForm',
+            /**
+             * Prefix to identify adyen payment methods
+             *
+             * @type {String}
+             */
+            adyenPaymentMethodPrefix: 'adyen_',
+            /**
+             * Selector for the payment method select fields.
+             *
+             * @type {String}
+             */
+            paymentMethodSelector: '.payment--method',
+            /**
+             * Selector for the payment method label wrapper.
+             *
+             * @type {String}
+             */
+            methodLabelSelector: '.method--label',
+            /**
+             * Selector for the payment method component wrapper.
+             *
+             * @type {String}
+             */
+            methodeBankdataSelector: '.method--bankdata',
+            /**
+             * Classname for 'Update Payment informations' button
+             */
+            classChangePaymentInfo: 'method--change-info',
+            /**
+             * Selector for the payment method form submit button element.
+             *
+             * @type {String}
+             */
+            paymentMethodFormSubmitSelector: 'button[type=submit]',
         },
 
-        /**
-         * Prefix to identify adyen payment methods
-         *
-         * @type {String}
-         */
-        adyenPaymentMethodPrefix: 'adyen_',
-        /**
-         * Selector for the payment method select fields.
-         *
-         * @type {String}
-         */
-        paymentMethodSelector: '.payment--method',
-        /**
-         * Selector for the payment method component wrapper.
-         *
-         * @type {String}
-         */
-        methodeBankdataSelector: '.method--bankdata',
         currentSelectedPaymentId: '',
         currentSelectedPaymentType: '',
         adyenConfiguration: {},
         adyenCheckout: null,
+        changeInfosButton: null,
+        paymentMethodSession: 'paymentMethod',
+        adyenConfigSession: 'adyenConfig',
 
         init: function () {
             var me = this;
+
+            me.sessionStorage = StorageManager.getStorage('session');
 
             me.applyDataAttributes();
             me.eventListeners();
             me.setConfig();
             me.setCheckout();
+            me.handleSelectedMethod();
         },
         eventListeners: function () {
             var me = this;
@@ -63,7 +82,8 @@
             var payment;
 
             //Return when no adyen payment
-            if (me.currentSelectedPaymentType.indexOf(me.adyenPaymentMethodPrefix) === -1) {
+            if (me.currentSelectedPaymentType.indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
+                me.sessionStorage.removeItem(me.paymentMethodSession);
                 return;
             }
 
@@ -72,11 +92,12 @@
             //When details is set load the component
             if (typeof payment.details !== "undefined") {
                 $('#' + me.currentSelectedPaymentId)
-                    .closest(me.paymentMethodSelector)
-                    .find(me.methodeBankdataSelector)
+                    .closest(me.opts.paymentMethodSelector)
+                    .find(me.opts.methodeBankdataSelector)
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
 
                 me.handleComponent(payment.type);
+                $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', true);
             }
         },
         setConfig: function () {
@@ -87,8 +108,10 @@
                 environment: me.opts.adyenEnvironment,
                 originKey: me.opts.adyenOriginkey,
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
-                onChange: me.handleOnChange,
+                onChange: $.proxy(me.handleOnChange, me),
             };
+
+            me.saveAdyenConfigInSession(me.adyenConfiguration);
         },
         getCurrentComponentId: function (currentSelectedPaymentId) {
             return 'component-' + currentSelectedPaymentId;
@@ -96,8 +119,7 @@
         getPaymentMethodByType(type) {
             var me = this;
 
-            var type = type.split(me.adyenPaymentMethodPrefix).pop();
-
+            type = type.split(me.opts.adyenPaymentMethodPrefix).pop();
             return me.opts.adyenPaymentMethodsResponse['paymentMethods'].find(function (paymentMethod) {
                 return paymentMethod.type === type
             });
@@ -112,9 +134,79 @@
 
             me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
-        handleOnChange: function (state, component) {
-        },
+        handleOnChange: function (state) {
+            var me = this;
 
+            $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', !state.isValid);
+
+            if (state.isValid && state.data && state.data.paymentMethod) {
+                me.setPayment(state);
+            }
+
+            if (me.changeInfosButton) {
+                me.changeInfosButton.remove();
+                me.changeInfosButton = null;
+            }
+        },
+        handleSelectedMethod: function () {
+            var me = this;
+
+            var form = $(me.opts.formSelector);
+            var paymentMethod = form.find('input[name=payment]:checked');
+            var paymentMethodContainer = form.find('input[name=payment]:checked').closest(me.opts.paymentMethodSelector);
+
+            //Return when no adyen payment
+            if (paymentMethod.val().indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
+                return;
+            }
+
+            me.currentSelectedPaymentId = paymentMethod.attr('id');
+            me.currentSelectedPaymentType = paymentMethod.val();
+
+            me.changeInfosButton = $('<a/>')
+                .addClass(me.opts.classChangePaymentInfo)
+                .html('Update your payment information')
+                .on('click', $.proxy(me.updatePaymentInfo, me));
+            paymentMethodContainer.find(me.opts.methodLabelSelector).append(me.changeInfosButton);
+        },
+        updatePaymentInfo: function () {
+            var me = this;
+
+            var paymentMethod = $(me.opts.formSelector).find('input[name=payment]:checked');
+            var payment = me.getPaymentMethodByType(paymentMethod.val());
+
+            //When details is set load the component
+            if (typeof payment.details !== "undefined") {
+                $('#' + me.currentSelectedPaymentId)
+                    .closest(me.opts.paymentMethodSelector)
+                    .find(me.opts.methodeBankdataSelector)
+                    .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
+
+                me.handleComponent(payment.type);
+
+                if (me.changeInfosButton) {
+                    me.changeInfosButton.remove();
+                    me.changeInfosButton = null;
+                }
+            }
+        },
+        setPayment: function (state) {
+            var me = this;
+
+            me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
+        },
+        saveAdyenConfigInSession: function (adyenConfiguration) {
+            var me = this;
+
+            var data = {
+                locale: adyenConfiguration.locale,
+                environment: adyenConfiguration.environment,
+                originKey: adyenConfiguration.originKey,
+                paymentMethodsResponse: adyenConfiguration.paymentMethodsResponse
+            };
+
+            me.sessionStorage.setItem(me.adyenConfigSession, JSON.stringify(data));
+        },
     });
 
 })(jQuery);

@@ -24,6 +24,7 @@ class Shopware_Controllers_Frontend_Notification
     public function indexAction()
     {
         if (!$this->checkAuthentication()) {
+            $this->View()->assign(['success' => false, 'message' => 'Invalid or missing auth']);
             return;
         }
 
@@ -76,6 +77,7 @@ class Shopware_Controllers_Frontend_Notification
             $params = $notificationItem['NotificationRequestItem'];
             $hmacCheck = $adyenUtils->isValidNotificationHMAC($configuration->getNotificationHmac(), $params);
             if (!$hmacCheck) {
+                $this->get('meteor_adyen.logger.notifications')->notice('Invalid HMAC detected');
                 return false;
             }
         }
@@ -146,13 +148,15 @@ class Shopware_Controllers_Frontend_Notification
         /** @var Configuration $configuration */
         $configuration = $this->get('meteor_adyen.components.configuration');
 
+        if (!isset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
+            return false;
+        }
+
         $authUsername = $_SERVER['PHP_AUTH_USER'];
         $authPassword = $_SERVER['PHP_AUTH_PW'];
 
         if ($authUsername !== $configuration->getNotificationAuthUsername() ||
             $authPassword !== $configuration->getNotificationAuthPassword()) {
-            $this->View()->assign(['success' => false, 'message' => 'Invalid or missing auth']);
-
             return false;
         }
 

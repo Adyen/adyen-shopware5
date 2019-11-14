@@ -8,6 +8,8 @@ use Adyen\AdyenException;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
+use MeteorAdyen\Components\Configuration;
+use MeteorAdyen\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use MeteorAdyen\MeteorAdyen;
 
 /**
@@ -20,15 +22,22 @@ class PaymentSubscriber implements SubscriberInterface
      * @var PaymentMethodService
      */
     protected $paymentMethodService;
+    /**
+     * @var ShopwarePaymentMethodService
+     */
+    private $shopwarePaymentMethodService;
 
     /**
      * PaymentSubscriber constructor.
      * @param PaymentMethodService $paymentMethodService
+     * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
      */
     public function __construct(
-        PaymentMethodService $paymentMethodService
+        PaymentMethodService $paymentMethodService,
+        ShopwarePaymentMethodService $shopwarePaymentMethodService
     ) {
         $this->paymentMethodService = $paymentMethodService;
+        $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
     }
 
     public static function getSubscribedEvents()
@@ -49,18 +58,33 @@ class PaymentSubscriber implements SubscriberInterface
     {
         $shopwareMethods = $args->getReturn();
 
+        /** @var \sAdmin $subject */
+        $subject = $args->get('subject');
+
+        if (!in_array(Shopware()->Front()->Request()->getActionName(), ['shippingPayment', 'payment'])) {
+            return $shopwareMethods;
+        }
+
         $shopwareMethods = array_filter($shopwareMethods, function ($method) {
             return $method['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD;
         });
 
-        $adyenMethods = $this->paymentMethodService->getPaymentMethods();
+        $countryCode = Shopware()->Session()->sOrderVariables['sUserData']['additional']['country']['countryiso'];
+        $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
+        $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
+
+        $adyenMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
+        $adyenMethods['paymentMethods'] = array_reverse($adyenMethods['paymentMethods']);
 
         foreach ($adyenMethods['paymentMethods'] as $adyenMethod) {
-            $shopwareMethods[] = [
-                'id' => "adyen_" . $adyenMethod['type'],
+            $paymentMethodInfo = $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($adyenMethod['type']);
+            array_unshift($shopwareMethods, [
+                'id' => Configuration::PAYMENT_PREFIX . $adyenMethod['type'],
                 'name' => $adyenMethod['type'],
-                'description' => $adyenMethod['name'],
-            ];
+                'description' => $paymentMethodInfo->getName(),
+                'additionaldescription' => $paymentMethodInfo->getDescription(),
+                'image' => $this->shopwarePaymentMethodService->getAdyenImage($adyenMethod),
+            ]);
         }
 
         return $shopwareMethods;

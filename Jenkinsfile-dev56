@@ -12,7 +12,6 @@ pipeline {
     }
     parameters {
         booleanParam(name: 'DRYRUN', defaultValue: false, description: '')
-        booleanParam(name: 'BLACKFIRE', defaultValue: true, description: '')
     }
         stages {
             stage('PREPARE') {
@@ -41,16 +40,6 @@ pipeline {
             steps {
                 wrap([$class: 'BuildUser']) {
                     sh './scripts/deploy.sh'
-                }
-            }
-        }
-        stage('BLACKFIRE') {
-            when {
-                 expression { params.BLACKFIRE ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
-            }
-            steps {
-                wrap([$class: 'BuildUser']) {
-                    sh './scripts/blackfire.sh'
                 }
             }
         }

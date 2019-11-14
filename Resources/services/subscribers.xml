@@ -9,14 +9,32 @@
             <argument type="service" id="template"/>
             <tag name="shopware.event_subscriber"/>
         </service>
+        <service id="meteor_adyen.subscriber.backend_payment_subscriber" class="MeteorAdyen\Subscriber\BackendPaymentSubscriber">
+            <tag name="shopware.event_subscriber"/>
+        </service>
         <service id="meteor_adyen.subscriber.payment" class="MeteorAdyen\Subscriber\PaymentSubscriber">
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.components.adyen.payment.method"/>
+            <argument type="service" id="meteor_adyen.components.payment_method_service"/>
+        </service>
+        <service id="meteor_adyen.subscriber.backend_order_subscriber" class="MeteorAdyen\Subscriber\BackendOrderSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="meteor_adyen.components.notification_manager"/>
         </service>
         <service id="meteor_adyen.subscriber.checkout" class="MeteorAdyen\Subscriber\CheckoutSubscriber">
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.components.configuration"/>
             <argument type="service" id="meteor_adyen.components.adyen.payment.method"/>
+            <argument type="service" id="meteor_adyen.components.payment_method_service"/>
+            <argument type="service" id="session"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="snippets"/>
+        </service>
+        <service id="meteor_adyen.subscriber.frontend_payment_name_subscriber" class="MeteorAdyen\Subscriber\FrontendPaymentNameSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="meteor_adyen.components.payment_method_service"/>
+            <argument type="service" id="meteor_adyen.logger"/>
         </service>
         <service id="meteor_adyen.subscriber.notification.save_notification" class="MeteorAdyen\Subscriber\Notification\SaveNotification">
             <tag name="shopware.event_subscriber"/>
@@ -32,7 +50,7 @@
         <service id="meteor_adyen.subscriber.cronjob.process_notifications" class="MeteorAdyen\Subscriber\Cronjob\ProcessNotifications">
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.components.notification_processor"/>
-            <argument type="service" id="models"/>
+            <argument type="service" id="meteor_adyen.components.notification_manager"/>
         </service>
     </services>
 </container>

@@ -3,6 +3,7 @@
 namespace MeteorAdyen\Commands;
 
 use Doctrine\ORM\NoResultException;
+use MeteorAdyen\Components\FifoNotificationLoader;
 use MeteorAdyen\Components\NotificationManager;
 use MeteorAdyen\Components\NotificationProcessor;
 use MeteorAdyen\Subscriber\Cronjob\ProcessNotifications as ProcessNotificationsCronjob;
@@ -17,9 +18,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProcessNotifications extends ShopwareCommand
 {
     /**
-     * @var NotificationManager
+     * @var FifoNotificationLoader
      */
-    private $notificationManager;
+    private $loader;
     /**
      * @var NotificationProcessor
      */
@@ -27,14 +28,14 @@ class ProcessNotifications extends ShopwareCommand
 
     /**
      * ProcessNotifications constructor.
-     * @param NotificationManager $notificationManager
+     * @param FifoNotificationLoader $loader
      * @param NotificationProcessor $notificationProcessor
      */
     public function __construct(
-        NotificationManager $notificationManager,
+        FifoNotificationLoader $loader,
         NotificationProcessor $notificationProcessor
     ) {
-        $this->notificationManager = $notificationManager;
+        $this->loader = $loader;
         $this->notificationProcessor = $notificationProcessor;
 
         parent::__construct();
@@ -60,36 +61,20 @@ class ProcessNotifications extends ShopwareCommand
     }
 
     /**
-     * {@inheritdoc}
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|void|null
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Enlight_Event_Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $number = $input->getOption('number');
 
-        for ($i = 0; $i < $number; $i++) {
-            if(!$this->processNotification($output)) {
-                break;
-            }
-        }
+        $this->notificationProcessor->processMany(
+            $this->loader->load($number)
+        );
 
         $output->writeln('Done.');
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @return bool
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    private function processNotification(OutputInterface $output)
-    {
-        try {
-            $notification = $this->notificationManager->getNextNotificationToHandle();
-        } catch (NoResultException $exception) {
-            $output->writeln('No notifications left to process. Exiting.');
-            return false;
-        }
-        $this->notificationProcessor->process($notification);
-        return true;
     }
 }

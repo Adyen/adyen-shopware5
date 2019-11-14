@@ -1,8 +1,6 @@
 <?php
 
-
 namespace MeteorAdyen\Components;
-
 
 use Psr\Log\LoggerInterface;
 use Shopware\Components\Model\ModelManager;

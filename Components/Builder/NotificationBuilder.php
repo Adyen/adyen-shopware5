@@ -2,7 +2,7 @@
 
 namespace MeteorAdyen\Components\Builder;
 
-use MeteorAdyen\Components\DataConversion;
+use Adyen\Util\Currency;
 use MeteorAdyen\Models\Notification;
 use MeteorAdyen\Models\Enum\NotificationStatus;
 use Shopware\Components\Model\ModelManager;
@@ -15,10 +15,6 @@ use Shopware\Models\Order\Order;
 class NotificationBuilder
 {
     /**
-     * @var DataConversion
-     */
-    private $dataConversion;
-    /**
      * @var ModelManager
      */
     private $modelManager;
@@ -26,19 +22,21 @@ class NotificationBuilder
      * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository|\Shopware\Models\Order\Repository
      */
     private $orderRepository;
+    /**
+     * @var Currency
+     */
+    private $currency;
 
     /**
      * NotificationBuilder constructor.
-     * @param DataConversion $dataConversion
      * @param ModelManager $modelManager
      */
     public function __construct(
-        DataConversion $dataConversion,
         ModelManager $modelManager
     ) {
-        $this->dataConversion = $dataConversion;
         $this->modelManager = $modelManager;
         $this->orderRepository = $modelManager->getRepository(Order::class);
+        $this->currency = new Currency();
     }
 
     /**
@@ -74,8 +72,7 @@ class NotificationBuilder
             $value = $params['amount']['value'];
             $currency = $params['amount']['currency'];
 
-            $decimalNumbers = $this->dataConversion->getDecimalNumbers($currency);
-            $value = $value / pow(10, $decimalNumbers);
+            $value = $this->currency->sanitize($value, $currency);
 
             $notification->setAmountValue($value);
             $notification->setAmountCurrency($params['amount']['currency']);

@@ -10,7 +10,7 @@ use Shopware\Models\Order\Order;
  * @ORM\Entity
  * @ORM\Table(name="adyen_order_notification")
  */
-class Notification extends ModelEntity
+class Notification extends ModelEntity implements \JsonSerializable
 {
     /**
      * @var int
@@ -335,5 +335,30 @@ class Notification extends ModelEntity
     {
         $this->errorDetails = $errorDetails;
         return $this;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'pspReference' => $this->getPspReference(),
+            'createdAt' => $this->getCreatedAt(),
+            'updatedAt' => $this->getUpdatedAt(),
+            'status' => $this->getStatus(),
+            'eventCode' => $this->getEventCode(),
+            'success' => $this->isSuccess(),
+            'merchantAccountCode' => $this->getMerchantAccountCode(),
+            'amountValue' => $this->getAmountValue(),
+            'amountCurrency' => $this->getAmountCurrency(),
+            'errorDetails' => $this->getErrorDetails(),
+            'orderId' => $this->getOrderId()
+        ];
     }
 }

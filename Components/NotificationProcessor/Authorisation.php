@@ -69,14 +69,6 @@ class Authorisation implements NotificationProcessorInterface
     public function process(Notification $notification)
     {
         $order = $notification->getOrder();
-        if (!$order) {
-            $this->logger->error('No order found', [
-                'eventCode' => $notification->getEventCode(),
-                'status ' => $notification->getStatus()
-            ]);
-            return;
-        }
-
         $this->eventManager->notify(Event::NOTIFICATION_PROCESS_AUTHORISATION,
             [
                 'order' => $order,
