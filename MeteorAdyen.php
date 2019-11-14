@@ -4,16 +4,19 @@ namespace MeteorAdyen;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Exception;
+use MeteorAdyen\Components\CompilerPass\NotificationProcessorCompilerPass;
 use MeteorAdyen\Models\Notification;
 use MeteorAdyen\Models\PaymentInfo;
 use MeteorAdyen\Models\Refund;
 use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
+use Shopware\Components\Logger;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\PaymentInstaller;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class MeteorAdyen
@@ -38,6 +41,22 @@ class MeteorAdyen extends Plugin
     public static function getPackageVendorAutoload(): string
     {
         return __DIR__ . '/vendor/autoload.php';
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @throws Exception
+     */
+    public function build(ContainerBuilder $container)
+    {
+        $container->addCompilerPass(new NotificationProcessorCompilerPass());
+
+        parent::build($container);
+
+        //set default logger level for 5.4
+        if (!$container->hasParameter('kernel.default_error_level')) {
+            $container->setParameter('kernel.default_error_level', Logger::ERROR);
+        }
     }
 
     /**

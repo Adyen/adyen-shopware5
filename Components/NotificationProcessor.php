@@ -24,7 +24,7 @@ class NotificationProcessor
     /**
      * @var NotificationProcessorInterface[]
      */
-    private $handlers;
+    private $processors;
     /**
      * @var LoggerInterface
      */
@@ -40,19 +40,16 @@ class NotificationProcessor
 
     /**
      * NotificationProcessor constructor.
-     * @param IteratorAggregate $handlers
      * @param LoggerInterface $logger
      * @param ModelManager $modelManager
      * @param ContainerAwareEventManager $eventManager
      * @throws \Enlight_Event_Exception
      */
     public function __construct(
-        IteratorAggregate $handlers,
         LoggerInterface $logger,
         ModelManager $modelManager,
         ContainerAwareEventManager $eventManager
     ) {
-        $this->handlers = $this->findTaggedHandlers($handlers);
         $this->logger = $logger;
         $this->modelManager = $modelManager;
         $this->eventManager = $eventManager;
@@ -79,14 +76,14 @@ class NotificationProcessor
      */
     public function process(Notification $notification)
     {
-        $handlers = $this->findHandlers($notification);
+        $processors = $this->findProcessors($notification);
 
-        if (empty($handlers)) {
+        if (empty($processors)) {
             $notification->setStatus(NotificationStatus::STATUS_FATAL);
             $this->modelManager->persist($notification);
 
             $this->logger->notice(
-                'No notification handler found',
+                'No notification processor found',
                 [
                     'eventCode' => $notification->getEventCode(),
                     'pspReference' => $notification->getPspReference(),
@@ -111,9 +108,9 @@ class NotificationProcessor
         }
 
         $status = NotificationStatus::STATUS_HANDLED;
-        foreach ($handlers as $handler) {
+        foreach ($processors as $processor) {
             try {
-                $handler->process($notification);
+                $processor->process($notification);
             } catch (NotificationException $exception) {
                 $status = NotificationStatus::STATUS_ERROR;
                 $this->logger->notice('NotificationException', [
@@ -134,36 +131,27 @@ class NotificationProcessor
     }
 
     /**
-     * Convert tagged handlers to array and check if they are actually Notification Processors
-     * The real magic happens in the DI
-     *
-     * @param $handlers
-     * @return NotificationProcessorInterface[]
-     * @throws \Enlight_Event_Exception
+     * @param $processor
      */
-    private function findTaggedHandlers($handlers)
+    public function setProcessors($processor)
     {
-        $handlers = iterator_to_array($handlers, false);
-        $handlers = array_filter($handlers, function ($handler) {
-            return $handler instanceof NotificationProcessorInterface;
-        });
-        return $handlers;
+        $this->processors = $processor;
     }
 
     /**
-     * Finds all handlers that support this type of Notification
+     * Finds all processors that support this type of Notification
      *
      * @param $notification
-     * @return NotificationProcessorInterface[]|array
+     * @return array
      */
-    private function findHandlers($notification)
+    private function findProcessors($notification): array
     {
-        $handlers = [];
-        foreach ($this->handlers as $handler) {
-            if ($handler->supports($notification)) {
-                $handlers[] = $handler;
+        $processors = [];
+        foreach ($this->processors as $processor) {
+            if ($processor->supports($notification)) {
+                $processors[] = $processor;
             }
         }
-        return $handlers;
+        return $processors;
     }
 }
