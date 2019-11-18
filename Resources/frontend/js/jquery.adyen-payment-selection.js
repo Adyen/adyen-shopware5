@@ -98,7 +98,11 @@
 
                 me.handleComponent(payment.type);
                 $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', true);
+
+                return;
             }
+
+            me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(payment));
         },
         setConfig: function () {
             var me = this;
@@ -136,6 +140,8 @@
         },
         handleOnChange: function (state) {
             var me = this;
+
+            console.log('(handleOnChange)', arguments);
 
             $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', !state.isValid);
 
@@ -192,7 +198,6 @@
         },
         setPayment: function (state) {
             var me = this;
-
             me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
         },
         saveAdyenConfigInSession: function (adyenConfiguration) {
