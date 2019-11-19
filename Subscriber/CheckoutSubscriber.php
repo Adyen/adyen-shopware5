@@ -104,7 +104,8 @@ class CheckoutSubscriber implements SubscriberInterface
     public function CheckoutFrontendPostDispatch(Enlight_Event_EventArgs $args)
     {
         $this->rewritePaymentData($args);
-        $this->addAdyenConfig($args);
+        $this->addAdyenConfigOnShipping($args);
+        $this->addAdyenConfigOnConfirm($args);
         $this->addAdyenSnippets($args);
         $this->addAdyenGooglePay($args);
     }
@@ -138,7 +139,7 @@ class CheckoutSubscriber implements SubscriberInterface
      * @param Enlight_Event_EventArgs $args
      * @throws AdyenException
      */
-    private function addAdyenConfig(Enlight_Event_EventArgs $args)
+    private function addAdyenConfigOnShipping(Enlight_Event_EventArgs $args)
     {
         /** @var Shopware_Controllers_Frontend_Checkout $subject */
         $subject = $args->getSubject();
@@ -158,6 +159,27 @@ class CheckoutSubscriber implements SubscriberInterface
             "environment" => $this->configuration->getEnvironment(),
             "paymentMethods" => json_encode($paymentMethods),
             "paymentMethodPrefix" => $this->configuration->getPaymentMethodPrefix(),
+            "jsComponents3DS2ChallengeImageSize" => $this->configuration->getJsComponents3DS2ChallengeImageSize(),
+        ];
+
+        $view->assign('sAdyenConfig', $adyenConfig);
+    }
+
+
+    /**
+     * @param Enlight_Event_EventArgs $args
+     */
+    private function addAdyenConfigOnConfirm(Enlight_Event_EventArgs $args)
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
+        $subject = $args->getSubject();
+
+        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+            return;
+        }
+
+        $adyenConfig = [
+            "jsComponents3DS2ChallengeImageSize" => $this->configuration->getJsComponents3DS2ChallengeImageSize(),
         ];
 
         $subject->View()->assign('sAdyenConfig', $adyenConfig);
@@ -176,7 +198,7 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         $errorSnippets = $this->snippets->getNamespace('meteor_adyen/checkout/error');
-        
+
         $snippets = [];
         $snippets['errorTransactionCancelled'] = $errorSnippets->get(
             'errorTransactionCancelled',

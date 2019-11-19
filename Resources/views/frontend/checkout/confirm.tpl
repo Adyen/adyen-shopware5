@@ -18,15 +18,21 @@
 
 {block name='frontend_index_body_attributes'}
     {$smarty.block.parent}
-    data-AdyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
-    data-AdyenAjaxIdentifyShopperUrl="{url module='frontend' controller='adyen' action='ajaxIdentifyShopper'}"
-    data-AdyenAjaxChallengeShopperUrl="{url module='frontend' controller='adyen' action='ajaxChallengeShopper'}"
     {if $mAdyenSnippets}data-AdyenSnippets="{$mAdyenSnippets}"{/if}
+    data-adyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
+    data-adyenAjaxIdentifyShopperUrl="{url module='frontend' controller='adyen' action='ajaxIdentifyShopper'}"
+    data-adyenAjaxChallengeShopperUrl="{url module='frontend' controller='adyen' action='ajaxChallengeShopper'}"
+    {if $mAdyenSnippets}
+        data-adyenSnippets="{$mAdyenSnippets}"
+    {/if}
     {if $sUserData.additional.payment.type}
-        data-AdyenType="{$sUserData.additional.payment.type}"
+        data-adyenType="{$sUserData.additional.payment.type}"
     {/if}
     {if $sAdyenGoogleConfig}
         data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
+    {/if}
+    {if $sAdyenConfig}
+        data-adyen3DS2ChallengeImageSize='{$sAdyenConfig.jsComponents3DS2ChallengeImageSize}'
     {/if}
 {/block}
 
