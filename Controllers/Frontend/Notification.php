@@ -47,7 +47,7 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
      */
     private function getNotificationItems()
     {
-        $jsonbody = json_decode($this->Request()->getContent(), true);
+        $jsonbody = json_decode($this->Request()->getRawBody(), true);
         $notificationItems = $jsonbody['notificationItems'];
 
         $this->events->notify(
@@ -137,8 +137,8 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
             $data = Zend_Json::prettyPrint($data);
         }
 
-        $this->Response()->headers->set('content-type', 'application/json', true);
-        $this->Response()->setContent($data);
+        $this->Response()->setHeader('content-type', 'application/json', true);
+        $this->Response()->setBody($data);
     }
 
     private function checkAuthentication()
