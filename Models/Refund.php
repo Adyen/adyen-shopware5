@@ -3,9 +3,8 @@
 
 namespace MeteorAdyen\Models;
 
-use Shopware\Models\Order\Order;
 use Doctrine\ORM\Mapping as ORM;
-use Shopware\Components\Model\ModelEntity;
+use Shopware\Models\Order\Order;
 
 /**
  * @ORM\Entity

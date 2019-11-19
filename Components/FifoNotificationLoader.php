@@ -6,9 +6,6 @@ namespace MeteorAdyen\Components;
 
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use MeteorAdyen\Models\Enum\NotificationStatus;
-use MeteorAdyen\Models\Notification;
-use Shopware\Components\Model\ModelManager;
 
 /**
  * Class FifoNotificationLoader
@@ -40,7 +37,7 @@ class FifoNotificationLoader
         try {
             yield $this->notificationManager->getNextNotificationToHandle();
             if ($amount > 1) {
-                yield from $this->load($amount-1);
+                yield from $this->load($amount - 1);
             }
         } catch (NoResultException $exception) {
             return;

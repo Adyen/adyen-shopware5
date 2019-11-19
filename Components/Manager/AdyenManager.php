@@ -7,7 +7,6 @@ namespace MeteorAdyen\Components\Manager;
 use Doctrine\ORM\EntityManagerInterface;
 use Enlight_Components_Session_Namespace;
 use sBasket;
-use Shopware_Components_Modules;
 
 /**
  * Class AdyenManager
@@ -25,11 +24,6 @@ class AdyenManager
      */
     private $session;
 
-    /**
-     * @var Shopware_Components_Modules
-     */
-    private $modules;
-
     public function __construct(
         EntityManagerInterface $modelManager,
         Enlight_Components_Session_Namespace $session
@@ -39,7 +33,7 @@ class AdyenManager
     }
 
     /**
-     * @return \sBasket
+     * @return sBasket
      */
     public function getBasket(): sBasket
     {

@@ -60,6 +60,7 @@ class CheckoutSubscriber implements SubscriberInterface
      * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
      * @param Enlight_Components_Session_Namespace $session
      * @param ModelManager $modelManager
+     * @param Shopware_Components_Snippet_Manager $snippets
      */
     public function __construct(
         Configuration $configuration,
@@ -319,20 +320,5 @@ class CheckoutSubscriber implements SubscriberInterface
             $adyenGoogleConfig['configuration']['merchantIdentifier'] = ''; // TODO: Configurable merchant identifier
         }
         $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
-    }
-
-    /**
-     * @param $method
-     * @param array $methods
-     * @return bool
-     */
-    private function hasMethod($method, array $methods)
-    {
-        foreach ($methods['paymentMethods'] as $paymentMethod) {
-            if ($paymentMethod['type'] === $method) {
-                return true;
-            }
-        }
-        return false;
     }
 }

@@ -2,9 +2,7 @@
 
 namespace MeteorAdyen\Subscriber\Cronjob;
 
-use Doctrine\ORM\NoResultException;
 use MeteorAdyen\Components\FifoNotificationLoader;
-use MeteorAdyen\Components\NotificationManager;
 use MeteorAdyen\Components\NotificationProcessor;
 
 /**

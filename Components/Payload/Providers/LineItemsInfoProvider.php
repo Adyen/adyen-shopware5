@@ -15,6 +15,7 @@ use Zend_Db_Adapter_Exception;
 class LineItemsInfoProvider implements PaymentPayloadProvider
 {
     /**
+     * @param PaymentContext $context
      * @return array
      * @throws Enlight_Event_Exception
      * @throws Enlight_Exception

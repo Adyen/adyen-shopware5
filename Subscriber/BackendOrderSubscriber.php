@@ -4,20 +4,15 @@ declare(strict_types=1);
 
 namespace MeteorAdyen\Subscriber;
 
-use Adyen\AdyenException;
-use Doctrine\ORM\NoResultException;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use MeteorAdyen\Components\Adyen\PaymentMethodService;
-use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Components\NotificationManager;
-use MeteorAdyen\Components\NotificationProcessor\NotificationProcessorInterface;
 use MeteorAdyen\MeteorAdyen;
 use MeteorAdyen\Models\Notification;
 use Shopware\Components\Model\ModelManager;
-use Shopware\Models\Order\Status;
 use Shopware_Controllers_Backend_Order;
-use Shopware_Controllers_Frontend_Checkout;
 
 /**
  * Class CheckoutSubscriber
@@ -31,7 +26,7 @@ class BackendOrderSubscriber implements SubscriberInterface
     private $modelManager;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var ObjectRepository|EntityRepository
      */
     private $notificationRepository;
 
@@ -85,6 +80,7 @@ class BackendOrderSubscriber implements SubscriberInterface
 
     /**
      * @param array $data
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     private function addTransactionData(array &$data)
     {

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace MeteorAdyen\Components\Adyen;
 
 use Adyen\AdyenException;
-use Adyen\Client;
 use Adyen\Service\Modification;
-use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Components\NotificationManager;
 use MeteorAdyen\Models\Refund;
 use Shopware\Components\Model\ModelManager;
@@ -33,9 +31,8 @@ class RefundService
     /**
      * PaymentMethodService constructor.
      * @param ApiFactory $apiFactory
-     * @param Configuration $configuration
+     * @param ModelManager $modelManager
      * @param NotificationManager $notificationManager
-     * @throws AdyenException
      */
     public function __construct(
         ApiFactory $apiFactory,

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MeteorAdyen\Components;
 
-use IteratorAggregate;
 use MeteorAdyen\Components\NotificationProcessor\NotificationProcessorInterface;
 use MeteorAdyen\Models\Enum\NotificationStatus;
 use MeteorAdyen\Models\Event;

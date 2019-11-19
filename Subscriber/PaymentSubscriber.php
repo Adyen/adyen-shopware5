@@ -58,9 +58,6 @@ class PaymentSubscriber implements SubscriberInterface
     {
         $shopwareMethods = $args->getReturn();
 
-        /** @var \sAdmin $subject */
-        $subject = $args->get('subject');
-
         if (!in_array(Shopware()->Front()->Request()->getActionName(), ['shippingPayment', 'payment'])) {
             return $shopwareMethods;
         }

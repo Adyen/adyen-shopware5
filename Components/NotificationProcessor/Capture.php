@@ -2,13 +2,15 @@
 
 namespace MeteorAdyen\Components\NotificationProcessor;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\TransactionRequiredException;
+use Enlight_Event_Exception;
 use MeteorAdyen\Components\PaymentStatusUpdate;
 use MeteorAdyen\Models\Event;
 use MeteorAdyen\Models\Notification;
 use Psr\Log\LoggerInterface;
-use Shopware\Components\Api\Resource;
 use Shopware\Components\ContainerAwareEventManager;
-use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Status;
 
 /**
@@ -63,10 +65,10 @@ class Capture implements NotificationProcessorInterface
     /**
      * Actual processing of the notification
      * @param Notification $notification
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
-     * @throws \Enlight_Event_Exception
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws TransactionRequiredException
+     * @throws Enlight_Event_Exception
      */
     public function process(Notification $notification)
     {

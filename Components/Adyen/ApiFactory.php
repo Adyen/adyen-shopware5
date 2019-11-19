@@ -7,6 +7,7 @@ namespace MeteorAdyen\Components\Adyen;
 use Adyen\AdyenException;
 use Adyen\Client;
 use MeteorAdyen\Components\Configuration;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
@@ -27,6 +28,7 @@ class ApiFactory
     /**
      * PaymentMethodService constructor.
      * @param Configuration $configuration
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Configuration $configuration,
@@ -55,6 +57,7 @@ class ApiFactory
 
     /**
      * @return Logger|LoggerInterface
+     * @throws \Exception
      */
     public function getLogger()
     {
@@ -67,6 +70,7 @@ class ApiFactory
 
     /**
      * @return Logger
+     * @throws \Exception
      */
     private function createDefaultLogger()
     {

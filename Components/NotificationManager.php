@@ -8,7 +8,6 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use MeteorAdyen\Models\Enum\NotificationStatus;
 use MeteorAdyen\Models\Notification;
 use Shopware\Components\Model\ModelManager;
 

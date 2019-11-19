@@ -47,6 +47,7 @@ class PaymentMethodService
      * PaymentMethodService constructor.
      * @param ModelManager $modelManager
      * @param Enlight_Components_Session_Namespace $session
+     * @param Shopware_Components_Snippet_Manager $snippetManager
      * @param AdyenPaymentMethodService $adyenPaymentMethodService
      */
     public function __construct(
@@ -158,7 +159,7 @@ class PaymentMethodService
     }
 
     /**
-     * @param $adyenMethod
+     * @param $type
      * @return string
      */
     public function getAdyenImageByType($type)

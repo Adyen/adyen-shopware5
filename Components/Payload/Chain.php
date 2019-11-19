@@ -24,7 +24,7 @@ class Chain implements PaymentPayloadProvider
     }
 
     /**
-     * @param PayContext $context
+     * @param PaymentContext $context
      * @return array
      */
     public function provide(PaymentContext $context): array

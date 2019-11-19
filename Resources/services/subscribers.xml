@@ -45,12 +45,5 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.logger.notifications"/>
         </service>
-
-        <!-- Cronjobs -->
-        <service id="meteor_adyen.subscriber.cronjob.process_notifications" class="MeteorAdyen\Subscriber\Cronjob\ProcessNotifications">
-            <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="meteor_adyen.components.notification_processor"/>
-            <argument type="service" id="meteor_adyen.components.notification_manager"/>
-        </service>
     </services>
 </container>

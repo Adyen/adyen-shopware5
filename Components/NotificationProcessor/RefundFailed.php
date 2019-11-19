@@ -7,7 +7,6 @@ use MeteorAdyen\Models\Event;
 use MeteorAdyen\Models\Notification;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
-use Shopware\Models\Order\Status;
 
 /**
  * Class RefundFailed
