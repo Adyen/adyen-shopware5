@@ -6,9 +6,9 @@
         <!-- Components -->
         <service id="meteor_adyen.components.data_conversion" class="MeteorAdyen\Components\DataConversion"/>
         <service id="meteor_adyen.components.notification_processor" class="MeteorAdyen\Components\NotificationProcessor">
-            <argument type="service" id="events"/>
             <argument type="service" id="meteor_adyen.logger.notifications"/>
             <argument type="service" id="models"/>
+            <argument type="service" id="events"/>
         </service>
         <service id="meteor_adyen.components.configuration" class="MeteorAdyen\Components\Configuration">
             <argument type="service" id="shopware.plugin.cached_config_reader"/>
