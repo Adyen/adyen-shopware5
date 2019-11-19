@@ -131,11 +131,11 @@ class NotificationProcessor
     }
 
     /**
-     * @param $processor
+     * @param NotificationProcessorInterface $processor
      */
-    public function setProcessors($processor)
+    public function addProcessor(NotificationProcessorInterface $processor)
     {
-        $this->processors = $processor;
+        $this->processors[] = $processor;
     }
 
     /**

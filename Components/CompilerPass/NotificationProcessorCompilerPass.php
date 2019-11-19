@@ -27,7 +27,7 @@ class NotificationProcessorCompilerPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds(NotificationProcessor\NotificationProcessorInterface::class);
 
         foreach ($taggedServices as $id => $tags) {
-            $definition->addMethodCall('setProcessors', [new Reference($id)]);
+            $definition->addMethodCall('addProcessor', [new Reference($id)]);
         }
     }
 }
