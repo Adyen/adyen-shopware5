@@ -19,6 +19,7 @@ pipeline {
                 wrap([$class: 'BuildUser']) {
                     sh './scripts/notify-start.sh'
                     bitbucketStatusNotify(buildState: 'INPROGRESS', buildName: 'meteor-shop5-module-adyen')
+                    sh './scripts/prepare.sh'
                 }
             }
         }
