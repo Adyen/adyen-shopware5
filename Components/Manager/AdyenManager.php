@@ -6,7 +6,6 @@ namespace MeteorAdyen\Components\Manager;
 use Doctrine\ORM\EntityManagerInterface;
 use Enlight_Components_Session_Namespace;
 use sBasket;
-use Shopware\Models\Order\Order;
 use Shopware_Components_Modules;
 
 /**
@@ -36,27 +35,6 @@ class AdyenManager
     ) {
         $this->modelManager = $modelManager;
         $this->session = $session;
-    }
-
-    /**
-     * @return object|Order|null
-     */
-    public function fetchOrderForCurrentSession()
-    {
-        $order = $this->modelManager->getRepository(Order::class)
-            ->findOneBy(['temporaryId' => $this->session->get('sessionId')]);
-
-        if ($order && empty($order->getAttribute()->getMeteorAdyenIdempotencyKey())) {
-            $uuid = \Adyen\Util\Uuid::generateV4();
-            $orderAttribute = $order->getAttribute();
-            $orderAttribute->setMeteorAdyenIdempotencyKey($uuid);
-            $order->setAttribute($orderAttribute);
-
-            $this->modelManager->persist($order);
-            $this->modelManager->flush();
-        }
-
-        return $order;
     }
 
     /**

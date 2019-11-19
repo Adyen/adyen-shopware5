@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace MeteorAdyen\Components\Payload;
 
+use MeteorAdyen\Models\PaymentInfo;
 use sBasket;
 use Shopware\Models\Order\Order;
 
@@ -43,6 +44,11 @@ class PaymentContext
     private $origin;
 
     /**
+     * @var PaymentInfo
+     */
+    private $transaction;
+
+    /**
      * PaymentContext constructor.
      * @param array $paymentInfo
      * @param Order $order
@@ -50,6 +56,7 @@ class PaymentContext
      * @param array $browserInfo
      * @param array $shopperInfo
      * @param string $origin
+     * @param PaymentInfo $transaction
      */
     public function __construct(
         array $paymentInfo,
@@ -57,7 +64,8 @@ class PaymentContext
         sBasket $basket,
         array $browserInfo,
         array $shopperInfo,
-        string $origin
+        string $origin,
+        PaymentInfo $transaction
     ) {
         $this->paymentInfo = $paymentInfo;
         $this->order = $order;
@@ -65,6 +73,7 @@ class PaymentContext
         $this->browserInfo = $browserInfo;
         $this->shopperInfo = $shopperInfo;
         $this->origin = $origin;
+        $this->transaction = $transaction;
     }
 
     /**
@@ -113,5 +122,10 @@ class PaymentContext
     public function getOrigin(): string
     {
         return $this->origin;
+    }
+
+    public function getTransaction(): PaymentInfo
+    {
+        return $this->transaction;
     }
 }

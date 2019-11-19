@@ -8,12 +8,14 @@ use MeteorAdyen\Components\Payload\Providers\BrowserInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\OrderInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\PaymentMethodProvider;
 use MeteorAdyen\Components\Payload\Providers\ShopperInfoProvider;
+use MeteorAdyen\Models\PaymentInfo;
 use Shopware\Models\Order\Order;
+use Shopware\Models\Order\Status;
 
 /**
  * Class Shopware_Controllers_Frontend_Adyen
  */
-class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
+class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_Payment
 {
     /**
      * @var AdyenManager
@@ -36,20 +38,7 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
         $this->Request()->setHeader('Content-Type', 'application/json');
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
-        $paymentInfo = json_decode($this->Request()->getPost('paymentMethod') ?? '{}', true);
-        $order = $this->adyenManager->fetchOrderForCurrentSession();
-        $browserInfo = $this->Request()->getPost('browserInfo');
-        $shopperInfo = $this->getShopperInfo();
-        $origin = $this->Request()->getPost('origin');
-
-        $context = new PaymentContext(
-            $paymentInfo,
-            $order,
-            $this->adyenManager->getBasket(),
-            $browserInfo,
-            $shopperInfo,
-            $origin
-        );
+        $context = $this->createPaymentContext();
 
         $chain = new Chain(
             new ApplicationInfoProvider(),
@@ -62,7 +51,9 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
 
         $payload = $chain->provide($context);
         $checkout = $this->adyenCheckout->getCheckout();
-        $paymentInfo = $checkout->payments($payload, ['idempotencyKey' => $order->getAttribute()->getMeteorAdyenIdempotencyKey()]);
+        $paymentInfo = $checkout->payments($payload, [
+            'idempotencyKey' => $context->getTransaction()->getIdempotencyKey()
+        ]);
 
         $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
 
@@ -101,6 +92,77 @@ class Shopware_Controllers_Frontend_Adyen extends Enlight_Controller_Action
         $checkout = $this->adyenCheckout->getCheckout();
         $paymentInfo = $checkout->paymentsDetails($payload);
         $this->Response()->setBody(json_encode($paymentInfo));
+    }
+
+    /**
+     * @return PaymentContext
+     */
+    private function createPaymentContext()
+    {
+        $paymentInfo = json_decode($this->Request()->getPost('paymentMethod') ?? '{}', true);
+        $transaction = $this->prepareTransaction();
+        $order = $this->prepareOrder($transaction);
+        $browserInfo = $this->Request()->getPost('browserInfo');
+        $shopperInfo = $this->getShopperInfo();
+        $origin = $this->Request()->getPost('origin');
+
+        return new PaymentContext(
+            $paymentInfo,
+            $order,
+            $this->adyenManager->getBasket(),
+            $browserInfo,
+            $shopperInfo,
+            $origin,
+            $transaction
+        );
+    }
+
+    /**
+     * @return PaymentInfo
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function prepareTransaction()
+    {
+        $transaction = new PaymentInfo();
+        $transaction->setOrderId(-1);
+        $transaction->setPspReference('');
+        $transaction->setIdempotencyKey('');
+
+        $this->getModelManager()->persist($transaction);
+        $this->getModelManager()->flush($transaction);
+
+        return $transaction;
+    }
+
+    /**
+     * @return Order
+     */
+    private function prepareOrder($transaction)
+    {
+        $signature = $this->persistBasket();
+
+        $orderNumber = $this->saveOrder(
+            $transaction->getId(),
+            $signature,
+            Status::PAYMENT_STATE_OPEN,
+            false
+        );
+
+        /** @var Order $order */
+        $order = $this->getModelManager()->getRepository(Order::class)->findOneBy([
+            'number' => $orderNumber
+        ]);
+
+        $transaction->setOrder($order);
+
+        $uuid = \Adyen\Util\Uuid::generateV4();
+        $transaction->setIdempotencyKey($uuid);
+
+        $this->getModelManager()->persist($transaction);
+        $this->getModelManager()->flush($transaction);
+
+        return $order;
     }
 
     /**

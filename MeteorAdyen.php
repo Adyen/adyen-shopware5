@@ -87,14 +87,6 @@ class MeteorAdyen extends Plugin
                 'label' => 'Adyen Payment Method'
             ]
         );
-        $crudService->update(
-            's_order_attributes',
-            'meteor_adyen_idempotency_key',
-            TypeMapping::TYPE_STRING,
-            [
-                'displayInBackend' => false
-            ]
-        );
     }
 
     /**

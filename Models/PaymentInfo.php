@@ -35,12 +35,6 @@ class PaymentInfo extends ModelEntity
     private $order;
 
     /**
-     * @var string
-     * @ORM\Column(name="psp_reference", type="text")
-     */
-    private $pspReference;
-
-    /**
      * @var \DateTime
      * @ORM\Column(name="created_at", type="datetime")
      */
@@ -128,23 +122,6 @@ class PaymentInfo extends ModelEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPspReference(): string
-    {
-        return $this->pspReference;
-    }
-
-    /**
-     * @param string $pspReference
-     * @return $this
-     */
-    public function setPspReference(string $pspReference)
-    {
-        $this->pspReference = $pspReference;
-        return $this;
-    }
 
     /**
      * @return \DateTime

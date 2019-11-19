@@ -98,7 +98,11 @@
 
                 $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', true);
                 me.handleComponent(payment.type);
+
+                return;
             }
+
+            me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(payment));
         },
         setConfig: function () {
             var me = this;
@@ -151,7 +155,7 @@
         },
         handleOnChange: function (state) {
             var me = this;
-
+            
             $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', !state.isValid);
 
             if (state.isValid && state.data && state.data.paymentMethod) {
@@ -216,7 +220,6 @@
         },
         setPaymentSession: function (state) {
             var me = this;
-
             me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
         },
         removePaymentSession: function () {
