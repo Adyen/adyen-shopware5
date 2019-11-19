@@ -140,9 +140,7 @@
         },
         handleOnChange: function (state) {
             var me = this;
-
-            console.log('(handleOnChange)', arguments);
-
+            
             $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', !state.isValid);
 
             if (state.isValid && state.data && state.data.paymentMethod) {
