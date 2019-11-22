@@ -66,11 +66,11 @@ class PaymentSubscriber implements SubscriberInterface
             return $method['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD;
         });
 
-        $countryCode = Shopware()->Session()->sOrderVariables['sUserData']['additional']['country']['countryiso'];
-        $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
-        $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
+        $paymentMethodOptions = $this->getPaymentMethodOptions();
 
-        $adyenMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
+        $adyenMethods = $this->paymentMethodService->getPaymentMethods(
+            $paymentMethodOptions['countryCode'], $paymentMethodOptions['currency'], $paymentMethodOptions['value']
+        );
         $adyenMethods['paymentMethods'] = array_reverse($adyenMethods['paymentMethods']);
 
         foreach ($adyenMethods['paymentMethods'] as $adyenMethod) {
@@ -85,5 +85,26 @@ class PaymentSubscriber implements SubscriberInterface
         }
 
         return $shopwareMethods;
+    }
+
+    public function getPaymentMethodOptions()
+    {
+        $countryCode = Shopware()->Session()->sOrderVariables['sUserData']['additional']['country']['countryiso'];
+        if (!$countryCode) {
+            $countryCode = Shopware()->Modules()->Admin()->sGetUserData()['additional']['country']['countryiso'];
+        }
+
+        $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
+        if (!$currency) {
+            $currency = Shopware()->Shop()->getCurrency()->getCurrency();
+        }
+
+        $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
+
+        $paymentMethodOptions['countryCode'] = $countryCode;
+        $paymentMethodOptions['currency'] = $currency;
+        $paymentMethodOptions['value'] = $value;
+
+        return $paymentMethodOptions;
     }
 }

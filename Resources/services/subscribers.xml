@@ -30,6 +30,7 @@
             <argument type="service" id="session"/>
             <argument type="service" id="models"/>
             <argument type="service" id="snippets"/>
+            <argument type="service" id="front" />
         </service>
         <service id="meteor_adyen.subscriber.frontend_payment_name_subscriber" class="MeteorAdyen\Subscriber\FrontendPaymentNameSubscriber">
             <tag name="shopware.event_subscriber"/>

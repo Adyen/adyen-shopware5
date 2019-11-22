@@ -8,6 +8,7 @@ use Adyen\AdyenException;
 use Adyen\Util\Currency;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
+use Enlight_Controller_Front;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\Configuration;
@@ -54,6 +55,11 @@ class CheckoutSubscriber implements SubscriberInterface
     private $snippets;
 
     /**
+     * @var \Enlight_Controller_Front
+     */
+    private $front;
+
+    /**
      * CheckoutSubscriber constructor.
      * @param Configuration $configuration
      * @param PaymentMethodService $paymentMethodService
@@ -61,6 +67,7 @@ class CheckoutSubscriber implements SubscriberInterface
      * @param Enlight_Components_Session_Namespace $session
      * @param ModelManager $modelManager
      * @param Shopware_Components_Snippet_Manager $snippets
+     * @param Enlight_Controller_Front $front
      */
     public function __construct(
         Configuration $configuration,
@@ -68,7 +75,8 @@ class CheckoutSubscriber implements SubscriberInterface
         ShopwarePaymentMethodService $shopwarePaymentMethodService,
         Enlight_Components_Session_Namespace $session,
         ModelManager $modelManager,
-        Shopware_Components_Snippet_Manager $snippets
+        Shopware_Components_Snippet_Manager $snippets,
+        Enlight_Controller_Front $front
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
@@ -76,6 +84,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->session = $session;
         $this->modelManager = $modelManager;
         $this->snippets = $snippets;
+        $this->front = Shopware()->Front();
     }
 
     /**
@@ -117,6 +126,12 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     public function sAdminAfterSUpdatePayment(\Enlight_Hook_HookArgs $args)
     {
+        $payment = $this->front->Request()->getPost('sPayment');;
+
+        if ($this->shopwarePaymentMethodService->isAdyenMethod($payment)) {
+            //todo: setUserAdyenMethod
+        }
+
         $paymentId = $args->get('paymentId');
         if ($paymentId !== $this->shopwarePaymentMethodService->getAdyenPaymentId()) {
             return;
@@ -127,13 +142,7 @@ class CheckoutSubscriber implements SubscriberInterface
             return false;
         }
 
-        $qb = $this->modelManager->getDBALQueryBuilder();
-        $qb->update('s_user_attributes', 'a')
-            ->set('a.meteor_adyen_payment_method', ':payment')
-            ->where('a.userId = :customerId')
-            ->setParameter('payment', $this->session->offsetGet('adyenPayment'))
-            ->setParameter('customerId', $userId)
-            ->execute();
+        $this->shopwarePaymentMethodService->setUserAdyenMethod($userId, $this->session->offsetGet('adyenPayment'));
     }
 
     /**
