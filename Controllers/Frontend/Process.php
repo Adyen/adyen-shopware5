@@ -54,7 +54,8 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                 case 'Received':
                     $this->redirect([
                         'controller' => 'checkout',
-                        'action' => 'finish'
+                        'action' => 'finish',
+                        'sAGB' => true
                     ]);
                     break;
                 case 'Cancelled':
