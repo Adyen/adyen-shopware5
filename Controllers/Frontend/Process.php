@@ -48,10 +48,25 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
             $result = $this->validateResponse($response);
             $this->handleReturnResult($result);
 
-            $this->redirect([
-                'controller' => 'checkout',
-                'action' => 'finish'
-            ]);
+            switch ($result['resultCode']) {
+                case 'Authorised':
+                case 'Pending':
+                case 'Received':
+                    $this->redirect([
+                        'controller' => 'checkout',
+                        'action' => 'finish'
+                    ]);
+                    break;
+                case 'Cancelled':
+                case 'Error':
+                case 'Fail':
+                default:
+                    $this->redirect([
+                        'controller' => 'checkout',
+                        'action' => 'confirm'
+                    ]);
+                    break;
+            }
         }
     }
 
