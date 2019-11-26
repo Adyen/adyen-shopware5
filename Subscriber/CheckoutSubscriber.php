@@ -126,13 +126,11 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     public function sAdminAfterSUpdatePayment(\Enlight_Hook_HookArgs $args)
     {
-        $payment = $this->front->Request()->getPost('sPayment');;
-
-        if ($this->shopwarePaymentMethodService->isAdyenMethod($payment)) {
-            //todo: setUserAdyenMethod
+        $paymentId = $args->get('paymentId');
+        if (!$paymentId) {
+            $paymentId = $this->front->Request()->getPost('sPayment');
         }
 
-        $paymentId = $args->get('paymentId');
         if ($paymentId !== $this->shopwarePaymentMethodService->getAdyenPaymentId()) {
             return;
         }
