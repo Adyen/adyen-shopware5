@@ -84,7 +84,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->session = $session;
         $this->modelManager = $modelManager;
         $this->snippets = $snippets;
-        $this->front = Shopware()->Front();
+        $this->front = $front;
     }
 
     /**
@@ -135,7 +135,7 @@ class CheckoutSubscriber implements SubscriberInterface
             return;
         }
 
-        $userId = $this->session->offsetGet('sUserId');
+        $userId = (int)$this->session->offsetGet('sUserId');
         if (empty($userId)) {
             return false;
         }
