@@ -9,6 +9,10 @@
             <argument type="service" id="template"/>
             <tag name="shopware.event_subscriber"/>
         </service>
+        <service id="meteor_adyen.subscriber.backend_config_subscriber" class="MeteorAdyen\Subscriber\BackendConfigSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="meteor_adyen.components.origin_keys_service"/>
+        </service>
         <service id="meteor_adyen.subscriber.backend_payment_subscriber" class="MeteorAdyen\Subscriber\BackendPaymentSubscriber">
             <tag name="shopware.event_subscriber"/>
         </service>

@@ -57,6 +57,11 @@
         <element required="true" type="text" scope="shop">
             <name>origin_key</name>
             <label lang="en">Origin key</label>
+            <options>
+                <readOnly>true</readOnly>
+                <helpText>This field will be automatically generated when saving Adyen settings.</helpText>
+                <disabled>true</disabled>
+            </options>
         </element>
         <element required="true" type="text" scope="shop">
             <name>notification_hmac</name>
