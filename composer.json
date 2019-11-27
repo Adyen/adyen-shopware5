@@ -6,7 +6,14 @@
     "keywords": ["adyen", "payment", "payment platform"],
     "homepage": "http://meteor.be",
     "license": "proprietary",
-    "authors": "Meteor",
+    "authors": [
+        {
+            "name": "Meteor",
+            "email": "info@meteor.be",
+            "homepage": "https://www.meteor.be",
+            "role": "Developer"
+        }
+    ],
     "require-dev": {
         "shopware/shopware": "^5.6",
         "phpro/grumphp": "^0.16.1",
