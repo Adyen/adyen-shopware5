@@ -5,7 +5,8 @@
     "type": "shopware-plugin",
     "keywords": ["adyen", "payment", "payment platform"],
     "homepage": "http://meteor.be",
-    "license": "MIT",
+    "license": "proprietary",
+    "authors": "Meteor",
     "require-dev": {
         "shopware/shopware": "^5.6",
         "phpro/grumphp": "^0.16.1",
