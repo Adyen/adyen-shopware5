@@ -113,6 +113,7 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     public function CheckoutFrontendPostDispatch(Enlight_Event_EventArgs $args)
     {
+        $this->checkFirstCheckoutStep($args);
         $this->rewritePaymentData($args);
         $this->addAdyenConfigOnShipping($args);
         $this->addAdyenConfigOnConfirm($args);
@@ -327,5 +328,58 @@ class CheckoutSubscriber implements SubscriberInterface
             $adyenGoogleConfig['configuration']['merchantIdentifier'] = ''; // TODO: Configurable merchant identifier
         }
         $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
+    }
+
+    private function checkFirstCheckoutStep(Enlight_Event_EventArgs $args)
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
+        $subject = $args->getSubject();
+
+        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+            return;
+        }
+
+        if ($this->shouldRedirectToStep2($subject)) {
+            $subject->forward(
+                'shippingPayment',
+                'checkout'
+            );
+        }
+    }
+
+    /**
+     * @param Shopware_Controllers_Frontend_Checkout $subject
+     * @return bool
+     * @throws AdyenException
+     */
+    private function shouldRedirectToStep2(Shopware_Controllers_Frontend_Checkout $subject)
+    {
+        $userData = $subject->View()->getAssign('sUserData');
+        if (!$userData['additional'] ||
+            !$userData['additional']['payment'] ||
+            $userData['additional']['payment']['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD) {
+            return false;
+        }
+
+        $countryCode = Shopware()->Session()->sOrderVariables['sUserData']['additional']['country']['countryiso'];
+        $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
+        $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
+
+        $adyenMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
+        $selectedType = $userData['additional']['user']['meteor_adyen_payment_method'];
+        $adyenMethods['paymentMethods'] = array_filter($adyenMethods['paymentMethods'], function($element) use ($selectedType) {
+            return ($element['type'] == $selectedType);
+        });
+
+        if (!count($adyenMethods['paymentMethods'])) {
+            return true;
+        }
+
+        if (!count($adyenMethods['paymentMethods'][0]['details'])) {
+            $subject->View()->assign('sAdyenSetSession', json_encode(reset($adyenMethods['paymentMethods'])));
+            return false;
+        }
+
+        return !$this->session->offsetExists('adyenPayment');
     }
 }

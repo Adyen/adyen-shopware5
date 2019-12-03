@@ -12,6 +12,7 @@
             adyenType: '',
             adyen3ds2challengeimagesize: '',
             adyenGoogleConfig: {},
+            adyenSetSession: {},
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxIdentifyShopperUrl: '/frontend/adyen/ajaxIdentifyShopper',
             adyenAjaxChallengeShopperUrl: '/frontend/adyen/ajaxChallengeShopper',
@@ -34,6 +35,7 @@
 
             me.applyDataAttributes();
             me.eventListeners();
+            me.checkSetSession();
             me.setConfig();
             me.setCheckout();
             me.handleCheckoutButton();
@@ -46,6 +48,13 @@
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
 
             me._on(me.opts.placeOrderSelector, 'click', $.proxy(me.onPlaceOrder, me));
+        },
+
+        checkSetSession: function() {
+            var me = this;
+            if (me.opts.adyenSetSession !== {}) {
+                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenSetSession));
+            }
         },
 
         onPlaceOrder: function (event) {

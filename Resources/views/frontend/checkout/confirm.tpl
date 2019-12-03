@@ -34,6 +34,9 @@
     {if $sAdyenConfig}
         data-adyen3DS2ChallengeImageSize='{$sAdyenConfig.jsComponents3DS2ChallengeImageSize}'
     {/if}
+    {if $sAdyenSetSession}
+        data-adyenSetSession='{$sAdyenSetSession}'
+    {/if}
 {/block}
 
 {block name='frontend_checkout_confirm_error_messages'}
