@@ -6,6 +6,7 @@ namespace MeteorAdyen\Components\Adyen;
 
 use Adyen\AdyenException;
 use Adyen\Client;
+use Adyen\Environment;
 use MeteorAdyen\Components\Configuration;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -46,9 +47,14 @@ class ApiFactory
     public function create($shop = null)
     {
         if (!$this->apiClient) {
+            $urlPrefix = null;
+            if ($this->configuration->getEnvironment($shop) === Environment::LIVE) {
+                $urlPrefix = $this->configuration->getApiUrlPrefix($shop);
+            }
+
             $this->apiClient = new Client();
             $this->apiClient->setXApiKey($this->configuration->getApiKey($shop));
-            $this->apiClient->setEnvironment($this->configuration->getEnvironment($shop));
+            $this->apiClient->setEnvironment($this->configuration->getEnvironment($shop), $urlPrefix);
             $this->apiClient->setLogger($this->getLogger());
         }
 

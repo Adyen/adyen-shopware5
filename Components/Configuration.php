@@ -160,6 +160,15 @@ class Configuration
 
     /**
      * @param bool $shop
+     * @return string
+     */
+    public function getGoogleMerchantId($shop = false): string
+    {
+        return (string)$this->getConfig('google_merchant_id', $shop);
+    }
+
+    /**
+     * @param bool $shop
      * @return int
      */
     public function getDebugLogging($shop = false): bool

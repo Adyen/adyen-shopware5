@@ -325,7 +325,7 @@ class CheckoutSubscriber implements SubscriberInterface
         ];
         if ($this->configuration->getEnvironment() === Configuration::ENV_LIVE) {
             $adyenGoogleConfig['environment'] = 'PRODUCTION';
-            $adyenGoogleConfig['configuration']['merchantIdentifier'] = ''; // TODO: Configurable merchant identifier
+            $adyenGoogleConfig['configuration']['merchantIdentifier'] = $this->configuration->getGoogleMerchantId();
         }
         $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
     }
