@@ -45,7 +45,7 @@ class NotificationBuilder
      * Builds Notification object from Adyen webhook params
      *
      * @param $params
-     * @return Notification
+     * @return Notification|void
      */
     public function fromParams($params)
     {
@@ -57,9 +57,11 @@ class NotificationBuilder
             /** @var Order $order */
             $order = $this->orderRepository->findOneBy(['number' => $params['merchantReference']]);
 
-            if ($order instanceof Order) {
-                $notification->setOrder($order);
+            if (!$order) {
+                return;
             }
+
+            $notification->setOrder($order);
         }
         if (isset($params['pspReference'])) {
             $notification->setPspReference($params['pspReference']);
