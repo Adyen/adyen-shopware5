@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MeteorAdyen\Components\Builder;
 
 use Adyen\Util\Currency;
-use MeteorAdyen\Models\Notification;
 use MeteorAdyen\Models\Enum\NotificationStatus;
+use MeteorAdyen\Models\Notification;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
 
@@ -56,7 +56,10 @@ class NotificationBuilder
         if (isset($params['merchantReference'])) {
             /** @var Order $order */
             $order = $this->orderRepository->findOneBy(['number' => $params['merchantReference']]);
-            $notification->setOrder($order);
+
+            if ($order instanceof Order) {
+                $notification->setOrder($order);
+            }
         }
         if (isset($params['pspReference'])) {
             $notification->setPspReference($params['pspReference']);
