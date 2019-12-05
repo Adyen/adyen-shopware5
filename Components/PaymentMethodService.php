@@ -92,7 +92,7 @@ class PaymentMethodService
         if (empty($userId)) {
             return 'false';
         }
-        return $this->getUserAdyenMethod((int) $userId, $prependAdyen);
+        return $this->getUserAdyenMethod((int)$userId, $prependAdyen);
     }
 
     /**
@@ -108,6 +108,21 @@ class PaymentMethodService
             ->where('a.userId = :customerId')
             ->setParameter('customerId', $userId);
         return ($prependAdyen ? Configuration::PAYMENT_PREFIX : '') . $qb->execute()->fetchColumn();
+    }
+
+    /**
+     * @param int $userId
+     * @param $payment
+     */
+    public function setUserAdyenMethod(int $userId, $payment)
+    {
+        $qb = $this->modelManager->getDBALQueryBuilder();
+        $qb->update('s_user_attributes', 'a')
+            ->set('a.meteor_adyen_payment_method', ':payment')
+            ->where('a.userId = :customerId')
+            ->setParameter('payment', $payment)
+            ->setParameter('customerId', $userId)
+            ->execute();
     }
 
     /**

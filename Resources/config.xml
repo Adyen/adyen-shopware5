@@ -57,6 +57,11 @@
         <element required="true" type="text" scope="shop">
             <name>origin_key</name>
             <label lang="en">Origin key</label>
+            <options>
+                <readOnly>true</readOnly>
+                <helpText>This field will be automatically generated when saving Adyen settings.</helpText>
+                <disabled>true</disabled>
+            </options>
         </element>
         <element required="true" type="text" scope="shop">
             <name>notification_hmac</name>
@@ -69,6 +74,10 @@
         <element required="true" type="text" scope="shop">
             <name>notification_auth_password</name>
             <label lang="en">Notification: Auth Password</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+            <name>google_merchant_id</name>
+            <label lang="en">Google Merchant ID</label>
         </element>
         <element required="true" type="boolean" scope="shop">
             <name>debug_logging</name>

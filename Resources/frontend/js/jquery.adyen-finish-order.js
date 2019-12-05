@@ -300,9 +300,7 @@
         },
 
         handleOnAdditionalDetails: function (state, component) {
-            //todo show popup
             $.loadingIndicator.close();
-            console.log('got additional data', {state: state, component: component});
         },
 
     });

@@ -18,6 +18,10 @@
             <argument type="service" id="meteor_adyen.components.configuration"/>
             <argument type="service" id="meteor_adyen.logger"/>
         </service>
+        <service id="meteor_adyen.components.adyen.origin_keys_service" class="MeteorAdyen\Components\Adyen\OriginKeysService">
+            <argument type="service" id="meteor_adyen.components.adyen.apifactory"/>
+            <argument type="service" id="models"/>
+        </service>
         <service id="meteor_adyen.components.adyen.payment.method"
                  class="MeteorAdyen\Components\Adyen\PaymentMethodService">
             <argument type="service" id="meteor_adyen.components.adyen.apifactory"/>
@@ -45,7 +49,11 @@
             <argument type="service" id="session"/>
             <argument type="service" id="snippets"/>
             <argument type="service" id="meteor_adyen.components.adyen.payment.method"/>
-
+        </service>
+        <service id="meteor_adyen.components.origin_keys_service" class="MeteorAdyen\Components\OriginKeysService">
+            <argument type="service" id="meteor_adyen.components.adyen.origin_keys_service"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="shopware.plugin.config_writer"/>
         </service>
         <service id="meteor_adyen.components.builder.notification_builder" class="MeteorAdyen\Components\Builder\NotificationBuilder">
             <argument type="service" id="models"/>

@@ -11,6 +11,7 @@ use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\NotificationManager;
 use MeteorAdyen\MeteorAdyen;
 use MeteorAdyen\Models\Notification;
+use MeteorAdyen\Models\PaymentInfo;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Controllers_Backend_Order;
 
@@ -28,7 +29,7 @@ class BackendOrderSubscriber implements SubscriberInterface
     /**
      * @var ObjectRepository|EntityRepository
      */
-    private $notificationRepository;
+    private $paymentInfoRepository;
 
     /**
      * @var NotificationManager
@@ -45,7 +46,7 @@ class BackendOrderSubscriber implements SubscriberInterface
         NotificationManager $notificationManager
     ) {
         $this->modelManager = $modelManager;
-        $this->notificationRepository = $this->modelManager->getRepository(Notification::class);
+        $this->paymentInfoRepository = $this->modelManager->getRepository(PaymentInfo::class);
         $this->notificationManager = $notificationManager;
     }
 
@@ -93,16 +94,13 @@ class BackendOrderSubscriber implements SubscriberInterface
                 continue;
             }
 
-            // adyenTransaction
-            // TODO: Replace with transaction instead of notification
-            $transaction = $this->notificationRepository->findOneBy(['orderId' => $order['id']]);
-            if ($transaction) {
-                $order['adyenTransaction'] = $transaction;
-            }
-
-            // adyenRefundable
             $lastNotification = $this->notificationManager->getLastNotificationForOrderId($order['id']);
             if ($lastNotification) {
+                $transaction = $this->paymentInfoRepository->findOneBy(['orderId' => $order['id']]);
+                if ($transaction) {
+                    $order['adyenTransaction'] = $transaction;
+                }
+
                 $order['adyenNotification'] = $lastNotification;
                 $order['adyenRefundable'] = in_array($lastNotification->getEventCode(), [
                     'AUTHORISATION',
