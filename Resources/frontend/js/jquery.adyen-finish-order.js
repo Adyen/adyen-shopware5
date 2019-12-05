@@ -52,7 +52,7 @@
 
         checkSetSession: function() {
             var me = this;
-            if ($.isEmptyObject(me.opts.adyenSetSession)) {
+            if (!$.isEmptyObject(me.opts.adyenSetSession)) {
                 me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenSetSession));
             }
         },
