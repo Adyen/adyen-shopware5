@@ -33,10 +33,6 @@
             <argument type="service" id="models"/>
             <argument type="service" id="meteor_adyen.components.notification_manager"/>
         </service>
-        <service id="meteor_adyen.components.notification_manager"
-                 class="MeteorAdyen\Components\NotificationManager">
-            <argument type="service" id="models"/>
-        </service>
         <service id="meteor_adyen.components.fifo_notification_loader"
                  class="MeteorAdyen\Components\FifoNotificationLoader">
             <argument type="service" id="meteor_adyen.components.notification_manager"/>

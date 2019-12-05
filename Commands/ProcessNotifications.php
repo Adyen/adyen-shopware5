@@ -4,6 +4,7 @@ namespace MeteorAdyen\Commands;
 
 use MeteorAdyen\Components\FifoNotificationLoader;
 use MeteorAdyen\Components\NotificationProcessor;
+use MeteorAdyen\Models\Feedback\NotificationProcessorFeedback;
 use MeteorAdyen\Subscriber\Cronjob\ProcessNotifications as ProcessNotificationsCronjob;
 use Shopware\Commands\ShopwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -68,9 +69,15 @@ class ProcessNotifications extends ShopwareCommand
     {
         $number = $input->getOption('number');
 
-        $this->notificationProcessor->processMany(
+        /** @var \Generator<NotificationProcessorFeedback> $feedback */
+        $feedback = $this->notificationProcessor->processMany(
             $this->loader->load($number)
         );
+
+        /** @var NotificationProcessorFeedback $item */
+        foreach ($feedback as $item) {
+            $output->writeln($item->getNotification()->getId() . ": " . $item->getMessage());
+        }
 
         $output->writeln('Done.');
     }

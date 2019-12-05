@@ -13,6 +13,8 @@ use MeteorAdyen\Models\NotificationException;
  */
 interface NotificationProcessorInterface
 {
+    const TAG = 'meteor.adyen.notificationprocessor';
+
     /**
      * Returns boolean on whether this processor can process the Notification object
      *

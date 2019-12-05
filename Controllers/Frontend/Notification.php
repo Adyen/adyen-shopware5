@@ -3,6 +3,7 @@
 use Adyen\AdyenException;
 use Adyen\Util\HmacSignature;
 use MeteorAdyen\Components\Configuration;
+use MeteorAdyen\Components\IncomingNotificationManager;
 use MeteorAdyen\Models\Event;
 use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Components\CSRFWhitelistAware;
@@ -13,6 +14,11 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
      * @var ContainerAwareEventManager
      */
     private $events;
+
+    /**
+     * @var IncomingNotificationManager
+     */
+    private $incomingNotificationsManager;
 
     /**
      * POST: /notification
@@ -84,7 +90,7 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
 
     /**
      * @param array $notifications
-     * @return Enlight_Event_EventArgs|null
+     * @return Generator
      * @throws Enlight_Event_Exception
      */
     private function saveNotifications(array $notifications)
@@ -93,12 +99,8 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
             Event::NOTIFICATION_SAVE_FILTER_NOTIFICATIONS,
             $notifications
         );
-        return $this->events->notify(
-            Event::NOTIFICATION_ON_SAVE_NOTIFICATIONS,
-            [
-                'params' => $notifications
-            ]
-        );
+
+        return iterator_count($this->incomingNotificationsManager->save($notifications)) === 0;
     }
 
     /**
@@ -115,9 +117,8 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
     public function preDispatch()
     {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
-
-        /** @var Enlight_Event_EventManager $eventManager */
         $this->events = $this->get('events');
+        $this->incomingNotificationsManager = $this->get('meteor_adyen.components.incoming_notification_manager');
     }
 
     public function postDispatch()

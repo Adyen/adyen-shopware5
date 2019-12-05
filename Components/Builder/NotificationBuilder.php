@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MeteorAdyen\Components\Builder;
 
 use Adyen\Util\Currency;
+use MeteorAdyen\Exceptions\MissingParameterException;
+use MeteorAdyen\Exceptions\OrderNotFoundException;
 use MeteorAdyen\Models\Enum\NotificationStatus;
 use MeteorAdyen\Models\Notification;
 use Shopware\Components\Model\ModelManager;
@@ -46,6 +48,8 @@ class NotificationBuilder
      *
      * @param $params
      * @return Notification|void
+     * @throws OrderNotFoundException
+     * @throws MissingParameterException
      */
     public function fromParams($params)
     {
@@ -53,16 +57,18 @@ class NotificationBuilder
 
         $notification->setStatus(NotificationStatus::STATUS_RECEIVED);
 
-        if (isset($params['merchantReference'])) {
-            /** @var Order $order */
-            $order = $this->orderRepository->findOneBy(['number' => $params['merchantReference']]);
-
-            if (!$order) {
-                return;
-            }
-
-            $notification->setOrder($order);
+        if (!isset($params['merchantReference'])) {
+            throw new MissingParameterException('merchantReference');
         }
+
+        /** @var Order $order */
+        $order = $this->orderRepository->findOneBy(['number' => $params['merchantReference']]);
+        if (!$order) {
+            throw new OrderNotFoundException($params['merchantReference']);
+        }
+
+        $notification->setOrder($order);
+
         if (isset($params['pspReference'])) {
             $notification->setPspReference($params['pspReference']);
         }

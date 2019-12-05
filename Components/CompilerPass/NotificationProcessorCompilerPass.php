@@ -20,13 +20,10 @@ class NotificationProcessorCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has(NotificationProcessor::class)) {
-            return;
-        }
 
-        $definition = $container->findDefinition(NotificationProcessor::class);
 
-        $taggedServices = $container->findTaggedServiceIds(NotificationProcessor\NotificationProcessorInterface::class);
+        $definition = $container->getDefinition('meteor_adyen.components.notification_processor');
+        $taggedServices = $container->findTaggedServiceIds('meteor.adyen.notificationprocessor');
 
         foreach ($taggedServices as $id => $tags) {
             $definition->addMethodCall('addProcessor', [new Reference($id)]);
