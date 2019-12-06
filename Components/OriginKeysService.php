@@ -4,8 +4,8 @@ namespace MeteorAdyen\Components;
 
 use Adyen\AdyenException;
 use MeteorAdyen\MeteorAdyen;
-use Shopware\Components\Plugin\ConfigWriter;
 use Shopware\Components\Model\ModelManager;
+use Shopware\Components\Plugin\ConfigWriter;
 use Shopware\Models\Plugin\Plugin;
 use Shopware\Models\Shop\Shop;
 
@@ -54,12 +54,12 @@ class OriginKeysService
     public function generate(array $shops = null)
     {
         if (!$shops) {
-            $shops = $this->models->getRepository('Shopware\Models\Shop\Shop')->findAll();
+            $shops = $this->models->getRepository(Shop::class)->findAll();
         }
 
         $domains = [];
         foreach ($shops as $shop) {
-            $domains[$shop->getId()] = ($shop->getSecure() ? 'https://' : 'http://') .  $shop->getHost();
+            $domains[$shop->getId()] = $this->getDomain($shop);
         }
 
         $keys = $this->originKeysService->generate(array_values($domains));
@@ -81,7 +81,7 @@ class OriginKeysService
     public function generateAndSave()
     {
         $plugin = $this->models->getRepository(Plugin::class)->findOneBy(['name' => MeteorAdyen::NAME]);
-        $shops = $this->models->getRepository('Shopware\Models\Shop\Shop')->findAll();
+        $shops = $this->models->getRepository(Shop::class)->findAll();
         $keys = $this->generate($shops);
 
         foreach ($shops as $shop) {
@@ -95,5 +95,22 @@ class OriginKeysService
                 $shop
             );
         }
+    }
+
+    /**
+     * @param $shop
+     * @return string
+     */
+    private function getDomain($shop)
+    {
+        $hostName = $shop->getHost();
+        $isSecure = $shop->getSecure();
+        $mainShop = $shop->getMain();
+        if ($mainShop) {
+            $hostName = $mainShop->getHost();
+            $isSecure = $mainShop->getSecure();
+        }
+
+        return ($isSecure ? 'https://' : 'http://') . $hostName;
     }
 }
