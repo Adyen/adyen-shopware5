@@ -15,6 +15,7 @@
             <argument type="service" id="dbal_connection"/>
         </service>
         <service id="meteor_adyen.components.adyen.apifactory" class="MeteorAdyen\Components\Adyen\ApiFactory">
+            <argument type="service" id="models"/>
             <argument type="service" id="meteor_adyen.components.configuration"/>
             <argument type="service" id="meteor_adyen.logger"/>
         </service>
