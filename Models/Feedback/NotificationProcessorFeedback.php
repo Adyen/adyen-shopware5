@@ -21,16 +21,42 @@ class NotificationProcessorFeedback
     private $notification;
 
     /**
+     * @var bool
+     */
+    private $success;
+
+    /**
      * NotificationProcessorFeedback constructor.
+     * @param bool $success
      * @param string $message
      * @param Notification $notification
      */
     public function __construct(
+        bool $success,
         string $message,
         Notification $notification
     ) {
+        $this->success = $success;
         $this->message = $message;
         $this->notification = $notification;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSuccess(): bool
+    {
+        return $this->success;
+    }
+
+    /**
+     * @param bool $success
+     * @return NotificationProcessorFeedback
+     */
+    public function setSuccess(bool $success): NotificationProcessorFeedback
+    {
+        $this->success = $success;
+        return $this;
     }
 
     /**

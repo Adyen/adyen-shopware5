@@ -3,7 +3,7 @@
 namespace MeteorAdyen\Components;
 
 use MeteorAdyen\Components\Builder\NotificationBuilder;
-use MeteorAdyen\Exceptions\MissingParameterException;
+use MeteorAdyen\Exceptions\InvalidParameterException;
 use MeteorAdyen\Exceptions\OrderNotFoundException;
 use MeteorAdyen\Models\Feedback\NotificationItemFeedback;
 use Psr\Log\LoggerInterface;
@@ -57,11 +57,11 @@ class IncomingNotificationManager
             try {
                 $notification = $this->notificationBuilder->fromParams($notificationItem['NotificationRequestItem']);
                 $this->entityManager->persist($notification);
-            } catch (MissingParameterException $exception) {
-                $this->logger->info($exception->getMessage());
+            } catch (InvalidParameterException $exception) {
+                $this->logger->warning($exception->getMessage());
                 yield new NotificationItemFeedback($exception->getMessage(), $notificationItem);
             } catch (OrderNotFoundException $exception) {
-                $this->logger->info($exception->getMessage());
+                $this->logger->warning($exception->getMessage());
                 yield new NotificationItemFeedback($exception->getMessage(), $notificationItem);
             }
         }

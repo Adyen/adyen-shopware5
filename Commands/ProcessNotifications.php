@@ -74,11 +74,21 @@ class ProcessNotifications extends ShopwareCommand
             $this->loader->load($number)
         );
 
+        $totalCount = 0;
+        $successCount = 0;
+
         /** @var NotificationProcessorFeedback $item */
         foreach ($feedback as $item) {
+            $totalCount++;
+            $successCount += (int)$item->isSuccess();
             $output->writeln($item->getNotification()->getId() . ": " . $item->getMessage());
         }
 
-        $output->writeln('Done.');
+        $output->writeln(sprintf(
+            'Imported %d items. %s OK, %s FAILED',
+            $totalCount,
+            $successCount,
+            $totalCount - $successCount
+        ));
     }
 }

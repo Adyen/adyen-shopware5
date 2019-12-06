@@ -64,14 +64,11 @@ class NotificationProcessor
      * @throws \Doctrine\ORM\ORMException
      * @throws \Enlight_Event_Exception
      */
-    public function processMany(Traversable $notifications)
+    private function processMany(Traversable $notifications)
     {
         foreach ($notifications as $notification) {
             try {
-                $processor = $this->process($notification);
-                foreach ($processor as $feedback) {
-                    yield $feedback;
-                }
+                yield from $this->process($notification);
             } catch (NoNotificationProcessorFoundException $exception) {
                 $this->logger->notice(
                     'No notification processor found',
@@ -82,7 +79,7 @@ class NotificationProcessor
                     ]
                 );
 
-                yield new NotificationProcessorFeedback($exception->getMessage(), $notification);
+                yield new NotificationProcessorFeedback(false, $exception->getMessage(), $notification);
             } catch (OrderNotFoundException $exception) {
                 $this->logger->error('No order found for notification', [
                     'eventCode' => $notification->getEventCode(),
@@ -92,7 +89,7 @@ class NotificationProcessor
                     'notification' => $notification
                 ]);
 
-                yield new NotificationProcessorFeedback($exception->getMessage(), $notification);
+                yield new NotificationProcessorFeedback(false, $exception->getMessage(), $notification);
             } finally {
                 $this->modelManager->flush($notification);
             }
@@ -132,21 +129,21 @@ class NotificationProcessor
                     'message' => $exception->getMessage(),
                     'notificationId' => $exception->getNotification()->getId()
                 ]);
-                yield new NotificationProcessorFeedback("NotificationException: " . $exception->getMessage(), $notification);
+                yield new NotificationProcessorFeedback(false, "NotificationException: " . $exception->getMessage(), $notification);
             } catch (\Exception $exception) {
                 $status = NotificationStatus::STATUS_FATAL;
                 $this->logger->notice('General Exception', [
                     'exception' => $exception,
                     'notificationId' => $notification->getId()
                 ]);
-                yield new NotificationProcessorFeedback("General Exception: " . $exception->getMessage(), $notification);
+                yield new NotificationProcessorFeedback(false, "General Exception: " . $exception->getMessage(), $notification);
             }
         }
 
         $notification->setStatus($status);
         $this->modelManager->persist($notification);
 
-        yield new NotificationProcessorFeedback("Processed " . $notification->getId(), $notification);
+        yield new NotificationProcessorFeedback(true, "Processed " . $notification->getId(), $notification);
     }
 
     /**

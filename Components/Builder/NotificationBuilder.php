@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MeteorAdyen\Components\Builder;
 
 use Adyen\Util\Currency;
-use MeteorAdyen\Exceptions\MissingParameterException;
+use MeteorAdyen\Exceptions\InvalidParameterException;
 use MeteorAdyen\Exceptions\OrderNotFoundException;
 use MeteorAdyen\Models\Enum\NotificationStatus;
 use MeteorAdyen\Models\Notification;
@@ -49,7 +49,7 @@ class NotificationBuilder
      * @param $params
      * @return Notification|void
      * @throws OrderNotFoundException
-     * @throws MissingParameterException
+     * @throws InvalidParameterException
      */
     public function fromParams($params)
     {
@@ -58,7 +58,7 @@ class NotificationBuilder
         $notification->setStatus(NotificationStatus::STATUS_RECEIVED);
 
         if (!isset($params['merchantReference'])) {
-            throw new MissingParameterException('merchantReference');
+            throw InvalidParameterException::missingParameter('merchantReference');
         }
 
         /** @var Order $order */
