@@ -64,7 +64,7 @@ class NotificationProcessor
      * @throws \Doctrine\ORM\ORMException
      * @throws \Enlight_Event_Exception
      */
-    private function processMany(Traversable $notifications)
+    public function processMany(Traversable $notifications)
     {
         foreach ($notifications as $notification) {
             try {
@@ -103,7 +103,7 @@ class NotificationProcessor
      * @throws \Doctrine\ORM\ORMException
      * @throws \Enlight_Event_Exception
      */
-    public function process(Notification $notification)
+    private function process(Notification $notification)
     {
         $processors = $this->findProcessors($notification);
 
