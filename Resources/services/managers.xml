@@ -7,5 +7,15 @@
             <argument type="service" id="models"/>
             <argument type="service" id="session"/>
         </service>
+        <service id="meteor_adyen.components.notification_manager"
+                 class="MeteorAdyen\Components\NotificationManager">
+            <argument type="service" id="models"/>
+        </service>
+        <service id="meteor_adyen.components.incoming_notification_manager"
+                 class="MeteorAdyen\Components\IncomingNotificationManager">
+            <argument type="service" id="meteor_adyen.logger.notifications"/>
+            <argument type="service" id="meteor_adyen.components.builder.notification_builder"/>
+            <argument type="service" id="models"/>
+        </service>
     </services>
 </container>

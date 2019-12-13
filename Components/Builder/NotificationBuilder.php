@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace MeteorAdyen\Components\Builder;
 
 use Adyen\Util\Currency;
-use MeteorAdyen\Models\Notification;
+use MeteorAdyen\Exceptions\InvalidParameterException;
+use MeteorAdyen\Exceptions\OrderNotFoundException;
 use MeteorAdyen\Models\Enum\NotificationStatus;
+use MeteorAdyen\Models\Notification;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
 
@@ -45,7 +47,9 @@ class NotificationBuilder
      * Builds Notification object from Adyen webhook params
      *
      * @param $params
-     * @return Notification
+     * @return Notification|void
+     * @throws OrderNotFoundException
+     * @throws InvalidParameterException
      */
     public function fromParams($params)
     {
@@ -53,11 +57,18 @@ class NotificationBuilder
 
         $notification->setStatus(NotificationStatus::STATUS_RECEIVED);
 
-        if (isset($params['merchantReference'])) {
-            /** @var Order $order */
-            $order = $this->orderRepository->findOneBy(['number' => $params['merchantReference']]);
-            $notification->setOrder($order);
+        if (!isset($params['merchantReference'])) {
+            throw InvalidParameterException::missingParameter('merchantReference');
         }
+
+        /** @var Order $order */
+        $order = $this->orderRepository->findOneBy(['number' => $params['merchantReference']]);
+        if (!$order) {
+            throw new OrderNotFoundException($params['merchantReference']);
+        }
+
+        $notification->setOrder($order);
+
         if (isset($params['pspReference'])) {
             $notification->setPspReference($params['pspReference']);
         }
