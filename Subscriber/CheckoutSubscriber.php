@@ -12,6 +12,7 @@ use Enlight_Controller_Front;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\Configuration;
+use MeteorAdyen\Components\Manager\AdyenManager;
 use MeteorAdyen\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use MeteorAdyen\MeteorAdyen;
 use Shopware\Components\Model\ModelManager;
@@ -60,6 +61,11 @@ class CheckoutSubscriber implements SubscriberInterface
     private $front;
 
     /**
+     * @var AdyenManager
+     */
+    private $adyenManager;
+
+    /**
      * CheckoutSubscriber constructor.
      * @param Configuration $configuration
      * @param PaymentMethodService $paymentMethodService
@@ -76,7 +82,8 @@ class CheckoutSubscriber implements SubscriberInterface
         Enlight_Components_Session_Namespace $session,
         ModelManager $modelManager,
         Shopware_Components_Snippet_Manager $snippets,
-        Enlight_Controller_Front $front
+        Enlight_Controller_Front $front,
+        AdyenManager $adyenManager
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
@@ -85,6 +92,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->modelManager = $modelManager;
         $this->snippets = $snippets;
         $this->front = $front;
+        $this->adyenManager = $adyenManager;
     }
 
     /**
@@ -105,6 +113,7 @@ class CheckoutSubscriber implements SubscriberInterface
     public function CheckoutFrontendPreDispatch(Enlight_Event_EventArgs $args)
     {
         $this->rewritePostPayment($args);
+        $this->unsetPaymentSessions($args);
     }
 
     /**
@@ -381,5 +390,17 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         return !$this->session->offsetExists('adyenPayment');
+    }
+
+    private function unsetPaymentSessions(Enlight_Event_EventArgs $args)
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
+        $subject = $args->getSubject();
+
+        if ($subject->Request()->getActionName() === 'finish') {
+            return;
+        }
+
+        $this->adyenManager->unsetPaymentDataInSession();
     }
 }
