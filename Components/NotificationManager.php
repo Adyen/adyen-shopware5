@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use MeteorAdyen\Models\Enum\NotificationStatus;
 use MeteorAdyen\Models\Notification;
 use Shopware\Components\Model\ModelManager;
 
@@ -47,8 +48,10 @@ class NotificationManager
     public function getNextNotificationToHandle()
     {
         $builder = $this->modelManager->getRepository(Notification::class)->createQueryBuilder('n');
-        $builder->where("n.status = 'received' OR n.status = 'retry'")
+        $builder->where("n.status = :statusReceived OR n.status = :statusRetry")
             ->orderBy('n.updatedAt', 'ASC')
+            ->setParameter('statusReceived', NotificationStatus::STATUS_RECEIVED)
+            ->setParameter('statusRetry', NotificationStatus::STATUS_RETRY)
             ->setMaxResults(1);
 
         return $builder->getQuery()->getSingleResult();
