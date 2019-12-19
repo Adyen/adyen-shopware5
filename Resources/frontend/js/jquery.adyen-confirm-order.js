@@ -44,9 +44,6 @@
         eventListeners: function () {
             var me = this;
 
-            $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
-            $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
-
             me._on(me.opts.placeOrderSelector, 'click', $.proxy(me.onPlaceOrder, me));
         },
 

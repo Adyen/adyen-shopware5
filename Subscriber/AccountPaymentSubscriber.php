@@ -70,7 +70,6 @@ class AccountPaymentSubscriber implements SubscriberInterface
 
             $subject->Request()->setPost('register', ['payment' => $paymentId]);
             $subject->Request()->setPost('adyenPayment', $adyenPayment);
-            $this->session->offsetSet('adyenPayment', $adyenPayment);
         }
     }
 

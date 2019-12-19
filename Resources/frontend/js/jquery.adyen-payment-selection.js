@@ -85,7 +85,7 @@
             me.currentSelectedPaymentId = event.target.id;
             me.currentSelectedPaymentType = $(event.target).val();
         },
-        onPaymentChangedAfter: function (event) {
+        onPaymentChangedAfter: function () {
             var me = this;
             var payment;
 
@@ -199,6 +199,13 @@
 
             me.currentSelectedPaymentId = paymentMethod.attr('id');
             me.currentSelectedPaymentType = paymentMethod.val();
+
+            // Return when no data has been entered yet + see if component is needed
+            if (!me.sessionStorage.getItem(me.paymentMethodSession) ||
+                me.sessionStorage.getItem(me.paymentMethodSession) === "{}") {
+                me.onPaymentChangedAfter();
+                return;
+            }
 
             me.changeInfosButton = $('<a/>')
                 .addClass(me.opts.classChangePaymentInfo)

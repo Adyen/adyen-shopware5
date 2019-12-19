@@ -132,7 +132,7 @@ class CheckoutSubscriber implements SubscriberInterface
 
     /**
      * @param \Enlight_Hook_HookArgs $args
-     * @return bool|void
+     * @return void
      */
     public function sAdminAfterSUpdatePayment(\Enlight_Hook_HookArgs $args)
     {
@@ -147,10 +147,15 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $userId = (int)$this->session->offsetGet('sUserId');
         if (empty($userId)) {
-            return false;
+            return;
         }
 
-        $this->shopwarePaymentMethodService->setUserAdyenMethod($userId, $this->session->offsetGet('adyenPayment'));
+        $adyenPayment = Shopware()->Front()->Request()->getParams()['adyenPayment'];
+        if (!$adyenPayment) {
+            return;
+        }
+
+        $this->shopwarePaymentMethodService->setUserAdyenMethod($userId, $adyenPayment);
     }
 
     /**
@@ -282,6 +287,7 @@ class CheckoutSubscriber implements SubscriberInterface
             return;
         }
 
+        $this->session->offsetSet(MeteorAdyen::SESSION_ADYEN_PAYMENT_VALID, false);
         if ($this->shopwarePaymentMethodService->isAdyenMethod($payment)) {
             $paymentId = $this->shopwarePaymentMethodService->getAdyenPaymentId();
             $adyenPayment = substr($payment, 6);
@@ -292,7 +298,8 @@ class CheckoutSubscriber implements SubscriberInterface
             ]);
             $subject->Request()->setPost('payment', $paymentId);
             $subject->Request()->setPost('adyenPayment', $adyenPayment);
-            $this->session->offsetSet('adyenPayment', $adyenPayment);
+            $this->session->offsetSet(MeteorAdyen::SESSION_ADYEN_PAYMENT, $adyenPayment);
+            $this->session->offsetSet(MeteorAdyen::SESSION_ADYEN_PAYMENT_VALID, true);
         }
     }
 
@@ -389,7 +396,7 @@ class CheckoutSubscriber implements SubscriberInterface
             return false;
         }
 
-        return !$this->session->offsetExists('adyenPayment');
+        return !$this->session->offsetExists(MeteorAdyen::SESSION_ADYEN_PAYMENT_VALID);
     }
 
     private function unsetPaymentSessions(Enlight_Event_EventArgs $args)

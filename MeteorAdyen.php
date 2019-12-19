@@ -28,6 +28,10 @@ class MeteorAdyen extends Plugin
     const NAME = 'MeteorAdyen';
     const ADYEN_GENERAL_PAYMENT_METHOD = 'adyen_general_payment_method';
 
+    const SESSION_ADYEN_PAYMENT = 'adyenPayment';
+    const SESSION_ADYEN_PAYMENT_VALID = 'adyenPaymentValid';
+    const SESSION_ADYEN_PAYMENT_DATA = 'adyenPaymentData';
+
     /**
      * @return bool
      */
