@@ -6,7 +6,6 @@ namespace MeteorAdyen\Components\Manager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Enlight_Components_Session_Namespace;
-use sBasket;
 
 /**
  * Class AdyenManager
@@ -14,6 +13,8 @@ use sBasket;
  */
 class AdyenManager
 {
+    const paymentDataSession = 'adyenPaymentData';
+
     /**
      * @var EntityManagerInterface
      */
@@ -33,19 +34,11 @@ class AdyenManager
     }
 
     /**
-     * @return sBasket
-     */
-    public function getBasket(): sBasket
-    {
-        return Shopware()->Modules()->Basket();
-    }
-
-    /**
      * @param $paymentData
      */
     public function storePaymentDataInSession($paymentData)
     {
-        $this->session->offsetSet('adyenPaymentData', $paymentData);
+        $this->session->offsetSet(self::paymentDataSession, $paymentData);
     }
 
     /**
@@ -53,6 +46,6 @@ class AdyenManager
      */
     public function getPaymentDataSession(): string
     {
-        return $this->session->offsetGet('adyenPaymentData');
+        return $this->session->offsetGet(self::paymentDataSession);
     }
 }
