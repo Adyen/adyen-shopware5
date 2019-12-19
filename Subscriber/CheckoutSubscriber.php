@@ -375,7 +375,7 @@ class CheckoutSubscriber implements SubscriberInterface
             return true;
         }
 
-        if (array_key_exists('details', reset($adyenMethods['paymentMethods']))) {
+        if (!array_key_exists('details', reset($adyenMethods['paymentMethods']))) {
             $subject->View()->assign('sAdyenSetSession', json_encode(reset($adyenMethods['paymentMethods'])));
             return false;
         }
