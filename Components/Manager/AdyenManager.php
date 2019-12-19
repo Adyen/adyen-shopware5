@@ -53,6 +53,6 @@ class AdyenManager
      */
     public function getPaymentDataSession(): string
     {
-        return $this->session->offsetGet('adyenPaymentData');
+        return $this->session->offsetGet('adyenPaymentData') ?? '';
     }
 }

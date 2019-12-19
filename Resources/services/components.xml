@@ -10,6 +10,10 @@
             <argument type="service" id="models"/>
             <argument type="service" id="events"/>
         </service>
+        <service id="meteor_adyen.components.basket_service" class="MeteorAdyen\Components\BasketService">
+            <argument type="service" id="events"/>
+            <argument type="service" id="models"/>
+        </service>
         <service id="meteor_adyen.components.configuration" class="MeteorAdyen\Components\Configuration">
             <argument type="service" id="shopware.plugin.cached_config_reader"/>
             <argument type="service" id="dbal_connection"/>
