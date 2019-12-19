@@ -397,7 +397,7 @@ class CheckoutSubscriber implements SubscriberInterface
         /** @var Shopware_Controllers_Frontend_Checkout $subject */
         $subject = $args->getSubject();
 
-        if ($subject->Request()->getActionName() === 'finish') {
+        if ($subject->Request()->getActionName() !== 'finish') {
             return;
         }
 
