@@ -68,8 +68,16 @@
         eventListeners: function () {
             var me = this;
 
+            $(document).on('submit', me.opts.formSelector, $.proxy(me.onPaymentFormSubmit, me));
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
+        },
+        onPaymentFormSubmit: function(e) {
+            var me = this;
+            if ($(me.opts.paymentMethodFormSubmitSelector).hasClass('is--disabled')) {
+                e.preventDefault();
+                return false;
+            }
         },
         onPaymentChangedBefore: function ($event) {
             var me = this;
@@ -96,7 +104,7 @@
                     .find(me.opts.methodeBankdataSelector)
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
 
-                $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', true);
+                $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
                 me.handleComponent(payment.type);
 
                 return;
@@ -151,12 +159,16 @@
         },
         handleComponentPayWithGoogle: function(type) {
             var me = this;
-            $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', false);
+            $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
         },
         handleOnChange: function (state) {
             var me = this;
-            
-            $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', !state.isValid);
+
+            if (state.isValid) {
+                $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
+            } else {
+                $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
+            }
 
             if (state.isValid && state.data && state.data.paymentMethod) {
                 me.setPaymentSession(state);
@@ -198,7 +210,7 @@
             var me = this;
 
             me.removePaymentSession();
-            $(me.opts.paymentMethodFormSubmitSelector).prop('disabled', true);
+            $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
 
             var paymentMethod = $(me.opts.formSelector).find('input[name=payment]:checked');
             var payment = me.getPaymentMethodByType(paymentMethod.val());
