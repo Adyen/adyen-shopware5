@@ -21,6 +21,11 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     private $adyenCheckout;
 
     /**
+     * @var \MeteorAdyen\Components\BasketService
+     */
+    private $basketService;
+
+    /**
      * Whitelist notifyAction
      */
     public function getWhitelistedCSRFActions()
@@ -33,6 +38,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     {
         $this->adyenManager = $this->get('meteor_adyen.components.manager.adyen_manager');
         $this->adyenCheckout = $this->get('meteor_adyen.components.adyen.payment.method');
+        $this->basketService = $this->get('meteor_adyen.components.basket_service');
     }
 
     /**
@@ -62,6 +68,8 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                 case 'Error':
                 case 'Fail':
                 default:
+                    $this->basketService->cancelAndRestoreByOrderNumber($result['merchantReference']);
+
                     $this->redirect([
                         'controller' => 'checkout',
                         'action' => 'confirm'

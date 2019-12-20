@@ -22,4 +22,8 @@ class Event
     const NOTIFICATION_PROCESS_REFUNDED_REVERSED = 'MeteorAdyen_Notification_Process_RefundedReversed';
     const NOTIFICATION_PROCESS_CHARGEBACK = 'MeteorAdyen_Notification_Process_Chargeback';
     const NOTIFICATION_PROCESS_CHARGEBACK_REVERSED = 'MeteorAdyen_Notification_Process_ChargebackReversed';
+
+    const BASKET_BEFORE_PROCESS_ORDER_DETAIL = 'MeteorAdyen_Basket_Before_ProcessOrderDetail';
+    const BASKET_STOPPED_PROCESS_ORDER_DETAIL = 'MeteorAdyen_Basket_Stopped_ProcessOrderDetail';
+    const BASKET_AFTER_PROCESS_ORDER_DETAIL = 'MeteorAdyen_Basket_After_ProcessOrderDetail';
 }
