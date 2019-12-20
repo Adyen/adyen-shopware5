@@ -185,6 +185,9 @@
 
         handlePaymentDataError: function (data) {
             var me = this;
+
+            $.loadingIndicator.close();
+
             switch (data.resultCode) {
                 case 'Cancelled':
                     this.addAdyenError(me.opts.adyenSnippets.errorTransactionCancelled);
