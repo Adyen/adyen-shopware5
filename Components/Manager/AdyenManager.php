@@ -48,4 +48,10 @@ class AdyenManager
     {
         return $this->session->offsetGet(self::paymentDataSession);
     }
+
+    public function unsetPaymentDataInSession()
+    {
+        $this->session->offsetUnset('adyenPayment');
+        $this->session->offsetUnset('adyenPaymentData');
+    }
 }
