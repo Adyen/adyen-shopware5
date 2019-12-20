@@ -10,6 +10,7 @@
             adyenEnvironment: 'test',
             adyenPaymentMethodsResponse: {},
             formSelector: '#shippingPaymentForm',
+            resetSessionUrl: '',
             /**
              * Prefix to identify adyen payment methods
              *
@@ -245,6 +246,7 @@
             var me = this;
 
             me.sessionStorage.removeItem(me.paymentMethodSession);
+            $.get(me.opts.resetSessionUrl);
         },
         saveAdyenConfigInSession: function (adyenConfiguration) {
             var me = this;

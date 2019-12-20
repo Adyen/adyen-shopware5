@@ -7,6 +7,7 @@
         <div data-adyenOriginKey='{$sAdyenConfig.originKey}'
              data-adyenEnvironment='{$sAdyenConfig.environment}'
              data-adyenPaymentMethodsResponse='{$sAdyenConfig.paymentMethods}'
+             data-resetSessionUrl='{url controller="Adyen" action="ResetValidPaymentSession"}'
              class="adyen-payment-selection">
         </div>
     {/if}

@@ -54,4 +54,9 @@ class AdyenManager
         $this->session->offsetUnset(MeteorAdyen::SESSION_ADYEN_PAYMENT_VALID);
         $this->session->offsetUnset(MeteorAdyen::SESSION_ADYEN_PAYMENT_DATA);
     }
+
+    public function unsetValidPaymentSession()
+    {
+        $this->session->offsetUnset(MeteorAdyen::SESSION_ADYEN_PAYMENT_VALID);
+    }
 }
