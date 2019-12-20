@@ -109,7 +109,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         return new PaymentContext(
             $paymentInfo,
             $order,
-            $this->adyenManager->getBasket(),
+            Shopware()->Modules()->Basket(),
             $browserInfo,
             $shopperInfo,
             $origin,

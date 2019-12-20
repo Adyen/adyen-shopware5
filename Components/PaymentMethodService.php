@@ -139,11 +139,18 @@ class PaymentMethodService
      * @return PaymentMethodInfo
      * @throws AdyenException
      */
-    public function getAdyenPaymentInfoByType($type)
+    public function getAdyenPaymentInfoByType($type, $paymentMethods= null)
     {
-        $adyenMethods = $this->adyenPaymentMethodService->getPaymentMethods();
+        if (!$paymentMethods) {
+            $paymentMethodOptions = $this->getPaymentMethodOptions();
+            $adyenMethods = $this->adyenPaymentMethodService->getPaymentMethods(
+                $paymentMethodOptions['countryCode'], $paymentMethodOptions['currency'], $paymentMethodOptions['value']
+            );
 
-        foreach ($adyenMethods['paymentMethods'] as $paymentMethod) {
+            $paymentMethods = $adyenMethods['paymentMethods'];
+        }
+
+        foreach ($paymentMethods as $paymentMethod) {
             if ($paymentMethod['type'] === $type) {
                 $name = $this->snippetManager
                     ->getNamespace('meteor_adyen/method/name')
@@ -183,5 +190,26 @@ class PaymentMethodService
             $type = 'card';
         }
         return sprintf('https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/%s.svg', $type);
+    }
+
+    public function getPaymentMethodOptions()
+    {
+        $countryCode = Shopware()->Session()->sOrderVariables['sUserData']['additional']['country']['countryiso'];
+        if (!$countryCode) {
+            $countryCode = Shopware()->Modules()->Admin()->sGetUserData()['additional']['country']['countryiso'];
+        }
+
+        $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
+        if (!$currency) {
+            $currency = Shopware()->Shop()->getCurrency()->getCurrency();
+        }
+
+        $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
+
+        $paymentMethodOptions['countryCode'] = $countryCode;
+        $paymentMethodOptions['currency'] = $currency;
+        $paymentMethodOptions['value'] = $value;
+
+        return $paymentMethodOptions;
     }
 }

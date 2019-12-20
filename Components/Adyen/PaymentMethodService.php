@@ -7,7 +7,9 @@ namespace MeteorAdyen\Components\Adyen;
 use Adyen\AdyenException;
 use Adyen\Client;
 use Adyen\Service\Checkout;
+use Adyen\Util\Currency;
 use MeteorAdyen\Components\Configuration;
+use MeteorAdyen\Models\Enum\Channel;
 
 /**
  * Class PaymentMethodService
@@ -60,20 +62,22 @@ class PaymentMethodService
         }
 
         $checkout = new Checkout($this->apiClient);
+        $adyenCurrency = new Currency();
 
         $paymentMethods = $checkout->paymentMethods([
             "merchantAccount" => $this->configuration->getMerchantAccount(),
             "countryCode" => $countryCode,
             "amount" => [
                 "currency" => $currency,
-                "value" => $value
+                "value" => $adyenCurrency->sanitize($value, $currency),
             ],
-            "channel" => "Web"
+            "channel" => Channel::WEB
         ]);
 
         if ($cache) {
             $this->cache[$cacheKey] = $paymentMethods;
         }
+
         return $paymentMethods;
     }
 
