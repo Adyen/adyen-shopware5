@@ -52,7 +52,7 @@
 
         checkSetSession: function() {
             var me = this;
-            if (me.opts.adyenSetSession !== {}) {
+            if (!$.isEmptyObject(me.opts.adyenSetSession)) {
                 me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenSetSession));
             }
         },
@@ -185,6 +185,9 @@
 
         handlePaymentDataError: function (data) {
             var me = this;
+
+            $.loadingIndicator.close();
+
             switch (data.resultCode) {
                 case 'Cancelled':
                     this.addAdyenError(me.opts.adyenSnippets.errorTransactionCancelled);
