@@ -2,6 +2,7 @@
 
 namespace MeteorAdyen;
 
+use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Tools\SchemaTool;
 use Exception;
 use MeteorAdyen\Components\CompilerPass\NotificationProcessorCompilerPass;
@@ -87,6 +88,8 @@ class MeteorAdyen extends Plugin
                 'label' => 'Adyen Payment Method'
             ]
         );
+
+        $this->rebuildAttributeModels();
     }
 
     /**
@@ -147,6 +150,8 @@ class MeteorAdyen extends Plugin
 
         $crudService = $this->container->get('shopware_attribute.crud_service');
         $crudService->delete('s_user_attributes', 'meteor_adyen_payment_method');
+
+        $this->rebuildAttributeModels();
     }
 
     /**
@@ -187,6 +192,17 @@ class MeteorAdyen extends Plugin
         ];
 
         return $options;
+    }
+
+    private function rebuildAttributeModels()
+    {
+        /** @var Cache $metaDataCache */
+        $metaDataCache = $this->container->get('models')->getConfiguration()->getMetadataCacheImpl();
+        if ($metaDataCache) {
+            $metaDataCache->deleteAll();
+        }
+
+        $this->container->get('models')->generateAttributeModels(['s_user_attributes']);
     }
 }
 
