@@ -72,8 +72,8 @@ class PaymentSubscriber implements SubscriberInterface
     {
         $shopwareMethods = $args->getReturn();
 
-        if (!in_array(Shopware()->Front()->Request()->getActionName(),
-                ['shippingPayment', 'payment']) || $this->skipReplaceAdyenMethods) {
+        if ($this->skipReplaceAdyenMethods || !in_array(Shopware()->Front()->Request()->getActionName(),
+                ['shippingPayment', 'payment'])) {
 
             $this->skipReplaceAdyenMethods = false;
             return $shopwareMethods;
