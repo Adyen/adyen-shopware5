@@ -76,6 +76,11 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->paymentDetails('threeds2_challengeResult', 'threeds2.challengeResult');
     }
 
+    public function resetValidPaymentSessionAction() {
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+        $this->adyenManager->unsetValidPaymentSession();
+    }
+
     /**
      * @param $post
      * @param $detail

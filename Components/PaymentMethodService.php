@@ -113,6 +113,7 @@ class PaymentMethodService
     /**
      * @param int $userId
      * @param $payment
+     * @return bool
      */
     public function setUserAdyenMethod(int $userId, $payment)
     {
