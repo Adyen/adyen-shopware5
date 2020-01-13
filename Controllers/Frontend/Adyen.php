@@ -59,12 +59,18 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
         $this->Response()->setBody(json_encode($paymentInfo));
     }
-    
+
+    /**
+     * @throws \Adyen\AdyenException
+     */
     public function ajaxIdentifyShopperAction()
     {
         $this->paymentDetails('threeds2_fingerprint', 'threeds2.fingerprint');
     }
 
+    /**
+     * @throws \Adyen\AdyenException
+     */
     public function ajaxChallengeShopperAction()
     {
         $this->paymentDetails('threeds2_challengeResult', 'threeds2.challengeResult');
@@ -96,6 +102,8 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
     /**
      * @return PaymentContext
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     private function createPaymentContext()
     {
@@ -136,7 +144,10 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     }
 
     /**
+     * @param $transaction
      * @return Order
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     private function prepareOrder($transaction)
     {

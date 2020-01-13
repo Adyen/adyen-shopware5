@@ -28,6 +28,11 @@ class PaymentSubscriber implements SubscriberInterface
     private $shopwarePaymentMethodService;
 
     /**
+     * @var $skipReplaceAdyenMethods
+     */
+    private $skipReplaceAdyenMethods = false;
+
+    /**
      * PaymentSubscriber constructor.
      * @param PaymentMethodService $paymentMethodService
      * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
@@ -44,7 +49,16 @@ class PaymentSubscriber implements SubscriberInterface
     {
         return [
             'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'replaceAdyenMethods',
+            'Shopware_Controllers_Frontend_Checkout::getSelectedPayment::before' => 'beforeGetSelectedPayment',
         ];
+    }
+
+    /**
+     * Skip replacement of payment methods during checkPaymentAvailability validation
+     */
+    public function beforeGetSelectedPayment()
+    {
+        $this->skipReplaceAdyenMethods = true;
     }
 
     /**
@@ -58,7 +72,10 @@ class PaymentSubscriber implements SubscriberInterface
     {
         $shopwareMethods = $args->getReturn();
 
-        if (!in_array(Shopware()->Front()->Request()->getActionName(), ['shippingPayment', 'payment'])) {
+        if (!in_array(Shopware()->Front()->Request()->getActionName(),
+                ['shippingPayment', 'payment']) || $this->skipReplaceAdyenMethods) {
+
+            $this->skipReplaceAdyenMethods = false;
             return $shopwareMethods;
         }
 
@@ -74,7 +91,8 @@ class PaymentSubscriber implements SubscriberInterface
         $adyenMethods['paymentMethods'] = array_reverse($adyenMethods['paymentMethods']);
 
         foreach ($adyenMethods['paymentMethods'] as $adyenMethod) {
-            $paymentMethodInfo = $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($adyenMethod['type'], $adyenMethods['paymentMethods']);
+            $paymentMethodInfo = $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($adyenMethod['type'],
+                $adyenMethods['paymentMethods']);
             array_unshift($shopwareMethods, [
                 'id' => Configuration::PAYMENT_PREFIX . $adyenMethod['type'],
                 'name' => $adyenMethod['type'],
