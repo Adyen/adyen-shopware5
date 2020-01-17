@@ -38,7 +38,7 @@ class ProcessNotifications implements \Enlight\Event\SubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'Meteor_Adyen_CronJob_ProcessNotifications' => 'runCronjob'
+            'Shopware_CronJob_MeteorAdyenProcessNotifications' => 'runCronjob'
         ];
     }
 

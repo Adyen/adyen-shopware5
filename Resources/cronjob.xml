@@ -3,7 +3,7 @@
           xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.3/engine/Shopware/Components/Plugin/schema/cronjob.xsd">
     <cronjob>
         <name>Adyen: Process Notifications</name>
-        <action>Meteor_Adyen_CronJob_ProcessNotifications</action>
+        <action>Shopware_CronJob_MeteorAdyenProcessNotifications</action>
         <active>true</active>
         <interval>60</interval>
         <disableOnError>false</disableOnError>
