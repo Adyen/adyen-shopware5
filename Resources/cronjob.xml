@@ -4,7 +4,7 @@
 
     <cronjob>
         <name>Adyen: Process Notifications</name>
-        <action>Meteor_Adyen_CronJob_ProcessNotifications</action>
+        <action>Shopware_CronJob_MeteorAdyenProcessNotifications</action>
         <active>true</active>
         <interval>60</interval>
         <disableOnError>false</disableOnError>
