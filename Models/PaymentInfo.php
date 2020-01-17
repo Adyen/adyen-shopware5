@@ -137,12 +137,15 @@ class PaymentInfo extends ModelEntity
         return $this->pspReference;
     }
 
+
     /**
      * @param string $pspReference
+     * @return $this
      */
-    public function setPspReference(string $pspReference): void
+    public function setPspReference(string $pspReference)
     {
         $this->pspReference = $pspReference;
+        return $this;
     }
 
     /**
