@@ -2,7 +2,7 @@
 <plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.3/engine/Shopware/Components/Plugin/schema/plugin.xsd">
 
-    <label lang="en">Meteor Adyen</label>
+    <label lang="en">Adyen Shopware Plugin by Meteor</label>
 
     <version>0.0.1</version>
     <copyright>(c) Meteor</copyright>

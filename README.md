@@ -1,2 +1,1 @@
-# meteor-shop5-adyen
-
+# Adyen Shopware Plugin by Meteor
