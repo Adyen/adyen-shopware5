@@ -27,10 +27,16 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private $adyenCheckout;
 
+    /**
+     * @var \MeteorAdyen\Components\BasketService
+     */
+    private $basketService;
+
     public function preDispatch()
     {
         $this->adyenManager = $this->get('meteor_adyen.components.manager.adyen_manager');
         $this->adyenCheckout = $this->get('meteor_adyen.components.adyen.payment.method');
+        $this->basketService = $this->get('meteor_adyen.components.basket_service');
     }
 
     public function ajaxDoPaymentAction()
@@ -56,7 +62,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         ]);
 
         $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
-
+        $this->handlePaymentData($paymentInfo);
         $this->Response()->setBody(json_encode($paymentInfo));
     }
 
@@ -76,7 +82,8 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->paymentDetails('threeds2_challengeResult', 'threeds2.challengeResult');
     }
 
-    public function resetValidPaymentSessionAction() {
+    public function resetValidPaymentSessionAction()
+    {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
         $this->adyenManager->unsetValidPaymentSession();
     }
@@ -102,6 +109,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
         $checkout = $this->adyenCheckout->getCheckout();
         $paymentInfo = $checkout->paymentsDetails($payload);
+        $this->handlePaymentData($paymentInfo);
         $this->Response()->setBody(json_encode($paymentInfo));
     }
 
@@ -189,5 +197,43 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         return [
             'shopperIP' => $this->request->getClientIp()
         ];
+    }
+
+
+    /**
+     * @param $paymentInfo
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function handlePaymentData($paymentInfo)
+    {
+        switch ($paymentInfo['resultCode']) {
+            case 'Authorised':
+            case 'IdentifyShopper':
+            case 'ChallengeShopper':
+            case 'RedirectShopper':
+                break;
+            default:
+                $this->handlePaymentDataError($paymentInfo);
+                break;
+        }
+    }
+
+    /**
+     * @param $paymentInfo
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function handlePaymentDataError($paymentInfo)
+    {
+        if ($paymentInfo['merchantReference']) {
+            $this->basketService->cancelAndRestoreByOrderNumber($paymentInfo['merchantReference']);
+        }
     }
 }

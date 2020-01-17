@@ -1,6 +1,7 @@
 <?php
 
 use MeteorAdyen\Components\Manager\AdyenManager;
+use MeteorAdyen\Models\Enum\PaymentResultCodes;
 use Shopware\Components\CSRFWhitelistAware;
 use Shopware\Models\Order\Order;
 use Shopware\Models\Order\Status;
@@ -55,19 +56,19 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
             $this->handleReturnResult($result);
 
             switch ($result['resultCode']) {
-                case 'Authorised':
-                case 'Pending':
-                case 'Received':
+                case PaymentResultCodes::AUTHORISED:
+                case PaymentResultCodes::PENDING:
+                case PaymentResultCodes::RECEIVED:
                     $this->redirect([
                         'controller' => 'checkout',
                         'action' => 'finish',
                         'sAGB' => true
                     ]);
                     break;
-                case 'Cancelled':
-                case 'Error':
-                case 'Fail':
+                case PaymentResultCodes::CANCELLED:
+                case PaymentResultCodes::ERROR:
                 default:
+
                     $this->basketService->cancelAndRestoreByOrderNumber($result['merchantReference']);
 
                     $this->redirect([

@@ -20,8 +20,6 @@ class NotificationProcessorCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-
-
         $definition = $container->getDefinition('meteor_adyen.components.notification_processor');
         $taggedServices = $container->findTaggedServiceIds('meteor.adyen.notificationprocessor');
 
