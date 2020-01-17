@@ -8,22 +8,22 @@ namespace MeteorAdyen\Models;
  */
 class Event
 {
-    const NOTIFICATION_RECEIVE = 'MeteorAdyen_Notification_onReceive_json';
-    const NOTIFICATION_SAVE_FILTER_NOTIFICATIONS = 'MeteorAdyen_Notification_saveNotifications_notifications';
-    const NOTIFICATION_FIND_HANDLERS = 'MeteorAdyen_Notification_FindHandlers';
-    const NOTIFICATION_PROCESS = 'MeteorAdyen_Notification_Process';
-    const NOTIFICATION_NO_ORDER_FOUND = 'MeteorAdyen_Notification_No_Order_Found';
-    const NOTIFICATION_PROCESS_AUTHORISATION = 'MeteorAdyen_Notification_Process_Authorisation';
-    const NOTIFICATION_PROCESS_CANCELLATION = 'MeteorAdyen_Notification_Process_Cancellation';
-    const NOTIFICATION_PROCESS_CAPTURE = 'MeteorAdyen_Notification_Process_Capture';
-    const NOTIFICATION_PROCESS_CAPTURE_FAILED = 'MeteorAdyen_Notification_Process_CaptureFailed';
-    const NOTIFICATION_PROCESS_REFUND = 'MeteorAdyen_Notification_Process_Refund';
-    const NOTIFICATION_PROCESS_REFUND_FAILED = 'MeteorAdyen_Notification_Process_RefundFailed';
-    const NOTIFICATION_PROCESS_REFUNDED_REVERSED = 'MeteorAdyen_Notification_Process_RefundedReversed';
-    const NOTIFICATION_PROCESS_CHARGEBACK = 'MeteorAdyen_Notification_Process_Chargeback';
-    const NOTIFICATION_PROCESS_CHARGEBACK_REVERSED = 'MeteorAdyen_Notification_Process_ChargebackReversed';
+    const NOTIFICATION_RECEIVE = 'Adyen_Notification_onReceive_json';
+    const NOTIFICATION_SAVE_FILTER_NOTIFICATIONS = 'Adyen_Notification_saveNotifications_notifications';
+    const NOTIFICATION_FIND_HANDLERS = 'Adyen_Notification_FindHandlers';
+    const NOTIFICATION_PROCESS = 'Adyen_Notification_Process';
+    const NOTIFICATION_NO_ORDER_FOUND = 'Adyen_Notification_No_Order_Found';
+    const NOTIFICATION_PROCESS_AUTHORISATION = 'Adyen_Notification_Process_Authorisation';
+    const NOTIFICATION_PROCESS_CANCELLATION = 'Adyen_Notification_Process_Cancellation';
+    const NOTIFICATION_PROCESS_CAPTURE = 'Adyen_Notification_Process_Capture';
+    const NOTIFICATION_PROCESS_CAPTURE_FAILED = 'Adyen_Notification_Process_CaptureFailed';
+    const NOTIFICATION_PROCESS_REFUND = 'Adyen_Notification_Process_Refund';
+    const NOTIFICATION_PROCESS_REFUND_FAILED = 'Adyen_Notification_Process_RefundFailed';
+    const NOTIFICATION_PROCESS_REFUNDED_REVERSED = 'Adyen_Notification_Process_RefundedReversed';
+    const NOTIFICATION_PROCESS_CHARGEBACK = 'Adyen_Notification_Process_Chargeback';
+    const NOTIFICATION_PROCESS_CHARGEBACK_REVERSED = 'Adyen_Notification_Process_ChargebackReversed';
 
-    const BASKET_BEFORE_PROCESS_ORDER_DETAIL = 'MeteorAdyen_Basket_Before_ProcessOrderDetail';
-    const BASKET_STOPPED_PROCESS_ORDER_DETAIL = 'MeteorAdyen_Basket_Stopped_ProcessOrderDetail';
-    const BASKET_AFTER_PROCESS_ORDER_DETAIL = 'MeteorAdyen_Basket_After_ProcessOrderDetail';
+    const BASKET_BEFORE_PROCESS_ORDER_DETAIL = 'Adyen_Basket_Before_ProcessOrderDetail';
+    const BASKET_STOPPED_PROCESS_ORDER_DETAIL = 'Adyen_Basket_Stopped_ProcessOrderDetail';
+    const BASKET_AFTER_PROCESS_ORDER_DETAIL = 'Adyen_Basket_After_ProcessOrderDetail';
 }
