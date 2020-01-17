@@ -210,15 +210,11 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private function handlePaymentData($paymentInfo)
     {
-        switch ($paymentInfo['resultCode']) {
-            case 'Authorised':
-            case 'IdentifyShopper':
-            case 'ChallengeShopper':
-            case 'RedirectShopper':
-                break;
-            default:
-                $this->handlePaymentDataError($paymentInfo);
-                break;
+        if (!in_array(
+            $paymentInfo['resultCode'],
+            ['Authorised', 'IdentifyShopper', 'ChallengeShopper', 'RedirectShopper']
+        )) {
+            $this->handlePaymentDataError($paymentInfo);
         }
     }
 
