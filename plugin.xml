@@ -4,14 +4,14 @@
 
     <label lang="en">Adyen Shopware Plugin by Meteor</label>
 
-    <version>0.0.1</version>
+    <version>1.1.0</version>
     <copyright>(c) Meteor</copyright>
     <author>Meteor</author>
     <link>https://meteor.be</link>
 
-    <compatibility minVersion="5.3.7"/>
+    <compatibility minVersion="5.6"/>
 
-    <changelog version="1.0.0">
-        <changes lang="en">First version</changes>
+    <changelog version="1.1.0">
+        <changes lang="en">Initial release</changes>
     </changelog>
 </plugin>
