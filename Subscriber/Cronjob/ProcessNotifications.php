@@ -52,8 +52,16 @@ class ProcessNotifications implements SubscriberInterface
      */
     public function runCronjob(Shopware_Components_Cron_CronJob $job)
     {
-        $this->notificationProcessor->processMany(
+        /** @var \Generator<NotificationProcessorFeedback> $feedback */
+        $feedback = $this->notificationProcessor->processMany(
             $this->loader->load(self::NUMBER_OF_NOTIFICATIONS_TO_HANDLE)
         );
+
+        /** @var NotificationProcessorFeedback $item */
+        foreach ($feedback as $item) {
+            if (!$item->isSuccess()) {
+                echo $item->getNotification()->getId() . ": " . $item->getMessage() . "\n";
+            }
+        }
     }
 }
