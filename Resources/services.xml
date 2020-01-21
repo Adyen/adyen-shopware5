@@ -8,5 +8,6 @@
         <import resource="services/loggers.xml"/>
         <import resource="services/managers.xml"/>
         <import resource="services/subscribers.xml"/>
+        <import resource="services/cronjobs.xml"/>
     </imports>
 </container>

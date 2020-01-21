@@ -27,14 +27,14 @@ class ProcessNotifications extends ShopwareCommand
 
     /**
      * ProcessNotifications constructor.
-     * @param FifoNotificationLoader $loader
+     * @param FifoNotificationLoader $fifoNotificationLoader
      * @param NotificationProcessor $notificationProcessor
      */
     public function __construct(
-        FifoNotificationLoader $loader,
+        FifoNotificationLoader $fifoNotificationLoader,
         NotificationProcessor $notificationProcessor
     ) {
-        $this->loader = $loader;
+        $this->loader = $fifoNotificationLoader;
         $this->notificationProcessor = $notificationProcessor;
 
         parent::__construct();

@@ -4,12 +4,15 @@ namespace MeteorAdyen\Subscriber\Cronjob;
 
 use MeteorAdyen\Components\FifoNotificationLoader;
 use MeteorAdyen\Components\NotificationProcessor;
+use MeteorAdyen\Models\Feedback\NotificationProcessorFeedback;
+use Enlight\Event\SubscriberInterface;
+use Shopware_Components_Cron_CronJob;
 
 /**
  * Class ProcessNotifications
  * @package MeteorAdyen\Subscriber\Cronjob
  */
-class ProcessNotifications implements \Enlight\Event\SubscriberInterface
+class ProcessNotifications implements SubscriberInterface
 {
     const NUMBER_OF_NOTIFICATIONS_TO_HANDLE = 20;
 
@@ -43,11 +46,11 @@ class ProcessNotifications implements \Enlight\Event\SubscriberInterface
     }
 
     /**
-     * @param \Shopware_Components_Cron_CronJob $job
+     * @param Shopware_Components_Cron_CronJob $job
      * @throws \Doctrine\ORM\ORMException
      * @throws \Enlight_Event_Exception
      */
-    public function runCronjob(\Shopware_Components_Cron_CronJob $job)
+    public function runCronjob(Shopware_Components_Cron_CronJob $job)
     {
         $this->notificationProcessor->processMany(
             $this->loader->load(self::NUMBER_OF_NOTIFICATIONS_TO_HANDLE)
