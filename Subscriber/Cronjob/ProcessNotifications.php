@@ -6,6 +6,7 @@ use MeteorAdyen\Components\FifoNotificationLoader;
 use MeteorAdyen\Components\NotificationProcessor;
 use MeteorAdyen\Models\Feedback\NotificationProcessorFeedback;
 use Enlight\Event\SubscriberInterface;
+use Psr\Log\LoggerInterface;
 use Shopware_Components_Cron_CronJob;
 
 /**
@@ -24,6 +25,10 @@ class ProcessNotifications implements SubscriberInterface
      * @var NotificationProcessor
      */
     private $notificationProcessor;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * ProcessNotifications constructor.
@@ -32,10 +37,12 @@ class ProcessNotifications implements SubscriberInterface
      */
     public function __construct(
         FifoNotificationLoader $fifoNotificationLoader,
-        NotificationProcessor $notificationProcessor
+        NotificationProcessor $notificationProcessor,
+        LoggerInterface $logger
     ) {
         $this->loader = $fifoNotificationLoader;
         $this->notificationProcessor = $notificationProcessor;
+        $this->logger = $logger;
     }
 
     public static function getSubscribedEvents()
@@ -60,7 +67,7 @@ class ProcessNotifications implements SubscriberInterface
         /** @var NotificationProcessorFeedback $item */
         foreach ($feedback as $item) {
             if (!$item->isSuccess()) {
-                echo $item->getNotification()->getId() . ": " . $item->getMessage() . "\n";
+                $this->logger->alert($item->getNotification()->getId() . ": " . $item->getMessage());
             }
         }
     }

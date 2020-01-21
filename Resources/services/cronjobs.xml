@@ -8,6 +8,7 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.components.fifo_notification_loader"/>
             <argument type="service" id="meteor_adyen.components.notification_processor"/>
+            <argument type="service" id="meteor_adyen.logger.notifications" />
         </service>
     </services>
 </container>
