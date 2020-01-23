@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.3/engine/Shopware/Components/Plugin/schema/plugin.xsd">
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.6/engine/Shopware/Components/Plugin/schema/plugin.xsd">
 
-    <label lang="en">Adyen Shopware Plugin by Meteor</label>
+    <label>Adyen Shopware Plugin by Meteor</label>
+    <label lang="de">Adyen Shopware Plugin von Meteor</label>
 
     <version>1.1.0</version>
     <copyright>(c) Meteor</copyright>
     <author>Meteor</author>
     <link>https://meteor.be</link>
 
-    <compatibility minVersion="5.6"/>
+    <description>
+        Official Adyen plugin by Meteor
+    </description>
+    <description lang="de">
+        Offizielles Adyen plugin von Meteor
+    </description>
+
+    <compatibility minVersion="5.6.0"/>
 
     <changelog version="1.1.0">
-        <changes lang="en">Initial release</changes>
+        <changes>
+            <![CDATA[First release Shopware Community Store]]>
+        </changes>
+        <changes lang="de">
+            <![CDATA[Erstveröffentlichung Shopware Community Store]]>
+        </changes>
     </changelog>
 </plugin>
