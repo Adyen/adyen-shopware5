@@ -1,19 +1,20 @@
 <?php
 
-use MeteorAdyen\Components\OriginKeysService;
+use MeteorAdyen\Components\Adyen\PaymentMethodService;
 
 class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Backend_ExtJs
 {
-    /** @var OriginKeysService */
-    private $originKeysService;
+    /** @var PaymentMethodService */
+    private $paymentMethodService;
 
     public function runAction()
     {
-        $this->originKeysService = $this->get('meteor_adyen.components.origin_keys_service');
+        $this->paymentMethodService = $this->get('meteor_adyen.components.adyen.payment.method');
 
         try {
-            $this->originKeysService->generateAndSave();
-            $this->View()->assign('responseText', 'Success!');
+            $this->paymentMethodService->getPaymentMethods('BE', 'EUR', 20, false);
+
+            $this->View()->assign('responseText', 'Adyen API connected');
         } catch (Exception $e) {
             $this->View()->assign('responseText', $e->getMessage());
         }
