@@ -10,7 +10,6 @@ use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\NotificationManager;
 use MeteorAdyen\MeteorAdyen;
-use MeteorAdyen\Models\Notification;
 use MeteorAdyen\Models\PaymentInfo;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Controllers_Backend_Order;

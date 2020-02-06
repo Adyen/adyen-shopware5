@@ -52,7 +52,8 @@ class IncomingNotificationManager
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function save(array $notificationItems) {
+    public function save(array $notificationItems)
+    {
         foreach ($notificationItems as $notificationItem) {
             try {
                 $notification = $this->notificationBuilder->fromParams($notificationItem['NotificationRequestItem']);

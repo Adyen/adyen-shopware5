@@ -27,8 +27,8 @@ interface NotificationProcessorInterface
      * Actual processing of the notification
      *
      * @param Notification $notification
-     * @throws NotificationException
      * @return void
+     * @throws NotificationException
      */
     public function process(Notification $notification);
 }

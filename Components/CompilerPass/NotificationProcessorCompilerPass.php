@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MeteorAdyen\Components\CompilerPass;
 
-use MeteorAdyen\Components\NotificationProcessor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;

@@ -140,7 +140,7 @@ class PaymentMethodService
      * @return PaymentMethodInfo
      * @throws AdyenException
      */
-    public function getAdyenPaymentInfoByType($type, $paymentMethods= null)
+    public function getAdyenPaymentInfoByType($type, $paymentMethods = null)
     {
         if (!$paymentMethods) {
             $paymentMethodOptions = $this->getPaymentMethodOptions();

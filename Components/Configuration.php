@@ -27,6 +27,7 @@ class Configuration
 
     /** @var Connection */
     private $connection;
+
     /**
      * Configuration constructor.
      * @param CachedConfigReader $cachedConfigReader
