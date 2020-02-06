@@ -37,7 +37,8 @@ class OriginKeysService
      * @return mixed
      * @throws AdyenException
      */
-    public function generate(array $originDomains) {
+    public function generate(array $originDomains)
+    {
         return $this->checkoutUtility->originKeys(['originDomains' => $originDomains])['originKeys'];
     }
 }

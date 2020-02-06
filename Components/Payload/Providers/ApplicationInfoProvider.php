@@ -4,6 +4,9 @@ namespace MeteorAdyen\Components\Payload\Providers;
 
 use MeteorAdyen\Components\Payload\PaymentContext;
 use MeteorAdyen\Components\Payload\PaymentPayloadProvider;
+use MeteorAdyen\MeteorAdyen;
+use Shopware\Components\Model\ModelManager;
+use Shopware\Models\Plugin\Plugin;
 
 /**
  * Class ApplicationInfoProvider
@@ -11,6 +14,16 @@ use MeteorAdyen\Components\Payload\PaymentPayloadProvider;
  */
 class ApplicationInfoProvider implements PaymentPayloadProvider
 {
+    /**
+     * @var ModelManager
+     */
+    private $modelManager;
+
+    public function __construct()
+    {
+        $this->modelManager = Shopware()->Container()->get('models');
+    }
+
     /**
      * @param PaymentContext $context
      * @return array
@@ -21,6 +34,8 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
             'controller' => 'process',
             'action' => 'return',
         ]);
+
+        $plugin = $this->modelManager->getRepository(Plugin::class)->findOneBy(array('name' => MeteorAdyen::NAME));
 
         return [
             'additionalData' => [
@@ -33,13 +48,17 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
             'merchantAccount' => 'Meteor-test',
             'applicationInfo' => [
                 'adyenPaymentSource' => [
-                    'name' => 'adyen-shopware',
-                    'version' => '0.0.1',
+                    'name' => $plugin->getLabel(),
+                    'version' => $plugin->getVersion(),
                 ],
                 'externalPlatform' => [
                     'name' => 'Shopware',
                     'version' => '5.6',
-                    'integrator' => 'Meteor',
+                    'integrator' => $plugin->getAuthor(),
+                ],
+                'merchantApplication' => [
+                    'name' => $plugin->getLabel(),
+                    'version' => $plugin->getVersion(),
                 ],
             ],
         ];

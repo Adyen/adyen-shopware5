@@ -12,7 +12,6 @@ use MeteorAdyen\Models\Event;
 use MeteorAdyen\Models\Feedback\NotificationProcessorFeedback;
 use MeteorAdyen\Models\Notification;
 use MeteorAdyen\Models\NotificationException;
-use MeteorAdyen\Models\Feedback\NotificationItemFeedback;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Components\Model\ModelManager;
@@ -110,13 +109,13 @@ class NotificationProcessor
         if (empty($processors)) {
             $notification->setStatus(NotificationStatus::STATUS_FATAL);
             $this->modelManager->persist($notification);
-            throw new NoNotificationProcessorFoundException((string) $notification->getId());
+            throw new NoNotificationProcessorFoundException((string)$notification->getId());
         }
 
         if (!$notification->getOrder()) {
             $notification->setStatus(NotificationStatus::STATUS_FATAL);
             $this->modelManager->persist($notification);
-            throw new OrderNotFoundException((string) $notification->getOrderId());
+            throw new OrderNotFoundException((string)$notification->getOrderId());
         }
 
         $status = NotificationStatus::STATUS_HANDLED;
