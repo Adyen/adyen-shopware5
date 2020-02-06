@@ -82,12 +82,7 @@ class NotificationBuilder
             $notification->setMerchantAccountCode($params['merchantAccountCode']);
         }
         if (isset($params['amount']['value']) && isset($params['amount']['currency'])) {
-            $value = $params['amount']['value'];
-            $currency = $params['amount']['currency'];
-
-            $value = $this->currency->sanitize($value, $currency);
-
-            $notification->setAmountValue($value);
+            $notification->setAmountValue($params['amount']['value']);
             $notification->setAmountCurrency($params['amount']['currency']);
         }
         if (isset($params['reason'])) {
