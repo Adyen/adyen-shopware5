@@ -178,6 +178,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $paymentMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
 
         $adyenConfig = [
+            "shopLocale" => Shopware()->Shop()->getLocale()->getLocale(),
             "originKey" => $this->configuration->getOriginKey(),
             "environment" => $this->configuration->getEnvironment(),
             "paymentMethods" => json_encode($paymentMethods),

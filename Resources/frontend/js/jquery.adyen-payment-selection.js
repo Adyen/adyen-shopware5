@@ -6,6 +6,7 @@
          * Plugin default options.
          */
         defaults: {
+            shopLocale: 'en_US',
             adyenOriginkey: '',
             adyenEnvironment: 'test',
             adyenPaymentMethodsResponse: {},
@@ -117,7 +118,7 @@
             var me = this;
 
             me.adyenConfiguration = {
-                locale: "en_US", //todo: make locale dynamic
+                locale: me.opts.shoplocale,
                 environment: me.opts.adyenEnvironment,
                 originKey: me.opts.adyenOriginkey,
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
