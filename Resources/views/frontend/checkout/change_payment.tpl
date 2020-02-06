@@ -4,7 +4,8 @@
     {include file="frontend/checkout/adyen_libaries.tpl"}
 
     {if $sAdyenConfig}
-        <div data-adyenOriginKey='{$sAdyenConfig.originKey}'
+        <div data-shopLocale='{$sAdyenConfig.shopLocale}'
+             data-adyenOriginKey='{$sAdyenConfig.originKey}'
              data-adyenEnvironment='{$sAdyenConfig.environment}'
              data-adyenPaymentMethodsResponse='{$sAdyenConfig.paymentMethods}'
              data-resetSessionUrl='{url controller="Adyen" action="ResetValidPaymentSession"}'
