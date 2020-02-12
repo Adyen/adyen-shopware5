@@ -171,6 +171,8 @@ class MeteorAdyen extends Plugin
      */
     public function activate(ActivateContext $context)
     {
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_DEFAULT);
+
         /** @var PaymentInstaller $installer */
         $installer = $this->container->get('shopware.plugin_payment_installer');
 
