@@ -117,6 +117,11 @@ class MeteorAdyen extends Plugin
     public function uninstall(UninstallContext $context)
     {
         $this->deactivatePaymentMethods();
+
+        if ($context->keepUserData()) {
+            return;
+        }
+
         $this->removeFreeTextFields($context);
 
         $tool = new SchemaTool($this->container->get('models'));
@@ -148,10 +153,6 @@ class MeteorAdyen extends Plugin
      */
     private function removeFreeTextFields(UninstallContext $uninstallContext)
     {
-        if ($uninstallContext->keepUserData()) {
-            return;
-        }
-
         $crudService = $this->container->get('shopware_attribute.crud_service');
         $crudService->delete('s_user_attributes', 'meteor_adyen_payment_method');
 
