@@ -10,6 +10,7 @@ use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\OriginKeysService;
 use MeteorAdyen\MeteorAdyen;
 use Psr\Log\LoggerInterface;
+use Shopware\Components\CacheManager;
 use Shopware_Controllers_Backend_Config;
 
 /**
@@ -62,6 +63,8 @@ class BackendConfigSubscriber implements SubscriberInterface
             } catch (AdyenException $e) {
                 $this->logger->error($e);
             }
+
+            $subject->get('shopware.cache_manager')->clearByTags([CacheManager::CACHE_TAG_CONFIG]);
         }
     }
 
