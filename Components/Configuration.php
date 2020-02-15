@@ -80,7 +80,7 @@ class Configuration
     public function getConfig($key = null, $shop = false)
     {
         if (!$shop) {
-            $shop = Shopware()->Shop();
+            $shop = null;
         }
 
         $config = $this->cachedConfigReader->getByPluginName(MeteorAdyen::NAME, $shop);
