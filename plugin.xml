@@ -5,7 +5,7 @@
     <label>Adyen Shopware Plugin by Meteor</label>
     <label lang="de">Adyen Shopware Plugin von Meteor</label>
 
-    <version>1.1.0</version>
+    <version>1.2.1</version>
     <copyright>(c) Meteor</copyright>
     <author>Meteor</author>
     <link>https://meteor.be</link>
@@ -18,9 +18,9 @@
         Offizielles Adyen plugin von Meteor
     </description>
 
-    <compatibility minVersion="5.3.7"/>
+    <compatibility minVersion="5.6.0"/>
 
-    <changelog version="1.1.0">
+    <changelog version="1.2.1">
         <changes>
             <![CDATA[First release Shopware Community Store]]>
         </changes>
