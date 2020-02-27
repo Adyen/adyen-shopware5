@@ -42,6 +42,7 @@
             <argument type="service" id="snippets"/>
             <argument type="service" id="front" />
             <argument type="service" id="meteor_adyen.components.manager.adyen_manager" />
+            <argument type="service" id="meteor_adyen.components.data_conversion" />
         </service>
         <service id="meteor_adyen.subscriber.frontend_payment_name_subscriber" class="MeteorAdyen\Subscriber\FrontendPaymentNameSubscriber">
             <tag name="shopware.event_subscriber"/>

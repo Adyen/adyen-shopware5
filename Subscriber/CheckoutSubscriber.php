@@ -12,6 +12,7 @@ use Enlight_Controller_Front;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\Configuration;
+use MeteorAdyen\Components\DataConversion;
 use MeteorAdyen\Components\Manager\AdyenManager;
 use MeteorAdyen\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use MeteorAdyen\MeteorAdyen;
@@ -66,6 +67,11 @@ class CheckoutSubscriber implements SubscriberInterface
     private $adyenManager;
 
     /**
+     * @var DataConversion
+     */
+    private $dataConversion;
+
+    /**
      * CheckoutSubscriber constructor.
      * @param Configuration $configuration
      * @param PaymentMethodService $paymentMethodService
@@ -83,7 +89,8 @@ class CheckoutSubscriber implements SubscriberInterface
         ModelManager $modelManager,
         Shopware_Components_Snippet_Manager $snippets,
         Enlight_Controller_Front $front,
-        AdyenManager $adyenManager
+        AdyenManager $adyenManager,
+        DataConversion $dataConversion
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
@@ -93,6 +100,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->snippets = $snippets;
         $this->front = $front;
         $this->adyenManager = $adyenManager;
+        $this->dataConversion = $dataConversion;
     }
 
     /**
@@ -178,7 +186,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $paymentMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
 
         $adyenConfig = [
-            "shopLocale" => Shopware()->Shop()->getLocale()->getLocale(),
+            "shopLocale" => $this->dataConversion->getISO3166FromLocale(Shopware()->Shop()->getLocale()->getLocale()),
             "originKey" => $this->configuration->getOriginKey(),
             "environment" => $this->configuration->getEnvironment(),
             "paymentMethods" => json_encode($paymentMethods),

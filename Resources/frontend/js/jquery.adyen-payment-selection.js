@@ -118,7 +118,7 @@
             var me = this;
 
             me.adyenConfiguration = {
-                locale: me.opts.shoplocale,
+                locale: me.opts.shopLocale,
                 environment: me.opts.adyenEnvironment,
                 originKey: me.opts.adyenOriginkey,
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
