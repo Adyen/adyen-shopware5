@@ -21,6 +21,7 @@
                 errorTransactionProcessing: 'An error occured while processing your payment.',
                 errorTransactionRefused: 'Your transaction was refused by the Payment Service Provider.',
                 errorTransactionUnknown: 'Your transaction was cancelled due to an unknown reason.',
+                errorTransactionNoSession: 'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
                 errorGooglePayNotAvailable: 'Google Pay is currently not available.',
             },
         },
@@ -86,6 +87,11 @@
                     },
                 });
             } else {
+                if ($('body').data('adyenisadyenpayment')) {
+                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
+                    return;
+                }
+
                 $(me.opts.confirmFormSelector).submit();
             }
         },

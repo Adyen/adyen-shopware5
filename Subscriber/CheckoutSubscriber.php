@@ -244,6 +244,11 @@ class CheckoutSubscriber implements SubscriberInterface
             'Your transaction was cancelled due to an unknown reason.',
             true
         );
+        $snippets['errorTransactionNoSession'] = $errorSnippets->get(
+            'errorTransactionNoSession',
+            'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
+            true
+        );
 
         $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
     }
