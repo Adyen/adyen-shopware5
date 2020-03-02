@@ -55,7 +55,7 @@ class BackendConfigSubscriber implements SubscriberInterface
         /** @var Shopware_Controllers_Backend_Config $subject */
         $subject = $args->getSubject();
 
-        if ($subject->Request()->getActionName() == 'saveForm' && $subject->Request()->getParam('name') === MeteorAdyen::NAME) {
+        if ($subject->Request()->getActionName() === 'saveForm' && $subject->Request()->getParam('name') === MeteorAdyen::NAME) {
             try {
                 $this->generateOriginKeys($subject);
             } catch (AdyenException $e) {
