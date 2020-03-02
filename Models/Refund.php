@@ -8,7 +8,7 @@ use Shopware\Models\Order\Order;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="s_adyen_order_refund")
+ * @ORM\Table(name="s_plugin_adyen_order_refund")
  */
 class Refund
 {
