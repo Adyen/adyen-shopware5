@@ -151,5 +151,9 @@
             <argument type="service" id="events"/>
             <argument type="service" id="meteor_adyen.components.payment_status_update"/>
         </service>
+        <service id="meteor_adyen.components.shopware_version_check" class="MeteorAdyen\Components\ShopwareVersionCheck">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="meteor_adyen.logger"/>
+        </service>
     </services>
 </container>
