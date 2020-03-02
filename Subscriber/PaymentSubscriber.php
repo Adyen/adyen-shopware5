@@ -88,6 +88,11 @@ class PaymentSubscriber implements SubscriberInterface
         $adyenMethods = $this->paymentMethodService->getPaymentMethods(
             $paymentMethodOptions['countryCode'], $paymentMethodOptions['currency'], $paymentMethodOptions['value']
         );
+
+        if (empty($adyenMethods)) {
+            return $shopwareMethods;
+        }
+
         $adyenMethods['paymentMethods'] = array_reverse($adyenMethods['paymentMethods']);
 
         foreach ($adyenMethods['paymentMethods'] as $adyenMethod) {
