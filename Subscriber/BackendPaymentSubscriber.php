@@ -44,9 +44,9 @@ class BackendPaymentSubscriber implements SubscriberInterface
 
         $data = $subject->View()->getAssign('data');
 
-        $data = array_filter($data, function ($e) {
+        $data = array_values(array_filter($data, function ($e) {
             return $e['name'] !== MeteorAdyen::ADYEN_GENERAL_PAYMENT_METHOD;
-        });
+        }));
 
         $subject->View()->assign('data', $data);
     }
