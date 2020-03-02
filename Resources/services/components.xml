@@ -31,6 +31,7 @@
                  class="MeteorAdyen\Components\Adyen\PaymentMethodService">
             <argument type="service" id="meteor_adyen.components.adyen.apifactory"/>
             <argument type="service" id="meteor_adyen.components.configuration"/>
+            <argument type="service" id="meteor_adyen.logger"/>
         </service>
         <service id="meteor_adyen.components.adyen.refund_service"
                  class="MeteorAdyen\Components\Adyen\RefundService">

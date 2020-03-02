@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace MeteorAdyen\Components\Adyen;
 
@@ -10,6 +8,7 @@ use Adyen\Service\Checkout;
 use Adyen\Util\Currency;
 use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Models\Enum\Channel;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class PaymentMethodService
@@ -31,6 +30,10 @@ class PaymentMethodService
      * @var array
      */
     private $cache;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * PaymentMethodService constructor.
@@ -40,10 +43,12 @@ class PaymentMethodService
      */
     public function __construct(
         ApiFactory $apiFactory,
-        Configuration $configuration
+        Configuration $configuration,
+        LoggerInterface $logger
     ) {
         $this->apiClient = $apiFactory->create();
         $this->configuration = $configuration;
+        $this->logger = $logger;
     }
 
     /**
@@ -64,7 +69,7 @@ class PaymentMethodService
         $checkout = new Checkout($this->apiClient);
         $adyenCurrency = new Currency();
 
-        $paymentMethods = $checkout->paymentMethods([
+        $requestParams = [
             "merchantAccount" => $this->configuration->getMerchantAccount(),
             "countryCode" => $countryCode,
             "amount" => [
@@ -72,7 +77,14 @@ class PaymentMethodService
                 "value" => $adyenCurrency->sanitize($value, $currency),
             ],
             "channel" => Channel::WEB
-        ]);
+        ];
+
+        try {
+            $paymentMethods = $checkout->paymentMethods($requestParams);
+        } catch (AdyenException $e) {
+            $this->logger->critical($e);
+            return [];
+        }
 
         if ($cache) {
             $this->cache[$cacheKey] = $paymentMethods;
