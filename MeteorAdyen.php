@@ -17,7 +17,9 @@ use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\PaymentInstaller;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 /**
  * Class MeteorAdyen
@@ -61,6 +63,19 @@ class MeteorAdyen extends Plugin
         //set default logger level for 5.4
         if (!$container->hasParameter('kernel.default_error_level')) {
             $container->setParameter('kernel.default_error_level', Logger::ERROR);
+        }
+
+        $loader = new XmlFileLoader(
+            $container,
+            new FileLocator()
+        );
+
+        $loader->load(__DIR__ . '/Resources/services.xml');
+
+        $versionCheck = $container->get('meteor_adyen.components.shopware_version_check');
+
+        if ($versionCheck->isHigherThanShopwareVersion('v5.6.2')) {
+           $loader->load(__DIR__ . '/Resources/services/version/563.xml');
         }
     }
 
