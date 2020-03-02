@@ -127,6 +127,8 @@ class MeteorAdyen extends Plugin
         $tool = new SchemaTool($this->container->get('models'));
         $classes = $this->getModelMetaData();
         $tool->dropSchema($classes);
+
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
     }
 
     /**
@@ -165,6 +167,8 @@ class MeteorAdyen extends Plugin
     public function deactivate(DeactivateContext $context)
     {
         $this->deactivatePaymentMethods();
+
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
     }
 
     /**
@@ -172,8 +176,6 @@ class MeteorAdyen extends Plugin
      */
     public function activate(ActivateContext $context)
     {
-        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
-
         /** @var PaymentInstaller $installer */
         $installer = $this->container->get('shopware.plugin_payment_installer');
 
@@ -182,6 +184,8 @@ class MeteorAdyen extends Plugin
         foreach ($paymentOptions as $key => $options) {
             $installer->createOrUpdate($context->getPlugin(), $options);
         }
+
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
     }
 
     /**
