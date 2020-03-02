@@ -209,7 +209,7 @@ class PaymentMethodService
 
         $paymentMethodOptions['countryCode'] = $countryCode;
         $paymentMethodOptions['currency'] = $currency;
-        $paymentMethodOptions['value'] = $value;
+        $paymentMethodOptions['value'] = $value ?? 1;
 
         return $paymentMethodOptions;
     }
