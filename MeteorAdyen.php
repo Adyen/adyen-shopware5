@@ -133,15 +133,13 @@ class MeteorAdyen extends Plugin
     {
         $this->deactivatePaymentMethods();
 
-        if ($context->keepUserData()) {
-            return;
+        if (!$context->keepUserData()) {
+            $this->removeFreeTextFields($context);
+
+            $tool = new SchemaTool($this->container->get('models'));
+            $classes = $this->getModelMetaData();
+            $tool->dropSchema($classes);
         }
-
-        $this->removeFreeTextFields($context);
-
-        $tool = new SchemaTool($this->container->get('models'));
-        $classes = $this->getModelMetaData();
-        $tool->dropSchema($classes);
 
         $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
     }
