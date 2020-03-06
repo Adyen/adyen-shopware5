@@ -75,7 +75,7 @@ class MeteorAdyen extends Plugin
         $versionCheck = $container->get('meteor_adyen.components.shopware_version_check');
 
         if ($versionCheck->isHigherThanShopwareVersion('v5.6.2')) {
-           $loader->load(__DIR__ . '/Resources/services/version/563.xml');
+            $loader->load(__DIR__ . '/Resources/services/version/563.xml');
         }
     }
 
@@ -93,39 +93,6 @@ class MeteorAdyen extends Plugin
     }
 
     /**
-     * @throws Exception
-     */
-    private function createFreeTextFields()
-    {
-        $crudService = $this->container->get('shopware_attribute.crud_service');
-        $crudService->update(
-            's_user_attributes',
-            'meteor_adyen_payment_method',
-            TypeMapping::TYPE_STRING,
-            [
-                'displayInBackend' => true,
-                'label' => 'Adyen Payment Method'
-            ]
-        );
-
-        $this->rebuildAttributeModels();
-    }
-
-    /**
-     * @return array
-     */
-    private function getModelMetaData(): array
-    {
-        $entityManager = $this->container->get('models');
-
-        return [
-            $entityManager->getClassMetadata(Notification::class),
-            $entityManager->getClassMetadata(PaymentInfo::class),
-            $entityManager->getClassMetadata(Refund::class),
-        ];
-    }
-
-    /**
      * @param UninstallContext $context
      * @throws Exception
      */
@@ -139,6 +106,35 @@ class MeteorAdyen extends Plugin
             $tool = new SchemaTool($this->container->get('models'));
             $classes = $this->getModelMetaData();
             $tool->dropSchema($classes);
+        }
+
+        if ($context->getPlugin()->getActive()) {
+            $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
+        }
+    }
+
+    /**
+     * @param DeactivateContext $context
+     */
+    public function deactivate(DeactivateContext $context)
+    {
+        $this->deactivatePaymentMethods();
+
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
+    }
+
+    /**
+     * @param ActivateContext $context
+     */
+    public function activate(ActivateContext $context)
+    {
+        /** @var PaymentInstaller $installer */
+        $installer = $this->container->get('shopware.plugin_payment_installer');
+
+        $paymentOptions[] = $this->getPaymentOptions();
+
+        foreach ($paymentOptions as $key => $options) {
+            $installer->createOrUpdate($context->getPlugin(), $options);
         }
 
         $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
@@ -175,30 +171,36 @@ class MeteorAdyen extends Plugin
     }
 
     /**
-     * @param DeactivateContext $context
+     * @throws Exception
      */
-    public function deactivate(DeactivateContext $context)
+    private function createFreeTextFields()
     {
-        $this->deactivatePaymentMethods();
+        $crudService = $this->container->get('shopware_attribute.crud_service');
+        $crudService->update(
+            's_user_attributes',
+            'meteor_adyen_payment_method',
+            TypeMapping::TYPE_STRING,
+            [
+                'displayInBackend' => true,
+                'label' => 'Adyen Payment Method'
+            ]
+        );
 
-        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
+        $this->rebuildAttributeModels();
     }
 
     /**
-     * @param ActivateContext $context
+     * @return array
      */
-    public function activate(ActivateContext $context)
+    private function getModelMetaData(): array
     {
-        /** @var PaymentInstaller $installer */
-        $installer = $this->container->get('shopware.plugin_payment_installer');
+        $entityManager = $this->container->get('models');
 
-        $paymentOptions[] = $this->getPaymentOptions();
-
-        foreach ($paymentOptions as $key => $options) {
-            $installer->createOrUpdate($context->getPlugin(), $options);
-        }
-
-        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
+        return [
+            $entityManager->getClassMetadata(Notification::class),
+            $entityManager->getClassMetadata(PaymentInfo::class),
+            $entityManager->getClassMetadata(Refund::class),
+        ];
     }
 
     /**
