@@ -1,16 +1,15 @@
 {
-    "name": "vendor-name/project-name",
+    "name": "meteor/adyen-plugin-shopware5",
     "description": "Adyen plugin Shopware 5",
-    "version": "0.0.1",
     "type": "shopware-plugin",
     "keywords": ["adyen", "payment", "payment platform"],
-    "homepage": "http://meteor.be",
+    "homepage": "https://meteor.be",
     "license": "proprietary",
     "authors": [
         {
             "name": "Meteor",
             "email": "info@meteor.be",
-            "homepage": "https://www.meteor.be",
+            "homepage": "https://meteor.be",
             "role": "Developer"
         }
     ],
