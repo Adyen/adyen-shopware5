@@ -62,32 +62,14 @@
         </service>
 
         <!-- Payload -->
-        <service id="meteor_adyen.components.payload.chain" class="MeteorAdyen\Components\Payload\Chain">
-            <argument type="service" id="models"/>
-        </service>
-        <service id="meteor_adyen.components.payload.payment_payload_provider" class="MeteorAdyen\Components\Payload\PaymentPayloadProvider">
-            <argument type="service" id="models"/>
-        </service>
-        <service id="meteor_adyen.components.payload.providers.application_info_provider" class="MeteorAdyen\Components\Payload\Providers\ApplicationInfoProvider">
-            <argument type="service" id="models"/>
-            <argument type="service" id="meteor_adyen.components.configuration"/>
-        </service>
-        <service id="meteor_adyen.components.payload.providers.browser_info_provider" class="MeteorAdyen\Components\Payload\Providers\BrowserInfoProvider">
-            <argument type="service" id="models"/>
-        </service>
-        <service id="meteor_adyen.components.payload.providers.lineitems_info_provider" class="MeteorAdyen\Components\Payload\Providers\LineItemsInfoProvider">
-            <argument type="service" id="models"/>
-        </service>
-        <service id="meteor_adyen.components.payload.providers.order_info_provider" class="MeteorAdyen\Components\Payload\Providers\OrderInfoProvider">
-            <argument type="service" id="models"/>
-        </service>
-        <service id="meteor_adyen.components.payload.providers.paymentmethod_provider" class="MeteorAdyen\Components\Payload\Providers\PaymentMethodProvider">
-            <argument type="service" id="models"/>
-        </service>
-        <service id="meteor_adyen.components.payload.providers.shopper_info_provider" class="MeteorAdyen\Components\Payload\Providers\ShopperInfoProvider">
-            <argument type="service" id="models"/>
-        </service>
-
+        <service id="meteor_adyen.components.payload.chain" class="MeteorAdyen\Components\Payload\Chain"/>
+        <service id="meteor_adyen.components.payload.payment_payload_provider" class="MeteorAdyen\Components\Payload\PaymentPayloadProvider"/>
+        <service id="meteor_adyen.components.payload.providers.application_info_provider" class="MeteorAdyen\Components\Payload\Providers\ApplicationInfoProvider"/>
+        <service id="meteor_adyen.components.payload.providers.browser_info_provider" class="MeteorAdyen\Components\Payload\Providers\BrowserInfoProvider"/>
+        <service id="meteor_adyen.components.payload.providers.lineitems_info_provider" class="MeteorAdyen\Components\Payload\Providers\LineItemsInfoProvider"/>
+        <service id="meteor_adyen.components.payload.providers.order_info_provider" class="MeteorAdyen\Components\Payload\Providers\OrderInfoProvider"/>
+        <service id="meteor_adyen.components.payload.providers.paymentmethod_provider" class="MeteorAdyen\Components\Payload\Providers\PaymentMethodProvider"/>
+        <service id="meteor_adyen.components.payload.providers.shopper_info_provider" class="MeteorAdyen\Components\Payload\Providers\ShopperInfoProvider"/>
 
         <!-- Notification Processors -->
         <service id="meteor_adyen.components.notification_processor.authorisation"

@@ -2,6 +2,7 @@
 
 namespace MeteorAdyen\Components\Payload\Providers;
 
+use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Components\Payload\PaymentContext;
 use MeteorAdyen\Components\Payload\PaymentPayloadProvider;
 use MeteorAdyen\MeteorAdyen;
@@ -18,9 +19,14 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
      * @var ModelManager
      */
     private $modelManager;
+    /**
+     * @var Configuration
+     */
+    private $configuration;
 
-    public function __construct()
+    public function __construct(Configuration $configuration)
     {
+        $this->configuration = $configuration;
         $this->modelManager = Shopware()->Container()->get('models');
     }
 
@@ -45,7 +51,7 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
             "channel" => "Web",
             'origin' => $context->getOrigin(),
             'returnUrl' => $returnUrl,
-            'merchantAccount' => 'Meteor-test',
+            'merchantAccount' => $this->configuration->getMerchantAccount(),
             'applicationInfo' => [
                 'adyenPaymentSource' => [
                     'name' => $plugin->getLabel(),

@@ -32,11 +32,17 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private $basketService;
 
+    /**
+     * @var \MeteorAdyen\Components\Configuration
+     */
+    private $configuration;
+
     public function preDispatch()
     {
         $this->adyenManager = $this->get('meteor_adyen.components.manager.adyen_manager');
         $this->adyenCheckout = $this->get('meteor_adyen.components.adyen.payment.method');
         $this->basketService = $this->get('meteor_adyen.components.basket_service');
+        $this->configuration = $this->get('meteor_adyen.components.configuration');
     }
 
     public function ajaxDoPaymentAction()
@@ -47,7 +53,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $context = $this->createPaymentContext();
 
         $chain = new Chain(
-            new ApplicationInfoProvider(),
+            new ApplicationInfoProvider($this->configuration),
             new ShopperInfoProvider(),
             new OrderInfoProvider(),
             new PaymentMethodProvider(),
