@@ -18,6 +18,7 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.components.origin_keys_service"/>
             <argument type="service" id="meteor_adyen.logger"/>
+            <argument type="service" id="meteor_adyen.components.shopware_version_check"/>
         </service>
         <service id="meteor_adyen.subscriber.backend_payment_subscriber" class="MeteorAdyen\Subscriber\BackendPaymentSubscriber">
             <tag name="shopware.event_subscriber"/>

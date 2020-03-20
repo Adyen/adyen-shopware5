@@ -6,6 +6,7 @@ use Adyen\AdyenException;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\OriginKeysService;
+use MeteorAdyen\Components\ShopwareVersionCheck;
 use MeteorAdyen\MeteorAdyen;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\CacheManager;
@@ -23,6 +24,10 @@ class BackendConfigSubscriber implements SubscriberInterface
      * @var LoggerInterface
      */
     private $logger;
+    /**
+     * @var ShopwareVersionCheck
+     */
+    private $shopwareVersionCheck;
 
     /**
      * BackendConfigSubscriber constructor.
@@ -30,10 +35,12 @@ class BackendConfigSubscriber implements SubscriberInterface
      */
     public function __construct(
         OriginKeysService $originKeysService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ShopwareVersionCheck $shopwareVersionCheck
     ) {
         $this->originKeysService = $originKeysService;
         $this->logger = $logger;
+        $this->shopwareVersionCheck = $shopwareVersionCheck;
     }
 
     /**
@@ -62,7 +69,9 @@ class BackendConfigSubscriber implements SubscriberInterface
                 $this->logger->error($e);
             }
 
-            $subject->get('shopware.cache_manager')->clearByTags([CacheManager::CACHE_TAG_CONFIG]);
+            if ($this->shopwareVersionCheck->isHigherThanShopwareVersion('v5.5.6')) {
+                $subject->get('shopware.cache_manager')->clearByTags([CacheManager::CACHE_TAG_CONFIG]);
+            }
         }
     }
 

@@ -17,7 +17,9 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Not
                 'eventCode': { },
                 'success': { },
                 'merchantAccountCode': { },
-                'amountValue': { },
+                'amountValue': {
+                    renderer: this.orderAmountValueRenderer
+                },
                 'amountCurrency': { },
                 'errorDetails': { },
                 'orderId': {
@@ -29,6 +31,10 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.view.list.Not
 
     orderIdRenderer: function (value, styles, row) {
         return row.raw.order.number;
+    },
+
+    orderAmountValueRenderer: function (value, styles, row) {
+        return row.raw.amountValue / 100;
     },
 
     /**
