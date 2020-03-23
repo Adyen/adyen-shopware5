@@ -75,6 +75,11 @@ class NotificationBuilder
         if (isset($params['eventCode'])) {
             $notification->setEventCode($params['eventCode']);
         }
+
+        if (isset($params['paymentMethod'])) {
+            $notification->setPaymentMethod($params['paymentMethod']);
+        }
+
         if (isset($params['success'])) {
             $notification->setSuccess($params['success'] == 'true');
         }

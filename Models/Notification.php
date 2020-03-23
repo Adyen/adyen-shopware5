@@ -60,6 +60,12 @@ class Notification extends ModelEntity implements \JsonSerializable
 
     /**
      * @var string
+     * @ORM\Column(name="paymentMethod", type="text")
+     */
+    private $paymentMethod;
+
+    /**
+     * @var string
      * @ORM\Column(name="event_code", type="text")
      */
     private $eventCode;
@@ -232,6 +238,24 @@ class Notification extends ModelEntity implements \JsonSerializable
     /**
      * @return string
      */
+    public function getPaymentMethod(): string
+    {
+        return $this->paymentMethod;
+    }
+
+    /**
+     * @param string $paymentMethod
+     * @return Notification
+     */
+    public function setPaymentMethod(string $paymentMethod): Notification
+    {
+        $this->paymentMethod = $paymentMethod;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function getEventCode(): string
     {
         return $this->eventCode;
@@ -352,6 +376,7 @@ class Notification extends ModelEntity implements \JsonSerializable
             'createdAt' => $this->getCreatedAt(),
             'updatedAt' => $this->getUpdatedAt(),
             'status' => $this->getStatus(),
+            'paymentMethod' => $this->getPaymentMethod(),
             'eventCode' => $this->getEventCode(),
             'success' => $this->isSuccess(),
             'merchantAccountCode' => $this->getMerchantAccountCode(),

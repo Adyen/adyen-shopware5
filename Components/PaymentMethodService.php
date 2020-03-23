@@ -103,7 +103,7 @@ class PaymentMethodService
     public function getUserAdyenMethod(int $userId, $prependAdyen = true)
     {
         $qb = $this->modelManager->getDBALQueryBuilder();
-        $qb->select('a.meteor_adyen_payment_method')
+        $qb->select('a.'. MeteorAdyen::METEOR_ADYEN_PAYMENT_METHOD)
             ->from('s_user_attributes', 'a')
             ->where('a.userId = :customerId')
             ->setParameter('customerId', $userId);
@@ -119,7 +119,7 @@ class PaymentMethodService
     {
         $qb = $this->modelManager->getDBALQueryBuilder();
         $qb->update('s_user_attributes', 'a')
-            ->set('a.meteor_adyen_payment_method', ':payment')
+            ->set('a.' . MeteorAdyen::METEOR_ADYEN_PAYMENT_METHOD, ':payment')
             ->where('a.userId = :customerId')
             ->setParameter('payment', $payment)
             ->setParameter('customerId', $userId)

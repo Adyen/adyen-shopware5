@@ -35,7 +35,7 @@
              *
              * @type {String}
              */
-            methodeBankdataSelector: '.method--bankdata',
+            methodBankdataSelector: '.method--bankdata',
             /**
              * Classname for 'Update Payment informations' button
              */
@@ -103,7 +103,7 @@
             if (typeof payment.details !== "undefined") {
                 $('#' + me.currentSelectedPaymentId)
                     .closest(me.opts.paymentMethodSelector)
-                    .find(me.opts.methodeBankdataSelector)
+                    .find(me.opts.methodBankdataSelector)
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
 
                 $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
@@ -228,7 +228,7 @@
             if (typeof payment.details !== "undefined") {
                 $('#' + me.currentSelectedPaymentId)
                     .closest(me.opts.paymentMethodSelector)
-                    .find(me.opts.methodeBankdataSelector)
+                    .find(me.opts.methodBankdataSelector)
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
 
                 me.handleComponent(payment.type);

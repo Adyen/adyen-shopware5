@@ -29,6 +29,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.notifications.Detail
                 { name: 'updatedAt', fieldLabel: 'Updated at'},
                 { name: 'eventCode', fieldLabel: 'Event code'},
                 { name: 'merchantAccountCode', fieldLabel: 'Merchant'},
+                { name: 'paymentMethod', fieldLabel: 'Payment method'},
                 { name: 'amountValue', fieldLabel: 'Amount'},
                 { name: 'amountCurrency', fieldLabel: 'Currency'},
                 { name: 'status', fieldLabel: 'Status'},

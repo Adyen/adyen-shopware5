@@ -47,7 +47,7 @@ class NotificationManager
      */
     public function getNextNotificationToHandle()
     {
-        $builder = $this->modelManager->getRepository(Notification::class)->createQueryBuilder('n');
+        $builder = $this->notificationRepository->createQueryBuilder('n');
         $builder->where("n.status = :statusReceived OR n.status = :statusRetry")
             ->orderBy('n.updatedAt', 'ASC')
             ->setParameter('statusReceived', NotificationStatus::STATUS_RECEIVED)
