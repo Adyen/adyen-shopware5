@@ -20,6 +20,11 @@
             <argument type="service" id="meteor_adyen.logger"/>
             <argument type="service" id="meteor_adyen.components.shopware_version_check"/>
         </service>
+        <service id="meteor_adyen.subscriber.backend_javascript_subscriber" class="MeteorAdyen\Subscriber\BackendJavascriptSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument>%meteor_adyen.plugin_dir%</argument>
+            <argument type="service" id="models"/>
+        </service>
         <service id="meteor_adyen.subscriber.backend_payment_subscriber" class="MeteorAdyen\Subscriber\BackendPaymentSubscriber">
             <tag name="shopware.event_subscriber"/>
         </service>

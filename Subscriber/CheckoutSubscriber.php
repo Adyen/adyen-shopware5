@@ -395,7 +395,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
 
         $adyenMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
-        $selectedType = $userData['additional']['user']['meteor_adyen_payment_method'];
+        $selectedType = $userData['additional']['user'][MeteorAdyen::METEOR_ADYEN_PAYMENT_METHOD];
         $adyenMethods['paymentMethods'] = array_filter($adyenMethods['paymentMethods'], function($element) use ($selectedType) {
             return ($element['type'] == $selectedType);
         });

@@ -29,6 +29,7 @@ class MeteorAdyen extends Plugin
 {
     const NAME = 'MeteorAdyen';
     const ADYEN_GENERAL_PAYMENT_METHOD = 'adyen_general_payment_method';
+    const METEOR_ADYEN_PAYMENT_METHOD = 'meteor_adyen_payment_method';
 
     const SESSION_ADYEN_PAYMENT = 'adyenPayment';
     const SESSION_ADYEN_PAYMENT_VALID = 'adyenPaymentValid';
@@ -85,7 +86,7 @@ class MeteorAdyen extends Plugin
      */
     public function install(InstallContext $context)
     {
-        $this->createFreeTextFields();
+        $this->installAttributes();
 
         $tool = new SchemaTool($this->container->get('models'));
         $classes = $this->getModelMetaData();
@@ -101,7 +102,7 @@ class MeteorAdyen extends Plugin
         $this->deactivatePaymentMethods();
 
         if (!$context->keepUserData()) {
-            $this->removeFreeTextFields($context);
+            $this->uninstallAttributes($context);
 
             $tool = new SchemaTool($this->container->get('models'));
             $classes = $this->getModelMetaData();
@@ -162,10 +163,10 @@ class MeteorAdyen extends Plugin
      * @param UninstallContext $uninstallContext
      * @throws Exception
      */
-    private function removeFreeTextFields(UninstallContext $uninstallContext)
+    private function uninstallAttributes(UninstallContext $uninstallContext)
     {
         $crudService = $this->container->get('shopware_attribute.crud_service');
-        $crudService->delete('s_user_attributes', 'meteor_adyen_payment_method');
+        $crudService->delete('s_user_attributes', self::METEOR_ADYEN_PAYMENT_METHOD);
 
         $this->rebuildAttributeModels();
     }
@@ -173,12 +174,12 @@ class MeteorAdyen extends Plugin
     /**
      * @throws Exception
      */
-    private function createFreeTextFields()
+    private function installAttributes()
     {
         $crudService = $this->container->get('shopware_attribute.crud_service');
         $crudService->update(
             's_user_attributes',
-            'meteor_adyen_payment_method',
+            self::METEOR_ADYEN_PAYMENT_METHOD,
             TypeMapping::TYPE_STRING,
             [
                 'displayInBackend' => true,

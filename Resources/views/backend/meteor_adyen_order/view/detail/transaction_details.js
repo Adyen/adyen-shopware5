@@ -107,6 +107,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.TransactionDetails', {
         var me = this;
 
         return [
+            { name: 'paymentMethod', fieldLabel: 'Payment method'},
             { name: 'amountValue', fieldLabel: 'Amount'},
             { name: 'amountCurrency', fieldLabel: 'Currency'},
             { name: 'status', fieldLabel: 'Status'},
