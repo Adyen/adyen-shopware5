@@ -17,7 +17,9 @@ Ext.define('Shopware.apps.MeteorAdyenNotificationsListingExtension.model.Notific
         { name : 'eventCode', type: 'string' },
         { name : 'success', type: 'string' },
         { name : 'merchantAccountCode', type: 'string' },
-        { name : 'amountValue', type: 'float' },
+        { name : 'amountValue', type: 'float', convert: function(v) {
+                return v / 100;
+        } },
         { name : 'amountCurrency', type: 'string' },
         { name : 'errorDetails', type: 'string' },
         { name : 'orderId', type: 'int' },

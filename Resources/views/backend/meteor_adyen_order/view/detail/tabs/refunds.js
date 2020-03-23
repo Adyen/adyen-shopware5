@@ -22,7 +22,7 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.Refunds', {
 
         me.detailView = Ext.create('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.refunds.Detail', {
             record: me.record,
-            refunds: me
+            refunds: me,
         });
         return me.detailView;
     }
