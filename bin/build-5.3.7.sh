@@ -29,8 +29,10 @@ done
 ( find ./$pluginName -type d -name 'scripts' && find . -type d -empty && find ./$pluginName -type f -name 'Jenkinsfile-*') | xargs rm -r
 
 
+sed -i '' 's/minVersion=\"5.6.0\"/minVersion=\"5.3.7\"/' ./$pluginName/plugin.xml
+
 # Create zip with tagged name
-zip -r $pluginName-${commit}.zip $pluginName
+zip -r $pluginName-${commit}-[sw5.3.7].zip $pluginName
 
 # Remove tmp folder
 rm -rf $pluginName
