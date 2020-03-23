@@ -9,7 +9,6 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.Window', {
 
     initComponent: function () {
         var me = this;
-        console.log(me.record);
         me.callParent();
     },
 

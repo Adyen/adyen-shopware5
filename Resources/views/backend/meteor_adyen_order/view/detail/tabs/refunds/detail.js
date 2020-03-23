@@ -19,7 +19,6 @@ Ext.define('Shopware.apps.MeteorAdyenOrder.view.detail.tabs.refunds.Detail', {
         me.callParent(arguments);
 
         me.loadRecord(me.record);
-        console.log(me.record);
     },
 
     createItems: function () {
