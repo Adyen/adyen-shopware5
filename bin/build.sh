@@ -26,7 +26,7 @@ do
  ( find ./$pluginName -name $i ) | xargs rm -r
 done
 
-( find ./MeteorAdyen -type d -name 'scripts' && find ./MeteorAdyen -type f -name 'Jenkinsfile-*') | xargs rm -r
+( find ./$pluginName -type d -name 'scripts' && find . -type d -empty && find ./$pluginName -type f -name 'Jenkinsfile-*') | xargs rm -r
 
 
 # Create zip with tagged name
