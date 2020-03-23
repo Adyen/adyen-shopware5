@@ -182,14 +182,15 @@ class CheckoutSubscriber implements SubscriberInterface
         $currency = $view->getAssign('sBasket')['sCurrencyName'];
         $value = $view->getAssign('sBasket')['AmountNumeric'];
         $paymentMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
+        $shop = Shopware()->Shop();
 
         $adyenConfig = [
-            "shopLocale" => $this->dataConversion->getISO3166FromLocale(Shopware()->Shop()->getLocale()->getLocale()),
-            "originKey" => $this->configuration->getOriginKey(),
-            "environment" => $this->configuration->getEnvironment(),
+            "shopLocale" => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
+            "originKey" => $this->configuration->getOriginKey($shop),
+            "environment" => $this->configuration->getEnvironment($shop),
             "paymentMethods" => json_encode($paymentMethods),
-            "paymentMethodPrefix" => $this->configuration->getPaymentMethodPrefix(),
-            "jsComponents3DS2ChallengeImageSize" => $this->configuration->getJsComponents3DS2ChallengeImageSize(),
+            "paymentMethodPrefix" => $this->configuration->getPaymentMethodPrefix($shop),
+            "jsComponents3DS2ChallengeImageSize" => $this->configuration->getJsComponents3DS2ChallengeImageSize($shop),
         ];
 
         $view->assign('sAdyenConfig', $adyenConfig);
