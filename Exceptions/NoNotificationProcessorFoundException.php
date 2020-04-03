@@ -2,6 +2,10 @@
 
 namespace MeteorAdyen\Exceptions;
 
+/**
+ * Class NoNotificationProcessorFoundException
+ * @package MeteorAdyen\Exceptions
+ */
 class NoNotificationProcessorFoundException extends \Exception
 {
 

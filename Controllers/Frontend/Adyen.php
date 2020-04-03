@@ -1,5 +1,8 @@
 <?php
 
+use MeteorAdyen\Components\Adyen\PaymentMethodService;
+use MeteorAdyen\Components\BasketService;
+use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Components\Manager\AdyenManager;
 use MeteorAdyen\Components\Payload\Chain;
 use MeteorAdyen\Components\Payload\PaymentContext;
@@ -9,6 +12,7 @@ use MeteorAdyen\Components\Payload\Providers\OrderInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\PaymentMethodProvider;
 use MeteorAdyen\Components\Payload\Providers\ShopperInfoProvider;
 use MeteorAdyen\Models\PaymentInfo;
+use Shopware\Components\Logger;
 use Shopware\Models\Order\Order;
 use Shopware\Models\Order\Status;
 
@@ -23,19 +27,24 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     private $adyenManager;
 
     /**
-     * @var \MeteorAdyen\Components\Adyen\PaymentMethodService
+     * @var PaymentMethodService
      */
     private $adyenCheckout;
 
     /**
-     * @var \MeteorAdyen\Components\BasketService
+     * @var BasketService
      */
     private $basketService;
 
     /**
-     * @var \MeteorAdyen\Components\Configuration
+     * @var Configuration
      */
     private $configuration;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     public function preDispatch()
     {
@@ -43,6 +52,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->adyenCheckout = $this->get('meteor_adyen.components.adyen.payment.method');
         $this->basketService = $this->get('meteor_adyen.components.basket_service');
         $this->configuration = $this->get('meteor_adyen.components.configuration');
+        $this->logger = $this->get('meteor_adyen.logger');
     }
 
     public function ajaxDoPaymentAction()
@@ -61,15 +71,30 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             new BrowserInfoProvider()
         );
 
-        $payload = $chain->provide($context);
-        $checkout = $this->adyenCheckout->getCheckout();
-        $paymentInfo = $checkout->payments($payload, [
-            'idempotencyKey' => $context->getTransaction()->getIdempotencyKey()
-        ]);
+        try {
+            $payload = $chain->provide($context);
+            $checkout = $this->adyenCheckout->getCheckout();
+            $paymentInfo = $checkout->payments($payload, [
+                'idempotencyKey' => $context->getTransaction()->getIdempotencyKey()
+            ]);
 
-        $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
-        $this->handlePaymentData($paymentInfo);
-        $this->Response()->setBody(json_encode($paymentInfo));
+            $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
+            $this->handlePaymentData($paymentInfo);
+            $this->Response()->setBody(json_encode(
+                [
+                    'status' => 'success',
+                    'content' => $paymentInfo
+                ]
+            ));
+        } catch (\Adyen\AdyenException $e) {
+            $this->logger->debug($e);
+            $this->Response()->setBody(json_encode(
+                [
+                    'status' => 'error',
+                    'content' => $e
+                ]
+            ));
+        }
     }
 
     /**

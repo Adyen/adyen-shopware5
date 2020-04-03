@@ -83,7 +83,11 @@
                     url: me.opts.adyenAjaxDoPaymentUrl,
                     data: data,
                     success: function (response) {
-                        me.handlePaymentData(response);
+                        if (response['status'] === 'success') {
+                            me.handlePaymentData(response['content']);
+                        } else {
+                            me.addAdyenError(response['content']);
+                        }
                     },
                 });
             } else {
