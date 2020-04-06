@@ -91,7 +91,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             $this->Response()->setBody(json_encode(
                 [
                     'status' => 'error',
-                    'content' => $e
+                    'content' => $e->getMessage()
                 ]
             ));
         }

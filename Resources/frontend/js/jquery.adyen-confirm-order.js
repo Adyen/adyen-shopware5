@@ -78,7 +78,7 @@
                 };
 
                 $.ajax({
-                    method: "POST",
+                    method: 'POST',
                     dataType: 'json',
                     url: me.opts.adyenAjaxDoPaymentUrl,
                     data: data,
@@ -88,6 +88,8 @@
                         } else {
                             me.addAdyenError(response['content']);
                         }
+
+                        $.loadingIndicator.close();
                     },
                 });
             } else {
@@ -136,7 +138,7 @@
                     fingerprintToken: data.authentication['threeds2.fingerprintToken'],
                     onComplete: function (fingerprintData) {
                         $.ajax({
-                            method: "POST",
+                            method: 'POST',
                             dataType: 'json',
                             url: me.opts.adyenAjaxIdentifyShopperUrl,
                             data: fingerprintData.data.details,
@@ -166,7 +168,7 @@
                     onComplete: function (challengeData) {
                         modal.close();
                         $.ajax({
-                            method: "POST",
+                            method: 'POST',
                             dataType: 'json',
                             url: me.opts.adyenAjaxChallengeShopperUrl,
                             data: challengeData.data.details,
