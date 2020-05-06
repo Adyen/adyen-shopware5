@@ -5,6 +5,7 @@
     <services>
         <!-- Components -->
         <service id="meteor_adyen.components.data_conversion" class="MeteorAdyen\Components\DataConversion"/>
+        <service class="MeteorAdyen\Components\Calculator\PriceCalculationService" id="meteor_adyen.components.calculator.price_calculation_service"/>
         <service id="meteor_adyen.components.notification_processor" class="MeteorAdyen\Components\NotificationProcessor">
             <argument type="service" id="meteor_adyen.logger.notifications"/>
             <argument type="service" id="models"/>
