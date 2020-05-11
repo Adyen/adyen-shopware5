@@ -32,7 +32,7 @@ class ShopperInfoProvider implements PaymentPayloadProvider
                 'city' => $context->getOrder()->getBilling()->getCity(),
                 'country' => $context->getOrder()->getBilling()->getCountry()->getIso(),
                 'houseNumberOrName' => $context->getOrder()->getBilling()->getNumber(),
-                'postCode' => $context->getOrder()->getBilling()->getZipCode(),
+                'postalCode' => $context->getOrder()->getBilling()->getZipCode(),
                 'street' => $context->getOrder()->getBilling()->getStreet(),
             ],
         ];
