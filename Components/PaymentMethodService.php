@@ -132,7 +132,7 @@ class PaymentMethodService
      */
     public function isAdyenMethod($payment)
     {
-        return substr($payment, 0, 6) === Configuration::PAYMENT_PREFIX;
+        return substr((string)$payment, 0, 6) === Configuration::PAYMENT_PREFIX;
     }
 
     /**

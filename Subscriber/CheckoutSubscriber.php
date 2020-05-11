@@ -110,6 +110,7 @@ class CheckoutSubscriber implements SubscriberInterface
             'Enlight_Controller_Action_PreDispatch_Frontend_Checkout' => 'CheckoutFrontendPreDispatch',
             'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'CheckoutFrontendPostDispatch',
             'sAdmin::sUpdatePayment::after' => 'sAdminAfterSUpdatePayment',
+            'sAdmin::sGetDispatchBasket::after' => 'sAdminAfterSGetDispatchBasket',
         ];
     }
 
@@ -162,6 +163,21 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         $this->shopwarePaymentMethodService->setUserAdyenMethod($userId, $adyenPayment);
+    }
+
+    /**
+     * @param \Enlight_Hook_HookArgs $args
+     * @return mixed
+     */
+    public function sAdminAfterSGetDispatchBasket(\Enlight_Hook_HookArgs $args)
+    {
+        $basket = $args->getReturn();
+
+        if ($this->shopwarePaymentMethodService->isAdyenMethod($basket['paymentID'])) {
+            $basket['paymentID'] = $this->shopwarePaymentMethodService->getAdyenPaymentId();
+        }
+
+        return $basket;
     }
 
     /**
