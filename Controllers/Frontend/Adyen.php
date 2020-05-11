@@ -74,9 +74,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         try {
             $payload = $chain->provide($context);
             $checkout = $this->adyenCheckout->getCheckout();
-            $paymentInfo = $checkout->payments($payload, [
-                'idempotencyKey' => $context->getTransaction()->getIdempotencyKey()
-            ]);
+            $paymentInfo = $checkout->payments($payload);
 
             $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
             $this->handlePaymentData($paymentInfo);
@@ -179,7 +177,6 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $transaction = new PaymentInfo();
         $transaction->setOrderId(-1);
         $transaction->setPspReference('');
-        $transaction->setIdempotencyKey('');
 
         $this->getModelManager()->persist($transaction);
         $this->getModelManager()->flush($transaction);
@@ -210,9 +207,6 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         ]);
 
         $transaction->setOrder($order);
-
-        $uuid = \Adyen\Util\Uuid::generateV4();
-        $transaction->setIdempotencyKey($uuid);
 
         $this->getModelManager()->persist($transaction);
         $this->getModelManager()->flush($transaction);

@@ -59,12 +59,6 @@ class PaymentInfo extends ModelEntity
     private $resultCode;
 
     /**
-     * @var string
-     * @ORM\Column(name="idempotency_key", type="text")
-     */
-    private $idempotencyKey;
-
-    /**
      * PaymenntInfo constructor
      */
     public function __construct()
@@ -199,24 +193,6 @@ class PaymentInfo extends ModelEntity
     public function setResultCode(string $resultCode)
     {
         $this->resultCode = $resultCode;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdempotencyKey(): string
-    {
-        return $this->idempotencyKey;
-    }
-
-    /**
-     * @param string $idempotencyKey
-     * @return $this
-     */
-    public function setIdempotencyKey(string $idempotencyKey)
-    {
-        $this->idempotencyKey = $idempotencyKey;
         return $this;
     }
 }

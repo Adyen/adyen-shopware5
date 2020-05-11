@@ -25,6 +25,6 @@
     "require": {
         "php": "^7.0",
         "ext-json": "*",
-        "adyen/php-api-library": "^4.2"
+        "adyen/php-api-library": "^6.1"
     }
 }
