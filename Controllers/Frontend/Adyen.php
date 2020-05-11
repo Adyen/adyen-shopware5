@@ -2,12 +2,14 @@
 
 use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\BasketService;
+use MeteorAdyen\Components\Calculator\PriceCalculationService;
 use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Components\Manager\AdyenManager;
 use MeteorAdyen\Components\Payload\Chain;
 use MeteorAdyen\Components\Payload\PaymentContext;
 use MeteorAdyen\Components\Payload\Providers\ApplicationInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\BrowserInfoProvider;
+use MeteorAdyen\Components\Payload\Providers\LineItemsInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\OrderInfoProvider;
 use MeteorAdyen\Components\Payload\Providers\PaymentMethodProvider;
 use MeteorAdyen\Components\Payload\Providers\ShopperInfoProvider;
@@ -46,6 +48,11 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private $logger;
 
+    /**
+     * @var PriceCalculationService
+     */
+    private $priceCalculationService;
+
     public function preDispatch()
     {
         $this->adyenManager = $this->get('meteor_adyen.components.manager.adyen_manager');
@@ -53,6 +60,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->basketService = $this->get('meteor_adyen.components.basket_service');
         $this->configuration = $this->get('meteor_adyen.components.configuration');
         $this->logger = $this->get('meteor_adyen.logger');
+        $this->priceCalculationService = $this->get('meteor_adyen.components.calculator.price_calculation_service');
     }
 
     public function ajaxDoPaymentAction()
@@ -67,7 +75,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             new ShopperInfoProvider(),
             new OrderInfoProvider(),
             new PaymentMethodProvider(),
-            // new LineItemsInfoProvider(),
+            new LineItemsInfoProvider($this->priceCalculationService),
             new BrowserInfoProvider()
         );
 

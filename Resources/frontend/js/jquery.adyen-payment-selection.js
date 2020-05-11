@@ -6,7 +6,7 @@
          * Plugin default options.
          */
         defaults: {
-            shopLocale: 'en_US',
+            shopLocale: 'en-US',
             adyenOriginkey: '',
             adyenEnvironment: 'test',
             adyenPaymentMethodsResponse: {},
