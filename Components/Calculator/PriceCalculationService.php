@@ -12,7 +12,7 @@ class PriceCalculationService
 {
     public function getAmountExcludingTax($amount, $tax)
     {
-        return round($amount - ($amount / 100 * $tax), 2);
+        return round($amount / (1 + $tax /100), 2);
     }
 
     public function getTaxAmount($amount, $tax)
