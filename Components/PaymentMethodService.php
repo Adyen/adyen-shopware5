@@ -145,7 +145,9 @@ class PaymentMethodService
         if (!$paymentMethods) {
             $paymentMethodOptions = $this->getPaymentMethodOptions();
             $adyenMethods = $this->adyenPaymentMethodService->getPaymentMethods(
-                $paymentMethodOptions['countryCode'], $paymentMethodOptions['currency'], $paymentMethodOptions['value']
+                $paymentMethodOptions['countryCode'],
+                $paymentMethodOptions['currency'],
+                $paymentMethodOptions['value']
             );
 
             $paymentMethods = $adyenMethods['paymentMethods'];

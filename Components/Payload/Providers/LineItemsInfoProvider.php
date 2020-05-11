@@ -89,17 +89,20 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
     {
         $currencyCode = $context->getOrder()->getCurrency();
         $amountExcludingTax = $this->adyenCurrency->sanitize(
-            $context->getOrder()->getInvoiceShippingNet(), $currencyCode
+            $context->getOrder()->getInvoiceShippingNet(),
+            $currencyCode
         );
         $amountIncludingTax = $this->adyenCurrency->sanitize(
-            $context->getOrder()->getInvoiceShipping(), $currencyCode
+            $context->getOrder()->getInvoiceShipping(),
+            $currencyCode
         );
 
         $shippingLines[] = [
             'quantity' => 1,
             'amountExcludingTax' => $amountExcludingTax,
             'taxPercentage' => $this->adyenCurrency->sanitize(
-                $context->getOrder()->getInvoiceShippingTaxRate(), $currencyCode
+                $context->getOrder()->getInvoiceShippingTaxRate(),
+                $currencyCode
             ),
             'description' => $context->getOrder()->getDispatch()->getName(),
             'id' => $context->getOrder()->getDispatch()->getId(),

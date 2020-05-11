@@ -41,7 +41,7 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
             'action' => 'return',
         ]);
 
-        $plugin = $this->modelManager->getRepository(Plugin::class)->findOneBy(array('name' => MeteorAdyen::NAME));
+        $plugin = $this->modelManager->getRepository(Plugin::class)->findOneBy(['name' => MeteorAdyen::NAME]);
 
         return [
             'additionalData' => [

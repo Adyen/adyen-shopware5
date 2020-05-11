@@ -72,9 +72,10 @@ class PaymentSubscriber implements SubscriberInterface
     {
         $shopwareMethods = $args->getReturn();
 
-        if ($this->skipReplaceAdyenMethods || !in_array(Shopware()->Front()->Request()->getActionName(),
-                ['shippingPayment', 'payment'])) {
-
+        if ($this->skipReplaceAdyenMethods || !in_array(
+            Shopware()->Front()->Request()->getActionName(),
+            ['shippingPayment', 'payment']
+        )) {
             $this->skipReplaceAdyenMethods = false;
             return $shopwareMethods;
         }
@@ -86,7 +87,9 @@ class PaymentSubscriber implements SubscriberInterface
         $paymentMethodOptions = $this->shopwarePaymentMethodService->getPaymentMethodOptions();
 
         $adyenMethods = $this->paymentMethodService->getPaymentMethods(
-            $paymentMethodOptions['countryCode'], $paymentMethodOptions['currency'], $paymentMethodOptions['value']
+            $paymentMethodOptions['countryCode'],
+            $paymentMethodOptions['currency'],
+            $paymentMethodOptions['value']
         );
 
         if (empty($adyenMethods)) {
@@ -96,8 +99,10 @@ class PaymentSubscriber implements SubscriberInterface
         $adyenMethods['paymentMethods'] = array_reverse($adyenMethods['paymentMethods']);
 
         foreach ($adyenMethods['paymentMethods'] as $adyenMethod) {
-            $paymentMethodInfo = $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($adyenMethod['type'],
-                $adyenMethods['paymentMethods']);
+            $paymentMethodInfo = $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType(
+                $adyenMethod['type'],
+                $adyenMethods['paymentMethods']
+            );
             array_unshift($shopwareMethods, [
                 'id' => Configuration::PAYMENT_PREFIX . $adyenMethod['type'],
                 'name' => $adyenMethod['type'],

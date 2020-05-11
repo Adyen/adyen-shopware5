@@ -9,7 +9,6 @@ use Shopware\Bundle\CookieBundle\Structs\CookieStruct;
 
 class CookieSubscriber implements SubscriberInterface
 {
-
     public static function getSubscribedEvents(): array
     {
         return [

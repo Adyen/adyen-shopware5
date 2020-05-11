@@ -77,7 +77,6 @@ class BackendJavascriptSubscriber implements SubscriberInterface
 
         $data = $assign['data'];
         foreach ($data as &$order) {
-
             $notification = $this->notificationRepository->findOneBy(['orderId' => $order['id']]);
 
             if (!$notification) {

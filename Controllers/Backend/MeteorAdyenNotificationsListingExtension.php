@@ -18,7 +18,7 @@ class Shopware_Controllers_Backend_MeteorAdyenNotificationsListingExtension exte
         $builder = parent::getListQuery();
 
         $builder->leftJoin('notification.order', 'nOrder')
-            ->addSelect(array('nOrder'))
+            ->addSelect(['nOrder'])
             ->where("notification.status != :notificationStatus")
             ->setParameter('notificationStatus', NotificationStatus::STATUS_HANDLED);
 
@@ -36,7 +36,7 @@ class Shopware_Controllers_Backend_MeteorAdyenNotificationsListingExtension exte
         $builder = parent::getDetailQuery($id);
 
         $builder->leftJoin('notification.order', 'nOrder')
-            ->addSelect(array('nOrder'));
+            ->addSelect(['nOrder']);
 
         return $builder;
     }
