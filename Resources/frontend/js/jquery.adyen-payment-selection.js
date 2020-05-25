@@ -6,18 +6,33 @@
          * Plugin default options.
          */
         defaults: {
-            shopLocale: 'en-US',
             adyenOriginkey: '',
-            adyenEnvironment: 'test',
             adyenPaymentMethodsResponse: {},
-            formSelector: '#shippingPaymentForm',
             resetSessionUrl: '',
+            /**
+             * Fallback environment variable
+             *
+             * @type {string}
+             */
+            adyenEnvironment: 'test',
+            /**
+             * Default shopLocale when no locate is assigned
+             *
+             * @type {string}
+             */
+            shopLocale: 'en-US',
             /**
              * Prefix to identify adyen payment methods
              *
              * @type {String}
              */
             adyenPaymentMethodPrefix: 'adyen_',
+            /**
+             * Selector for the payment form.
+             *
+             * @type {String}
+             */
+            formSelector: '#shippingPaymentForm',
             /**
              * Selector for the payment method select fields.
              *
@@ -74,7 +89,7 @@
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
         },
-        onPaymentFormSubmit: function(e) {
+        onPaymentFormSubmit: function (e) {
             var me = this;
             if ($(me.opts.paymentMethodFormSubmitSelector).hasClass('is--disabled')) {
                 e.preventDefault();
@@ -155,11 +170,11 @@
                     break;
             }
         },
-        handleComponentGeneral: function(type) {
+        handleComponentGeneral: function (type) {
             var me = this;
             me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
-        handleComponentPayWithGoogle: function(type) {
+        handleComponentPayWithGoogle: function (type) {
             var me = this;
             $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
         },
@@ -188,8 +203,7 @@
             var paymentMethod = form.find('input[name=payment]:checked');
             var paymentMethodContainer = form.find('input[name=payment]:checked').closest(me.opts.paymentMethodSelector);
 
-            //Return when no adyen payment
-            if (paymentMethod.val().indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
+            if (!me.isPaymentMethodValid(paymentMethod)) {
                 return;
             }
 
@@ -214,6 +228,25 @@
                 .html('Update your payment information')
                 .on('click', $.proxy(me.updatePaymentInfo, me));
             paymentMethodContainer.find(me.opts.methodLabelSelector).append(me.changeInfosButton);
+        },
+        isPaymentMethodValid: function (paymentMethod) {
+            var me = this;
+
+            if (!paymentMethod.length) {
+                return false;
+            }
+
+            //Return when no adyen payment
+            if (paymentMethod.val().indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
+                return false;
+            }
+
+            //Return when redirect
+            if (typeof me.getPaymentMethodByType(paymentMethod.val()).details === "undefined") {
+                return false;
+            }
+
+            return true;
         },
         updatePaymentInfo: function () {
             var me = this;
