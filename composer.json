@@ -13,6 +13,11 @@
             "role": "Developer"
         }
     ],
+    "require": {
+        "php": "^7.0",
+        "ext-json": "*",
+        "adyen/php-api-library": "^6.1"
+    },
     "require-dev": {
         "shopware/shopware": "^5.6",
         "phpro/grumphp": "^0.16.1",
@@ -23,11 +28,6 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "require": {
-        "php": "^7.0",
-        "ext-json": "*",
-        "adyen/php-api-library": "^6.1"
-    },
     "scripts": {
         "format": [
             "vendor/bin/php-cs-fixer fix"
