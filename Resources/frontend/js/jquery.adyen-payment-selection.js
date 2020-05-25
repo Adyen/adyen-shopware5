@@ -188,8 +188,7 @@
             var paymentMethod = form.find('input[name=payment]:checked');
             var paymentMethodContainer = form.find('input[name=payment]:checked').closest(me.opts.paymentMethodSelector);
 
-            //Return when no adyen payment
-            if (paymentMethod.val().indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
+            if(!me.isPaymentMethodValid(paymentMethod)){
                 return;
             }
 
@@ -214,6 +213,25 @@
                 .html('Update your payment information')
                 .on('click', $.proxy(me.updatePaymentInfo, me));
             paymentMethodContainer.find(me.opts.methodLabelSelector).append(me.changeInfosButton);
+        },
+        isPaymentMethodValid: function (paymentMethod) {
+            var me = this;
+
+            if (!paymentMethod.length) {
+                return false;
+            }
+
+            //Return when no adyen payment
+            if (paymentMethod.val().indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
+                return false;
+            }
+
+            //Return when redirect
+            if (typeof me.getPaymentMethodByType(paymentMethod.val()).details === "undefined") {
+                return false;
+            }
+
+            return true;
         },
         updatePaymentInfo: function () {
             var me = this;
