@@ -28,23 +28,23 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
     public function indexAction()
     {
         if (!$this->checkAuthentication()) {
-            $this->View()->assign(['success' => false, 'message' => 'Invalid or missing auth']);
+            $this->View()->assign('[Invalid or missing auth]');
             return;
         }
 
         $notifications = $this->getNotificationItems();
 
         if (!$this->checkHMAC($notifications)) {
-            $this->View()->assign(['notificationResponse' => "[wrong hmac detected]"]);
+            $this->View()->assign('[wrong hmac detected]');
             return;
         }
 
         if (!$this->saveNotifications($notifications)) {
-            $this->View()->assign(['notificationResponse' => "[notification save error]"]);
+            $this->View()->assign('[notification save error]');
             return;
         }
 
-        $this->View()->assign(['notificationResponse' => "[accepted]"]);
+        $this->View()->assign('[accepted]');
     }
 
     /**
