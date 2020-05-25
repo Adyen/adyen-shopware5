@@ -76,7 +76,8 @@ class PaymentMethodService
                 "currency" => $currency,
                 "value" => $adyenCurrency->sanitize($value, $currency),
             ],
-            "channel" => Channel::WEB
+            "channel" => Channel::WEB,
+            'shopperLocale' => Shopware()->Shop()->getLocale()->getLocale(),
         ];
 
         try {
