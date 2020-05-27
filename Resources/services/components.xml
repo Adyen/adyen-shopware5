@@ -57,6 +57,7 @@
             <argument type="service" id="meteor_adyen.components.adyen.origin_keys_service"/>
             <argument type="service" id="models"/>
             <argument type="service" id="shopware.plugin.config_writer"/>
+            <argument type="service" id="meteor_adyen.components.shopware_version_check"/>
         </service>
         <service id="meteor_adyen.components.builder.notification_builder" class="MeteorAdyen\Components\Builder\NotificationBuilder">
             <argument type="service" id="models"/>

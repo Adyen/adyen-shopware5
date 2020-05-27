@@ -6,7 +6,6 @@ use Adyen\AdyenException;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use MeteorAdyen\Components\OriginKeysService;
-use MeteorAdyen\Components\ShopwareVersionCheck;
 use MeteorAdyen\MeteorAdyen;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\CacheManager;
@@ -24,10 +23,6 @@ class BackendConfigSubscriber implements SubscriberInterface
      * @var LoggerInterface
      */
     private $logger;
-    /**
-     * @var ShopwareVersionCheck
-     */
-    private $shopwareVersionCheck;
 
     /**
      * BackendConfigSubscriber constructor.
@@ -35,12 +30,10 @@ class BackendConfigSubscriber implements SubscriberInterface
      */
     public function __construct(
         OriginKeysService $originKeysService,
-        LoggerInterface $logger,
-        ShopwareVersionCheck $shopwareVersionCheck
+        LoggerInterface $logger
     ) {
         $this->originKeysService = $originKeysService;
         $this->logger = $logger;
-        $this->shopwareVersionCheck = $shopwareVersionCheck;
     }
 
     /**
@@ -64,7 +57,7 @@ class BackendConfigSubscriber implements SubscriberInterface
 
         if ($subject->Request()->getActionName() === 'saveForm' && $subject->Request()->getParam('name') === MeteorAdyen::NAME) {
             try {
-                $this->generateOriginKeys($subject);
+                $this->originKeysService->generateAndSave();
             } catch (AdyenException $e) {
                 $this->logger->error($e);
             }
@@ -73,14 +66,5 @@ class BackendConfigSubscriber implements SubscriberInterface
                 $subject->get('shopware.cache_manager')->clearByTags([CacheManager::CACHE_TAG_CONFIG]);
             }
         }
-    }
-
-    /**
-     * @param Shopware_Controllers_Backend_Config $subject
-     * @throws \Adyen\AdyenException
-     */
-    private function generateOriginKeys(Shopware_Controllers_Backend_Config $subject)
-    {
-        $this->originKeysService->generateAndSave();
     }
 }
