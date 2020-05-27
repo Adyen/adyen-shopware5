@@ -59,8 +59,13 @@ class PaymentMethodService
      * @return array
      * @throws AdyenException
      */
-    public function getPaymentMethods($countryCode = null, $currency = null, $value = null, $cache = true): array
-    {
+    public function getPaymentMethods(
+        $countryCode = null,
+        $currency = null,
+        $locale = null,
+        $value = null,
+        $cache = true
+    ): array {
         $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string)$value ?? '');
         if ($cache && isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
@@ -70,14 +75,14 @@ class PaymentMethodService
         $adyenCurrency = new Currency();
 
         $requestParams = [
-            "merchantAccount" => $this->configuration->getMerchantAccount(),
-            "countryCode" => $countryCode,
-            "amount" => [
-                "currency" => $currency,
-                "value" => $adyenCurrency->sanitize($value, $currency),
+            'merchantAccount' => $this->configuration->getMerchantAccount(),
+            'countryCode' => $countryCode,
+            'amount' => [
+                'currency' => $currency,
+                'value' => $adyenCurrency->sanitize($value, $currency),
             ],
-            "channel" => Channel::WEB,
-            'shopperLocale' => Shopware()->Shop()->getLocale()->getLocale(),
+            'channel' => Channel::WEB,
+            'shopperLocale' => $locale ?? Shopware()->Shop()->getLocale()->getLocale(),
         ];
 
         try {
