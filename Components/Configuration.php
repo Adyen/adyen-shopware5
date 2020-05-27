@@ -169,15 +169,6 @@ class Configuration
     }
 
     /**
-     * @param bool $shop
-     * @return int
-     */
-    public function getDebugLogging($shop = false): bool
-    {
-        return (bool)$this->getConfig('debug_logging', $shop);
-    }
-
-    /**
      * @return string
      */
     public function getPaymentMethodPrefix(): string

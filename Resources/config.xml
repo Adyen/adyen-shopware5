@@ -77,11 +77,6 @@
             <name>google_merchant_id</name>
             <label lang="en">Google Merchant ID</label>
         </element>
-        <element required="true" type="boolean" scope="shop">
-            <name>debug_logging</name>
-            <label lang="en">Debug logging</label>
-            <value>true</value>
-        </element>
         <element type="button">
             <name>testAPIconnection</name>
             <label lang="en">Test API connection</label>
