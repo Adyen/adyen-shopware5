@@ -19,6 +19,7 @@ class Configuration
     const ENV_TEST = 'TEST';
     const ENV_LIVE = 'LIVE';
     const PAYMENT_PREFIX = 'adyen_';
+    const PAYMENT_LENGHT = 6;
 
     /**
      * @var CachedConfigReader

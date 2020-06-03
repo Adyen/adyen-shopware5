@@ -18,7 +18,6 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="meteor_adyen.components.origin_keys_service"/>
             <argument type="service" id="meteor_adyen.logger"/>
-            <argument type="service" id="meteor_adyen.components.shopware_version_check"/>
         </service>
         <service id="meteor_adyen.subscriber.backend_javascript_subscriber" class="MeteorAdyen\Subscriber\BackendJavascriptSubscriber">
             <tag name="shopware.event_subscriber"/>
@@ -49,6 +48,7 @@
             <argument type="service" id="front" />
             <argument type="service" id="meteor_adyen.components.manager.adyen_manager" />
             <argument type="service" id="meteor_adyen.components.data_conversion" />
+            <argument type="service" id="meteor_adyen.components.origin_keys_service"/>
         </service>
         <service id="meteor_adyen.subscriber.frontend_payment_name_subscriber" class="MeteorAdyen\Subscriber\FrontendPaymentNameSubscriber">
             <tag name="shopware.event_subscriber"/>

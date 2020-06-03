@@ -12,6 +12,7 @@ use MeteorAdyen\Components\Adyen\PaymentMethodService;
 use MeteorAdyen\Components\Configuration;
 use MeteorAdyen\Components\DataConversion;
 use MeteorAdyen\Components\Manager\AdyenManager;
+use MeteorAdyen\Components\OriginKeysService;
 use MeteorAdyen\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use MeteorAdyen\MeteorAdyen;
 use Shopware\Components\Model\ModelManager;
@@ -68,6 +69,10 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var DataConversion
      */
     private $dataConversion;
+    /**
+     * @var OriginKeysService
+     */
+    private $originKeysService;
 
     /**
      * CheckoutSubscriber constructor.
@@ -88,7 +93,8 @@ class CheckoutSubscriber implements SubscriberInterface
         Shopware_Components_Snippet_Manager $snippets,
         Enlight_Controller_Front $front,
         AdyenManager $adyenManager,
-        DataConversion $dataConversion
+        DataConversion $dataConversion,
+        OriginKeysService $originKeysService
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
@@ -99,6 +105,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->front = $front;
         $this->adyenManager = $adyenManager;
         $this->dataConversion = $dataConversion;
+        $this->originKeysService = $originKeysService;
     }
 
     /**
@@ -202,7 +209,7 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $adyenConfig = [
             "shopLocale" => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
-            "originKey" => $this->configuration->getOriginKey($shop),
+            "originKey" => $this->getOriginKey($shop),
             "environment" => $this->configuration->getEnvironment($shop),
             "paymentMethods" => json_encode($paymentMethods),
             "paymentMethodPrefix" => $this->configuration->getPaymentMethodPrefix($shop),
@@ -319,7 +326,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->session->offsetSet(MeteorAdyen::SESSION_ADYEN_PAYMENT_VALID, false);
         if ($this->shopwarePaymentMethodService->isAdyenMethod($payment)) {
             $paymentId = $this->shopwarePaymentMethodService->getAdyenPaymentId();
-            $adyenPayment = substr($payment, 6);
+            $adyenPayment = $this->shopwarePaymentMethodService->getAdyenMethod($payment);
 
             $subject->Request()->setParams([
                 'payment' => $paymentId,
@@ -397,7 +404,7 @@ class CheckoutSubscriber implements SubscriberInterface
      * @return bool
      * @throws AdyenException
      */
-    private function shouldRedirectToStep2(Shopware_Controllers_Frontend_Checkout $subject)
+    private function shouldRedirectToStep2(Shopware_Controllers_Frontend_Checkout $subject): bool
     {
         $userData = $subject->View()->getAssign('sUserData');
         if (!$userData['additional'] ||
@@ -412,9 +419,10 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $adyenMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
         $selectedType = $userData['additional']['user'][MeteorAdyen::METEOR_ADYEN_PAYMENT_METHOD];
-        $adyenMethods['paymentMethods'] = array_filter($adyenMethods['paymentMethods'], function ($element) use ($selectedType) {
-            return ($element['type'] == $selectedType);
-        });
+        $adyenMethods['paymentMethods'] = array_filter($adyenMethods['paymentMethods'],
+            function ($element) use ($selectedType) {
+                return ($element['type'] === $selectedType);
+            });
 
         if (!count($adyenMethods['paymentMethods'])) {
             return true;
@@ -438,5 +446,14 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         $this->adyenManager->unsetPaymentDataInSession();
+    }
+
+    private function getOriginKey($shop): string
+    {
+        if (!$this->configuration->getOriginKey($shop)) {
+            $this->originKeysService->generateAndSave();
+        }
+
+        return $this->configuration->getOriginKey($shop);
     }
 }

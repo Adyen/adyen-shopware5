@@ -4,6 +4,7 @@ namespace MeteorAdyen\Components;
 
 use Adyen\AdyenException;
 use MeteorAdyen\MeteorAdyen;
+use Shopware\Components\CacheManager;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin\ConfigWriter;
 use Shopware\Models\Plugin\Plugin;
@@ -29,6 +30,10 @@ class OriginKeysService
      * @var ConfigWriter
      */
     private $configWriter;
+    /**
+     * @var ShopwareVersionCheck
+     */
+    private $shopwareVersionCheck;
 
     /**
      * OriginKeysService constructor.
@@ -39,11 +44,13 @@ class OriginKeysService
     public function __construct(
         Adyen\OriginKeysService $originKeysService,
         ModelManager $models,
-        ConfigWriter $configWriter
+        ConfigWriter $configWriter,
+        ShopwareVersionCheck $shopwareVersionCheck
     ) {
         $this->originKeysService = $originKeysService;
         $this->models = $models;
         $this->configWriter = $configWriter;
+        $this->shopwareVersionCheck = $shopwareVersionCheck;
     }
 
     /**
@@ -94,6 +101,10 @@ class OriginKeysService
                 $keys[$shop->getId()],
                 $shop
             );
+        }
+
+        if ($this->shopwareVersionCheck->isHigherThanShopwareVersion('v5.5.6')) {
+            Shopware()->Container()->get('shopware.cache_manager')->clearByTags([CacheManager::CACHE_TAG_CONFIG]);
         }
     }
 
