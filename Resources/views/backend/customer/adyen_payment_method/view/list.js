@@ -1,9 +1,9 @@
 //
-// {namespace name=backend/order/main}
+// {namespace name=backend/customer/view/order}
 
-// {block name="backend/order/view/list/list"}
-    Ext.define('Shopware.apps.Order.MeteorAdyen.view.List', {
-        override: 'Shopware.apps.Order.view.list.List',
+// {block name="backend/customer/view/order/list"}
+    Ext.define('Shopware.apps.Customer.MeteorAdyen.view.List', {
+        override: 'Shopware.apps.Customer.view.order.List',
 
         getColumns: function () {
             var columns = this.callParent(arguments);
