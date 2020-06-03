@@ -172,7 +172,7 @@
         },
         handleComponentGeneral: function (type) {
             var me = this;
-            me.adyenCheckout.create(type, {}).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
+            me.adyenCheckout.create(type).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleComponentPayWithGoogle: function (type) {
             var me = this;
