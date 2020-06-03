@@ -3,6 +3,7 @@
 use MeteorAdyen\Components\Manager\AdyenManager;
 use MeteorAdyen\Models\Enum\PaymentResultCodes;
 use Shopware\Components\CSRFWhitelistAware;
+use Shopware\Components\Logger;
 use Shopware\Models\Order\Order;
 use Shopware\Models\Order\Status;
 
@@ -27,6 +28,11 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     private $basketService;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * Whitelist notifyAction
      */
     public function getWhitelistedCSRFActions()
@@ -40,6 +46,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         $this->adyenManager = $this->get('meteor_adyen.components.manager.adyen_manager');
         $this->adyenCheckout = $this->get('meteor_adyen.components.adyen.payment.method');
         $this->basketService = $this->get('meteor_adyen.components.basket_service');
+        $this->logger = $this->get('meteor_adyen.logger');
     }
 
     /**
@@ -67,6 +74,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                     break;
                 case PaymentResultCodes::CANCELLED:
                 case PaymentResultCodes::ERROR:
+                case PaymentResultCodes::REFUSED:
                 default:
 
                     $this->basketService->cancelAndRestoreByOrderNumber($result['merchantReference']);
@@ -94,6 +102,14 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
             'number' => $orderNumber
         ]);
 
+        if (!$order) {
+            $this->logger->error('No order found for ', [
+                'ordernumber' => $orderNumber,
+            ]);
+
+            return;
+        }
+
         switch ($result['resultCode']) {
             case 'Authorised':
             case 'Pending':
@@ -103,6 +119,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
             case 'Cancelled':
             case 'Error':
             case 'Fail':
+            case 'Refused':
                 $paymentStatus = $this->getModelManager()->find(Status::class, Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED);
                 break;
             default:
