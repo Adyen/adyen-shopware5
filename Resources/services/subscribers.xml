@@ -1,0 +1,64 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <!-- Subscribers -->
+        <service id="adyen_payment.subscriber.template" class="AdyenPayment\Subscriber\Template">
+            <argument>%adyen_payment.plugin_dir%</argument>
+            <argument type="service" id="template"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="adyen_payment.subscriber.account_payment_subscriber" class="AdyenPayment\Subscriber\AccountPaymentSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="adyen_payment.components.payment_method_service"/>
+            <argument type="service" id="session"/>
+        </service>
+        <service id="adyen_payment.subscriber.backend_config_subscriber" class="AdyenPayment\Subscriber\BackendConfigSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="adyen_payment.components.origin_keys_service"/>
+            <argument type="service" id="adyen_payment.logger"/>
+            <argument type="service" id="adyen_payment.components.shopware_version_check"/>
+        </service>
+        <service id="adyen_payment.subscriber.backend_javascript_subscriber" class="AdyenPayment\Subscriber\BackendJavascriptSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument>%adyen_payment.plugin_dir%</argument>
+            <argument type="service" id="models"/>
+        </service>
+        <service id="adyen_payment.subscriber.backend_payment_subscriber" class="AdyenPayment\Subscriber\BackendPaymentSubscriber">
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="adyen_payment.subscriber.payment" class="AdyenPayment\Subscriber\PaymentSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
+            <argument type="service" id="adyen_payment.components.payment_method_service"/>
+        </service>
+        <service id="adyen_payment.subscriber.backend_order_subscriber" class="AdyenPayment\Subscriber\BackendOrderSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="adyen_payment.components.notification_manager"/>
+        </service>
+        <service id="adyen_payment.subscriber.checkout" class="AdyenPayment\Subscriber\CheckoutSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="adyen_payment.components.configuration"/>
+            <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
+            <argument type="service" id="adyen_payment.components.payment_method_service"/>
+            <argument type="service" id="session"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="snippets"/>
+            <argument type="service" id="front" />
+            <argument type="service" id="adyen_payment.components.manager.adyen_manager" />
+            <argument type="service" id="adyen_payment.components.data_conversion" />
+            <argument type="service" id="adyen_payment.components.origin_keys_service"/>
+        </service>
+        <service id="adyen_payment.subscriber.frontend_payment_name_subscriber" class="AdyenPayment\Subscriber\FrontendPaymentNameSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="adyen_payment.components.payment_method_service"/>
+            <argument type="service" id="adyen_payment.logger"/>
+        </service>
+        <service id="adyen_payment.subscriber.notification.log_incoming_notification" class="AdyenPayment\Subscriber\Notification\LogIncomingNotification">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+        </service>
+    </services>
+</container>

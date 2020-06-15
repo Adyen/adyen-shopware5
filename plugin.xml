@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.6/engine/Shopware/Components/Plugin/schema/plugin.xsd">
+
+    <label>Adyen Shopware Plugin</label>
+    <label lang="de">Adyen Shopware Plugin</label>
+
+    <version>1.4.1</version>
+    <copyright>Adyen</copyright>
+    <author>Adyen</author>
+    <link>https://adyen.com</link>
+    <license>MIT</license>
+
+    <description>Official Adyen plugin</description>
+    <description lang="de">Offizielles Adyen plugin</description>
+
+    <compatibility minVersion="5.6.0"/>
+
+    <changelog version="1.4.1">
+        <changes>
+            <![CDATA[
+                <h4>Release 🎉</h4>
+            ]]>
+        </changes>
+    </changelog>
+</plugin>
