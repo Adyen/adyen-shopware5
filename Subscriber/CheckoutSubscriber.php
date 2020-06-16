@@ -419,10 +419,12 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $adyenMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
         $selectedType = $userData['additional']['user'][AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD];
-        $adyenMethods['paymentMethods'] = array_filter($adyenMethods['paymentMethods'],
+        $adyenMethods['paymentMethods'] = array_filter(
+            $adyenMethods['paymentMethods'],
             function ($element) use ($selectedType) {
                 return ($element['type'] === $selectedType);
-            });
+            }
+        );
 
         if (!count($adyenMethods['paymentMethods'])) {
             return true;
