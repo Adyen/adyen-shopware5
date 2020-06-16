@@ -18,7 +18,7 @@ Ext.define('Shopware.apps.AdyenPaymentNotificationsListingExtension.model.Notifi
         { name : 'eventCode', type: 'string' },
         { name : 'success', type: 'string' },
         { name : 'merchantAccountCode', type: 'string' },
-        { name : 'amountValue', type: 'float', convert: function(v) {
+        { name : 'amountValue', type: 'float', convert: function (v) {
                 return v / 100;
         } },
         { name : 'amountCurrency', type: 'string' },

@@ -13,7 +13,7 @@
             me.cleanupSessions();
         },
 
-        cleanupSessions: function() {
+        cleanupSessions: function () {
             var me = this;
             me.sessions.forEach(function (session) {
                 me.sessionStorage.removeItem(session);

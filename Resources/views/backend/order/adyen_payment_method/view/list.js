@@ -12,7 +12,7 @@
                 dataIndex: 'adyen_payment_order_payment',
                 flex:1,
                 sortable: false,
-                renderer: function(value, metaData, record) {
+                renderer: function (value, metaData, record) {
                     return record.raw.adyen_payment_order_payment;
                 }
             });

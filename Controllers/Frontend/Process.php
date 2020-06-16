@@ -84,7 +84,6 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                         'action' => 'confirm'
                     ]);
                     break;
-
             }
         }
     }
@@ -115,15 +114,19 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
             case 'Authorised':
             case 'Pending':
             case 'Received':
-                $paymentStatus = $this->getModelManager()->find(Status::class,
-                    Status::PAYMENT_STATE_THE_PAYMENT_HAS_BEEN_ORDERED);
+                $paymentStatus = $this->getModelManager()->find(
+                    Status::class,
+                    Status::PAYMENT_STATE_THE_PAYMENT_HAS_BEEN_ORDERED
+                );
                 break;
             case 'Cancelled':
             case 'Error':
             case 'Fail':
             case 'Refused':
-                $paymentStatus = $this->getModelManager()->find(Status::class,
-                    Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED);
+                $paymentStatus = $this->getModelManager()->find(
+                    Status::class,
+                    Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED
+                );
                 break;
             default:
                 $paymentStatus = $this->getModelManager()->find(Status::class, Status::PAYMENT_STATE_REVIEW_NECESSARY);

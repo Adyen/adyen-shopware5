@@ -69,7 +69,8 @@ class AccountPaymentSubscriber implements SubscriberInterface
 
             $subject->Request()->setPost('register', ['payment' => $paymentId]);
             $subject->Request()->setPost(
-                'adyenPayment', $this->shopwarePaymentMethodService->getAdyenMethod($payment)
+                'adyenPayment',
+                $this->shopwarePaymentMethodService->getAdyenMethod($payment)
             );
         }
     }
