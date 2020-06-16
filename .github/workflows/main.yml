@@ -17,7 +17,7 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run PHP Code Sniffer
-        run: vendor/bin/phpcs --ignore=*vendor/ --ignore=AdyenPayment.php --standard=PSR2 .
+        run: vendor/bin/phpcs --ignore=*vendor/ --ignore=AdyenPayment.php --ignore=Controllers --standard=PSR2 .
 
       - name: Make sure project files are compilable
         run: find -L . -path ./vendor -prune -o -path ./tests -prune -o -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l
