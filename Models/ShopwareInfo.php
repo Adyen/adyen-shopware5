@@ -39,7 +39,7 @@ class ShopwareInfo
      */
     public function getPluginVersion()
     {
-        return "1.0.0";
+        return "1.4.1";
     }
 
     /**
