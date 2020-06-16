@@ -57,7 +57,9 @@ class IncomingNotificationManager
         foreach ($notificationItems as $notificationItem) {
             try {
                 if (!empty($notificationItem['NotificationRequestItem'])) {
-                    $notification = $this->notificationBuilder->fromParams($notificationItem['NotificationRequestItem']);
+                    $notification = $this->notificationBuilder->fromParams(
+                        $notificationItem['NotificationRequestItem']
+                    );
                     $this->entityManager->persist($notification);
                 }
             } catch (InvalidParameterException $exception) {
