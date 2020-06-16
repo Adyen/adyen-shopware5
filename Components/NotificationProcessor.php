@@ -128,14 +128,22 @@ class NotificationProcessor
                     'message' => $exception->getMessage(),
                     'notificationId' => $exception->getNotification()->getId()
                 ]);
-                yield new NotificationProcessorFeedback(false, "NotificationException: " . $exception->getMessage(), $notification);
+                yield new NotificationProcessorFeedback(
+                    false,
+                    "NotificationException: " . $exception->getMessage(),
+                    $notification
+                );
             } catch (\Exception $exception) {
                 $status = NotificationStatus::STATUS_FATAL;
                 $this->logger->notice('General Exception', [
                     'exception' => $exception,
                     'notificationId' => $notification->getId()
                 ]);
-                yield new NotificationProcessorFeedback(false, "General Exception: " . $exception->getMessage(), $notification);
+                yield new NotificationProcessorFeedback(
+                    false,
+                    "General Exception: " . $exception->getMessage(),
+                    $notification
+                );
             }
         }
 

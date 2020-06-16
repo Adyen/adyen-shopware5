@@ -114,8 +114,8 @@ class CheckoutSubscriber implements SubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'Enlight_Controller_Action_PreDispatch_Frontend_Checkout' => 'CheckoutFrontendPreDispatch',
-            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'CheckoutFrontendPostDispatch',
+            'Enlight_Controller_Action_PreDispatch_Frontend_Checkout' => 'checkoutFrontendPreDispatch',
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'checkoutFrontendPostDispatch',
             'sAdmin::sUpdatePayment::after' => 'sAdminAfterSUpdatePayment',
             'sAdmin::sGetDispatchBasket::after' => 'sAdminAfterSGetDispatchBasket',
         ];
@@ -124,7 +124,7 @@ class CheckoutSubscriber implements SubscriberInterface
     /**
      * @param Enlight_Event_EventArgs $args
      */
-    public function CheckoutFrontendPreDispatch(Enlight_Event_EventArgs $args)
+    public function checkoutFrontendPreDispatch(Enlight_Event_EventArgs $args)
     {
         $this->rewritePostPayment($args);
         $this->unsetPaymentSessions($args);
@@ -134,7 +134,7 @@ class CheckoutSubscriber implements SubscriberInterface
      * @param Enlight_Event_EventArgs $args
      * @throws AdyenException
      */
-    public function CheckoutFrontendPostDispatch(Enlight_Event_EventArgs $args)
+    public function checkoutFrontendPostDispatch(Enlight_Event_EventArgs $args)
     {
         $this->checkFirstCheckoutStep($args);
         $this->rewritePaymentData($args);

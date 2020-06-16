@@ -62,7 +62,9 @@ class BackendConfigSubscriber implements SubscriberInterface
         /** @var Shopware_Controllers_Backend_Config $subject */
         $subject = $args->getSubject();
 
-        if ($subject->Request()->getActionName() === 'saveForm' && $subject->Request()->getParam('name') === AdyenPayment::NAME) {
+        if ($subject->Request()->getActionName() === 'saveForm'
+            && $subject->Request()->getParam('name') === AdyenPayment::NAME
+        ) {
             try {
                 $this->originKeysService->generateAndSave();
             } catch (AdyenException $e) {

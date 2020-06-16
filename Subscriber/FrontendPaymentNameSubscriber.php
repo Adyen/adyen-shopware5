@@ -45,14 +45,14 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'CheckoutFrontendPostDispatch',
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'checkoutFrontendPostDispatch',
         ];
     }
 
     /**
      * @param Enlight_Event_EventArgs $args
      */
-    public function CheckoutFrontendPostDispatch(Enlight_Event_EventArgs $args)
+    public function checkoutFrontendPostDispatch(Enlight_Event_EventArgs $args)
     {
         $this->rewriteConfirmPaymentInfo($args);
         $this->rewriteFinishPaymentInfo($args);
@@ -85,7 +85,8 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
 
         $userData['additional']['payment']['description'] = $adyenMethodName->getName();
         $userData['additional']['payment']['additionaldescription'] = $adyenMethodName->getDescription();
-        $userData['additional']['payment']['image'] = $this->shopwarePaymentMethodService->getAdyenImageByType($adyenType);
+        $userData['additional']['payment']['image'] = $this->shopwarePaymentMethodService
+            ->getAdyenImageByType($adyenType);
         $userData['additional']['payment']['type'] = $adyenType;
 
         $subject->View()->assign('sUserData', $userData);
