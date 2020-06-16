@@ -1,0 +1,144 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <!-- Components -->
+        <service id="adyen_payment.components.data_conversion" class="AdyenPayment\Components\DataConversion"/>
+        <service class="AdyenPayment\Components\Calculator\PriceCalculationService" id="adyen_payment.components.calculator.price_calculation_service"/>
+        <service id="adyen_payment.components.notification_processor" class="AdyenPayment\Components\NotificationProcessor">
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="events"/>
+        </service>
+        <service id="adyen_payment.components.basket_service" class="AdyenPayment\Components\BasketService">
+            <argument type="service" id="events"/>
+            <argument type="service" id="models"/>
+        </service>
+        <service id="adyen_payment.components.configuration" class="AdyenPayment\Components\Configuration">
+            <argument type="service" id="shopware.plugin.cached_config_reader"/>
+            <argument type="service" id="dbal_connection"/>
+        </service>
+        <service id="adyen_payment.components.adyen.apifactory" class="AdyenPayment\Components\Adyen\ApiFactory">
+            <argument type="service" id="models"/>
+            <argument type="service" id="adyen_payment.components.configuration"/>
+            <argument type="service" id="adyen_payment.logger"/>
+        </service>
+        <service id="adyen_payment.components.adyen.origin_keys_service" class="AdyenPayment\Components\Adyen\OriginKeysService">
+            <argument type="service" id="adyen_payment.components.adyen.apifactory"/>
+            <argument type="service" id="models"/>
+        </service>
+        <service id="adyen_payment.components.adyen.payment.method"
+                 class="AdyenPayment\Components\Adyen\PaymentMethodService">
+            <argument type="service" id="adyen_payment.components.adyen.apifactory"/>
+            <argument type="service" id="adyen_payment.components.configuration"/>
+            <argument type="service" id="adyen_payment.logger"/>
+        </service>
+        <service id="adyen_payment.components.adyen.refund_service"
+                 class="AdyenPayment\Components\Adyen\RefundService">
+            <argument type="service" id="adyen_payment.components.adyen.apifactory"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="adyen_payment.components.notification_manager"/>
+        </service>
+        <service id="adyen_payment.components.fifo_notification_loader"
+                 class="AdyenPayment\Components\FifoNotificationLoader">
+            <argument type="service" id="adyen_payment.components.notification_manager"/>
+        </service>
+        <service id="adyen_payment.components.payment_status_update" class="AdyenPayment\Components\PaymentStatusUpdate">
+            <argument type="service" id="models"/>
+        </service>
+        <service id="adyen_payment.components.payment_method_service" class="AdyenPayment\Components\PaymentMethodService">
+            <argument type="service" id="models"/>
+            <argument type="service" id="session"/>
+            <argument type="service" id="snippets"/>
+            <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
+        </service>
+        <service id="adyen_payment.components.origin_keys_service" class="AdyenPayment\Components\OriginKeysService">
+            <argument type="service" id="adyen_payment.components.adyen.origin_keys_service"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="shopware.plugin.config_writer"/>
+            <argument type="service" id="adyen_payment.components.shopware_version_check"/>
+        </service>
+        <service id="adyen_payment.components.builder.notification_builder" class="AdyenPayment\Components\Builder\NotificationBuilder">
+            <argument type="service" id="models"/>
+        </service>
+
+        <!-- Payload -->
+        <service id="adyen_payment.components.payload.chain" class="AdyenPayment\Components\Payload\Chain"/>
+        <service id="adyen_payment.components.payload.payment_payload_provider" class="AdyenPayment\Components\Payload\PaymentPayloadProvider"/>
+        <service id="adyen_payment.components.payload.providers.application_info_provider" class="AdyenPayment\Components\Payload\Providers\ApplicationInfoProvider"/>
+        <service id="adyen_payment.components.payload.providers.browser_info_provider" class="AdyenPayment\Components\Payload\Providers\BrowserInfoProvider"/>
+        <service id="adyen_payment.components.payload.providers.lineitems_info_provider" class="AdyenPayment\Components\Payload\Providers\LineItemsInfoProvider"/>
+        <service id="adyen_payment.components.payload.providers.order_info_provider" class="AdyenPayment\Components\Payload\Providers\OrderInfoProvider"/>
+        <service id="adyen_payment.components.payload.providers.paymentmethod_provider" class="AdyenPayment\Components\Payload\Providers\PaymentMethodProvider"/>
+        <service id="adyen_payment.components.payload.providers.shopper_info_provider" class="AdyenPayment\Components\Payload\Providers\ShopperInfoProvider"/>
+
+        <!-- Notification Processors -->
+        <service id="adyen_payment.components.notification_processor.authorisation"
+                 class="AdyenPayment\Components\NotificationProcessor\Authorisation">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="adyen_payment.components.payment_status_update"/>
+        </service>
+        <service id="adyen_payment.components.notification_processor.cancellation"
+                 class="AdyenPayment\Components\NotificationProcessor\Cancellation">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="adyen_payment.components.payment_status_update"/>
+        </service>
+        <service id="adyen_payment.components.notification_processor.capture"
+                 class="AdyenPayment\Components\NotificationProcessor\Capture">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="adyen_payment.components.payment_status_update"/>
+        </service>
+        <service id="adyen_payment.components.notification_processor.capture_failed"
+                 class="AdyenPayment\Components\NotificationProcessor\CaptureFailed">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+        </service>
+        <service id="adyen_payment.components.notification_processor.chargeback"
+                 class="AdyenPayment\Components\NotificationProcessor\Chargeback">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="adyen_payment.components.payment_status_update"/>
+        </service>
+        <service id="adyen_payment.components.notification_processor.chargeback_reversed"
+                 class="AdyenPayment\Components\NotificationProcessor\ChargebackReversed">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="adyen_payment.components.payment_status_update"/>
+        </service>
+        <service id="adyen_payment.components.notification_processor.refund"
+                 class="AdyenPayment\Components\NotificationProcessor\Refund">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="adyen_payment.components.payment_status_update"/>
+        </service>
+        <service id="adyen_payment.components.notification_processor.refund_failed"
+                 class="AdyenPayment\Components\NotificationProcessor\RefundFailed">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="adyen_payment.components.payment_status_update"/>
+        </service>
+        <service id="adyen_payment.components.notification_processor.refunded_reversed"
+                 class="AdyenPayment\Components\NotificationProcessor\RefundedReversed">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="adyen_payment.components.payment_status_update"/>
+        </service>
+        <service id="adyen_payment.components.shopware_version_check" class="AdyenPayment\Components\ShopwareVersionCheck">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="adyen_payment.logger"/>
+        </service>
+    </services>
+</container>
