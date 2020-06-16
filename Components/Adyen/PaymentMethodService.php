@@ -55,15 +55,15 @@ class PaymentMethodService
      * @param string $countryCode
      * @param string $currency
      * @param int $value
+     * @param null $locale
      * @param bool $cache
      * @return array
-     * @throws AdyenException
      */
     public function getPaymentMethods(
         $countryCode = null,
         $currency = null,
-        $locale = null,
         $value = null,
+        $locale = null,
         $cache = true
     ): array {
         $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string)$value ?? '');
