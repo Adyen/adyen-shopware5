@@ -84,7 +84,6 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                         'action' => 'confirm'
                     ]);
                     break;
-
             }
         }
     }
