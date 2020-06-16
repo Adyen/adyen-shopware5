@@ -56,8 +56,10 @@ class IncomingNotificationManager
     {
         foreach ($notificationItems as $notificationItem) {
             try {
-                $notification = $this->notificationBuilder->fromParams($notificationItem['NotificationRequestItem']);
-                $this->entityManager->persist($notification);
+                 if (!empty($notificationItem['NotificationRequestItem']) {
+                    $notification = $this->notificationBuilder->fromParams($notificationItem['NotificationRequestItem']);
+                    $this->entityManager->persist($notification);
+                }
             } catch (InvalidParameterException $exception) {
                 $this->logger->warning($exception->getMessage());
                 yield new NotificationItemFeedback($exception->getMessage(), $notificationItem);
