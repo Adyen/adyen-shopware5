@@ -16,15 +16,15 @@ Read our [**contribution guidelines**](https://github.com/Adyen/.github/blob/mas
 Note: The Adyen payment plugin is not compatible with the cookie manager plugin (<= 5.6.2), it is however compatible with the Shopware default cookie consent manager (>5.6.2).
 
 ## Installation
-Please use the [official documentation]() of the plugin to see how to install it.
+Please use the [official documentation](https://docs.adyen.com/plugins/shopware-5) of the plugin to see how to install it.
 
 ## Usage
-Please use the [official documentation]() of the plugin to see how to configure and use it.
+Please use the [official documentation](https://docs.adyen.com/plugins/shopware-5) of the plugin to see how to configure and use it.
 
 ## Documentation
 Please find the relevant documentation for
- - [How to start with Adyen]()
- - [Shopware 5 official plugin]()
+ - [Get started with Adyen](https://docs.adyen.com/user-management/get-started-with-adyen)
+ - [Shopware 5 official plugin](https://docs.adyen.com/plugins/shopware-5)
  - [Adyen PHP API Library](https://docs.adyen.com/development-resources/libraries#php)
 
 ## Support
