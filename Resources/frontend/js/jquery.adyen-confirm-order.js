@@ -146,9 +146,9 @@
                             },
                         });
                     },
-                    onError: function (error) {
-                        console.error(error);
-                    }
+                onError: function (error) {
+                    console.error(error);
+                }
                 })
                 .mount('#AdyenIdentifyShopperThreeDS2');
         },
@@ -176,9 +176,9 @@
                             },
                         });
                     },
-                    onError: function (error) {
-                        console.log(error);
-                    }
+                onError: function (error) {
+                    console.log(error);
+                }
                 })
                 .mount('#AdyenChallengeShopperThreeDS2');
         },
