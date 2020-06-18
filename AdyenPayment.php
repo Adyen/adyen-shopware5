@@ -40,7 +40,7 @@ class AdyenPayment extends Plugin
      */
     public static function isPackage(): bool
     {
-        return file_exists(self::getPackageVendorAutoload());
+        return file_exists(static::getPackageVendorAutoload());
     }
 
     /**

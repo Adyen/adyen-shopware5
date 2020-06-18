@@ -101,15 +101,6 @@ class Configuration
      * @param bool|Shop $shop
      * @return string
      */
-    public function getJsComponents3DS2ChallengeImageSize($shop = false): string
-    {
-        return (string)$this->getConfig('js_components_3DS2_challenge_image_size', $shop);
-    }
-
-    /**
-     * @param bool|Shop $shop
-     * @return string
-     */
     public function getApiKey($shop = false): string
     {
         return (string)$this->getConfig('api_key', $shop);

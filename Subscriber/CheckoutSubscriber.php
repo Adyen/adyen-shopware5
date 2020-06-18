@@ -139,7 +139,6 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->checkFirstCheckoutStep($args);
         $this->rewritePaymentData($args);
         $this->addAdyenConfigOnShipping($args);
-        $this->addAdyenConfigOnConfirm($args);
         $this->addAdyenSnippets($args);
         $this->addAdyenGooglePay($args);
     }
@@ -213,30 +212,9 @@ class CheckoutSubscriber implements SubscriberInterface
             "environment" => $this->configuration->getEnvironment($shop),
             "paymentMethods" => json_encode($paymentMethods),
             "paymentMethodPrefix" => $this->configuration->getPaymentMethodPrefix($shop),
-            "jsComponents3DS2ChallengeImageSize" => $this->configuration->getJsComponents3DS2ChallengeImageSize($shop),
         ];
 
         $view->assign('sAdyenConfig', $adyenConfig);
-    }
-
-
-    /**
-     * @param Enlight_Event_EventArgs $args
-     */
-    private function addAdyenConfigOnConfirm(Enlight_Event_EventArgs $args)
-    {
-        /** @var Shopware_Controllers_Frontend_Checkout $subject */
-        $subject = $args->getSubject();
-
-        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
-            return;
-        }
-
-        $adyenConfig = [
-            "jsComponents3DS2ChallengeImageSize" => $this->configuration->getJsComponents3DS2ChallengeImageSize(),
-        ];
-
-        $subject->View()->assign('sAdyenConfig', $adyenConfig);
     }
 
     /**
