@@ -178,7 +178,8 @@
                     },
                 onError: function (error) {
                     console.log(error);
-                }
+                },
+                size: 5
                 })
                 .mount('#AdyenChallengeShopperThreeDS2');
         },
