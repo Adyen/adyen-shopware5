@@ -148,9 +148,9 @@
         getPaymentMethodByType(type) {
             var me = this;
 
-            type = type.split(me.opts.adyenPaymentMethodPrefix).pop();
+            var pmType = type.split(me.opts.adyenPaymentMethodPrefix).pop();
             return me.opts.adyenPaymentMethodsResponse['paymentMethods'].find(function (paymentMethod) {
-                return paymentMethod.type === type
+                return paymentMethod.type === pmType
             });
         },
         setCheckout: function () {

@@ -31,9 +31,6 @@
     {if $sAdyenGoogleConfig}
         data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
     {/if}
-    {if $sAdyenConfig}
-        data-adyen3DS2ChallengeImageSize='{$sAdyenConfig.jsComponents3DS2ChallengeImageSize}'
-    {/if}
     {if $sAdyenSetSession}
         data-adyenSetSession='{$sAdyenSetSession}'
     {/if}
