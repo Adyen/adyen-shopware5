@@ -2,6 +2,7 @@
 
 use Shopware\Components\CSRFWhitelistAware;
 
+//phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps, Generic.Files.LineLength.TooLong
 class Shopware_Controllers_Backend_AdyenPaymentRefund extends Shopware_Controllers_Backend_ExtJs implements CSRFWhitelistAware
 {
     public function refundAction()

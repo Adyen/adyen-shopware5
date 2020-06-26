@@ -3,6 +3,7 @@
 use AdyenPayment\Models\Enum\NotificationStatus;
 use AdyenPayment\Models\Notification;
 
+//phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps, Generic.Files.LineLength.TooLong
 class Shopware_Controllers_Backend_AdyenPaymentNotificationsListingExtension extends Shopware_Controllers_Backend_Application
 {
     protected $model = Notification::class;

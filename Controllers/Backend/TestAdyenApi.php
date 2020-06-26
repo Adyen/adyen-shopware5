@@ -2,6 +2,7 @@
 
 use Symfony\Component\HttpFoundation\Response;
 
+//phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Backend_ExtJs
 {
     public function runAction()
