@@ -8,6 +8,7 @@ use AdyenPayment\Components\Payload\PaymentPayloadProvider;
 use AdyenPayment\AdyenPayment;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Plugin\Plugin;
+use AdyenPayment\Models\Enum\Channel;
 
 /**
  * Class ApplicationInfoProvider
@@ -48,7 +49,7 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
                 'executeThreeD' => true,
                 'allow3DS2' => true,
             ],
-            "channel" => "Web",
+            "channel" => Channel::WEB,
             'origin' => $context->getOrigin(),
             'returnUrl' => $returnUrl,
             'merchantAccount' => $this->configuration->getMerchantAccount(),

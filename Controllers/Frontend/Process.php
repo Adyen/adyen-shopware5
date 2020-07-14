@@ -10,6 +10,7 @@ use Shopware\Models\Order\Status;
 /**
  * Class Redirect
  */
+//phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
     /**
@@ -111,18 +112,17 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         }
 
         switch ($result['resultCode']) {
-            case 'Authorised':
-            case 'Pending':
-            case 'Received':
+            case PaymentResultCodes::AUTHORISED:
+            case PaymentResultCodes::PENDING:
+            case PaymentResultCodes::RECEIVED:
                 $paymentStatus = $this->getModelManager()->find(
                     Status::class,
                     Status::PAYMENT_STATE_THE_PAYMENT_HAS_BEEN_ORDERED
                 );
                 break;
-            case 'Cancelled':
-            case 'Error':
-            case 'Fail':
-            case 'Refused':
+            case PaymentResultCodes::CANCELLED:
+            case PaymentResultCodes::ERROR:
+            case PaymentResultCodes::REFUSED:
                 $paymentStatus = $this->getModelManager()->find(
                     Status::class,
                     Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED

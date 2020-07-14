@@ -21,6 +21,7 @@ use Shopware\Models\Order\Status;
 /**
  * Class Shopware_Controllers_Frontend_Adyen
  */
+//phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_Payment
 {
     /**
