@@ -5,6 +5,9 @@
     "keywords": ["adyen", "payment", "payment platform"],
     "homepage": "https://adyen.com",
     "license": "MIT",
+    "extra": {
+        "installer-name": "AdyenPayment"
+    },
     "authors": [
         {
             "name": "Adyen",
