@@ -85,7 +85,7 @@ class Capture implements NotificationProcessorInterface
         if ($notification->isSuccess()) {
             $this->paymentStatusUpdate->updatePaymentStatus(
                 $order,
-                Status::PAYMENT_STATE_THE_CREDIT_HAS_BEEN_ACCEPTED
+                Status::PAYMENT_STATE_COMPLETELY_PAID
             );
         }
     }
