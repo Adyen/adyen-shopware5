@@ -78,6 +78,6 @@ class RefundedReversed implements NotificationProcessorInterface
             ]
         );
 
-        $this->paymentStatusUpdate->updatePaymentStatus($order, Status::PAYMENT_STATE_THE_CREDIT_HAS_BEEN_ACCEPTED);
+        $this->paymentStatusUpdate->updatePaymentStatus($order, Status::PAYMENT_STATE_COMPLETELY_PAID);
     }
 }
