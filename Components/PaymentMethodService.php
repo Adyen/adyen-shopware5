@@ -18,6 +18,12 @@ use Shopware_Components_Snippet_Manager;
  */
 class PaymentMethodService
 {
+
+    const PM_LOGO_FILENAME = [
+        'scheme' => 'card',
+        'yandex_money' => 'yandex'
+    ];
+
     /**
      * @var ModelManager
      */
@@ -203,8 +209,9 @@ class PaymentMethodService
      */
     public function getAdyenImageByType($type)
     {
-        if ($type === 'scheme') {
-            $type = 'card';
+        //Some payment method codes don't match the logo filename
+        if (!empty(self::PM_LOGO_FILENAME[$type])) {
+            $type = self::PM_LOGO_FILENAME[$type];
         }
         return sprintf('https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/%s.svg', $type);
     }
