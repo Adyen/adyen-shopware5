@@ -68,7 +68,7 @@
                                 if (response.status === 404) {
                                     Shopware.Msg.createGrowlMessage('Plugin Manager', 'Please activate plugin before testing.');
                                 } else {
-                                	var value = Ext.decode(response.responseText);
+                                    var value = Ext.decode(response.responseText);
                                     Shopware.Msg.createGrowlMessage('failure', value.responseText)
                                 }
                             }
