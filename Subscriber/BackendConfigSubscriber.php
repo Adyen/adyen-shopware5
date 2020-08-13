@@ -69,10 +69,10 @@ class BackendConfigSubscriber implements SubscriberInterface
                 $this->originKeysService->generateAndSave();
             } catch (AdyenException $ex) {
                 $this->logger->error('AdyenException on Backend Config', [
-					'message' => $ex->getMessage(),
-					'file' => $ex->getFile(),
-					'line' => $ex->getLine()
-				]);
+                    'message' => $ex->getMessage(),
+                    'file' => $ex->getFile(),
+                    'line' => $ex->getLine()
+                ]);
             }
 
             if ($this->shopwareVersionCheck->isHigherThanShopwareVersion('v5.5.6')) {
