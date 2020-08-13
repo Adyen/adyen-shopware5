@@ -31,53 +31,53 @@ class PaymentStatusUpdate
         $this->modelManager = $modelManager;
     }
 
-	/**
-	 * @param Order $order
-	 * @param int $statusId
-	 * @throws \Doctrine\ORM\ORMException
-	 * @throws \Doctrine\ORM\OptimisticLockException
-	 * @throws \Doctrine\ORM\TransactionRequiredException
-	 */
-	public function updateOrderStatus(Order $order, int $statusId)
-	{
-		$orderStatus = $this->modelManager->find(Status::class, $statusId);
+    /**
+     * @param Order $order
+     * @param int $statusId
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function updateOrderStatus(Order $order, int $statusId)
+    {
+        $orderStatus = $this->modelManager->find(Status::class, $statusId);
 
-		if ($this->logger) {
-			$this->logger->debug('Update order status', [
-				'number' => $order->getNumber(),
-				'oldStatus' => $order->getOrderStatus()->getName(),
-				'newStatus' => $orderStatus->getName()
-			]);
-		}
+        if ($this->logger) {
+            $this->logger->debug('Update order status', [
+                'number' => $order->getNumber(),
+                'oldStatus' => $order->getOrderStatus()->getName(),
+                'newStatus' => $orderStatus->getName()
+            ]);
+        }
 
-		$order->setOrderStatus($orderStatus);
-		$this->modelManager->persist($order);
-		$this->modelManager->flush();
-	}
+        $order->setOrderStatus($orderStatus);
+        $this->modelManager->persist($order);
+        $this->modelManager->flush();
+    }
 
-	/**
-	 * @param Order $order
-	 * @param int $statusId
-	 * @throws \Doctrine\ORM\ORMException
-	 * @throws \Doctrine\ORM\OptimisticLockException
-	 * @throws \Doctrine\ORM\TransactionRequiredException
-	 */
-	public function updatePaymentStatus(Order $order, int $statusId)
-	{
-		$paymentStatus = $this->modelManager->find(Status::class, $statusId);
+    /**
+     * @param Order $order
+     * @param int $statusId
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function updatePaymentStatus(Order $order, int $statusId)
+    {
+        $paymentStatus = $this->modelManager->find(Status::class, $statusId);
 
-		if ($this->logger) {
-			$this->logger->debug('Update order payment status', [
-				'number' => $order->getNumber(),
-				'oldStatus' => $order->getPaymentStatus()->getName(),
-				'newStatus' => $paymentStatus->getName()
-			]);
-		}
+        if ($this->logger) {
+            $this->logger->debug('Update order payment status', [
+                'number' => $order->getNumber(),
+                'oldStatus' => $order->getPaymentStatus()->getName(),
+                'newStatus' => $paymentStatus->getName()
+            ]);
+        }
 
-		$order->setPaymentStatus($paymentStatus);
-		$this->modelManager->persist($order);
-		$this->modelManager->flush();
-	}
+        $order->setPaymentStatus($paymentStatus);
+        $this->modelManager->persist($order);
+        $this->modelManager->flush();
+    }
 
     /**
      * @param LoggerInterface $logger

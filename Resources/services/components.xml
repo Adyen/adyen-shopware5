@@ -115,13 +115,13 @@
             <argument type="service" id="events"/>
             <argument type="service" id="adyen_payment.components.payment_status_update"/>
         </service>
-		<service id="adyen_payment.components.notification_processor.offer_closed"
-				 class="AdyenPayment\Components\NotificationProcessor\OfferClosed">
-			<tag name="adyen.payment.notificationprocessor"/>
-			<argument type="service" id="adyen_payment.logger.notifications"/>
-			<argument type="service" id="events"/>
-			<argument type="service" id="adyen_payment.components.payment_status_update"/>
-		</service>
+        <service id="adyen_payment.components.notification_processor.offer_closed"
+                 class="AdyenPayment\Components\NotificationProcessor\OfferClosed">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="adyen_payment.components.payment_status_update"/>
+        </service>
         <service id="adyen_payment.components.notification_processor.refund"
                  class="AdyenPayment\Components\NotificationProcessor\Refund">
             <tag name="adyen.payment.notificationprocessor"/>
