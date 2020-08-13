@@ -93,12 +93,17 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                     'content' => $paymentInfo
                 ]
             ));
-        } catch (\Adyen\AdyenException $e) {
-            $this->logger->debug($e);
+        } catch (\Adyen\AdyenException $ex) {
+            $this->logger->debug('AdyenException during doPayment', [
+                'message' => $ex->getMessage(),
+                'file' => $ex->getFile(),
+                'line' => $ex->getLine()
+            ]);
+
             $this->Response()->setBody(json_encode(
                 [
                     'status' => 'error',
-                    'content' => $e->getMessage()
+                    'content' => $ex->getMessage()
                 ]
             ));
         }
