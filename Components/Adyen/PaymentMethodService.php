@@ -92,7 +92,6 @@ class PaymentMethodService
 				'message' => $e->getMessage(),
             	'file' => $e->getFile(),
 				'line' => $e->getLine(),
-				'statuc' => $e->getStatus(),
 				'errorType' => $e->getErrorType(),
 				'status' => $e->getStatus()
 			]);
