@@ -17,6 +17,7 @@ class Event
     const NOTIFICATION_PROCESS_CANCELLATION = 'Adyen_Notification_Process_Cancellation';
     const NOTIFICATION_PROCESS_CAPTURE = 'Adyen_Notification_Process_Capture';
     const NOTIFICATION_PROCESS_CAPTURE_FAILED = 'Adyen_Notification_Process_CaptureFailed';
+    const NOTIFICATION_PROCESS_OFFER_CLOSED = 'Adyen_Notification_Process_OfferClosed';
     const NOTIFICATION_PROCESS_REFUND = 'Adyen_Notification_Process_Refund';
     const NOTIFICATION_PROCESS_REFUND_FAILED = 'Adyen_Notification_Process_RefundFailed';
     const NOTIFICATION_PROCESS_REFUNDED_REVERSED = 'Adyen_Notification_Process_RefundedReversed';
