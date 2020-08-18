@@ -18,9 +18,13 @@ class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Bac
             $responseText = 'Missing API configuration. Save the configuration form before testing';
         }
 
-        if (!empty($paymentMethodService->getPaymentMethods('BE', 'EUR', 20, 'nl_NL', false))) {
-            $this->response->setHttpResponseCode(Response::HTTP_OK);
-            $responseText = 'Adyen API connected';
+        try {
+            if (!empty($paymentMethodService->getPaymentMethods('BE', 'EUR', 20, 'nl_NL', false))) {
+                $this->response->setHttpResponseCode(Response::HTTP_OK);
+                $responseText = 'Adyen API connected';
+            }
+        } catch (\Exception $exception) {
+            $responseText = 'Adyen API failed, check error logs';
         }
 
         $this->View()->assign('responseText', $responseText);
