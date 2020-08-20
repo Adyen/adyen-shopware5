@@ -55,27 +55,35 @@
             <name>testAPIconnection</name>
             <label lang="en">Test API connection</label>
             <options>
-                <handler>
-                    <![CDATA[
-                    function () {
-                        Ext.Ajax.request({
-                            url: 'TestAdyenApi/run',
-                            success: function (response) {
-                                var value = Ext.decode(response.responseText);
-                                Shopware.Msg.createGrowlMessage('success', value.responseText)
-                            },
-                            failure: function (response) {
-                                if (response.status === 404) {
-                                    Shopware.Msg.createGrowlMessage('Plugin Manager', 'Please activate plugin before testing.');
-                                } else {
-                                    var value = Ext.decode(response.responseText);
-                                    Shopware.Msg.createGrowlMessage('failure', value.responseText)
-                                }
-                            }
-                        });
-                    }
-                    ]]>
-                </handler>
+				<handler>
+					<![CDATA[
+            function () {
+                var container = me.findParentByType('plugin-manager-detail-page');
+
+                container.configurationForm.onSaveForm(
+                  container.configurationForm,
+                  false,
+                  function () {
+                    Ext.Ajax.request({
+                      url: 'TestAdyenApi/run',
+                      success: function (response) {
+                        var value = Ext.decode(response.responseText);
+                        Shopware.Msg.createGrowlMessage('success', value.responseText)
+                      },
+                      failure: function (response) {
+                        if (response.status === 404) {
+                          Shopware.Msg.createGrowlMessage('Plugin Manager', 'Please activate plugin before testing.');
+                        } else {
+                          var value = Ext.decode(response.responseText);
+                          Shopware.Msg.createGrowlMessage('failure', value.responseText)
+                        }
+                      }
+                    });
+                  }
+                );
+              }
+            ]]>
+				</handler>
             </options>
         </element>
     </elements>
