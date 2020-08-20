@@ -47,10 +47,15 @@
             <name>notification_auth_password</name>
             <label lang="en">Notification Auth Password</label>
         </element>
-        <element type="text" scope="shop">
-            <name>google_merchant_id</name>
-            <label lang="en">Google Merchant ID</label>
-        </element>
+		<element type="text" scope="shop">
+			<name>google_merchant_id</name>
+			<label lang="en">Google Merchant ID</label>
+		</element>
+		<element type="boolean" scope="shop">
+			<name>paymentmethods_cache</name>
+			<label lang="en">Enable Payments Methods cache</label>
+			<description lang="en">Remembers the active payments methods for better performance.</description>
+		</element>
         <element type="button">
             <name>testAPIconnection</name>
             <label lang="en">Test API connection</label>
