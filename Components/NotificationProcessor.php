@@ -136,7 +136,11 @@ class NotificationProcessor
             } catch (\Exception $exception) {
                 $status = NotificationStatus::STATUS_FATAL;
                 $this->logger->notice('General Exception', [
-                    'exception' => $exception,
+                    'exception' => [
+                        'message' => $exception->getMessage(),
+                        'file' => $exception->getFile(),
+                        'line' => $exception->getLine()
+                    ],
                     'notificationId' => $notification->getId()
                 ]);
                 yield new NotificationProcessorFeedback(

@@ -78,7 +78,7 @@ class Authorisation implements NotificationProcessorInterface
         );
 
         $status = $notification->isSuccess() ?
-            Status::PAYMENT_STATE_THE_CREDIT_HAS_BEEN_ACCEPTED :
+            Status::PAYMENT_STATE_COMPLETELY_PAID :
             Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED;
 
         $this->paymentStatusUpdate->updatePaymentStatus($order, $status);

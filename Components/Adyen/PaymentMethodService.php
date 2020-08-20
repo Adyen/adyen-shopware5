@@ -88,7 +88,13 @@ class PaymentMethodService
         try {
             $paymentMethods = $checkout->paymentMethods($requestParams);
         } catch (AdyenException $e) {
-            $this->logger->critical($e);
+            $this->logger->critical('Adyen Exception', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'errorType' => $e->getErrorType(),
+                'status' => $e->getStatus()
+            ]);
             return [];
         }
 

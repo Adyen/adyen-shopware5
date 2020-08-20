@@ -2,10 +2,6 @@
 
 namespace AdyenPayment\Components\NotificationProcessor;
 
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
-use Doctrine\ORM\TransactionRequiredException;
-use Enlight_Event_Exception;
 use AdyenPayment\Components\PaymentStatusUpdate;
 use AdyenPayment\Models\Event;
 use AdyenPayment\Models\Notification;
@@ -13,13 +9,9 @@ use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Models\Order\Status;
 
-/**
- * Class Capture
- * @package AdyenPayment\Components\NotificationProcessor
- */
-class Capture implements NotificationProcessorInterface
+class OfferClosed implements NotificationProcessorInterface
 {
-    const EVENT_CODE = 'CAPTURE';
+    const EVENT_CODE = 'OFFER_CLOSED';
 
     /**
      * @var LoggerInterface
@@ -34,13 +26,6 @@ class Capture implements NotificationProcessorInterface
      */
     private $paymentStatusUpdate;
 
-
-    /**
-     * Capture constructor.
-     * @param LoggerInterface $logger
-     * @param ContainerAwareEventManager $eventManager
-     * @param PaymentStatusUpdate $paymentStatusUpdate
-     */
     public function __construct(
         LoggerInterface $logger,
         ContainerAwareEventManager $eventManager,
@@ -64,18 +49,19 @@ class Capture implements NotificationProcessorInterface
 
     /**
      * Actual processing of the notification
+     *
      * @param Notification $notification
-     * @throws ORMException
-     * @throws OptimisticLockException
-     * @throws TransactionRequiredException
-     * @throws Enlight_Event_Exception
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     * @throws \Enlight_Event_Exception
      */
     public function process(Notification $notification)
     {
         $order = $notification->getOrder();
 
         $this->eventManager->notify(
-            Event::NOTIFICATION_PROCESS_CAPTURE,
+            Event::NOTIFICATION_PROCESS_OFFER_CLOSED,
             [
                 'order' => $order,
                 'notification' => $notification
@@ -83,9 +69,13 @@ class Capture implements NotificationProcessorInterface
         );
 
         if ($notification->isSuccess()) {
+            $this->paymentStatusUpdate->updateOrderStatus(
+                $order,
+                Status::ORDER_STATE_CANCELLED_REJECTED
+            );
             $this->paymentStatusUpdate->updatePaymentStatus(
                 $order,
-                Status::PAYMENT_STATE_COMPLETELY_PAID
+                Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED
             );
         }
     }
