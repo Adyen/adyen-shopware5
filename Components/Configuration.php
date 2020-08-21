@@ -161,6 +161,15 @@ class Configuration
     }
 
     /**
+     * @param bool $shop
+     * @return bool
+     */
+    public function isPaymentmethodsCacheEnabled($shop = false): bool
+    {
+        return (bool)$this->getConfig('paymentmethods_cache', $shop);
+    }
+
+    /**
      * @return string
      */
     public function getPaymentMethodPrefix(): string

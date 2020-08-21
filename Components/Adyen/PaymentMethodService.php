@@ -66,6 +66,7 @@ class PaymentMethodService
         $locale = null,
         $cache = true
     ): array {
+        $cache = $cache && $this->configuration->isPaymentmethodsCacheEnabled();
         $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string)$value ?? '');
         if ($cache && isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
