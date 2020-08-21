@@ -29,11 +29,11 @@
         </element>
 		<element required="true" type="text" scope="shop">
 			<name>api_key_test</name>
-			<label lang="en">API: key (Test)</label>
+			<label lang="en">API key (Test)</label>
 		</element>
 		<element required="true" type="text" scope="shop">
 			<name>api_key_live</name>
-			<label lang="en">API: key (Live)</label>
+			<label lang="en">API key (Live)</label>
 		</element>
         <element type="text" scope="shop">
             <name>api_url_prefix</name>
