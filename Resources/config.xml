@@ -54,7 +54,7 @@
 		<element type="boolean" scope="shop">
 			<name>paymentmethods_cache</name>
 			<label lang="en">Enable Payment Methods cache</label>
-			<description lang="en">Remembers the active payments methods for better performance.</description>
+			<description lang="en">Caches the payment methods active in Adyen Customer Area for better performance.</description>
 		</element>
         <element type="button">
             <name>testAPIconnection</name>
