@@ -53,7 +53,7 @@
 		</element>
 		<element type="boolean" scope="shop">
 			<name>paymentmethods_cache</name>
-			<label lang="en">Enable Payments Methods cache</label>
+			<label lang="en">Enable Payment Methods cache</label>
 			<description lang="en">Remembers the active payments methods for better performance.</description>
 		</element>
         <element type="button">
