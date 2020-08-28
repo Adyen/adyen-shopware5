@@ -35,17 +35,17 @@ class Capture implements NotificationProcessorInterface
      * @var PaymentStatusUpdate
      */
     private $paymentStatusUpdate;
-	/**
-	 * @var ModelManager
-	 */
-	private $modelManager;
-	/**
-	 * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
-	 */
-	private $paymentInfoRepository;
+    /**
+     * @var ModelManager
+     */
+    private $modelManager;
+    /**
+     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     */
+    private $paymentInfoRepository;
 
 
-	/**
+    /**
      * Capture constructor.
      * @param LoggerInterface $logger
      * @param ContainerAwareEventManager $eventManager
@@ -55,14 +55,14 @@ class Capture implements NotificationProcessorInterface
         LoggerInterface $logger,
         ContainerAwareEventManager $eventManager,
         PaymentStatusUpdate $paymentStatusUpdate,
-		ModelManager $modelManager
+        ModelManager $modelManager
     ) {
         $this->logger = $logger;
         $this->eventManager = $eventManager;
         $this->paymentStatusUpdate = $paymentStatusUpdate->setLogger($this->logger);
-		$this->modelManager = $modelManager;
-		$this->paymentInfoRepository = $modelManager->getRepository(PaymentInfo::class);
-	}
+        $this->modelManager = $modelManager;
+        $this->paymentInfoRepository = $modelManager->getRepository(PaymentInfo::class);
+    }
 
     /**
      * Returns boolean on whether this processor can process the Notification object
@@ -101,14 +101,14 @@ class Capture implements NotificationProcessorInterface
                 Status::PAYMENT_STATE_COMPLETELY_PAID
             );
 
-			/** @var PaymentInfo $paymentInfo */
-			$paymentInfo = $this->paymentInfoRepository->findOneBy([
-				'orderId' => $order->getId()
-			]);
+            /** @var PaymentInfo $paymentInfo */
+            $paymentInfo = $this->paymentInfoRepository->findOneBy([
+                'orderId' => $order->getId()
+            ]);
 
-			$paymentInfo->setPspReference($notification->getPspReference());
-			$this->modelManager->persist($paymentInfo);
-			$this->modelManager->flush($paymentInfo);
+            $paymentInfo->setPspReference($notification->getPspReference());
+            $this->modelManager->persist($paymentInfo);
+            $this->modelManager->flush($paymentInfo);
         }
     }
 }

@@ -31,16 +31,16 @@ class Authorisation implements NotificationProcessorInterface
      * @var PaymentStatusUpdate
      */
     private $paymentStatusUpdate;
-	/**
-	 * @var ModelManager
-	 */
-	private $modelManager;
-	/**
-	 * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
-	 */
-	private $paymentInfoRepository;
+    /**
+     * @var ModelManager
+     */
+    private $modelManager;
+    /**
+     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     */
+    private $paymentInfoRepository;
 
-	/**
+    /**
      * Authorisation constructor.
      * @param LoggerInterface $logger
      * @param ContainerAwareEventManager $eventManager
@@ -50,14 +50,14 @@ class Authorisation implements NotificationProcessorInterface
         LoggerInterface $logger,
         ContainerAwareEventManager $eventManager,
         PaymentStatusUpdate $paymentStatusUpdate,
-		ModelManager $modelManager
+        ModelManager $modelManager
     ) {
         $this->logger = $logger;
         $this->eventManager = $eventManager;
         $this->paymentStatusUpdate = $paymentStatusUpdate->setLogger($this->logger);
-		$this->modelManager = $modelManager;
-		$this->paymentInfoRepository = $modelManager->getRepository(PaymentInfo::class);
-	}
+        $this->modelManager = $modelManager;
+        $this->paymentInfoRepository = $modelManager->getRepository(PaymentInfo::class);
+    }
 
     /**
      * Returns boolean on whether this processor can process the Notification object
@@ -97,14 +97,14 @@ class Authorisation implements NotificationProcessorInterface
         $this->paymentStatusUpdate->updatePaymentStatus($order, $status);
 
         if ($notification->isSuccess()) {
-        	/** @var PaymentInfo $paymentInfo */
-        	$paymentInfo = $this->paymentInfoRepository->findOneBy([
-        		'orderId' => $order->getId()
-			]);
+            /** @var PaymentInfo $paymentInfo */
+            $paymentInfo = $this->paymentInfoRepository->findOneBy([
+                'orderId' => $order->getId()
+            ]);
 
-        	$paymentInfo->setPspReference($notification->getPspReference());
-        	$this->modelManager->persist($paymentInfo);
-        	$this->modelManager->flush($paymentInfo);
-		}
+            $paymentInfo->setPspReference($notification->getPspReference());
+            $this->modelManager->persist($paymentInfo);
+            $this->modelManager->flush($paymentInfo);
+        }
     }
 }
