@@ -27,45 +27,50 @@
             <name>merchant_account</name>
             <label lang="en">Merchant account</label>
         </element>
-		<element required="true" type="text" scope="shop">
-			<name>api_key_test</name>
-			<label lang="en">API key (Test)</label>
-		</element>
-		<element required="true" type="text" scope="shop">
-			<name>api_key_live</name>
-			<label lang="en">API key (Live)</label>
-		</element>
+        <element required="true" type="text" scope="shop">
+          <name>api_key_test</name>
+          <label lang="en">API key (Test)</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+          <name>api_key_live</name>
+          <label lang="en">API key (Live)</label>
+        </element>
         <element type="text" scope="shop">
             <name>api_url_prefix</name>
             <label lang="en">API: URL prefix</label>
         </element>
-		<element required="true" type="text" scope="shop">
-			<name>notification_hmac_test</name>
-			<label lang="en">Notification HMAC (Test)</label>
-		</element>
-		<element required="true" type="text" scope="shop">
-			<name>notification_auth_username_test</name>
-			<label lang="en">Notification Auth Username (Test)</label>
-		</element>
-		<element required="true" type="text" scope="shop">
-			<name>notification_auth_password_test</name>
-			<label lang="en">Notification Auth Password (Test)</label>
-		</element>
-		<element required="true" type="text" scope="shop">
-			<name>notification_hmac_live</name>
-			<label lang="en">Notification HMAC (Live)</label>
-		</element>
-		<element required="true" type="text" scope="shop">
-			<name>notification_auth_username_live</name>
-			<label lang="en">Notification Auth Username (Live)</label>
-		</element>
-		<element required="true" type="text" scope="shop">
-			<name>notification_auth_password_live</name>
-			<label lang="en">Notification Auth Password (Live)</label>
-		</element>
+        <element required="true" type="text" scope="shop">
+          <name>notification_hmac_test</name>
+          <label lang="en">Notification HMAC (Test)</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+          <name>notification_auth_username_test</name>
+          <label lang="en">Notification Auth Username (Test)</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+          <name>notification_auth_password_test</name>
+          <label lang="en">Notification Auth Password (Test)</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+          <name>notification_hmac_live</name>
+          <label lang="en">Notification HMAC (Live)</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+          <name>notification_auth_username_live</name>
+          <label lang="en">Notification Auth Username (Live)</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+          <name>notification_auth_password_live</name>
+          <label lang="en">Notification Auth Password (Live)</label>
+        </element>
         <element type="text" scope="shop">
             <name>google_merchant_id</name>
             <label lang="en">Google Merchant ID</label>
+        </element>
+        <element type="boolean" scope="shop">
+          <name>paymentmethods_cache</name>
+          <label lang="en">Enable Payment Methods cache</label>
+          <description lang="en">Caches the payment methods active in Adyen Customer Area for better performance.</description>
         </element>
         <element type="button">
             <name>testAPIconnection</name>
