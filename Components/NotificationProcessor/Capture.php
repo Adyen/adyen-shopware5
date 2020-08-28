@@ -2,6 +2,7 @@
 
 namespace AdyenPayment\Components\NotificationProcessor;
 
+use AdyenPayment\Models\PaymentInfo;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
@@ -11,6 +12,7 @@ use AdyenPayment\Models\Event;
 use AdyenPayment\Models\Notification;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
+use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Status;
 
 /**
@@ -33,9 +35,17 @@ class Capture implements NotificationProcessorInterface
      * @var PaymentStatusUpdate
      */
     private $paymentStatusUpdate;
+	/**
+	 * @var ModelManager
+	 */
+	private $modelManager;
+	/**
+	 * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+	 */
+	private $paymentInfoRepository;
 
 
-    /**
+	/**
      * Capture constructor.
      * @param LoggerInterface $logger
      * @param ContainerAwareEventManager $eventManager
@@ -44,12 +54,15 @@ class Capture implements NotificationProcessorInterface
     public function __construct(
         LoggerInterface $logger,
         ContainerAwareEventManager $eventManager,
-        PaymentStatusUpdate $paymentStatusUpdate
+        PaymentStatusUpdate $paymentStatusUpdate,
+		ModelManager $modelManager
     ) {
         $this->logger = $logger;
         $this->eventManager = $eventManager;
         $this->paymentStatusUpdate = $paymentStatusUpdate->setLogger($this->logger);
-    }
+		$this->modelManager = $modelManager;
+		$this->paymentInfoRepository = $modelManager->getRepository(PaymentInfo::class);
+	}
 
     /**
      * Returns boolean on whether this processor can process the Notification object
@@ -87,6 +100,15 @@ class Capture implements NotificationProcessorInterface
                 $order,
                 Status::PAYMENT_STATE_COMPLETELY_PAID
             );
+
+			/** @var PaymentInfo $paymentInfo */
+			$paymentInfo = $this->paymentInfoRepository->findOneBy([
+				'orderId' => $order->getId()
+			]);
+
+			$paymentInfo->setPspReference($notification->getPspReference());
+			$this->modelManager->persist($paymentInfo);
+			$this->modelManager->flush($paymentInfo);
         }
     }
 }
