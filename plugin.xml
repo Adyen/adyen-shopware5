@@ -18,9 +18,8 @@
 
     <changelog version="1.4.1">
         <changes>
-            <![CDATA[
-                <h4>Release 🎉</h4>
-            ]]>
+            <changes lang="de">1.4.1 release</changes>
+            <changes lang="en">1.4.1 release</changes>
         </changes>
     </changelog>
 </plugin>
