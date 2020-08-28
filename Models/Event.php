@@ -24,6 +24,7 @@ class Event
     const NOTIFICATION_PROCESS_CHARGEBACK = 'Adyen_Notification_Process_Chargeback';
     const NOTIFICATION_PROCESS_CHARGEBACK_REVERSED = 'Adyen_Notification_Process_ChargebackReversed';
 
+    const BASKET_RESTORE_FROM_ORDER = 'Adyen_Basket_RestoreFromOrder';
     const BASKET_BEFORE_PROCESS_ORDER_DETAIL = 'Adyen_Basket_Before_ProcessOrderDetail';
     const BASKET_STOPPED_PROCESS_ORDER_DETAIL = 'Adyen_Basket_Stopped_ProcessOrderDetail';
     const BASKET_AFTER_PROCESS_ORDER_DETAIL = 'Adyen_Basket_After_ProcessOrderDetail';
