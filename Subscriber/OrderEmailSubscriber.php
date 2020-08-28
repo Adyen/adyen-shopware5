@@ -17,78 +17,80 @@ use Shopware_Controllers_Frontend_Checkout;
 
 class OrderEmailSubscriber implements SubscriberInterface
 {
-	/**
-	 * @var ModelManager
-	 */
-	private $modelManager;
+    /**
+     * @var ModelManager
+     */
+    private $modelManager;
 
-	/**
-	 * @var ObjectRepository|EntityRepository
-	 */
-	private $paymentInfoRepository;
-	/**
-	 * @var OrderMailService
-	 */
-	private $orderMailService;
+    /**
+     * @var ObjectRepository|EntityRepository
+     */
+    private $paymentInfoRepository;
+    /**
+     * @var OrderMailService
+     */
+    private $orderMailService;
 
-	public function __construct(
-		ModelManager $modelManager,
-		OrderMailService $orderMailService
-	) {
-		$this->modelManager = $modelManager;
-		$this->paymentInfoRepository = $this->modelManager->getRepository(PaymentInfo::class);
-		$this->orderMailService = $orderMailService;
-	}
+    public function __construct(
+        ModelManager $modelManager,
+        OrderMailService $orderMailService
+    ) {
+        $this->modelManager = $modelManager;
+        $this->paymentInfoRepository = $this->modelManager->getRepository(PaymentInfo::class);
+        $this->orderMailService = $orderMailService;
+    }
 
-	public static function getSubscribedEvents()
-	{
-		return [
-			'Shopware_Modules_Order_SendMail_Send' => 'shouldStopEmailSending',
-			'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'onCheckoutDispatch'
-		];
-	}
+    public static function getSubscribedEvents()
+    {
+        return [
+            'Shopware_Modules_Order_SendMail_Send' => 'shouldStopEmailSending',
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'onCheckoutDispatch'
+        ];
+    }
 
-	public function shouldStopEmailSending(Enlight_Event_EventArgs $args) {
-		$orderId = $args->get('orderId');
-		$variables = $args->get('variables');
+    public function shouldStopEmailSending(Enlight_Event_EventArgs $args)
+    {
+        $orderId = $args->get('orderId');
+        $variables = $args->get('variables');
 
-		if ($variables['additional']['payment']['name'] === AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD &&
-			Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true) === false){
-			Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true);
+        if ($variables['additional']['payment']['name'] === AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD &&
+            Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true) === false) {
+            Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true);
 
-			/** @var PaymentInfo $paymentInfo */
-			$paymentInfo = $this->paymentInfoRepository->findOneBy([
-				'orderId' => $orderId
-			]);
+            /** @var PaymentInfo $paymentInfo */
+            $paymentInfo = $this->paymentInfoRepository->findOneBy([
+                'orderId' => $orderId
+            ]);
 
-			if ($paymentInfo && empty($paymentInfo->getOrdermailVariables())) {
-				$paymentInfo->setOrdermailVariables(json_encode($variables));
+            if ($paymentInfo && empty($paymentInfo->getOrdermailVariables())) {
+                $paymentInfo->setOrdermailVariables(json_encode($variables));
 
-				$this->modelManager->persist($paymentInfo);
-				$this->modelManager->flush($paymentInfo);
-			}
+                $this->modelManager->persist($paymentInfo);
+                $this->modelManager->flush($paymentInfo);
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public function onCheckoutDispatch(Enlight_Event_EventArgs $args) {
+    public function onCheckoutDispatch(Enlight_Event_EventArgs $args)
+    {
 
-		/** @var Shopware_Controllers_Frontend_Checkout $subject */
-		$subject = $args->getSubject();
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
+        $subject = $args->getSubject();
 
-		if ($subject->Request()->getActionName() !== 'finish') {
-			return;
-		}
+        if ($subject->Request()->getActionName() !== 'finish') {
+            return;
+        }
 
-		$data = $subject->View()->getAssign();
+        $data = $subject->View()->getAssign();
 
-		if (!$data['sOrderNumber']) {
-			return;
-		}
+        if (!$data['sOrderNumber']) {
+            return;
+        }
 
-		$this->orderMailService->sendOrderConfirmationMail($data['sOrderNumber']);
-	}
+        $this->orderMailService->sendOrderConfirmationMail($data['sOrderNumber']);
+    }
 }

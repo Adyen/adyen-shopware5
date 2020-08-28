@@ -37,7 +37,7 @@ class AdyenPayment extends Plugin
     const SESSION_ADYEN_PAYMENT = 'adyenPayment';
     const SESSION_ADYEN_PAYMENT_VALID = 'adyenPaymentValid';
     const SESSION_ADYEN_PAYMENT_DATA = 'adyenPaymentData';
-	const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
+    const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
 
     /**
      * @return bool
@@ -98,17 +98,17 @@ class AdyenPayment extends Plugin
     }
 
     public function update(UpdateContext $context)
-	{
-		$this->installAttributes();
+    {
+        $this->installAttributes();
 
-		$tool = new SchemaTool($this->container->get('models'));
-		$classes = $this->getModelMetaData();
-		$tool->updateSchema($classes, true);
+        $tool = new SchemaTool($this->container->get('models'));
+        $classes = $this->getModelMetaData();
+        $tool->updateSchema($classes, true);
 
-		parent::update($context);
-	}
+        parent::update($context);
+    }
 
-	/**
+    /**
      * @param UninstallContext $context
      * @throws Exception
      */

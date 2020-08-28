@@ -207,9 +207,9 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private function prepareOrder($transaction)
     {
-    	$signature = $this->persistBasket();
+        $signature = $this->persistBasket();
 
-    	Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, $transaction->getId());
+        Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, $transaction->getId());
 
         $orderNumber = $this->saveOrder(
             $transaction->getId(),
@@ -218,7 +218,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             false
         );
 
-		Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, false);
+        Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, false);
 
         /** @var Order $order */
         $order = $this->getModelManager()->getRepository(Order::class)->findOneBy([

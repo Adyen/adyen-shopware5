@@ -28,10 +28,10 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
      */
     private $basketService;
 
-	/**
-	 * @var \AdyenPayment\Components\OrderMailService
-	 */
-	private $orderMailService;
+    /**
+     * @var \AdyenPayment\Components\OrderMailService
+     */
+    private $orderMailService;
 
     /**
      * @var Logger
@@ -39,7 +39,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     private $logger;
 
 
-	/**
+    /**
      * Whitelist notifyAction
      */
     public function getWhitelistedCSRFActions()
@@ -51,8 +51,8 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     {
         $this->adyenManager = $this->get('adyen_payment.components.manager.adyen_manager');
         $this->adyenCheckout = $this->get('adyen_payment.components.adyen.payment.method');
-		$this->basketService = $this->get('adyen_payment.components.basket_service');
-		$this->orderMailService = $this->get('adyen_payment.components.order_mail_service');
+        $this->basketService = $this->get('adyen_payment.components.basket_service');
+        $this->orderMailService = $this->get('adyen_payment.components.order_mail_service');
         $this->logger = $this->get('adyen_payment.logger');
     }
 
@@ -70,12 +70,12 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
             $this->handleReturnResult($result);
 
             switch ($result['resultCode']) {
-				case PaymentResultCodes::AUTHORISED:
-				case PaymentResultCodes::PENDING:
-				case PaymentResultCodes::RECEIVED:
-					if (!empty($result['merchantReference'])) {
-						$this->orderMailService->sendOrderConfirmationMail($result['merchantReference']);
-					}
+                case PaymentResultCodes::AUTHORISED:
+                case PaymentResultCodes::PENDING:
+                case PaymentResultCodes::RECEIVED:
+                    if (!empty($result['merchantReference'])) {
+                        $this->orderMailService->sendOrderConfirmationMail($result['merchantReference']);
+                    }
                     $this->redirect([
                         'controller' => 'checkout',
                         'action' => 'finish',
