@@ -77,4 +77,25 @@ class NotificationManager
             return null;
         }
     }
+
+    /**
+     * @param string $pspReference
+     * @return mixed|null
+     * @throws NonUniqueResultException
+     */
+    public function getLastNotificationForPspReference(string $pspReference)
+    {
+        try {
+            $lastNotification = $this->notificationRepository->createQueryBuilder('n')
+                ->where('n.pspReference = :pspReference')
+                ->setMaxResults(1)
+                ->orderBy('n.createdAt', 'ASC')
+                ->setParameter('pspReference', $pspReference)
+                ->getQuery()
+                ->getSingleResult();
+            return $lastNotification;
+        } catch (NoResultException $ex) {
+            return null;
+        }
+    }
 }
