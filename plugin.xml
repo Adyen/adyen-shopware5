@@ -17,9 +17,7 @@
     <compatibility minVersion="5.6.0"/>
 
     <changelog version="1.4.1">
-        <changes>
-            <changes lang="de">1.4.1 release</changes>
-            <changes lang="en">1.4.1 release</changes>
-        </changes>
+        <changes lang="de">1.4.1 release</changes>
+        <changes lang="en">1.4.1 release</changes>
     </changelog>
 </plugin>
