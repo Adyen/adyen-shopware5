@@ -5,7 +5,7 @@
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
 
-    <version>1.4.1</version>
+    <version>1.5.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -19,5 +19,37 @@
     <changelog version="1.4.1">
         <changes lang="de">1.4.1 release</changes>
         <changes lang="en">1.4.1 release</changes>
+    </changelog>
+    <changelog version="1.5.0">
+        <changes lang="de">
+            Fixes:
+            Removed customer ID from shopperinfo payload
+            Changed order completed state
+            Improvements to error handling on test API button
+            Improve exception logging
+            Yandex logo
+            Refund using original PSP
+
+            Features:
+            offer_closed notification handling
+            Event for order restore
+            Payment methods cache
+            Live/Test config values
+        </changes>
+        <changes lang="en">
+            Fixes:
+            Removed customer ID from shopperinfo payload
+            Changed order completed state
+            Improvements to error handling on test API button
+            Improve exception logging
+            Yandex logo
+            Refund using original PSP
+
+            Features:
+            offer_closed notification handling
+            Event for order restore
+            Payment methods cache
+            Live/Test config values
+        </changes>
     </changelog>
 </plugin>
