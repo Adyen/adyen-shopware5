@@ -5,8 +5,10 @@ namespace AdyenPayment\Components\NotificationProcessor;
 use AdyenPayment\Components\PaymentStatusUpdate;
 use AdyenPayment\Models\Event;
 use AdyenPayment\Models\Notification;
+use AdyenPayment\Models\PaymentInfo;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
+use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Status;
 
 /**
@@ -29,6 +31,14 @@ class Authorisation implements NotificationProcessorInterface
      * @var PaymentStatusUpdate
      */
     private $paymentStatusUpdate;
+    /**
+     * @var ModelManager
+     */
+    private $modelManager;
+    /**
+     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     */
+    private $paymentInfoRepository;
 
     /**
      * Authorisation constructor.
@@ -39,11 +49,14 @@ class Authorisation implements NotificationProcessorInterface
     public function __construct(
         LoggerInterface $logger,
         ContainerAwareEventManager $eventManager,
-        PaymentStatusUpdate $paymentStatusUpdate
+        PaymentStatusUpdate $paymentStatusUpdate,
+        ModelManager $modelManager
     ) {
         $this->logger = $logger;
         $this->eventManager = $eventManager;
         $this->paymentStatusUpdate = $paymentStatusUpdate->setLogger($this->logger);
+        $this->modelManager = $modelManager;
+        $this->paymentInfoRepository = $modelManager->getRepository(PaymentInfo::class);
     }
 
     /**
@@ -78,9 +91,20 @@ class Authorisation implements NotificationProcessorInterface
         );
 
         $status = $notification->isSuccess() ?
-            Status::PAYMENT_STATE_THE_CREDIT_HAS_BEEN_ACCEPTED :
+            Status::PAYMENT_STATE_COMPLETELY_PAID :
             Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED;
 
         $this->paymentStatusUpdate->updatePaymentStatus($order, $status);
+
+        if ($notification->isSuccess()) {
+            /** @var PaymentInfo $paymentInfo */
+            $paymentInfo = $this->paymentInfoRepository->findOneBy([
+                'orderId' => $order->getId()
+            ]);
+
+            $paymentInfo->setPspReference($notification->getPspReference());
+            $this->modelManager->persist($paymentInfo);
+            $this->modelManager->flush($paymentInfo);
+        }
     }
 }

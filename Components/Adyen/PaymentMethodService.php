@@ -66,6 +66,7 @@ class PaymentMethodService
         $locale = null,
         $cache = true
     ): array {
+        $cache = $cache && $this->configuration->isPaymentmethodsCacheEnabled();
         $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string)$value ?? '');
         if ($cache && isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
@@ -88,7 +89,13 @@ class PaymentMethodService
         try {
             $paymentMethods = $checkout->paymentMethods($requestParams);
         } catch (AdyenException $e) {
-            $this->logger->critical($e);
+            $this->logger->critical('Adyen Exception', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'errorType' => $e->getErrorType(),
+                'status' => $e->getStatus()
+            ]);
             return [];
         }
 

@@ -10,7 +10,6 @@
             confirmFormSelector: '#confirm--form',
             mountRedirectSelector: '.is--act-confirm',
             adyenType: '',
-            adyen3ds2challengeimagesize: '',
             adyenGoogleConfig: {},
             adyenSetSession: {},
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
@@ -179,8 +178,7 @@
                     },
                 onError: function (error) {
                     console.log(error);
-                },
-                size: me.getThreeDS2ChallengeSize(),
+                }
                 })
                 .mount('#AdyenChallengeShopperThreeDS2');
         },
@@ -245,11 +243,6 @@
                 .catch(function (e) {
                     this.addAdyenError(me.opts.adyenSnippets.errorGooglePayNotAvailable);
                 });
-        },
-        getThreeDS2ChallengeSize: function () {
-            var me = this;
-
-            return '0' + me.opts.adyen3ds2challengeimagesize;
         },
         addAdyenError: function (message) {
             var me = this;

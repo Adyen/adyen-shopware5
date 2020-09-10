@@ -17,9 +17,11 @@ class BrowserInfoProvider implements PaymentPayloadProvider
      */
     public function provide(PaymentContext $context): array
     {
-        $browserInfo = [
-            'acceptHeader' => $_SERVER['HTTP_ACCEPT'] ?? '',
-        ];
+        $browserInfo = [];
+
+        if (!empty($_SERVER['HTTP_ACCEPT'])) {
+            $browserInfo['acceptHeader'] = $_SERVER['HTTP_ACCEPT'];
+        }
 
         return [
             'browserInfo' => array_merge($browserInfo, $context->getBrowserInfo()),

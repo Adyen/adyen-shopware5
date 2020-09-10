@@ -45,7 +45,11 @@ class ShopwareVersionCheck
                 list($composerVersion, $sha) = explode('@', Versions::getVersion('shopware/shopware'));
                 $version = $composerVersion;
             } catch (OutOfBoundsException $ex) {
-                $this->logger->error($ex);
+                $this->logger->error('OutOfBoundsException', [
+                    'message' => $ex->getMessage(),
+                    'file' => $ex->getFile(),
+                    'line' => $ex->getLine()
+                ]);
             }
         }
 

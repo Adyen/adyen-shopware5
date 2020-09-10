@@ -1,5 +1,7 @@
 <?php
 
+//phpcs:disable PSR1.Files.SideEffects
+
 namespace AdyenPayment;
 
 use Doctrine\Common\Cache\Cache;
@@ -40,7 +42,7 @@ class AdyenPayment extends Plugin
      */
     public static function isPackage(): bool
     {
-        return file_exists(self::getPackageVendorAutoload());
+        return file_exists(static::getPackageVendorAutoload());
     }
 
     /**
@@ -236,3 +238,4 @@ class AdyenPayment extends Plugin
 if (AdyenPayment::isPackage()) {
     require_once AdyenPayment::getPackageVendorAutoload();
 }
+//phpcs:enable PSR1.Files.SideEffects

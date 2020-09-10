@@ -21,6 +21,7 @@ use Shopware\Models\Order\Status;
 /**
  * Class Shopware_Controllers_Frontend_Adyen
  */
+//phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_Payment
 {
     /**
@@ -92,12 +93,17 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                     'content' => $paymentInfo
                 ]
             ));
-        } catch (\Adyen\AdyenException $e) {
-            $this->logger->debug($e);
+        } catch (\Adyen\AdyenException $ex) {
+            $this->logger->debug('AdyenException during doPayment', [
+                'message' => $ex->getMessage(),
+                'file' => $ex->getFile(),
+                'line' => $ex->getLine()
+            ]);
+
             $this->Response()->setBody(json_encode(
                 [
                     'status' => 'error',
-                    'content' => $e->getMessage()
+                    'content' => $ex->getMessage()
                 ]
             ));
         }

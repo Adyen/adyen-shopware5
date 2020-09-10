@@ -31,7 +31,7 @@ class ShopperInfoProvider implements PaymentPayloadProvider
             'billingAddress' => [
                 'city' => $context->getOrder()->getBilling()->getCity(),
                 'country' => $context->getOrder()->getBilling()->getCountry()->getIso(),
-                'houseNumberOrName' => $context->getOrder()->getBilling()->getNumber(),
+                'houseNumberOrName' => 'N/A',
                 'postalCode' => $context->getOrder()->getBilling()->getZipCode(),
                 'street' => $context->getOrder()->getBilling()->getStreet(),
             ],
