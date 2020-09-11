@@ -46,13 +46,18 @@ class Configuration
      * @param bool $shop
      * @return string
      */
-    public function getEnvironment($shop = false): string
+    public function getEnvironment($shop = false, $lowercase = false): string
     {
+        $environment = Environment::TEST;
         if ($this->getConfig('environment', $shop) === self::ENV_LIVE) {
-            return Environment::LIVE;
+            $environment = Environment::LIVE;
         }
 
-        return Environment::TEST;
+        if ($lowercase) {
+            return strtolower($environment);
+        }
+
+        return $environment;
     }
 
     /**
@@ -103,7 +108,10 @@ class Configuration
      */
     public function getApiKey($shop = false): string
     {
-        return (string)$this->getConfig('api_key', $shop);
+        return (string)$this->getConfig(
+            'api_key_' . $this->getEnvironment($shop, true),
+            $shop
+        );
     }
 
     /**
@@ -130,7 +138,10 @@ class Configuration
      */
     public function getNotificationHmac($shop = false): string
     {
-        return (string)$this->getConfig('notification_hmac', $shop);
+        return (string)$this->getConfig(
+            'notification_hmac_' . $this->getEnvironment($shop, true),
+            $shop
+        );
     }
 
     /**
@@ -139,7 +150,10 @@ class Configuration
      */
     public function getNotificationAuthUsername($shop = false): string
     {
-        return (string)$this->getConfig('notification_auth_username', $shop);
+        return (string)$this->getConfig(
+            'notification_auth_username_' . $this->getEnvironment($shop, true),
+            $shop
+        );
     }
 
     /**
@@ -148,7 +162,10 @@ class Configuration
      */
     public function getNotificationAuthPassword($shop = false): string
     {
-        return (string)$this->getConfig('notification_auth_password', $shop);
+        return (string)$this->getConfig(
+            'notification_auth_password_' . $this->getEnvironment($shop, true),
+            $shop
+        );
     }
 
     /**

@@ -118,6 +118,11 @@ class BasketService
         foreach ($orderDetails as $orderDetail) {
             $this->processOrderDetail($order, $orderDetail);
         }
+
+        $this->events->notify(Event::BASKET_RESTORE_FROM_ORDER, [
+            'order' => $order
+        ]);
+
         $this->sBasket->sRefreshBasket();
     }
 

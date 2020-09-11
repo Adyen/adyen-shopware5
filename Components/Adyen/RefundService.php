@@ -7,6 +7,7 @@ namespace AdyenPayment\Components\Adyen;
 use Adyen\AdyenException;
 use Adyen\Service\Modification;
 use AdyenPayment\Components\NotificationManager;
+use AdyenPayment\Models\PaymentInfo;
 use AdyenPayment\Models\Refund;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
@@ -27,6 +28,10 @@ class RefundService
      * @var NotificationManager
      */
     private $notificationManager;
+    /**
+     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     */
+    private $paymentInfoRepository;
 
     /**
      * PaymentMethodService constructor.
@@ -42,6 +47,7 @@ class RefundService
         $this->apiFactory = $apiFactory;
         $this->modelManager = $modelManager;
         $this->notificationManager = $notificationManager;
+        $this->paymentInfoRepository = $modelManager->getRepository(PaymentInfo::class);
     }
 
     /**
@@ -53,11 +59,23 @@ class RefundService
      */
     public function doRefund(int $orderId): Refund
     {
+        /** @var Order $order */
         $order = $this->modelManager->find(Order::class, $orderId);
         $apiClient = $this->apiFactory->create($order->getShop());
         $modification = new Modification($apiClient);
 
-        $notification = $this->notificationManager->getLastNotificationForOrderId($orderId);
+        /** @var PaymentInfo $paymentInfo */
+        $paymentInfo = $this->paymentInfoRepository->findOneBy([
+            'orderId' => $orderId
+        ]);
+
+        if ($paymentInfo && !empty($paymentInfo->getPspReference())) {
+            $notification = $this->notificationManager->getLastNotificationForPspReference(
+                $paymentInfo->getPspReference()
+            );
+        } else {
+            $notification = $this->notificationManager->getLastNotificationForOrderId($orderId);
+        }
 
         $request = [
             'originalReference' => $notification->getPspReference(),
