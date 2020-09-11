@@ -1,5 +1,6 @@
 <?php
 
+use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\BasketService;
 use AdyenPayment\Components\Calculator\PriceCalculationService;
@@ -199,7 +200,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     }
 
     /**
-     * @param $transaction
+     * @param PaymentInfo $transaction
      * @return Order
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -208,12 +209,16 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     {
         $signature = $this->persistBasket();
 
+        Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, $transaction->getId());
+
         $orderNumber = $this->saveOrder(
             $transaction->getId(),
             $signature,
             Status::PAYMENT_STATE_OPEN,
             false
         );
+
+        Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, false);
 
         /** @var Order $order */
         $order = $this->getModelManager()->getRepository(Order::class)->findOneBy([

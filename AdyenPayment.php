@@ -18,6 +18,7 @@ use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
+use Shopware\Components\Plugin\Context\UpdateContext;
 use Shopware\Components\Plugin\PaymentInstaller;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -36,6 +37,7 @@ class AdyenPayment extends Plugin
     const SESSION_ADYEN_PAYMENT = 'adyenPayment';
     const SESSION_ADYEN_PAYMENT_VALID = 'adyenPaymentValid';
     const SESSION_ADYEN_PAYMENT_DATA = 'adyenPaymentData';
+    const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
 
     /**
      * @return bool
@@ -93,6 +95,17 @@ class AdyenPayment extends Plugin
         $tool = new SchemaTool($this->container->get('models'));
         $classes = $this->getModelMetaData();
         $tool->updateSchema($classes, true);
+    }
+
+    public function update(UpdateContext $context)
+    {
+        $this->installAttributes();
+
+        $tool = new SchemaTool($this->container->get('models'));
+        $classes = $this->getModelMetaData();
+        $tool->updateSchema($classes, true);
+
+        parent::update($context);
     }
 
     /**
