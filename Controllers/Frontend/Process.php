@@ -29,9 +29,15 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     private $basketService;
 
     /**
+     * @var \AdyenPayment\Components\OrderMailService
+     */
+    private $orderMailService;
+
+    /**
      * @var Logger
      */
     private $logger;
+
 
     /**
      * Whitelist notifyAction
@@ -41,12 +47,12 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         return ['return'];
     }
 
-
     public function preDispatch()
     {
         $this->adyenManager = $this->get('adyen_payment.components.manager.adyen_manager');
         $this->adyenCheckout = $this->get('adyen_payment.components.adyen.payment.method');
         $this->basketService = $this->get('adyen_payment.components.basket_service');
+        $this->orderMailService = $this->get('adyen_payment.components.order_mail_service');
         $this->logger = $this->get('adyen_payment.logger');
     }
 
@@ -67,6 +73,9 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                 case PaymentResultCodes::AUTHORISED:
                 case PaymentResultCodes::PENDING:
                 case PaymentResultCodes::RECEIVED:
+                    if (!empty($result['merchantReference'])) {
+                        $this->orderMailService->sendOrderConfirmationMail($result['merchantReference']);
+                    }
                     $this->redirect([
                         'controller' => 'checkout',
                         'action' => 'finish',
