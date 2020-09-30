@@ -51,4 +51,20 @@
             Live/Test config values
         </changes>
     </changelog>
+    <changelog version="1.5.1">
+        <changes lang="de">
+            Fixes:
+            Only send mail after successful payment
+            Adding N/A to houseNumberOrName
+            Cronjobs not running fix
+            Add redirect data to payments request
+        </changes>
+        <changes lang="en">
+            Fixes:
+            Only send mail after successful payment
+            Adding N/A to houseNumberOrName
+            Cronjobs not running fix
+            Add redirect data to payments request
+        </changes>
+    </changelog>
 </plugin>
