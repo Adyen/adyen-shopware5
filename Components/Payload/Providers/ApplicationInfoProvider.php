@@ -49,8 +49,10 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
                 'executeThreeD' => true,
                 'allow3DS2' => true,
             ],
-            "channel" => Channel::WEB,
+            'channel' => Channel::WEB,
             'origin' => $context->getOrigin(),
+            'redirectFromIssuerMethod' => 'GET',
+            'redirectToIssuerMethod' => 'POST',
             'returnUrl' => $returnUrl,
             'merchantAccount' => $this->configuration->getMerchantAccount(),
             'applicationInfo' => [
