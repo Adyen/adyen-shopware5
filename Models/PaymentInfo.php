@@ -59,8 +59,12 @@ class PaymentInfo extends ModelEntity
     private $resultCode;
 
     /**
-     * PaymenntInfo constructor
+     * @var string
+     *
+     * @ORM\Column(name="ordermail_variables", type="text", nullable=true)
      */
+    private $ordermailVariables;
+
     public function __construct()
     {
         $this->setCreatedAt(new \DateTime('now'));
@@ -193,6 +197,24 @@ class PaymentInfo extends ModelEntity
     public function setResultCode(string $resultCode)
     {
         $this->resultCode = $resultCode;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOrdermailVariables()
+    {
+        return $this->ordermailVariables;
+    }
+
+    /**
+     * @param string|null $ordermailVariables
+     * @return $this
+     */
+    public function setOrdermailVariables($ordermailVariables)
+    {
+        $this->ordermailVariables = $ordermailVariables;
         return $this;
     }
 }

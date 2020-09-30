@@ -19,6 +19,10 @@
             <argument type="service" id="shopware.plugin.cached_config_reader"/>
             <argument type="service" id="dbal_connection"/>
         </service>
+        <service id="adyen_payment.components.order_mail_service" class="AdyenPayment\Components\OrderMailService">
+            <argument type="service" id="models"/>
+            <argument type="service" id="adyen_payment.components.basket_service"/>
+        </service>
         <service id="adyen_payment.components.adyen.apifactory" class="AdyenPayment\Components\Adyen\ApiFactory">
             <argument type="service" id="models"/>
             <argument type="service" id="adyen_payment.components.configuration"/>
@@ -80,6 +84,7 @@
             <argument type="service" id="adyen_payment.logger.notifications"/>
             <argument type="service" id="events"/>
             <argument type="service" id="adyen_payment.components.payment_status_update"/>
+            <argument type="service" id="models"/>
         </service>
         <service id="adyen_payment.components.notification_processor.cancellation"
                  class="AdyenPayment\Components\NotificationProcessor\Cancellation">
@@ -94,6 +99,7 @@
             <argument type="service" id="adyen_payment.logger.notifications"/>
             <argument type="service" id="events"/>
             <argument type="service" id="adyen_payment.components.payment_status_update"/>
+            <argument type="service" id="models"/>
         </service>
         <service id="adyen_payment.components.notification_processor.capture_failed"
                  class="AdyenPayment\Components\NotificationProcessor\CaptureFailed">

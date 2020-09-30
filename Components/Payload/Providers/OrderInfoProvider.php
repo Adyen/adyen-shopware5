@@ -23,8 +23,8 @@ class OrderInfoProvider implements PaymentPayloadProvider
 
         return [
             'amount' => [
-                "currency" => $currencyCode,
-                "value" => $adyenCurrency->sanitize($context->getOrder()->getInvoiceAmount(), $currencyCode),
+                'currency' => $currencyCode,
+                'value' => $adyenCurrency->sanitize($context->getOrder()->getInvoiceAmount(), $currencyCode),
             ],
             'reference' => $context->getOrder()->getNumber(),
         ];
