@@ -61,6 +61,10 @@
              * @type {String}
              */
             paymentMethodFormSubmitSelector: 'button[type=submit]',
+            /**
+             * @type {string} the group name of Gift card types
+             */
+            giftCardGroupName: 'Gift Card',
         },
 
         currentSelectedPaymentId: '',
@@ -161,14 +165,18 @@
         handleComponent: function (type) {
             var me = this;
 
-            switch (type) {
-                case 'paywithgoogle':
-                    me.handleComponentPayWithGoogle(type);
-                    break;
-                default:
-                    me.handleComponentGeneral(type);
-                    break;
+            if (me.__isGiftCardType(type)) {
+                me.handleComponentGeneral(type);
+                // me.handleGiftCard(type);
+                return;
             }
+
+            if ('paywithgoogle' === type) {
+                me.handleComponentPayWithGoogle(type);
+                return;
+            }
+
+            me.handleComponentGeneral(type);
         },
         handleComponentGeneral: function (type) {
             var me = this;
@@ -293,6 +301,18 @@
             };
 
             me.sessionStorage.setItem(me.adyenConfigSession, JSON.stringify(data));
+        },
+        /**
+         * @param {string} type
+         * @return {boolean}
+         * @private
+         */
+        __isGiftCardType(type) {
+            const giftCardGroup = this.opts.adyenPaymentMethodsResponse['groups']?.find(
+                group => this.defaults.giftCardGroupName === group['name']
+            ) ?? {};
+
+            return (giftCardGroup['types'] ?? []).includes(type);
         },
     });
 
