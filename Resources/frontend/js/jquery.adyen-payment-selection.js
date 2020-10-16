@@ -166,8 +166,7 @@
             var me = this;
 
             if (me.__isGiftCardType(type)) {
-                me.handleComponentGeneral(type);
-                // me.handleGiftCard(type);
+                me.handleGiftCardComponent(type);
                 return;
             }
 
@@ -185,6 +184,15 @@
         handleComponentPayWithGoogle: function (type) {
             var me = this;
             $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
+        },
+        handleGiftCardComponent: function (giftCardType) {
+            const me = this;
+            me.adyenCheckout
+                .create('giftcard', {
+                    type: giftCardType,
+                    pinRequired: true   // @todo: get setting from giftcard data
+                })
+                .mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleOnChange: function (state) {
             var me = this;
@@ -303,16 +311,16 @@
             me.sessionStorage.setItem(me.adyenConfigSession, JSON.stringify(data));
         },
         /**
-         * @param {string} type
+         * @param {string} paymentType
          * @return {boolean}
          * @private
          */
-        __isGiftCardType(type) {
+        __isGiftCardType(paymentType) {
             const giftCardGroup = this.opts.adyenPaymentMethodsResponse['groups']?.find(
                 group => this.defaults.giftCardGroupName === group['name']
             ) ?? {};
 
-            return (giftCardGroup['types'] ?? []).includes(type);
+            return (giftCardGroup['types'] ?? []).includes(paymentType);
         },
     });
 
