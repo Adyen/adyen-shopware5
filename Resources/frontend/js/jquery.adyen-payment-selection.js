@@ -157,6 +157,17 @@
                 return paymentMethod.type === pmType
             });
         },
+        /**
+         * @param {String} paymentType
+         * @param {String} detailKey
+         * @return {({} | null)}
+         * @private
+         */
+        __retrievePaymentMethodDetailByKey(paymentType, detailKey) {
+            const me = this;
+            return me.getPaymentMethodByType(paymentType)?.details
+                ?.find(detail => detail.key === detailKey);
+        },
         setCheckout: function () {
             var me = this;
 
@@ -187,10 +198,12 @@
         },
         handleGiftCardComponent: function (giftCardType) {
             const me = this;
+            const pinRequiredDetail = me.__retrievePaymentMethodDetailByKey(giftCardType, 'encryptedSecurityCode');
+
             me.adyenCheckout
                 .create('giftcard', {
                     type: giftCardType,
-                    pinRequired: true   // @todo: get setting from giftcard data
+                    pinRequired: false === pinRequiredDetail?.optional
                 })
                 .mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
