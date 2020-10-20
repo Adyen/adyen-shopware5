@@ -25,6 +25,7 @@ class OrderMailService
 
     /**
      * Sends the mail after a payment is confirmed
+     * @param string|int $orderNumber
      */
     public function sendOrderConfirmationMail($orderNumber)
     {
