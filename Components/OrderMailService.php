@@ -25,8 +25,7 @@ class OrderMailService
 
     /**
      * Sends the mail after a payment is confirmed
-     *
-     * @param \Shopware\Models\Order\Order $order
+     * @param string|int $orderNumber
      */
     public function sendOrderConfirmationMail($orderNumber)
     {

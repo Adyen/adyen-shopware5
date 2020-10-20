@@ -209,7 +209,10 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     {
         $signature = $this->persistBasket();
 
-        Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, $transaction->getId());
+        Shopware()->Session()->offsetSet(
+            AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS,
+            (bool) (0 < $transaction->getId())
+        );
 
         $orderNumber = $this->saveOrder(
             $transaction->getId(),
