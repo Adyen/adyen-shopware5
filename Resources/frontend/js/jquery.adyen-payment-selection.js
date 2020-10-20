@@ -61,6 +61,10 @@
              * @type {String}
              */
             paymentMethodFormSubmitSelector: 'button[type=submit]',
+            /**
+             * @type {string} the group name of Gift card types
+             */
+            giftCardGroupName: 'Gift Card',
         },
 
         currentSelectedPaymentId: '',
@@ -153,6 +157,17 @@
                 return paymentMethod.type === pmType
             });
         },
+        /**
+         * @param {String} paymentType
+         * @param {String} detailKey
+         * @return {({} | null)}
+         * @private
+         */
+        __retrievePaymentMethodDetailByKey(paymentType, detailKey) {
+            const me = this;
+            return me.getPaymentMethodByType(paymentType)?.details
+                ?.find(detail => detail.key === detailKey);
+        },
         setCheckout: function () {
             var me = this;
 
@@ -161,14 +176,17 @@
         handleComponent: function (type) {
             var me = this;
 
-            switch (type) {
-                case 'paywithgoogle':
-                    me.handleComponentPayWithGoogle(type);
-                    break;
-                default:
-                    me.handleComponentGeneral(type);
-                    break;
+            if (me.__isGiftCardType(type)) {
+                me.handleGiftCardComponent(type);
+                return;
             }
+
+            if ('paywithgoogle' === type) {
+                me.handleComponentPayWithGoogle(type);
+                return;
+            }
+
+            me.handleComponentGeneral(type);
         },
         handleComponentGeneral: function (type) {
             var me = this;
@@ -177,6 +195,17 @@
         handleComponentPayWithGoogle: function (type) {
             var me = this;
             $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
+        },
+        handleGiftCardComponent: function (giftCardType) {
+            const me = this;
+            const pinRequiredDetail = me.__retrievePaymentMethodDetailByKey(giftCardType, 'encryptedSecurityCode');
+
+            me.adyenCheckout
+                .create('giftcard', {
+                    type: giftCardType,
+                    pinRequired: false === pinRequiredDetail?.optional
+                })
+                .mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleOnChange: function (state) {
             var me = this;
@@ -293,6 +322,18 @@
             };
 
             me.sessionStorage.setItem(me.adyenConfigSession, JSON.stringify(data));
+        },
+        /**
+         * @param {string} paymentType
+         * @return {boolean}
+         * @private
+         */
+        __isGiftCardType(paymentType) {
+            const giftCardGroup = this.opts.adyenPaymentMethodsResponse['groups']?.find(
+                group => this.defaults.giftCardGroupName === group['name']
+            ) ?? {};
+
+            return (giftCardGroup['types'] ?? []).includes(paymentType);
         },
     });
 
