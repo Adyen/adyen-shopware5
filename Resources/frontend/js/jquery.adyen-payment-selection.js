@@ -100,7 +100,7 @@
                 return false;
             }
         },
-        onPaymentChangedBefore: function ($event) {
+        onPaymentChangedBefore: function (event) {
             var me = this;
 
             me.currentSelectedPaymentId = event.target.id;
@@ -190,7 +190,12 @@
         },
         handleComponentGeneral: function (type) {
             var me = this;
-            me.adyenCheckout.create(type).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
+            const supportsRecurring = me.getPaymentMethodByType(type)?.supportsRecurring || false;
+
+            me.adyenCheckout.create(type, {
+                enableStoreDetails: true,  // se-remove die()
+                // enableStoreDetails: supportsRecurring, // se-remove die()
+            }).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleComponentPayWithGoogle: function (type) {
             var me = this;

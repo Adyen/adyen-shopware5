@@ -13,6 +13,7 @@ use AdyenPayment\Components\Payload\Providers\BrowserInfoProvider;
 use AdyenPayment\Components\Payload\Providers\LineItemsInfoProvider;
 use AdyenPayment\Components\Payload\Providers\OrderInfoProvider;
 use AdyenPayment\Components\Payload\Providers\PaymentMethodProvider;
+use AdyenPayment\Components\Payload\Providers\RecurringPaymentProvider;
 use AdyenPayment\Components\Payload\Providers\ShopperInfoProvider;
 use AdyenPayment\Models\PaymentInfo;
 use Shopware\Components\Logger;
@@ -78,7 +79,8 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             new OrderInfoProvider(),
             new PaymentMethodProvider(),
             new LineItemsInfoProvider($this->priceCalculationService),
-            new BrowserInfoProvider()
+            new BrowserInfoProvider(),
+            new RecurringPaymentProvider()
         );
 
         try {

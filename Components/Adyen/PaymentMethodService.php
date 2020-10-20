@@ -8,7 +8,11 @@ use Adyen\Service\Checkout;
 use Adyen\Util\Currency;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Models\Enum\Channel;
+use Enlight_Components_Session_Namespace;
 use Psr\Log\LoggerInterface;
+use Shopware\Components\Model\ModelManager;
+use Shopware\Models\Customer\Customer;
+use Shopware\Models\Customer\Repository;
 
 /**
  * Class PaymentMethodService
@@ -34,21 +38,27 @@ class PaymentMethodService
      * @var LoggerInterface
      */
     private $logger;
-
     /**
-     * PaymentMethodService constructor.
-     * @param ApiFactory $apiFactory
-     * @param Configuration $configuration
-     * @throws AdyenException
+     * @var Enlight_Components_Session_Namespace
      */
+    private $session;
+    /**
+     * @var ModelManager
+     */
+    private $modelManager;
+
     public function __construct(
         ApiFactory $apiFactory,
         Configuration $configuration,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Enlight_Components_Session_Namespace $session,
+        ModelManager $modelManager
     ) {
         $this->apiClient = $apiFactory->create();
         $this->configuration = $configuration;
         $this->logger = $logger;
+        $this->session = $session;
+        $this->modelManager = $modelManager;
     }
 
     /**
@@ -84,6 +94,7 @@ class PaymentMethodService
             ],
             'channel' => Channel::WEB,
             'shopperLocale' => $locale ?? Shopware()->Shop()->getLocale()->getLocale(),
+            'shopperReference' => $this->provideCustomerNumber()
         ];
 
         try {
@@ -122,5 +133,16 @@ class PaymentMethodService
     public function getCheckout()
     {
         return new Checkout($this->apiClient);
+    }
+
+    private function provideCustomerNumber(): string
+    {
+        $userId = $this->session->get('sUserId');
+        if (!$userId) {
+            return '';
+        }
+        $customer = $this->modelManager->getRepository(Customer::class)->find($userId);
+
+        return $customer ? (string) $customer->getNumber() : '';
     }
 }
