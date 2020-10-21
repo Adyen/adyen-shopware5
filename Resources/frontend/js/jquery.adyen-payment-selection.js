@@ -192,9 +192,10 @@
             var me = this;
             const supportsRecurring = me.getPaymentMethodByType(type)?.supportsRecurring || false;
 
+            // se-remove die(): update this
             me.adyenCheckout.create(type, {
-                enableStoreDetails: true,  // se-remove die()
-                // enableStoreDetails: supportsRecurring, // se-remove die()
+                enableStoreDetails: true,  // @todo remove (awaiting Adyen for enable test account)
+                // enableStoreDetails: supportsRecurring, // @todo this line on data from Adyen
             }).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleComponentPayWithGoogle: function (type) {
