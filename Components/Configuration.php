@@ -86,7 +86,7 @@ class Configuration
     public function getConfig($key = null, $shop = false)
     {
         if (!$shop) {
-            $shop = null;
+            $shop = Shopware()->Shop();
         }
 
         $config = $this->cachedConfigReader->getByPluginName(AdyenPayment::NAME, $shop);
