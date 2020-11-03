@@ -10,6 +10,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Make sure we are using composer v1
+        run: sudo composer self-update --1 && sudo chown $USER $HOME/.composer
+
       - name: Validate composer.json and composer.lock
         run: composer validate
 
