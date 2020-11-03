@@ -186,7 +186,7 @@
 
         handlePaymentDataRedirectShopper: function (data) {
             const me = this;
-            if (['redirect', 'qrCode'].includes(data.action.type)) {
+            if ('redirect' === data.action.type || 'qrCode' === data.action.type) {
                 me.adyenCheckout
                     .createFromAction(data.action)
                     .mount(me.opts.mountRedirectSelector);
