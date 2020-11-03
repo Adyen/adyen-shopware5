@@ -13,18 +13,26 @@ class RecurringPaymentProvider implements PaymentPayloadProvider
     public function provide(PaymentContext $context): array
     {
         $paymentInfo = $context->getPaymentInfo();
+        // se-remove die(): to verify once payments are approved and recurring cards are shown in the payments list
         $storedPaymentMethodId = $paymentInfo['storedPaymentMethodId'] ?? null;
+        $recurringProcessingModel = $paymentInfo['recurringProcessingModel'] ?? null; // "Subscription" or "CardOnFile"
         $storeDetails = (bool) ($paymentInfo['storeDetails'] ?? false);
+
+        // se-remove die()
+        echo '<pre>SE-DEBUG: ',print_r([
+            '$storedPaymentMethodId' => $storedPaymentMethodId,
+            '$recurringProcessingModel' => $recurringProcessingModel,
+            '$storeDetails' => $storeDetails,
+        ], true),'</pre>';die('DIE after print');
 
         if (!$storeDetails && !$storedPaymentMethodId) {
             return [];
         }
 
-        // se-remove die(): update this
         // selected stored payment
         if ($storedPaymentMethodId) {
             return [
-                'recurringProcessingModel' => $paymentInfo[''], // @todo get from data "Subscription" or "CardOnFile"
+                'recurringProcessingModel' => $recurringProcessingModel,
                 'shopperInteraction' => 'ContAuth',
             ];
         }
@@ -32,7 +40,7 @@ class RecurringPaymentProvider implements PaymentPayloadProvider
         // new payment to store
         return [
             'storePaymentMethod' => true,
-            'recurringProcessingModel' => $context->getPaymentInfo()[''], // @todo  "Subscription" or "CardOnFile"
+            'recurringProcessingModel' => $recurringProcessingModel,
             'shopperInteraction' => 'Ecommerce',
         ];
     }
