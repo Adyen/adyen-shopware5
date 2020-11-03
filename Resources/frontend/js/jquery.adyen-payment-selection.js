@@ -100,7 +100,7 @@
                 return false;
             }
         },
-        onPaymentChangedBefore: function (event) {
+        onPaymentChangedBefore: function ($event) {
             var me = this;
 
             me.currentSelectedPaymentId = event.target.id;
@@ -165,8 +165,10 @@
          */
         __retrievePaymentMethodDetailByKey(paymentType, detailKey) {
             const me = this;
-            return me.getPaymentMethodByType(paymentType)?.details
-                ?.find(detail => detail.key === detailKey);
+            const paymentMethod = me.getPaymentMethodByType(paymentType) || {};
+            const details = (paymentMethod && paymentMethod.details) || [];
+
+            return details.find(detail => detail.key === detailKey);
         },
         setCheckout: function () {
             var me = this;
@@ -190,12 +192,10 @@
         },
         handleComponentGeneral: function (type) {
             var me = this;
-            const supportsRecurring = me.getPaymentMethodByType(type)?.supportsRecurring || false;
+            const paymentMethod = me.getPaymentMethodByType(type) || {};
 
-            // se-remove die(): update this
             me.adyenCheckout.create(type, {
-                enableStoreDetails: true,  // @todo remove (awaiting Adyen for enable test account)
-                // enableStoreDetails: supportsRecurring, // @todo this line on data from Adyen
+                enableStoreDetails: paymentMethod.supportsRecurring || false,
             }).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleComponentPayWithGoogle: function (type) {
@@ -209,7 +209,7 @@
             me.adyenCheckout
                 .create('giftcard', {
                     type: giftCardType,
-                    pinRequired: false === pinRequiredDetail?.optional
+                    pinRequired: false === pinRequiredDetail.optional || false
                 })
                 .mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
@@ -335,11 +335,13 @@
          * @private
          */
         __isGiftCardType(paymentType) {
-            const giftCardGroup = this.opts.adyenPaymentMethodsResponse['groups']?.find(
+            const paymentGroups = this.opts.adyenPaymentMethodsResponse['groups'] || [];
+            const giftCardGroup = paymentGroups.find(
                 group => this.defaults.giftCardGroupName === group['name']
-            ) ?? {};
+            );
+            const giftCardGroupTypes = (giftCardGroup && giftCardGroup['types']) || [];
 
-            return (giftCardGroup['types'] ?? []).includes(paymentType);
+            return giftCardGroupTypes.includes(paymentType);
         },
     });
 
