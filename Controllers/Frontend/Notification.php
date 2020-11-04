@@ -22,11 +22,11 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
     private $incomingNotificationsManager;
 
     /**
-     * POST: /notification
+     * POST: /notification/adyen
      * @throws Enlight_Event_Exception
      * @throws AdyenException
      */
-    public function indexAction()
+    public function adyenAction()
     {
         if (!$this->checkAuthentication()) {
             $this->View()->assign('[Invalid or missing auth]');
@@ -109,7 +109,7 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
      */
     public function getWhitelistedCSRFActions()
     {
-        return ['index'];
+        return ['adyen'];
     }
 
     /**
