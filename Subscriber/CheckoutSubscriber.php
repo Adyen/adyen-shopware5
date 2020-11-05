@@ -136,11 +136,20 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     public function checkoutFrontendPostDispatch(Enlight_Event_EventArgs $args)
     {
+        $subject = $args->getSubject();
+
         $this->checkFirstCheckoutStep($args);
         $this->rewritePaymentData($args);
         $this->addAdyenConfigOnShipping($args);
-        $this->addAdyenSnippets($args);
         $this->addAdyenGooglePay($args);
+
+        if (in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
+            $this->addPaymentSnippets($args);
+        }
+
+        if (in_array($subject->Request()->getActionName(), ['confirm'])) {
+            $this->addConfirmSnippets($args);
+        }
     }
 
     /**
@@ -220,14 +229,10 @@ class CheckoutSubscriber implements SubscriberInterface
     /**
      * @param Enlight_Event_EventArgs $args
      */
-    private function addAdyenSnippets(Enlight_Event_EventArgs $args)
+    private function addConfirmSnippets(Enlight_Event_EventArgs $args)
     {
         /** @var Shopware_Controllers_Frontend_Checkout $subject */
         $subject = $args->getSubject();
-
-        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
-            return;
-        }
 
         $errorSnippets = $this->snippets->getNamespace('adyen/checkout/error');
 
@@ -255,6 +260,26 @@ class CheckoutSubscriber implements SubscriberInterface
         $snippets['errorTransactionNoSession'] = $errorSnippets->get(
             'errorTransactionNoSession',
             'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
+            true
+        );
+
+        $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
+    }
+
+    /**
+     * @param Enlight_Event_EventArgs $args
+     */
+    private function addPaymentSnippets(Enlight_Event_EventArgs $args)
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $subject */
+        $subject = $args->getSubject();
+
+        $paymentSnippets = $this->snippets->getNamespace('adyen/checkout/payment');
+
+        $snippets = [];
+        $snippets['updatePaymentInformation'] = $paymentSnippets->get(
+            'updatePaymentInformation',
+            'Update your payment information',
             true
         );
 

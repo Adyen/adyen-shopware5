@@ -40,12 +40,6 @@
              */
             paymentMethodSelector: '.payment--method',
             /**
-             * Selector for the payment method label wrapper.
-             *
-             * @type {String}
-             */
-            methodLabelSelector: '.method--label',
-            /**
              * Selector for the payment method component wrapper.
              *
              * @type {String}
@@ -65,6 +59,12 @@
              * @type {string} the group name of Gift card types
              */
             giftCardGroupName: 'Gift Card',
+            /**
+             * @type {string} Snippets associated with the payment page
+             */
+            adyenSnippets: {
+                updatePaymentInformation: 'Update your payment information'
+            }
         },
 
         currentSelectedPaymentId: '',
@@ -254,9 +254,9 @@
 
             me.changeInfosButton = $('<a/>')
                 .addClass(me.opts.classChangePaymentInfo)
-                .html('Update your payment information')
+                .html(me.opts.adyenSnippets.updatePaymentInformation)
                 .on('click', $.proxy(me.updatePaymentInfo, me));
-            paymentMethodContainer.find(me.opts.methodLabelSelector).append(me.changeInfosButton);
+            paymentMethodContainer.find(me.opts.methodBankdataSelector).append(me.changeInfosButton);
         },
         isPaymentMethodValid: function (paymentMethod) {
             var me = this;
