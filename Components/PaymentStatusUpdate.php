@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Components;
 
+use AdyenPayment\Models\Event;
 use Psr\Log\LoggerInterface;
+use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
 use Shopware\Models\Order\Status;
@@ -22,13 +24,21 @@ class PaymentStatusUpdate
     private $logger;
 
     /**
+     * @var ContainerAwareEventManager
+     */
+    private $eventManager;
+
+    /**
      * PaymentStatusUpdate constructor.
      * @param ModelManager $modelManager
+     * @param ContainerAwareEventManager $eventManager
      */
     public function __construct(
-        ModelManager $modelManager
+        ModelManager $modelManager,
+        ContainerAwareEventManager $eventManager
     ) {
         $this->modelManager = $modelManager;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -49,6 +59,14 @@ class PaymentStatusUpdate
                 'newStatus' => $orderStatus->getName()
             ]);
         }
+
+        $this->eventManager->notify(
+            Event::ORDER_STATUS_CHANGED,
+            [
+                'order' => $order,
+                'newStatus' => $orderStatus
+            ]
+        );
 
         $order->setOrderStatus($orderStatus);
         $this->modelManager->persist($order);
@@ -73,6 +91,14 @@ class PaymentStatusUpdate
                 'newStatus' => $paymentStatus->getName()
             ]);
         }
+
+        $this->eventManager->notify(
+            Event::ORDER_PAYMENT_STATUS_CHANGED,
+            [
+                'order' => $order,
+                'newStatus' => $paymentStatus
+            ]
+        );
 
         $order->setPaymentStatus($paymentStatus);
         $this->modelManager->persist($order);
