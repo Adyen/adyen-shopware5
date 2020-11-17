@@ -54,7 +54,7 @@
              *
              * @type {String}
              */
-            paymentMethodFormSubmitSelector: 'button[type=submit]',
+            paymentMethodFormSubmitSelector: '#shippingPaymentForm button[type=submit]',
             /**
              * @type {string} the group name of Gift card types
              */
