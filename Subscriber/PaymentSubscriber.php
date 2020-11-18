@@ -97,11 +97,23 @@ class PaymentSubscriber implements SubscriberInterface
         }
 
         $adyenMethods['paymentMethods'] = array_reverse($adyenMethods['paymentMethods']);
+//        $shopwareMethods = $this->addPaymentMethods($shopwareMethods, $adyenMethods['paymentMethods']);
+//        $shopwareMethods = $this->addPaymentMethods($shopwareMethods, $adyenMethods['storedPaymentMethods']);
 
-        foreach ($adyenMethods['paymentMethods'] as $adyenMethod) {
+        // se-remove die()
+        echo '<pre>SE-DEBUG: ',print_r([
+            '$shopwareMethods' => $shopwareMethods,
+        ], true),'</pre>';die('DIE after print');
+
+        return $shopwareMethods;
+    }
+
+    private function addPaymentMethods(array $shopwareMethods, array $adyenMethods): array
+    {
+        foreach ($adyenMethods as $adyenMethod) {
             $paymentMethodInfo = $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType(
                 $adyenMethod['type'],
-                $adyenMethods['paymentMethods']
+                $adyenMethods
             );
             array_unshift($shopwareMethods, [
                 'id' => Configuration::PAYMENT_PREFIX . $adyenMethod['type'],

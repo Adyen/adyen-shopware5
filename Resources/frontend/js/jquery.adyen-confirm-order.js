@@ -25,6 +25,7 @@
             },
         },
         paymentMethodSession: 'paymentMethod',
+        storePaymentMethodSession: 'storePaymentMethod',
         adyenConfiguration: {},
         adyenCheckout: null,
 
@@ -70,8 +71,9 @@
 
                 $.loadingIndicator.open();
 
-                var data = {
+                const data = {
                     'paymentMethod': me.getPaymentMethod(),
+                    'storePaymentMethod': me.getStorePaymentMethod(),
                     'browserInfo': me.getBrowserInfo(),
                     'origin': window.location.origin
                 };
@@ -287,6 +289,12 @@
             var me = this;
 
             return me.sessionStorage.getItem(me.paymentMethodSession);
+        },
+
+        getStorePaymentMethod: function () {
+            const me = this;
+
+            return me.sessionStorage.getItem(me.storePaymentMethodSession);
         },
 
         getAdyenConfigSession: function () {

@@ -8,6 +8,7 @@ use AdyenPayment\Components\Adyen\Model\RecurringProcessing;
 use AdyenPayment\Components\Payload\PaymentContext;
 use AdyenPayment\Components\Payload\PaymentPayloadProvider;
 
+// se-remove die(): verify if this is actually needed
 class RecurringPaymentProvider implements PaymentPayloadProvider
 {
     public function provide(PaymentContext $context): array
@@ -18,12 +19,14 @@ class RecurringPaymentProvider implements PaymentPayloadProvider
         $recurringProcessingModel = $paymentInfo['recurringProcessingModel'] ?? null; // "Subscription" or "CardOnFile"
         $storeDetails = (bool) ($paymentInfo['storeDetails'] ?? false);
 
-        // se-remove die()
-        echo '<pre>SE-DEBUG: ',print_r([
-            '$storedPaymentMethodId' => $storedPaymentMethodId,
-            '$recurringProcessingModel' => $recurringProcessingModel,
-            '$storeDetails' => $storeDetails,
-        ], true),'</pre>';die('DIE after print');
+////        // se-remove die()
+//        echo '<pre>SE-DEBUG: ',print_r([
+//            '$storedPaymentMethodId' => $storedPaymentMethodId,
+//            '$recurringProcessingModel' => $recurringProcessingModel,
+//            '$storeDetails' => $storeDetails,
+//            '$paymentInfo' => $paymentInfo,
+//            'getStorePaymentMethod' => (int) $context->getStorePaymentMethod(),
+//        ], true),'</pre>';die('DIE after print');
 
         if (!$storeDetails && !$storedPaymentMethodId) {
             return [];
@@ -39,7 +42,6 @@ class RecurringPaymentProvider implements PaymentPayloadProvider
 
         // new payment to store
         return [
-            'storePaymentMethod' => true,
             'recurringProcessingModel' => $recurringProcessingModel,
             'shopperInteraction' => 'Ecommerce',
         ];

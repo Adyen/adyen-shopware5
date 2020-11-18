@@ -73,6 +73,7 @@
         adyenCheckout: null,
         changeInfosButton: null,
         paymentMethodSession: 'paymentMethod',
+        storePaymentMethodSession: 'storePaymentMethod',
         adyenConfigSession: 'adyenConfig',
 
         init: function () {
@@ -196,6 +197,7 @@
 
             me.adyenCheckout.create(type, {
                 enableStoreDetails: paymentMethod.supportsRecurring || false,
+                showStoredPaymentMethods: true,
             }).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleComponentPayWithGoogle: function (type) {
@@ -308,13 +310,14 @@
             }
         },
         setPaymentSession: function (state) {
-            var me = this;
+            const me = this;
             me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
+            me.sessionStorage.setItem(me.storePaymentMethodSession, state.data.storePaymentMethod || false);
         },
         removePaymentSession: function () {
-            var me = this;
-
+            const me = this;
             me.sessionStorage.removeItem(me.paymentMethodSession);
+            me.sessionStorage.removeItem(me.storePaymentMethodSession);
             $.get(me.opts.resetSessionUrl);
         },
         saveAdyenConfigInSession: function (adyenConfiguration) {
