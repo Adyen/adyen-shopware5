@@ -6,7 +6,7 @@
     <body onload="document.forms['transparent_redirect'].submit();">
         <form id="transparent_redirect" method="POST" action="{$redirectUrl}">
             {foreach $postParams as $value}
-                <input type="hidden" name="{$value@key}" value="{$value}" />
+                <input type="hidden" name="{$value@key}" value="{$value|escape}" />
             {/foreach}
         </form>
     </body>

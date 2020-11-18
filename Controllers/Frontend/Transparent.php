@@ -29,15 +29,16 @@ class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Fro
      */
     public function redirectAction()
     {
+        $allowedPostParams = ['MD', 'PaRes'];
         $redirectUrl = Shopware()->Router()->assemble([
             'controller' => 'process',
             'action' => 'return',
         ]);
 
         $this->View()->assign('redirectUrl', $redirectUrl);
-        $this->View()->assign('postParams', $this->retrievePostParams($allowedParams = ['MD', 'PaRes']));
+        $this->View()->assign('postParams', $this->retrievePostParams($allowedPostParams));
         $this->logger->debug('Forward incoming POST response to process/return', [
-            'POST parameter keys' => $allowedParams
+            'POST parameter keys' => $allowedPostParams
         ]);
     }
 
