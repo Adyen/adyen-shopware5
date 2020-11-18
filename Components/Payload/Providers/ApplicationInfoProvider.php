@@ -38,8 +38,8 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
     public function provide(PaymentContext $context): array
     {
         $returnUrl = Shopware()->Router()->assemble([
-            'controller' => 'process',
-            'action' => 'return',
+            'controller' => 'transparent',
+            'action' => 'redirect',
         ]);
 
         $plugin = $this->modelManager->getRepository(Plugin::class)->findOneBy(['name' => AdyenPayment::NAME]);
