@@ -1,10 +1,22 @@
 <?php
 
 use Shopware\Components\CSRFWhitelistAware;
+use Shopware\Components\Logger;
 
 // phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps, Generic.Files.LineLength.TooLong
 class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    public function preDispatch()
+    {
+        $this->logger = $this->get('adyen_payment.logger');
+    }
+
     public function getWhitelistedCSRFActions()
     {
         return ['redirect'];
@@ -23,7 +35,10 @@ class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Fro
         ]);
 
         $this->View()->assign('redirectUrl', $redirectUrl);
-        $this->View()->assign('postParams', $this->retrievePostParams(['MD', 'PaRes']));
+        $this->View()->assign('postParams', $this->retrievePostParams($allowedParams = ['MD', 'PaRes']));
+        $this->logger->debug('Forward incoming POST response to process/return', [
+            'POST parameter keys' => $allowedParams
+        ]);
     }
 
     private function retrievePostParams(array $allowedParams): array
