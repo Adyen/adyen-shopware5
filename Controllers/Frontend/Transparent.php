@@ -7,7 +7,7 @@ use Shopware\Components\Logger;
 class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
 
-    const ALLOWED_PARAMS = ['MD', 'PaRes', 'payload'];
+    const ALLOWED_PARAMS = ['MD', 'PaRes', 'payload', 'redirectResult'];
 
     /**
      * @var Logger
