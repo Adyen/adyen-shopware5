@@ -7,8 +7,7 @@ use Shopware\Components\Logger;
 class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
 
-    const ALLOWED_PARAMS = ['MD', 'PaRes', 'payload', 'redirectResult'];
-
+    const ALLOWED_PARAMS = ['MD', 'PaRes'];
     /**
      * @var Logger
      */
@@ -45,13 +44,20 @@ class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Fro
 
     private function retrieveParams(): array
     {
-        $params = $this->Request()->getParams();
-        $result = array();
-        foreach (self::ALLOWED_PARAMS as $approvedKey) {
-            if (isset($params[$approvedKey])) {
-                $result[$approvedKey] = $params[$approvedKey];
+        $request = $this->Request();
+
+        //Getting all GET parameters except for Shopware's action, controller and module
+        $getParams = $request->getQuery();
+        unset($getParams['action'], $getParams['controller'], $getParams['module']);
+
+        //Filtering allowed POST parameters
+        $fullPostParams = $request->getParams();
+        $postParams = [];
+        foreach (self::ALLOWED_PARAMS as $allowedParam) {
+            if (isset($fullPostParams[$allowedParam])) {
+                $postParams[$allowedParam] = $fullPostParams[$allowedParam];
             }
         }
-        return $result;
+        return array_merge($getParams, $postParams);
     }
 }
