@@ -9,6 +9,7 @@ use Doctrine\DBAL\Connection;
 use AdyenPayment\AdyenPayment;
 use Shopware\Components\Plugin\CachedConfigReader;
 use Shopware\Models\Shop\Shop;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * Class Configuration
@@ -86,7 +87,12 @@ class Configuration
     public function getConfig($key = null, $shop = false)
     {
         if (!$shop) {
-            $shop = Shopware()->Shop();
+            try {
+                $shop = Shopware()->Shop();
+            } catch (ServiceNotFoundException $exception) {
+                //The Shop service is not available in the context (i.e. getting the config from the Backend)
+                $shop = null;
+            }
         }
 
         $config = $this->cachedConfigReader->getByPluginName(AdyenPayment::NAME, $shop);
