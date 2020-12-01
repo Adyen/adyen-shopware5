@@ -51,8 +51,6 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
             ],
             'channel' => Channel::WEB,
             'origin' => $context->getOrigin(),
-            'redirectFromIssuerMethod' => 'GET',
-            'redirectToIssuerMethod' => 'POST',
             'returnUrl' => $returnUrl,
             'merchantAccount' => $this->configuration->getMerchantAccount(),
             'applicationInfo' => [
