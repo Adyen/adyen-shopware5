@@ -7,6 +7,7 @@ use Shopware\Components\Logger;
 class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
 
+    const ALLOWED_PARAMS = ['MD', 'PaRes'];
     /**
      * @var Logger
      */
@@ -29,30 +30,34 @@ class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Fro
      */
     public function redirectAction()
     {
-        $allowedPostParams = ['MD', 'PaRes'];
         $redirectUrl = Shopware()->Router()->assemble([
             'controller' => 'process',
             'action' => 'return',
         ]);
 
         $this->View()->assign('redirectUrl', $redirectUrl);
-        $this->View()->assign('postParams', $this->retrievePostParams($allowedPostParams));
+        $this->View()->assign('redirectParams', $this->retrieveParams());
         $this->logger->debug('Forward incoming POST response to process/return', [
-            'POST parameter keys' => $allowedPostParams
+            'POST and GET parameter keys' => self::ALLOWED_PARAMS
         ]);
     }
 
-    private function retrievePostParams(array $allowedParams): array
+    private function retrieveParams(): array
     {
-        $params = [];
-        foreach ($allowedParams as $key) {
-            if (null === $value = $this->Request()->getPost($key)) {
-                continue;
+        $request = $this->Request();
+
+        //Getting all GET parameters except for Shopware's action, controller and module
+        $getParams = $request->getQuery();
+        unset($getParams['action'], $getParams['controller'], $getParams['module']);
+
+        //Filtering allowed POST parameters
+        $fullPostParams = $request->getParams();
+        $postParams = [];
+        foreach (self::ALLOWED_PARAMS as $allowedParam) {
+            if (isset($fullPostParams[$allowedParam])) {
+                $postParams[$allowedParam] = $fullPostParams[$allowedParam];
             }
-
-            $params[$key] = $value;
         }
-
-        return $params;
+        return array_merge($getParams, $postParams);
     }
 }
