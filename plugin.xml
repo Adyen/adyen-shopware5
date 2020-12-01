@@ -67,4 +67,40 @@
             Add redirect data to payments request
         </changes>
     </changelog>
+    <changelog version="1.6.0">
+        <changes lang="de">
+            Features
+            Gift card payment method
+            Mobile Bancontact payment method
+            Add snippets to payment information link + update position link
+            Add extra events for better extensibility
+
+            Fixes
+            Update mail sending
+            Add fallback for config fetch when no shop is specified
+            Alter notification url to /frontend/notification/adyen
+            Using composer v1 in Github Actions
+            More strict paymentMethodFormSubmitSelector
+            Redirect payment methods flow with POST->Transparent controller
+            Adding payload and redirectResult GET parameters to transparent redirect
+            try/catch block for getting the Shop service from the backend
+        </changes>
+        <changes lang="en">
+            Features
+            Gift card payment method
+            Mobile Bancontact payment method
+            Add snippets to payment information link + update position link
+            Add extra events for better extensibility
+
+            Fixes
+            Update mail sending
+            Add fallback for config fetch when no shop is specified
+            Alter notification url to /frontend/notification/adyen
+            Using composer v1 in Github Actions
+            More strict paymentMethodFormSubmitSelector
+            Redirect payment methods flow with POST->Transparent controller
+            Adding payload and redirectResult GET parameters to transparent redirect
+            try/catch block for getting the Shop service from the backend
+        </changes>
+    </changelog>
 </plugin>
