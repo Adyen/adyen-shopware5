@@ -123,15 +123,10 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
 
     /**
      * @param $adyenType
-     * @return \AdyenPayment\Models\PaymentMethodInfo|null
+     * @return \AdyenPayment\Models\PaymentMethodInfo
      */
     private function getSelectedAdyenMethodName($adyenType)
     {
-        try {
-            return $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($adyenType);
-        } catch (AdyenException $ex) {
-            $this->logger->notice('Fail loading Adyen description', ['ex' => $ex]);
-            return null;
-        }
+        return $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($adyenType);
     }
 }

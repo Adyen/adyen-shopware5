@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
+use AdyenPayment\AdyenPayment;
+use AdyenPayment\Components\Adyen\PaymentMethodService;
+use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
+use AdyenPayment\Converter\Payment\PaymentMethodConverter;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use AdyenPayment\Components\Adyen\PaymentMethodService;
-use AdyenPayment\Components\Configuration;
-use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
-use AdyenPayment\AdyenPayment;
 
 /**
  * Class PaymentSubscriber
+ *
  * @package AdyenPayment\Subscriber
  */
 class PaymentSubscriber implements SubscriberInterface
@@ -31,18 +32,26 @@ class PaymentSubscriber implements SubscriberInterface
      * @var $skipReplaceAdyenMethods
      */
     private $skipReplaceAdyenMethods = false;
+    /**
+     * @var PaymentMethodConverter
+     */
+    private $paymentMethodConverter;
 
     /**
      * PaymentSubscriber constructor.
-     * @param PaymentMethodService $paymentMethodService
+     *
+     * @param PaymentMethodService         $paymentMethodService
      * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
+     * @param PaymentMethodConverter $paymentMethodConverter
      */
     public function __construct(
         PaymentMethodService $paymentMethodService,
-        ShopwarePaymentMethodService $shopwarePaymentMethodService
+        ShopwarePaymentMethodService $shopwarePaymentMethodService,
+        PaymentMethodConverter $paymentMethodConverter
     ) {
         $this->paymentMethodService = $paymentMethodService;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
+        $this->paymentMethodConverter = $paymentMethodConverter;
     }
 
     public static function getSubscribedEvents()
@@ -65,6 +74,7 @@ class PaymentSubscriber implements SubscriberInterface
      * Replace general Adyen payment method with dynamic loaded payment methods
      *
      * @param Enlight_Event_EventArgs $args
+     *
      * @return array
      * @throws AdyenException
      */
@@ -72,11 +82,14 @@ class PaymentSubscriber implements SubscriberInterface
     {
         $shopwareMethods = $args->getReturn();
 
-        if ($this->skipReplaceAdyenMethods || !in_array(
-            Shopware()->Front()->Request()->getActionName(),
-            ['shippingPayment', 'payment']
-        )) {
+        if ($this->skipReplaceAdyenMethods
+            || !in_array(
+                Shopware()->Front()->Request()->getActionName(),
+                ['shippingPayment', 'payment']
+            )
+        ) {
             $this->skipReplaceAdyenMethods = false;
+
             return $shopwareMethods;
         }
 
@@ -96,34 +109,6 @@ class PaymentSubscriber implements SubscriberInterface
             return $shopwareMethods;
         }
 
-        $adyenMethods['paymentMethods'] = array_reverse($adyenMethods['paymentMethods']);
-//        $shopwareMethods = $this->addPaymentMethods($shopwareMethods, $adyenMethods['paymentMethods']);
-//        $shopwareMethods = $this->addPaymentMethods($shopwareMethods, $adyenMethods['storedPaymentMethods']);
-
-        // se-remove die()
-        echo '<pre>SE-DEBUG: ',print_r([
-            '$shopwareMethods' => $shopwareMethods,
-        ], true),'</pre>';die('DIE after print');
-
-        return $shopwareMethods;
-    }
-
-    private function addPaymentMethods(array $shopwareMethods, array $adyenMethods): array
-    {
-        foreach ($adyenMethods as $adyenMethod) {
-            $paymentMethodInfo = $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType(
-                $adyenMethod['type'],
-                $adyenMethods
-            );
-            array_unshift($shopwareMethods, [
-                'id' => Configuration::PAYMENT_PREFIX . $adyenMethod['type'],
-                'name' => $adyenMethod['type'],
-                'description' => $paymentMethodInfo->getName(),
-                'additionaldescription' => $paymentMethodInfo->getDescription(),
-                'image' => $this->shopwarePaymentMethodService->getAdyenImage($adyenMethod),
-            ]);
-        }
-
-        return $shopwareMethods;
+        return $this->paymentMethodConverter->toShopwarePaymentMethod($shopwareMethods, $adyenMethods);
     }
 }

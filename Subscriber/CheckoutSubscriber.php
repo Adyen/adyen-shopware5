@@ -276,12 +276,23 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $paymentSnippets = $this->snippets->getNamespace('adyen/checkout/payment');
 
-        $snippets = [];
-        $snippets['updatePaymentInformation'] = $paymentSnippets->get(
-            'updatePaymentInformation',
-            'Update your payment information',
-            true
-        );
+        $snippets = [
+            'updatePaymentInformation' => $paymentSnippets->get(
+                'updatePaymentInformation',
+                'Update your payment information',
+                true
+            ),
+            'storedPaymentMethodTitle' => $paymentSnippets->get(
+                'storedPaymentMethodTitle',
+                'Stored payment methods',
+                true
+            ),
+            'paymentMethodTitle' => $paymentSnippets->get(
+                'paymentMethodTitle',
+                'Payment methods',
+                true
+            ),
+        ];
 
         $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
     }
