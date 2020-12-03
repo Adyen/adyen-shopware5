@@ -35,10 +35,11 @@ class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Fro
             'action' => 'return',
         ]);
 
+        $redirectParams = $this->retrieveParams();
         $this->View()->assign('redirectUrl', $redirectUrl);
-        $this->View()->assign('redirectParams', $this->retrieveParams());
+        $this->View()->assign('redirectParams', $redirectParams);
         $this->logger->debug('Forward incoming POST response to process/return', [
-            'POST and GET parameter keys' => self::ALLOWED_PARAMS
+            'POST and GET parameter keys' => array_keys($redirectParams)
         ]);
     }
 
