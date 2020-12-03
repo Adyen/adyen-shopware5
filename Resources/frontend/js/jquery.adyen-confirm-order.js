@@ -114,6 +114,7 @@
                 case 'ChallengeShopper':
                     me.handlePaymentDataChallengeShopper(data);
                     break;
+                case 'Pending':
                 case 'RedirectShopper':
                     me.handlePaymentDataRedirectShopper(data);
                     break;
@@ -146,9 +147,9 @@
                             },
                         });
                     },
-                onError: function (error) {
-                    console.error(error);
-                }
+                    onError: function (error) {
+                        console.error(error);
+                    }
                 })
                 .mount('#AdyenIdentifyShopperThreeDS2');
         },
@@ -176,17 +177,19 @@
                             },
                         });
                     },
-                onError: function (error) {
-                    console.log(error);
-                }
+                    onError: function (error) {
+                        console.log(error);
+                    }
                 })
                 .mount('#AdyenChallengeShopperThreeDS2');
         },
 
         handlePaymentDataRedirectShopper: function (data) {
-            var me = this;
-            if (data.action.type === 'redirect') {
-                me.adyenCheckout.createFromAction(data.action).mount(me.opts.mountRedirectSelector);
+            const me = this;
+            if ('redirect' === data.action.type || 'qrCode' === data.action.type) {
+                me.adyenCheckout
+                    .createFromAction(data.action)
+                    .mount(me.opts.mountRedirectSelector);
             }
         },
 

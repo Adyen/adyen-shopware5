@@ -50,6 +50,7 @@
         </service>
         <service id="adyen_payment.components.payment_status_update" class="AdyenPayment\Components\PaymentStatusUpdate">
             <argument type="service" id="models"/>
+            <argument type="service" id="events"/>
         </service>
         <service id="adyen_payment.components.payment_method_service" class="AdyenPayment\Components\PaymentMethodService">
             <argument type="service" id="models"/>

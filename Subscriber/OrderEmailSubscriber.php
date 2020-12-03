@@ -3,15 +3,12 @@
 namespace AdyenPayment\Subscriber;
 
 use AdyenPayment\AdyenPayment;
-use AdyenPayment\Components\NotificationManager;
 use AdyenPayment\Components\OrderMailService;
 use AdyenPayment\Models\PaymentInfo;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use MollieShopware\Models\Transaction;
-use Shopware\Components\HttpClient\Response;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Controllers_Frontend_Checkout;
 
@@ -43,8 +40,8 @@ class OrderEmailSubscriber implements SubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'Shopware_Modules_Order_SendMail_Send' => 'shouldStopEmailSending',
-            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'onCheckoutDispatch'
+            'Shopware_Modules_Order_SendMail_Send'                     => 'shouldStopEmailSending',
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'onCheckoutDispatch',
         ];
     }
 
@@ -53,9 +50,9 @@ class OrderEmailSubscriber implements SubscriberInterface
         $orderId = $args->get('orderId');
         $variables = $args->get('variables');
 
-        if ($variables['additional']['payment']['name'] === AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD &&
-            Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true) === false) {
-            Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true);
+        if (AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD === $variables['additional']['payment']['name']
+            && true === Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true)
+        ) {
 
             /** @var PaymentInfo $paymentInfo */
             $paymentInfo = $this->paymentInfoRepository->findOneBy([
@@ -77,7 +74,6 @@ class OrderEmailSubscriber implements SubscriberInterface
 
     public function onCheckoutDispatch(Enlight_Event_EventArgs $args)
     {
-
         /** @var Shopware_Controllers_Frontend_Checkout $subject */
         $subject = $args->getSubject();
 
