@@ -56,7 +56,6 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
         }, $this->paymentMethods);
     }
 
-
     /**
      * @return PaymentMethod|null
      */

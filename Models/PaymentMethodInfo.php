@@ -17,49 +17,47 @@ class PaymentMethodInfo
     private $description;
 
     /**
-     * PaymentMethodInfo constructor.
-     * @param string $name
-     * @param string $description
+     * @var string
      */
-    public function __construct()
+    private $type;
+
+    private function __construct(string $name, string $description, string $type)
     {
-        $this->name = '';
-        $this->description = '';
+        $this->name = $name;
+        $this->description = $description;
+        $this->type = $type;
     }
 
-    /**
-     * @return string
-     */
+    public static function empty(): self
+    {
+        return new self('', '', '');
+    }
+
+    public static function create(string $name, string $description, string $type): self
+    {
+        return new self($name, $description, $type);
+    }
+
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     * @return PaymentMethodInfo
-     */
-    public function setName(string $name): PaymentMethodInfo
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     * @return PaymentMethodInfo
-     */
-    public function setDescription(string $description): PaymentMethodInfo
+    public function getType(): string
     {
-        $this->description = $description;
-        return $this;
+        return $this->type;
+    }
+
+    public function withDescription(string $description): self
+    {
+        $new = clone $this;
+        $new->description = $description;
+
+        return $new;
     }
 }

@@ -65,7 +65,7 @@ final class PaymentMethodSerializer
     {
         $paymentMethodInfo = $this->paymentMethodService->getAdyenPaymentInfoByType(
             $paymentMethod->getType(),
-            $allAdyenMethods->mapToRaw()
+            $allAdyenMethods
         );
         $paymentMethodInfo = $this->enrich($paymentMethodInfo, $paymentMethod);
 
@@ -74,7 +74,7 @@ final class PaymentMethodSerializer
             'name' => $paymentMethod->getType(),
             'description' => $paymentMethodInfo->getName(),
             'additionaldescription' => $paymentMethodInfo->getDescription(),
-            'image' => $this->paymentMethodService->getAdyenImageByType($paymentMethod->getType()),
+            'image' => $this->paymentMethodService->getAdyenImageByType($paymentMethodInfo->getType()),
             'metadata' => $paymentMethod->getRawData(),
         ];
     }
@@ -94,7 +94,7 @@ final class PaymentMethodSerializer
             return $paymentMethodInfo;
         }
 
-        $paymentMethodInfo->setDescription(sprintf(
+        return $paymentMethodInfo->withDescription(sprintf(
             '%s%s: %s',
             ($paymentMethodInfo->getDescription() ? $paymentMethodInfo->getDescription().' ' : ''),
             $this->snippets
@@ -102,7 +102,5 @@ final class PaymentMethodSerializer
                 ->get('CardNumberEndingOn', 'Card number ending on', true),
             $adyenMethod->getValue('lastFour', '')
         ));
-
-        return $paymentMethodInfo;
     }
 }
