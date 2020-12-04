@@ -174,7 +174,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $browserInfo = $this->Request()->getPost('browserInfo');
         $shopperInfo = $this->getShopperInfo();
         $origin = $this->Request()->getPost('origin');
-        $storePaymentMethod = (bool) $this->Request()->getPost('storePaymentMethod', false);
+        $storePaymentMethod = (bool) json_decode($this->Request()->getPost('storePaymentMethod', false), true);
 
         return new PaymentContext(
             $paymentInfo,

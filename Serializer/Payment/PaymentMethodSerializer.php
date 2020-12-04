@@ -2,14 +2,17 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Converter\Payment;
+namespace AdyenPayment\Serializer\Payment;
 
+use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
+use AdyenPayment\Models\Payment\PaymentMethod;
+use AdyenPayment\Models\Payment\PaymentMethodType;
 use AdyenPayment\Models\PaymentMethodInfo;
 use Shopware_Components_Snippet_Manager;
 
-final class PaymentMethodConverter
+final class PaymentMethodSerializer
 {
     /**
      * @var ShopwarePaymentMethodService
@@ -29,87 +32,65 @@ final class PaymentMethodConverter
     }
 
     /**
-     * @param array<int, array<string, mixed>>    $shopwareMethods
-     * @param array<string, array<string, mixed>> $adyenMethods
+     * @param array<int, array<string, mixed>> $shopwareMethods
      *
      * @return array<string, array<string, mixed>>
      */
-    public function toShopwarePaymentMethod(array $shopwareMethods, array $adyenMethods): array
+    public function __invoke(array $shopwareMethods, PaymentMethodCollection $adyenPaymentMethods): array
     {
-        $paymentMethods = $adyenMethods['paymentMethods'] ?? [];
-        $storedPaymentMethods = $adyenMethods['storedPaymentMethods'] ?? [];
+        $defaultPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::default());
+        $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
 
         return [
-            'paymentMethods' => array_merge(array_reduce(
-                $paymentMethods,
-                function (array $payload, array $adyenMethod) use ($paymentMethods) {
-                    $adyenMethod['paymentMethodType'] = PaymentMethodType::default();
-
-                    return $this->convert($payload, $adyenMethod, $paymentMethods);
-                },
-                []
-            ), $shopwareMethods),
-            'storedPaymentMethods' => array_reduce(
-                $storedPaymentMethods,
-                function (array $payload, array $adyenMethod) use ($storedPaymentMethods) {
-                    $adyenMethod['paymentMethodType'] = PaymentMethodType::stored();
-
-                    return $this->convert($payload, $adyenMethod, $storedPaymentMethods);
-                },
-                []
+            'paymentMethods' => array_merge(
+                $defaultPaymentMethods->map(
+                    function (PaymentMethod $adyenMethod) use ($defaultPaymentMethods) {
+                        return $this->serialize($adyenMethod, $defaultPaymentMethods);
+                    }
+                ),
+                $shopwareMethods
+            ),
+            'storedPaymentMethods' => $storedPaymentMethods->map(
+                function (PaymentMethod $adyenMethod) use ($storedPaymentMethods) {
+                    return $this->serialize($adyenMethod, $storedPaymentMethods);
+                }
             ),
         ];
     }
 
     /**
-     * @param array<int, array<string, mixed>> $payload
-     * @param array<string, mixed>             $adyenMethod
-     * @param array<int, array<string, mixed>> $allAdyenMethods
-     *
-     * @return array<int, array<string, mixed>>
+     * @return array<string, mixed>
      */
-    private function convert(array $payload, array $adyenMethod, array $allAdyenMethods): array
+    private function serialize(PaymentMethod $paymentMethod, PaymentMethodCollection $allAdyenMethods): array
     {
         $paymentMethodInfo = $this->paymentMethodService->getAdyenPaymentInfoByType(
-            $adyenMethod['type'],
-            $allAdyenMethods
+            $paymentMethod->getType(),
+            $allAdyenMethods->mapToRaw()
         );
-        $paymentMethodInfo = $this->enrich($paymentMethodInfo, $adyenMethod);
+        $paymentMethodInfo = $this->enrich($paymentMethodInfo, $paymentMethod);
 
-        $payload[] = [
-            'id' => $this->provideId($adyenMethod),
-            'name' => $adyenMethod['type'],
+        return [
+            'id' => $this->provideId($paymentMethod),
+            'name' => $paymentMethod->getType(),
             'description' => $paymentMethodInfo->getName(),
             'additionaldescription' => $paymentMethodInfo->getDescription(),
-            'image' => $this->paymentMethodService->getAdyenImage($adyenMethod),
-            'metadata' => $adyenMethod,
+            'image' => $this->paymentMethodService->getAdyenImageByType($paymentMethod->getType()),
+            'metadata' => $paymentMethod->getRawData(),
         ];
-
-        return $payload;
     }
 
     /**
-     * Default payment methods do not have an id: type is used
-     * Stored payment methods have an id which will be used
-     * @param array<string, mixed> $adyenMethod
-     *
-     * @return string
+     * Default payment methods do not have an id,  type is used
+     * Stored payment methods have an id which is used
      */
-    private function provideId(array $adyenMethod): string
+    private function provideId(PaymentMethod $adyenMethod): string
     {
-        return Configuration::PAYMENT_PREFIX.($adyenMethod['id'] ?? $adyenMethod['type']);
+        return Configuration::PAYMENT_PREFIX.($adyenMethod->getId() ?: $adyenMethod->getType());
     }
 
-    /**
-     * @param PaymentMethodInfo    $paymentMethodInfo
-     * @param array<string, mixed> $adyenMethod
-     *
-     * @return PaymentMethodInfo
-     */
-    private function enrich(PaymentMethodInfo $paymentMethodInfo, array $adyenMethod): PaymentMethodInfo
+    private function enrich(PaymentMethodInfo $paymentMethodInfo, PaymentMethod $adyenMethod): PaymentMethodInfo
     {
-        $paymentMethodType = $adyenMethod['paymentMethodType'];
-        if (!$paymentMethodType->equals(PaymentMethodType::stored())) {
+        if (!$adyenMethod->isStoredPayment()) {
             return $paymentMethodInfo;
         }
 
@@ -119,7 +100,7 @@ final class PaymentMethodConverter
             $this->snippets
                 ->getNamespace('adyen/checkout/payment')
                 ->get('CardNumberEndingOn', 'Card number ending on', true),
-            (string)($adyenMethod['lastFour'] ?? '')
+            $adyenMethod->getValue('lastFour', '')
         ));
 
         return $paymentMethodInfo;

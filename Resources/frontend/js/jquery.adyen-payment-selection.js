@@ -108,8 +108,7 @@
             me.currentSelectedPaymentType = $(event.target).val();
         },
         onPaymentChangedAfter: function () {
-            var me = this;
-            var payment;
+            const me = this;
 
             //Return when no adyen payment
             if (me.currentSelectedPaymentType.indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
@@ -117,17 +116,14 @@
                 return;
             }
 
-            payment = me.getPaymentMethodByType(me.currentSelectedPaymentType);
-
-            //When details is set load the component
-            if (typeof payment.details !== "undefined") {
+            const payment = me.getPaymentMethodByType(me.currentSelectedPaymentType);
+            if (me.__canHandlePayment(payment)) {
                 $('#' + me.currentSelectedPaymentId)
                     .closest(me.opts.paymentMethodSelector)
                     .find(me.opts.methodBankdataSelector)
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
-
                 $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
-                me.handleComponent(payment.type);
+                me.handleComponent(payment);
 
                 return;
             }
@@ -151,12 +147,26 @@
             return 'component-' + currentSelectedPaymentId;
         },
         getPaymentMethodByType(type) {
-            var me = this;
+            const me = this;
+            // stored payment methods: pmType contains the id of the payment method
+            const pmType = type.split(me.opts.adyenPaymentMethodPrefix).pop();
+            const paymentMethod = me.opts.adyenPaymentMethodsResponse['paymentMethods'].find(
+                paymentMethod => paymentMethod.type === pmType
+            );
 
-            var pmType = type.split(me.opts.adyenPaymentMethodPrefix).pop();
-            return me.opts.adyenPaymentMethodsResponse['paymentMethods'].find(function (paymentMethod) {
-                return paymentMethod.type === pmType
-            });
+            return paymentMethod ? paymentMethod : me.getStoredPaymentMethodById(pmType);
+        },
+        /**
+         * @param {String} storedPaymentMethodId
+         * @return {({} | undefined)}
+         */
+        getStoredPaymentMethodById(storedPaymentMethodId) {
+            const me = this;
+            const storedPaymentMethods = me.opts.adyenPaymentMethodsResponse['storedPaymentMethods'] || [];
+
+            return storedPaymentMethods.find(
+                paymentMethod => paymentMethod.id === storedPaymentMethodId
+            );
         },
         /**
          * @param {String} paymentType
@@ -176,44 +186,22 @@
 
             me.adyenCheckout = new AdyenCheckout(me.adyenConfiguration);
         },
-        handleComponent: function (type) {
-            var me = this;
+        handleComponent: function (paymentMethod) {
+            const me = this;
 
-            if (me.__isGiftCardType(type)) {
-                me.handleGiftCardComponent(type);
+            if ('paywithgoogle' === paymentMethod.type) {
+                me.handleComponentPayWithGoogle(paymentMethod);
                 return;
             }
 
-            if ('paywithgoogle' === type) {
-                me.handleComponentPayWithGoogle(type);
-                return;
-            }
-
-            me.handleComponentGeneral(type);
+            const adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
+            me.adyenCheckout
+                .create(adyenCheckoutData.cardType, adyenCheckoutData.paymentMethodData)
+                .mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
-        handleComponentGeneral: function (type) {
-            var me = this;
-            const paymentMethod = me.getPaymentMethodByType(type) || {};
-
-            me.adyenCheckout.create(type, {
-                enableStoreDetails: paymentMethod.supportsRecurring || false,
-                showStoredPaymentMethods: true,
-            }).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
-        },
-        handleComponentPayWithGoogle: function (type) {
+        handleComponentPayWithGoogle: function (paymentMethod) {
             var me = this;
             $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
-        },
-        handleGiftCardComponent: function (giftCardType) {
-            const me = this;
-            const pinRequiredDetail = me.__retrievePaymentMethodDetailByKey(giftCardType, 'encryptedSecurityCode');
-
-            me.adyenCheckout
-                .create('giftcard', {
-                    type: giftCardType,
-                    pinRequired: false === pinRequiredDetail.optional || false
-                })
-                .mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleOnChange: function (state) {
             var me = this;
@@ -244,12 +232,6 @@
                 return;
             }
 
-            //Return when redirect
-            var payment = me.getPaymentMethodByType(paymentMethod.val());
-            if (typeof payment.details === "undefined") {
-                return;
-            }
-
             me.currentSelectedPaymentId = paymentMethod.attr('id');
             me.currentSelectedPaymentType = paymentMethod.val();
 
@@ -267,7 +249,7 @@
             paymentMethodContainer.find(me.opts.methodBankdataSelector).append(me.changeInfosButton);
         },
         isPaymentMethodValid: function (paymentMethod) {
-            var me = this;
+            const me = this;
 
             if (!paymentMethod.length) {
                 return false;
@@ -278,12 +260,9 @@
                 return false;
             }
 
-            //Return when redirect
-            if (typeof me.getPaymentMethodByType(paymentMethod.val()).details === "undefined") {
-                return false;
-            }
-
-            return true;
+            return me.__canHandlePayment(
+                me.getPaymentMethodByType(paymentMethod.val())
+            );
         },
         updatePaymentInfo: function () {
             var me = this;
@@ -294,14 +273,13 @@
             var paymentMethod = $(me.opts.formSelector).find('input[name=payment]:checked');
             var payment = me.getPaymentMethodByType(paymentMethod.val());
 
-            //When details is set load the component
-            if (typeof payment.details !== "undefined") {
+            if (me.__canHandlePayment(payment)) {
                 $('#' + me.currentSelectedPaymentId)
                     .closest(me.opts.paymentMethodSelector)
                     .find(me.opts.methodBankdataSelector)
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
 
-                me.handleComponent(payment.type);
+                me.handleComponent(payment);
 
                 if (me.changeInfosButton) {
                     me.changeInfosButton.remove();
@@ -345,6 +323,71 @@
             const giftCardGroupTypes = (giftCardGroup && giftCardGroup['types']) || [];
 
             return giftCardGroupTypes.includes(paymentType);
+        },
+        /**
+         * paymentType contains the id for a stored payment
+         * @param {string} paymentMethodId
+         * @return {boolean}
+         * @private
+         */
+        __isStoredPaymentMethod(paymentMethodId) {
+            return !!this.getStoredPaymentMethodById(paymentMethodId);
+        },
+        __canHandlePayment(paymentMethod) {
+            if (this.__isStoredPaymentMethod(paymentMethod.id || '')) {
+                return true;
+            }
+
+            return "undefined" !== typeof paymentMethod.details;
+        },
+        /**
+         * Modify AdyenPaymentMethod with additional data for the web-component library
+         * @param paymentMethod Adyen response: Payment Method response
+         * @return  {{cardType: string, paymentMethodData: object}}
+         * @private
+         */
+        __buildCheckoutComponentData(paymentMethod) {
+            const defaultData = {
+                cardType: paymentMethod.type,
+                paymentMethodData: {
+                    ...paymentMethod,
+                }
+            };
+
+            if (this.__isStoredPaymentMethod(paymentMethod.id || '')) {
+                return {
+                    ...defaultData,
+                    paymentMethodData: {
+                        ...defaultData.paymentMethodData,
+                        storedPaymentMethodId: paymentMethod.id,
+                    }
+                };
+            }
+
+            if (this.__isGiftCardType(paymentMethod)) {
+                const pinRequiredDetail = this.__retrievePaymentMethodDetailByKey(
+                    paymentMethod.type,
+                    'encryptedSecurityCode'
+                );
+
+                return {
+                    ...defaultData,
+                    cardType: 'giftcard',
+                    paymentMethodData: {
+                        ...defaultData.paymentMethodData,
+                        type: paymentMethod.type,
+                        pinRequired: false === pinRequiredDetail.optional || false
+                    }
+                };
+            }
+
+            return {
+                ...defaultData,
+                paymentMethodData: {
+                    ...defaultData.paymentMethodData,
+                    enableStoreDetails: paymentMethod.supportsRecurring || false,
+                }
+            };
         },
     });
 

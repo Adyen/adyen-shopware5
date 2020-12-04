@@ -45,4 +45,3 @@
     {/if}
     {$smarty.block.parent}
 {/block}
-

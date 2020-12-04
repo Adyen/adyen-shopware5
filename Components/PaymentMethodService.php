@@ -195,16 +195,6 @@ class PaymentMethodService
     }
 
     /**
-     * @param $adyenMethod
-     * @return string
-     */
-    public function getAdyenImage($adyenMethod)
-    {
-        $type = $adyenMethod['type'];
-        return $this->getAdyenImageByType($type);
-    }
-
-    /**
      * @param $type
      * @return string
      */
