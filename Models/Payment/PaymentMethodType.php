@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Converter\Payment;
+namespace AdyenPayment\Serializer\Payment;
 
 final class PaymentMethodType
 {

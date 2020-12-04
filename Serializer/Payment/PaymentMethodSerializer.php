@@ -89,18 +89,15 @@ final class PaymentMethodConverter
     }
 
     /**
+     * Default payment methods do not have an id: type is used
+     * Stored payment methods have an id which will be used
      * @param array<string, mixed> $adyenMethod
      *
      * @return string
      */
     private function provideId(array $adyenMethod): string
     {
-        return sprintf(
-            '%s%s%s',
-            Configuration::PAYMENT_PREFIX,
-            $adyenMethod['type'],
-            $adyenMethod['id'] ? '_'.$adyenMethod['id'] : ''
-        );
+        return Configuration::PAYMENT_PREFIX.($adyenMethod['id'] ?? $adyenMethod['type']);
     }
 
     /**
