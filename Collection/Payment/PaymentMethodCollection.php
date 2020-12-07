@@ -20,7 +20,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @return \Generator<PaymentMethod>|PaymentMethod[]
+     * @return \Generator<PaymentMethod>
      */
     public function getIterator(): \Generator
     {

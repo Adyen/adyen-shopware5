@@ -9,7 +9,6 @@ use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use AdyenPayment\Models\Payment\PaymentMethodType;
-use AdyenPayment\Models\PaymentMethodInfo;
 use Shopware_Components_Snippet_Manager;
 
 final class PaymentMethodSerializer
@@ -67,14 +66,19 @@ final class PaymentMethodSerializer
             $paymentMethod->getType(),
             $allAdyenMethods
         );
-        $paymentMethodInfo = $this->enrich($paymentMethodInfo, $paymentMethod);
+
+        $name = $paymentMethodInfo ? $paymentMethodInfo->getName() : '';
+        $description = $this->enrichDescription(
+            $paymentMethodInfo ? $paymentMethodInfo->getDescription() : '',
+            $paymentMethod
+        );
 
         return [
             'id' => $this->provideId($paymentMethod),
             'name' => $paymentMethod->getType(),
-            'description' => $paymentMethodInfo->getName(),
-            'additionaldescription' => $paymentMethodInfo->getDescription(),
-            'image' => $this->paymentMethodService->getAdyenImageByType($paymentMethodInfo->getType()),
+            'description' => $name,
+            'additionaldescription' => $description,
+            'image' => $this->paymentMethodService->getAdyenImageByType($paymentMethod->getType()),
             'metadata' => $paymentMethod->getRawData(),
         ];
     }
@@ -88,19 +92,19 @@ final class PaymentMethodSerializer
         return Configuration::PAYMENT_PREFIX.($adyenMethod->getId() ?: $adyenMethod->getType());
     }
 
-    private function enrich(PaymentMethodInfo $paymentMethodInfo, PaymentMethod $adyenMethod): PaymentMethodInfo
+    private function enrichDescription(string $description, PaymentMethod $adyenMethod): string
     {
         if (!$adyenMethod->isStoredPayment()) {
-            return $paymentMethodInfo;
+            return $description;
         }
 
-        return $paymentMethodInfo->withDescription(sprintf(
+        return sprintf(
             '%s%s: %s',
-            ($paymentMethodInfo->getDescription() ? $paymentMethodInfo->getDescription().' ' : ''),
+            ($description ? $description.' ' : ''),
             $this->snippets
                 ->getNamespace('adyen/checkout/payment')
                 ->get('CardNumberEndingOn', 'Card number ending on', true),
             $adyenMethod->getValue('lastFour', '')
-        ));
+        );
     }
 }

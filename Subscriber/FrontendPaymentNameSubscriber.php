@@ -80,7 +80,7 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
 
         $adyenType = $this->shopwarePaymentMethodService->getActiveUserAdyenMethod(false);
         $paymentMethodInfo = $this->getSelectedAdyenMethodName($adyenType);
-        if (!$paymentMethodInfo->getName()) {
+        if (!$paymentMethodInfo) {
             return;
         }
 
@@ -112,7 +112,7 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
 
         $adyenType = $this->shopwarePaymentMethodService->getActiveUserAdyenMethod(false);
         $paymentMethodInfo = $this->getSelectedAdyenMethodName($adyenType);
-        if (!$paymentMethodInfo->getName()) {
+        if (!$paymentMethodInfo) {
             return;
         }
 
@@ -122,7 +122,10 @@ class FrontendPaymentNameSubscriber implements SubscriberInterface
         $subject->View()->assign('sPayment', $sPayment);
     }
 
-    private function getSelectedAdyenMethodName(string $adyenType): PaymentMethodInfo
+    /**
+     * @return PaymentMethodInfo|null
+     */
+    private function getSelectedAdyenMethodName(string $adyenType)
     {
         return $this->shopwarePaymentMethodService->getAdyenPaymentInfoByType($adyenType);
     }

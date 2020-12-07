@@ -28,11 +28,6 @@ class PaymentMethodInfo
         $this->type = $type;
     }
 
-    public static function empty(): self
-    {
-        return new self('', '', '');
-    }
-
     public static function create(string $name, string $description, string $type): self
     {
         return new self($name, $description, $type);
@@ -51,13 +46,5 @@ class PaymentMethodInfo
     public function getType(): string
     {
         return $this->type;
-    }
-
-    public function withDescription(string $description): self
-    {
-        $new = clone $this;
-        $new->description = $description;
-
-        return $new;
     }
 }

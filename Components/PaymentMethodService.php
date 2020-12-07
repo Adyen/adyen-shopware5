@@ -151,10 +151,13 @@ class PaymentMethodService
         return substr((string)$payment, Configuration::PAYMENT_LENGHT);
     }
 
+    /**
+     * @return PaymentMethodInfo|null
+     */
     public function getAdyenPaymentInfoByType(
         string $type,
         PaymentMethodCollection $paymentMethods = null
-    ): PaymentMethodInfo {
+    ) {
         if (!$paymentMethods) {
             $paymentMethodOptions = $this->getPaymentMethodOptions();
 
@@ -168,23 +171,23 @@ class PaymentMethodService
         }
 
         $paymentMethod = $paymentMethods->fetchByTypeOrId($type);
-        if ($paymentMethod) {
-            $paymentMethodName = $paymentMethod->getValue('name', '');
-            $name = $this->snippetManager
-                ->getNamespace('adyen/method/name')
-                ->get($type, $paymentMethodName, true);
-            $description = $this->snippetManager
-                ->getNamespace('adyen/method/description')
-                ->get($type);
-
-            return PaymentMethodInfo::create(
-                $name ?: $paymentMethodName,
-                $description ?: '',
-                $paymentMethod->getType()
-            );
+        if (!$paymentMethod) {
+            return null;
         }
 
-        return PaymentMethodInfo::empty();
+        $paymentMethodName = $paymentMethod->getValue('name', '');
+        $name = $this->snippetManager
+            ->getNamespace('adyen/method/name')
+            ->get($type, $paymentMethodName, true);
+        $description = $this->snippetManager
+            ->getNamespace('adyen/method/description')
+            ->get($type);
+
+        return PaymentMethodInfo::create(
+            $name ?: $paymentMethodName,
+            $description ?: '',
+            $paymentMethod->getType()
+        );
     }
 
     /**
