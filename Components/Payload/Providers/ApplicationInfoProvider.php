@@ -43,7 +43,7 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
             'controller' => 'transparent',
             'action' => 'redirect',
         ]).'?'.http_build_query([
-          'mercherchantReference' => $context->getOrder()->getNumber(),
+          'merchantReference' => $context->getOrder()->getNumber(),
         ]);
 
         $plugin = $this->modelManager->getRepository(Plugin::class)->findOneBy(['name' => AdyenPayment::NAME]);
