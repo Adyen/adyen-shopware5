@@ -46,7 +46,7 @@ class PaymentMethodService
         Configuration $configuration,
         LoggerInterface $logger
     ) {
-        $this->apiClient = $apiFactory->create();
+        $this->apiClient = $apiFactory->create(Shopware()->Shop());
         $this->configuration = $configuration;
         $this->logger = $logger;
     }
