@@ -71,7 +71,7 @@
 
                 $.loadingIndicator.open();
 
-                const data = {
+                var data = {
                     'paymentMethod': me.getPaymentMethod(),
                     'storePaymentMethod': me.getStorePaymentMethod(),
                     'browserInfo': me.getBrowserInfo(),
@@ -187,7 +187,7 @@
         },
 
         handlePaymentDataRedirectShopper: function (data) {
-            const me = this;
+            var me = this;
             if ('redirect' === data.action.type || 'qrCode' === data.action.type) {
                 me.adyenCheckout
                     .createFromAction(data.action)
@@ -292,7 +292,7 @@
         },
 
         getStorePaymentMethod: function () {
-            const me = this;
+            var me = this;
 
             return me.sessionStorage.getItem(me.storePaymentMethodSession);
         },
