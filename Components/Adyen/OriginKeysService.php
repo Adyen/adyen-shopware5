@@ -14,9 +14,13 @@ use Shopware\Models\Shop\Shop;
 class OriginKeysService
 {
     /**
-     * @var CheckoutUtility
+     * @var ApiFactory
      */
-    private $checkoutUtility;
+    private $apiFactory;
+    /**
+     * @var ModelManager
+     */
+    private $models;
 
     /**
      * OriginKeysService constructor.
@@ -28,8 +32,8 @@ class OriginKeysService
         ApiFactory $apiFactory,
         ModelManager $models
     ) {
-        $mainShop = $models->getRepository(Shop::class)->findOneBy(['default' => 1]);
-        $this->checkoutUtility = new CheckoutUtility($apiFactory->create($mainShop));
+        $this->apiFactory = $apiFactory;
+        $this->models = $models;
     }
 
     /**
@@ -37,8 +41,12 @@ class OriginKeysService
      * @return mixed
      * @throws AdyenException
      */
-    public function generate(array $originDomains)
+    public function generate(array $originDomains, Shop $shop)
     {
-        return $this->checkoutUtility->originKeys(['originDomains' => $originDomains])['originKeys'];
+        $checkoutUtility = new CheckoutUtility(
+            $this->apiFactory->provide($shop)
+        );
+
+        return $checkoutUtility->originKeys(['originDomains' => $originDomains])['originKeys'];
     }
 }
