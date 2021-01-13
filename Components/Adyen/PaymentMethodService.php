@@ -3,7 +3,6 @@
 namespace AdyenPayment\Components\Adyen;
 
 use Adyen\AdyenException;
-use Adyen\Client;
 use Adyen\Service\Checkout;
 use Adyen\Util\Currency;
 use AdyenPayment\Components\Configuration;
@@ -17,11 +16,6 @@ use Psr\Log\LoggerInterface;
 class PaymentMethodService
 {
     /**
-     * @var Client
-     */
-    private $apiClient;
-
-    /**
      * @var Configuration
      */
     private $configuration;
@@ -34,6 +28,10 @@ class PaymentMethodService
      * @var LoggerInterface
      */
     private $logger;
+    /**
+     * @var ApiFactory
+     */
+    private $apiFactory;
 
     /**
      * PaymentMethodService constructor.
@@ -46,7 +44,7 @@ class PaymentMethodService
         Configuration $configuration,
         LoggerInterface $logger
     ) {
-        $this->apiClient = $apiFactory->create();
+        $this->apiFactory = $apiFactory;
         $this->configuration = $configuration;
         $this->logger = $logger;
     }
@@ -72,7 +70,7 @@ class PaymentMethodService
             return $this->cache[$cacheKey];
         }
 
-        $checkout = new Checkout($this->apiClient);
+        $checkout = $this->getCheckout();
         $adyenCurrency = new Currency();
 
         $requestParams = [
@@ -116,11 +114,12 @@ class PaymentMethodService
     }
 
     /**
-     * @return Checkout
      * @throws AdyenException
      */
-    public function getCheckout()
+    public function getCheckout(): Checkout
     {
-        return new Checkout($this->apiClient);
+        $apiClient = $this->apiFactory->provide(Shopware()->Shop());
+
+        return new Checkout($apiClient);
     }
 }

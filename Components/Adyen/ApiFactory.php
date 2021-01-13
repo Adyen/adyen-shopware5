@@ -9,8 +9,6 @@ use Adyen\Client;
 use Adyen\Environment;
 use AdyenPayment\Components\Configuration;
 use Psr\Log\LoggerInterface;
-use Shopware\Components\Model\ModelManager;
-use Shopware\Models\Shop\Repository as ShopRepository;
 use Shopware\Models\Shop\Shop;
 
 /**
@@ -30,57 +28,50 @@ class ApiFactory
     private $logger;
 
     /**
-     * @var ShopRepository
-     */
-    private $shopRepository;
-
-    /**
      * @var Client[]
      */
-    private $apiClients;
+    private $apiClients = [];
 
     /**
      * ApiFactory constructor.
-     * @param ModelManager $modelManager
      * @param Configuration $configuration
      * @param LoggerInterface $logger
      */
     public function __construct(
-        ModelManager $modelManager,
         Configuration $configuration,
         LoggerInterface $logger
     ) {
         $this->configuration = $configuration;
         $this->logger = $logger;
-        $this->shopRepository = $modelManager->getRepository(Shop::class);
-        $this->apiClients = [];
     }
 
     /**
-     * @param null|Shop $shop
-     * @return Client
      * @throws AdyenException
      */
-    public function create($shop = null)
+    public function provide(Shop $shop): Client
     {
-        if (!$shop) {
-            $shop = $this->shopRepository->getDefault();
-        }
-
-        if (!$this->apiClients[$shop->getId()]) {
-            $urlPrefix = null;
-            if ($this->configuration->getEnvironment($shop) === Environment::LIVE) {
-                $urlPrefix = $this->configuration->getApiUrlPrefix($shop);
-            }
-
-            $apiClient = new Client();
-            $apiClient->setXApiKey($this->configuration->getApiKey($shop));
-            $apiClient->setEnvironment($this->configuration->getEnvironment($shop), $urlPrefix);
-            $apiClient->setLogger($this->logger);
-
-            $this->apiClients[$shop->getId()] = $apiClient;
+        if (!array_key_exists($shop->getId(), $this->apiClients)) {
+            $this->apiClients[$shop->getId()] = $this->buildStorefrontApiClient($shop);
         }
 
         return $this->apiClients[$shop->getId()];
+    }
+
+    /**
+     * @throws AdyenException
+     */
+    private function buildStorefrontApiClient(Shop $shop): Client
+    {
+        $urlPrefix = Environment::LIVE === $this->configuration->getEnvironment($shop)
+            ? $this->configuration->getApiUrlPrefix($shop)
+            : null;
+
+        $apiClient = new Client();
+        $apiClient->setMerchantAccount($this->configuration->getMerchantAccount($shop));
+        $apiClient->setXApiKey($this->configuration->getApiKey($shop));
+        $apiClient->setEnvironment($this->configuration->getEnvironment($shop), $urlPrefix);
+        $apiClient->setLogger($this->logger);
+
+        return $apiClient;
     }
 }

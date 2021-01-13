@@ -61,7 +61,7 @@ class RefundService
     {
         /** @var Order $order */
         $order = $this->modelManager->find(Order::class, $orderId);
-        $apiClient = $this->apiFactory->create($order->getShop());
+        $apiClient = $this->apiFactory->provide($order->getShop());
         $modification = new Modification($apiClient);
 
         /** @var PaymentInfo $paymentInfo */
