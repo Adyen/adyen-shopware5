@@ -6,6 +6,9 @@ use AdyenPayment\Components\Builder\NotificationBuilder;
 use AdyenPayment\Exceptions\InvalidParameterException;
 use AdyenPayment\Exceptions\OrderNotFoundException;
 use AdyenPayment\Models\Feedback\NotificationItemFeedback;
+use AdyenPayment\Models\Feedback\TextNotificationItemFeedback;
+use AdyenPayment\Models\TextNotification;
+use Doctrine\ORM\ORMException;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\Model\ModelManager;
 
@@ -52,7 +55,7 @@ class IncomingNotificationManager
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function save(array $notificationItems)
+    public function saveNotification(array $notificationItems)
     {
         foreach ($notificationItems as $notificationItem) {
             try {
@@ -68,6 +71,29 @@ class IncomingNotificationManager
             } catch (OrderNotFoundException $exception) {
                 $this->logger->warning($exception->getMessage());
                 yield new NotificationItemFeedback($exception->getMessage(), $notificationItem);
+            }
+        }
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @param array $textNotificationItems
+     * @return \Generator
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function saveTextNotification(array $textNotificationItems): \Generator
+    {
+        foreach ($textNotificationItems as $textNotificationItem) {
+            try {
+                if (!empty($textNotificationItem['NotificationRequestItem'])) {
+                    $textNotification = new TextNotification();
+                    $textNotification->setTextNotification(json_encode($textNotificationItem['NotificationRequestItem']));
+                    $this->entityManager->persist($textNotification);
+                }
+            } catch (ORMException $exception) {
+                $this->logger->warning($exception->getMessage());
+                yield new TextNotificationItemFeedback($exception->getMessage(), $textNotificationItem);
             }
         }
         $this->entityManager->flush();
