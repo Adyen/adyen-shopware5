@@ -54,51 +54,23 @@ class OriginKeysService
     }
 
     /**
-     * @param Shop[]|null $shops
-     * @return array
-     * @throws AdyenException
-     */
-    public function generate(array $shops = null)
-    {
-        if (!$shops) {
-            $shops = $this->models->getRepository(Shop::class)->findAll();
-        }
-
-        $domains = [];
-        foreach ($shops as $shop) {
-            $domains[$shop->getId()] = $this->getDomain($shop);
-        }
-
-        $keys = $this->originKeysService->generate(array_values($domains));
-        $shopKeys = [];
-        foreach ($domains as $shopId => $domain) {
-            if (!isset($keys[$domain])) {
-                continue;
-            }
-
-            $shopKeys[$shopId] = $keys[$domain];
-        }
-
-        return $shopKeys;
-    }
-
-    /**
      * @throws AdyenException
      */
     public function generateAndSave()
     {
         $plugin = $this->models->getRepository(Plugin::class)->findOneBy(['name' => AdyenPayment::NAME]);
         $shops = $this->models->getRepository(Shop::class)->findAll();
-        $keys = $this->generate($shops);
 
         foreach ($shops as $shop) {
-            if (!isset($keys[$shop->getId()])) {
+            $shopOriginKey = $this->provideOriginKey($shop);
+            if (!$shopOriginKey) {
                 continue;
             }
+
             $this->configWriter->saveConfigElement(
                 $plugin,
                 'origin_key',
-                $keys[$shop->getId()],
+                $shopOriginKey,
                 $shop
             );
         }
@@ -106,6 +78,23 @@ class OriginKeysService
         if ($this->shopwareVersionCheck->isHigherThanShopwareVersion('v5.5.6')) {
             Shopware()->Container()->get('shopware.cache_manager')->clearByTags([CacheManager::CACHE_TAG_CONFIG]);
         }
+    }
+
+    /**
+     * @throws AdyenException
+     */
+    private function provideOriginKey(Shop $shop): string
+    {
+        $originKeys = (array) $this->originKeysService->generate(
+            (array) $this->getDomain($shop),
+            $shop
+        );
+
+        if (!$originKeys) {
+            return '';
+        }
+
+        return (string) array_shift($originKeys);
     }
 
     /**
