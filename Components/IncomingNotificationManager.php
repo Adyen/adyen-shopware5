@@ -50,28 +50,26 @@ class IncomingNotificationManager
     }
 
     /**
-     * @param array $notificationItems
-     * @return \Generator
-     * @throws \Doctrine\ORM\ORMException
+     * @param TextNotification[] $textNotifications
+     * @throws ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function saveNotification(array $notificationItems)
+    public function convertNotifications(array $textNotifications)
     {
-        foreach ($notificationItems as $notificationItem) {
+        foreach ($textNotifications as $textNotificationItem) {
             try {
-                if (!empty($notificationItem['NotificationRequestItem'])) {
+                if (!empty($textNotificationItem->getTextNotification())) {
                     $notification = $this->notificationBuilder->fromParams(
-                        $notificationItem['NotificationRequestItem']
+                        json_decode($textNotificationItem->getTextNotification(), true)
                     );
                     $this->entityManager->persist($notification);
                 }
-            } catch (InvalidParameterException $exception) {
-                $this->logger->warning($exception->getMessage());
-                yield new NotificationItemFeedback($exception->getMessage(), $notificationItem);
-            } catch (OrderNotFoundException $exception) {
-                $this->logger->warning($exception->getMessage());
-                yield new NotificationItemFeedback($exception->getMessage(), $notificationItem);
+            } catch (InvalidParameterException | OrderNotFoundException $exception) {
+                $this->logger->warning(
+                    $exception->getMessage() . " " . $textNotificationItem->getTextNotification()
+                );
             }
+            $this->entityManager->remove($textNotificationItem);
         }
         $this->entityManager->flush();
     }

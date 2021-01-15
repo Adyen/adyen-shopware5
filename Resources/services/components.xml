@@ -47,6 +47,10 @@
                  class="AdyenPayment\Components\FifoNotificationLoader">
             <argument type="service" id="adyen_payment.components.notification_manager"/>
         </service>
+        <service id="adyen_payment.components.fifo_text_notification_loader"
+                 class="AdyenPayment\Components\FifoTextNotificationLoader">
+            <argument type="service" id="adyen_payment.components.text_notification_manager"/>
+        </service>
         <service id="adyen_payment.components.payment_status_update" class="AdyenPayment\Components\PaymentStatusUpdate">
             <argument type="service" id="models"/>
             <argument type="service" id="events"/>

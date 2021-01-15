@@ -3,6 +3,8 @@
 namespace AdyenPayment\Subscriber\Cronjob;
 
 use AdyenPayment\Components\FifoNotificationLoader;
+use AdyenPayment\Components\FifoTextNotificationLoader;
+use AdyenPayment\Components\IncomingNotificationManager;
 use AdyenPayment\Components\NotificationProcessor;
 use AdyenPayment\Models\Feedback\NotificationProcessorFeedback;
 use Enlight\Event\SubscriberInterface;
@@ -20,28 +22,47 @@ class ProcessNotifications implements SubscriberInterface
     /**
      * @var FifoNotificationLoader
      */
-    private $loader;
+    private $fifoNotificationLoader;
+
     /**
      * @var NotificationProcessor
      */
     private $notificationProcessor;
+
     /**
      * @var LoggerInterface
      */
     private $logger;
 
     /**
+     * @var FifoTextNotificationLoader
+     */
+    private $fifoTextNotificationLoader;
+
+    /**
+     * @var IncomingNotificationManager
+     */
+    private $incomingNotificationManager;
+
+    /**
      * ProcessNotifications constructor.
      * @param FifoNotificationLoader $fifoNotificationLoader
+     * @param FifoTextNotificationLoader $fifoTextNotificationLoader
      * @param NotificationProcessor $notificationProcessor
+     * @param IncomingNotificationManager $incomingNotificationManager
+     * @param LoggerInterface $logger
      */
     public function __construct(
         FifoNotificationLoader $fifoNotificationLoader,
+        FifoTextNotificationLoader $fifoTextNotificationLoader,
         NotificationProcessor $notificationProcessor,
+        IncomingNotificationManager $incomingNotificationManager,
         LoggerInterface $logger
     ) {
-        $this->loader = $fifoNotificationLoader;
+        $this->fifoNotificationLoader = $fifoNotificationLoader;
+        $this->fifoTextNotificationLoader = $fifoTextNotificationLoader;
         $this->notificationProcessor = $notificationProcessor;
+        $this->incomingNotificationManager = $incomingNotificationManager;
         $this->logger = $logger;
     }
 
@@ -59,9 +80,13 @@ class ProcessNotifications implements SubscriberInterface
      */
     public function runCronjob(Shopware_Components_Cron_CronJob $job)
     {
+        $textNotifications = $this->fifoTextNotificationLoader->get();
+
+        $this->incomingNotificationManager->convertNotifications($textNotifications);
+
         /** @var \Generator<NotificationProcessorFeedback> $feedback */
         $feedback = $this->notificationProcessor->processMany(
-            $this->loader->load(self::NUMBER_OF_NOTIFICATIONS_TO_HANDLE)
+            $this->fifoNotificationLoader->load(self::NUMBER_OF_NOTIFICATIONS_TO_HANDLE)
         );
 
         /** @var NotificationProcessorFeedback $item */
