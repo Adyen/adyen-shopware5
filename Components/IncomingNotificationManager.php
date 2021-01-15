@@ -86,7 +86,9 @@ class IncomingNotificationManager
             try {
                 if (!empty($textNotificationItem['NotificationRequestItem'])) {
                     $textNotification = new TextNotification();
-                    $textNotification->setTextNotification(json_encode($textNotificationItem['NotificationRequestItem']));
+                    $textNotification->setTextNotification(
+                        json_encode($textNotificationItem['NotificationRequestItem'])
+                    );
                     $this->entityManager->persist($textNotification);
                 }
             } catch (ORMException $exception) {
