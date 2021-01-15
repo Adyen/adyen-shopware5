@@ -33,18 +33,11 @@ class TextNotification extends ModelEntity implements \JsonSerializable
     private $createdAt;
 
     /**
-     * @var \DateTime
-     * @ORM\Column(name="updated_at", type="datetime")
-     */
-    private $updatedAt;
-
-    /**
      * TextNotification constructor
      */
     public function __construct()
     {
         $this->setCreatedAt(new \DateTime('now'));
-        $this->setUpdatedAt(new \DateTime('now'));
     }
 
     /**
@@ -102,24 +95,6 @@ class TextNotification extends ModelEntity implements \JsonSerializable
     }
 
     /**
-     * @return \DateTime
-     */
-    public function getUpdatedAt(): \DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \DateTime $updatedAt
-     * @return TextNotification
-     */
-    public function setUpdatedAt(\DateTime $updatedAt): TextNotification
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
      * Specify data which should be serialized to JSON
      * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
      * @return mixed data which can be serialized by <b>json_encode</b>,
@@ -131,8 +106,7 @@ class TextNotification extends ModelEntity implements \JsonSerializable
         return [
             'id' => $this->getId(),
             'textNotification' => $this->getTextNotification(),
-            'createdAt' => $this->getCreatedAt(),
-            'updatedAt' => $this->getUpdatedAt()
+            'createdAt' => $this->getCreatedAt()
         ];
     }
 }
