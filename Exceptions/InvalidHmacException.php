@@ -6,7 +6,7 @@ namespace AdyenPayment\Exceptions;
 
 use Adyen\AdyenException;
 
-class InvalidHmacException extends \InvalidArgumentException
+class InvalidHmacException extends AuthorizationException
 {
     public static function withHmacKey(string $hmac): self
     {

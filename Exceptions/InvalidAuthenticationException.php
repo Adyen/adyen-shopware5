@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Exceptions;
 
-class InvalidAuthenticationException extends \InvalidArgumentException
+class InvalidAuthenticationException extends AuthorizationException
 {
     public static function missingAuthentication(): self
     {
