@@ -86,25 +86,28 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             $checkout = $this->adyenCheckout->getCheckout();
             $paymentInfo = $checkout->payments($payload);
 
-            $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
+            $this->adyenManager->storePaymentDataInSession(
+                $context->getTransaction(),
+                $paymentInfo['paymentData']
+            );
             $this->handlePaymentData($paymentInfo);
             $this->Response()->setBody(json_encode(
                 [
                     'status' => 'success',
-                    'content' => $paymentInfo
+                    'content' => $paymentInfo,
                 ]
             ));
         } catch (\Adyen\AdyenException $ex) {
             $this->logger->debug('AdyenException during doPayment', [
                 'message' => $ex->getMessage(),
                 'file' => $ex->getFile(),
-                'line' => $ex->getLine()
+                'line' => $ex->getLine(),
             ]);
 
             $this->Response()->setBody(json_encode(
                 [
                     'status' => 'error',
-                    'content' => $ex->getMessage()
+                    'content' => $ex->getMessage(),
                 ]
             ));
         }
@@ -133,22 +136,28 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     }
 
     /**
-     * @param $post
-     * @param $detail
      * @throws \Adyen\AdyenException
      */
-    private function paymentDetails($post, $detail)
+    private function paymentDetails(string $post, string $detail)
     {
         $this->Request()->setHeader('Content-Type', 'application/json');
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
-        $postData = $this->Request()->getPost($post);
+        $postData = $this->Request()->getPost();
+        $threeDsDetail = (string) $postData['details'][$detail] ?? '';
+        $paymentData = (string) $postData['paymentData'] ?? '';
+        if (!$threeDsDetail || !$paymentData) {
+            $this->logger->error('3DS2 missing data', [
+                $detail => substr($threeDsDetail, -5),
+                'paymentData' => substr($paymentData, -5),
+            ]);
+        }
 
         $payload = [
-            'paymentData' => $this->adyenManager->getPaymentDataSession(),
+            'paymentData' => $paymentData,
             'details' => [
-                $detail => $postData
-            ]
+                $detail => $threeDsDetail,
+            ],
         ];
 
         $checkout = $this->adyenCheckout->getCheckout();
@@ -201,6 +210,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
     /**
      * @param PaymentInfo $transaction
+     *
      * @return Order
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -211,7 +221,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
         Shopware()->Session()->offsetSet(
             AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS,
-            (bool) (0 < $transaction->getId())
+            (bool)(0 < $transaction->getId())
         );
 
         $orderNumber = $this->saveOrder(
@@ -225,7 +235,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
         /** @var Order $order */
         $order = $this->getModelManager()->getRepository(Order::class)->findOneBy([
-            'number' => $orderNumber
+            'number' => $orderNumber,
         ]);
 
         $transaction->setOrder($order);
@@ -242,13 +252,14 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     private function getShopperInfo()
     {
         return [
-            'shopperIP' => $this->request->getClientIp()
+            'shopperIP' => $this->request->getClientIp(),
         ];
     }
 
 
     /**
      * @param $paymentInfo
+     *
      * @throws Enlight_Event_Exception
      * @throws Enlight_Exception
      * @throws Zend_Db_Adapter_Exception
@@ -260,13 +271,15 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         if (!in_array(
             $paymentInfo['resultCode'],
             ['Authorised', 'IdentifyShopper', 'ChallengeShopper', 'RedirectShopper']
-        )) {
+        )
+        ) {
             $this->handlePaymentDataError($paymentInfo);
         }
     }
 
     /**
      * @param $paymentInfo
+     *
      * @throws Enlight_Event_Exception
      * @throws Enlight_Exception
      * @throws Zend_Db_Adapter_Exception

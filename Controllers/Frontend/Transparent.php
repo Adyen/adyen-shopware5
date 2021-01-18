@@ -1,5 +1,6 @@
 <?php
 
+use AdyenPayment\Utils\RequestDataFormatter;
 use Shopware\Components\CSRFWhitelistAware;
 use Shopware\Components\Logger;
 
@@ -49,7 +50,7 @@ class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Fro
 
         //Getting all GET parameters except for Shopware's action, controller and module
         $getParams = $request->getQuery();
-        unset($getParams['action'], $getParams['controller'], $getParams['module']);
+        $getParams = RequestDataFormatter::forRedirect($getParams);
 
         //Filtering allowed POST parameters
         $fullPostParams = $request->getParams();
