@@ -144,7 +144,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
         $postData = $this->Request()->getPost();
-        $threeDsDetail = (string) $postData['details'][$detail] ?? '';
+        $threeDsDetail = (string) ($postData['details'][$detail] ?? $postData['details'][$post] ?? '');
         $paymentData = (string) $postData['paymentData'] ?? '';
         if (!$threeDsDetail || !$paymentData) {
             $this->logger->error('3DS2 missing data', [
