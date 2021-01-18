@@ -64,7 +64,11 @@ class IncomingNotificationManager
                     );
                     $this->entityManager->persist($notification);
                 }
-            } catch (InvalidParameterException | OrderNotFoundException $exception) {
+            } catch (InvalidParameterException $exception) {
+                $this->logger->warning(
+                    $exception->getMessage() . " " . $textNotificationItem->getTextNotification()
+                );
+            } catch (OrderNotFoundException $exception) {
                 $this->logger->warning(
                     $exception->getMessage() . " " . $textNotificationItem->getTextNotification()
                 );
