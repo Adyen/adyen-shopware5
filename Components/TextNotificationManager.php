@@ -43,7 +43,7 @@ class TextNotificationManager
     public function getTextNextNotificationsToHandle(): array
     {
         $builder = $this->textNotificationRepository->createQueryBuilder('n');
-        $builder->orderBy('n.createdAt', 'ASC');
+        $builder->orderBy('n.createdAt', 'ASC')->setMaxResults(20);
 
         return $builder->getQuery()->getResult();
     }
