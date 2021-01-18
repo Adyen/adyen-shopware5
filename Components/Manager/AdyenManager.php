@@ -35,7 +35,7 @@ class AdyenManager
         $this->session = $session;
     }
 
-    public function storePaymentDataInSession(PaymentInfo $transaction, string $paymentData)
+    public function storePaymentData(PaymentInfo $transaction, string $paymentData)
     {
         $transaction->setPaymentData($paymentData);
         $this->modelManager->persist($transaction);
