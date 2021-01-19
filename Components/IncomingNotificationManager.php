@@ -91,7 +91,8 @@ class IncomingNotificationManager
                 if (!empty($textNotificationItem['NotificationRequestItem'])) {
 
                     if ($this->skipNotification($textNotificationItem['NotificationRequestItem'])) {
-                        $this->logger->info('Skipped notification', ['eventCode' => $notificationRequest['eventCode'] ?? '']);
+                        $this->logger->info('Skipped notification',
+                            ['eventCode' => $notificationRequest['eventCode'] ?? '']);
                         continue;
                     }
 
@@ -111,10 +112,11 @@ class IncomingNotificationManager
 
     private function skipNotification(array $notificationRequest): bool
     {
-        if (strpos($notificationRequest['event_code'], 'REPORT_') !== false) {
-            return false;
+        if (!empty($notificationRequest['eventCode']) &&
+            strpos($notificationRequest['eventCode'], 'REPORT_') !== false) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 }
