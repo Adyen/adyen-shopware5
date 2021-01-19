@@ -9,5 +9,7 @@
         <import resource="services/managers.xml"/>
         <import resource="services/subscribers.xml"/>
         <import resource="services/cronjobs.xml"/>
+        <import resource="services/adyen.xml"/>
+        <import resource="services/validators.xml"/>
     </imports>
 </container>

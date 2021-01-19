@@ -47,6 +47,7 @@ class IncomingNotificationManager
         $this->logger = $logger;
         $this->notificationBuilder = $notificationBuilder;
         $this->entityManager = $entityManager;
+        $this->notificationReceiver = $notificationReceiver;
     }
 
     /**
@@ -89,6 +90,12 @@ class IncomingNotificationManager
         foreach ($textNotificationItems as $textNotificationItem) {
             try {
                 if (!empty($textNotificationItem['NotificationRequestItem'])) {
+                  
+                    if ($this->skipNotification($notificationRequest)) {
+                        $this->logger->info('Skipped notification', ['eventCode' => $notificationRequest['eventCode'] ?? '']);
+                        continue;
+                    }
+                  
                     $textNotification = new TextNotification();
                     $textNotification->setTextNotification(
                         json_encode($textNotificationItem['NotificationRequestItem'])
@@ -101,5 +108,14 @@ class IncomingNotificationManager
             }
         }
         $this->entityManager->flush();
+    }
+
+    private function skipNotification(array $notificationRequest): bool
+    {
+        if (strpos($notificationRequest['event_code'], 'REPORT_') !== false) {
+            return false;
+        }
+
+        return true;
     }
 }
