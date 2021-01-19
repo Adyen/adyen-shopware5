@@ -62,7 +62,6 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
         try {
             $notifications = $this->getNotificationItems();
             $this->authorizationValidator->validate($notifications);
-
         } catch (AuthorizationException $exception) {
             $this->View()->assign('responseData', NotificationResponseFactory::unauthorized($exception->getMessage()));
 

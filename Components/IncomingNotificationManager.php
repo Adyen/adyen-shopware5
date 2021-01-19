@@ -90,8 +90,10 @@ class IncomingNotificationManager
             try {
                 if (!empty($textNotificationItem['NotificationRequestItem'])) {
                     if ($this->skipNotification($textNotificationItem['NotificationRequestItem'])) {
-                        $this->logger->info('Skipped notification',
-                            ['eventCode' => $notificationRequest['eventCode'] ?? '']);
+                        $this->logger->info(
+                            'Skipped notification',
+                            ['eventCode' => $notificationRequest['eventCode'] ?? '']
+                        );
                         continue;
                     }
 
