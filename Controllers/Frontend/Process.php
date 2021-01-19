@@ -2,6 +2,7 @@
 
 use AdyenPayment\Components\Manager\AdyenManager;
 use AdyenPayment\Models\Enum\PaymentResultCodes;
+use AdyenPayment\Utils\RequestDataFormatter;
 use Shopware\Components\CSRFWhitelistAware;
 use Shopware\Components\Logger;
 use Shopware\Models\Order\Order;
@@ -66,8 +67,12 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         $response = $this->Request()->getParams();
 
         if ($response) {
-            $result = $this->validateResponse($response);
-            $this->handleReturnResult($result);
+            /** @var Order $order */
+            $order = $this->getModelManager()->getRepository(Order::class)->findOneBy([
+                'number' => $response['merchantReference'] ?? ''
+            ]);
+            $result = $this->validateResponse($response, $order);
+            $this->handleReturnResult($result, $order);
 
             switch ($result['resultCode']) {
                 case PaymentResultCodes::AUTHORISED:
@@ -99,22 +104,17 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     }
 
     /**
-     * @param $result
+     * @param array $result
+     * @param Order|null $order
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    private function handleReturnResult($result)
+    private function handleReturnResult(array $result, $order)
     {
-        $orderNumber = $result['merchantReference'];
-        /** @var Order $order */
-        $order = $this->getModelManager()->getRepository(Order::class)->findOneBy([
-            'number' => $orderNumber
-        ]);
-
         if (!$order) {
             $this->logger->error('No order found for ', [
-                'ordernumber' => $orderNumber,
+                'ordernumber' => $result['merchantReference'] ?? '',
             ]);
 
             return;
@@ -150,13 +150,14 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     /**
      * Validates the payload from checkout /payments hpp and returns the api response
      *
-     * @param $response
+     * @param array $response
+     * @param Order $order
      * @return mixed
      */
-    private function validateResponse($response)
+    private function validateResponse($response, $order)
     {
-        $request['paymentData'] = $this->adyenManager->getPaymentDataSession();
-        $request['details'] = $response;
+        $request['paymentData'] = $this->adyenManager->fetchOrderPaymentData($order);
+        $request['details'] = RequestDataFormatter::forPaymentDetails($response);
 
         try {
             $checkout = $this->adyenCheckout->getCheckout();
