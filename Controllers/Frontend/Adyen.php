@@ -64,7 +64,10 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             $checkout = $this->adyenCheckout->getCheckout();
             $paymentInfo = $checkout->payments($payload);
 
-            $this->adyenManager->storePaymentDataInSession($paymentInfo['paymentData']);
+            $this->adyenManager->storePaymentData(
+                $context->getTransaction(),
+                $paymentInfo['paymentData'] ?? ''
+            );
             $this->handlePaymentData($paymentInfo);
             $this->Response()->setBody(json_encode(
                 [
@@ -111,22 +114,27 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     }
 
     /**
-     * @param $post
-     * @param $detail
-     *
      * @throws AdyenException
      */
-    private function paymentDetails($post, $detail)
+    private function paymentDetails(string $post, string $detail)
     {
         $this->Request()->setHeader('Content-Type', 'application/json');
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
-        $postData = $this->Request()->getPost($post);
+        $postData = $this->Request()->getPost();
+        $threeDsDetail = (string) ($postData['details'][$detail] ?? $postData['details'][$post] ?? '');
+        $paymentData = (string) $postData['paymentData'] ?? '';
+        if (!$threeDsDetail || !$paymentData) {
+            $this->logger->error('3DS2 missing data', [
+                $detail => substr($threeDsDetail, -5),
+                'paymentData' => substr($paymentData, -5),
+            ]);
+        }
 
         $payload = [
-            'paymentData' => $this->adyenManager->getPaymentDataSession(),
+            'paymentData' => $paymentData,
             'details' => [
-                $detail => $postData,
+                $detail => $threeDsDetail,
             ],
         ];
 

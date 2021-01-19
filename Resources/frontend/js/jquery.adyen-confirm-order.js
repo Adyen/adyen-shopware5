@@ -133,7 +133,7 @@
 
         handlePaymentDataIdentifyShopper: function (data) {
             var me = this;
-
+            var paymentData = data.paymentData;
             $(me.opts.placeOrderSelector).parent().append('<div id="AdyenIdentifyShopperThreeDS2"/>');
             me.adyenCheckout
                 .create('threeDS2DeviceFingerprint', {
@@ -143,7 +143,10 @@
                             method: 'POST',
                             dataType: 'json',
                             url: me.opts.adyenAjaxIdentifyShopperUrl,
-                            data: fingerprintData.data.details,
+                            data: {
+                                'details': fingerprintData.data.details,
+                                'paymentData': paymentData
+                            },
                             success: function (response) {
                                 me.handlePaymentData(response);
                             },
@@ -158,7 +161,7 @@
 
         handlePaymentDataChallengeShopper: function (data) {
             var me = this;
-
+            var paymentData = data.paymentData;
             var modal = $.modal.open('<div id="AdyenChallengeShopperThreeDS2"/>', {
                 showCloseButton: false,
                 closeOnOverlay: false,
@@ -173,7 +176,10 @@
                             method: 'POST',
                             dataType: 'json',
                             url: me.opts.adyenAjaxChallengeShopperUrl,
-                            data: challengeData.data.details,
+                            data: {
+                                'details': challengeData.data.details,
+                                'paymentData': paymentData
+                            },
                             success: function (response) {
                                 me.handlePaymentData(response);
                             },
