@@ -330,7 +330,7 @@
             });
             var giftCardGroup = filteredGiftCardGroup[0] || [];
             var giftCardGroupTypes = (giftCardGroup && giftCardGroup['types']) || [];
-            var filteredTypes = giftCardGroupTypes.filter(function(giftCardGroupType) {
+            var filteredTypes = giftCardGroupTypes.filter(function (giftCardGroupType) {
                 return giftCardGroupType === paymentType;
             });
 
@@ -351,6 +351,15 @@
             }
 
             return "undefined" !== typeof paymentMethod.details;
+        },
+        /**
+         * @param  {object} paymentMethod
+         * @return {boolean}
+         * @private
+         */
+        __enableStoreDetails: function (paymentMethod) {
+            // ignore property "paymentMethod.supportsRecurring"
+            return 'scheme' === paymentMethod.type;
         },
         /**
          * Modify AdyenPaymentMethod with additional data for the web-component library
@@ -389,7 +398,7 @@
 
             return $.extend(true, {}, defaultData, {
                 paymentMethodData: {
-                    enableStoreDetails: paymentMethod.supportsRecurring || false
+                    enableStoreDetails: this.__enableStoreDetails(paymentMethod)
                 }
             });
         }
