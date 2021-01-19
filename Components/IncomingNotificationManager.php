@@ -2,6 +2,7 @@
 
 namespace AdyenPayment\Components;
 
+use Adyen\Service\NotificationReceiver as AdyenNotificationReceiver;
 use AdyenPayment\Components\Builder\NotificationBuilder;
 use AdyenPayment\Exceptions\InvalidParameterException;
 use AdyenPayment\Exceptions\OrderNotFoundException;
@@ -29,6 +30,10 @@ class IncomingNotificationManager
      * @var ModelManager
      */
     private $entityManager;
+    /**
+     * @var AdyenNotificationReceiver
+     */
+    private $notificationReceiver;
 
     /**
      * IncomingNotificationManager constructor.
@@ -39,11 +44,13 @@ class IncomingNotificationManager
     public function __construct(
         LoggerInterface $logger,
         NotificationBuilder $notificationBuilder,
-        ModelManager $entityManager
+        ModelManager $entityManager,
+        AdyenNotificationReceiver $notificationReceiver
     ) {
         $this->logger = $logger;
         $this->notificationBuilder = $notificationBuilder;
         $this->entityManager = $entityManager;
+        $this->notificationReceiver = $notificationReceiver;
     }
 
     /**
@@ -55,13 +62,19 @@ class IncomingNotificationManager
     public function save(array $notificationItems)
     {
         foreach ($notificationItems as $notificationItem) {
+            $notificationRequest = $notificationItem['NotificationRequestItem'] ?? [];
+            if (empty($notificationRequest)) {
+                continue;
+            }
+
+            if ($this->skipNotification($notificationRequest)) {
+                $this->logger->info('Skipped notification', ['eventCode' => $notificationRequest['eventCode'] ?? '']);
+                continue;
+            }
+
             try {
-                if (!empty($notificationItem['NotificationRequestItem'])) {
-                    $notification = $this->notificationBuilder->fromParams(
-                        $notificationItem['NotificationRequestItem']
-                    );
-                    $this->entityManager->persist($notification);
-                }
+                $notification = $this->notificationBuilder->fromParams($notificationRequest);
+                $this->entityManager->persist($notification);
             } catch (InvalidParameterException $exception) {
                 $this->logger->warning($exception->getMessage());
                 yield new NotificationItemFeedback($exception->getMessage(), $notificationItem);
@@ -71,5 +84,14 @@ class IncomingNotificationManager
             }
         }
         $this->entityManager->flush();
+    }
+
+    private function skipNotification(array $notificationRequest): bool
+    {
+        if ($this->notificationReceiver->isReportNotification($notificationRequest['eventCode'])) {
+            return true;
+        }
+
+        return false;
     }
 }
