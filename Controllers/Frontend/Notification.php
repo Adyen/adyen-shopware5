@@ -63,7 +63,6 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
             $notifications = $this->getNotificationItems();
             $this->authorizationValidator->validate($notifications);
 
-            $this->saveNotifications($notifications);
         } catch (AuthorizationException $exception) {
             $this->View()->assign('responseData', NotificationResponseFactory::unauthorized($exception->getMessage()));
 
@@ -79,7 +78,7 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
             $this->View()->assign('[notification save error]');
             return;
         }
-      
+
         // on valid credentials, always return ACCEPTED
         $this->View()->assign('responseData', NotificationResponseFactory::accepted());
     }
