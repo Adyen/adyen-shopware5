@@ -3,9 +3,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="Adyen\Util\HmacSignature" />
-        <service id="Adyen\Service\NotificationReceiver">
-            <argument type="service" id="Adyen\Util\HmacSignature" />
-        </service>
     </services>
 </container>
 

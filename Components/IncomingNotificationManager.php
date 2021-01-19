@@ -47,7 +47,6 @@ class IncomingNotificationManager
         $this->logger = $logger;
         $this->notificationBuilder = $notificationBuilder;
         $this->entityManager = $entityManager;
-        $this->notificationReceiver = $notificationReceiver;
     }
 
     /**
@@ -90,12 +89,12 @@ class IncomingNotificationManager
         foreach ($textNotificationItems as $textNotificationItem) {
             try {
                 if (!empty($textNotificationItem['NotificationRequestItem'])) {
-                  
-                    if ($this->skipNotification($notificationRequest)) {
+
+                    if ($this->skipNotification($textNotificationItem['NotificationRequestItem'])) {
                         $this->logger->info('Skipped notification', ['eventCode' => $notificationRequest['eventCode'] ?? '']);
                         continue;
                     }
-                  
+
                     $textNotification = new TextNotification();
                     $textNotification->setTextNotification(
                         json_encode($textNotificationItem['NotificationRequestItem'])
