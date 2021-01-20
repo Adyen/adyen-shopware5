@@ -30,10 +30,6 @@ class FifoTextNotificationLoader
 
     public function get(): array
     {
-        try {
-            return $this->textNotificationManager->getTextNextNotificationsToHandle();
-        } catch (NoResultException | NonUniqueResultException $e) {
-            return [];
-        }
+        return $this->textNotificationManager->getTextNextNotificationsToHandle();
     }
 }
