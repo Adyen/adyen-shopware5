@@ -62,8 +62,6 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
         try {
             $notifications = $this->getNotificationItems();
             $this->authorizationValidator->validate($notifications);
-
-            $this->saveNotifications($notifications);
         } catch (AuthorizationException $exception) {
             $this->View()->assign('responseData', NotificationResponseFactory::unauthorized($exception->getMessage()));
 
@@ -73,6 +71,11 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
                 'trace' => $exception->getTraceAsString(),
                 'previous' => $exception->getPrevious(),
             ]);
+        }
+
+        if (!$this->saveTextNotification($notifications)) {
+            $this->View()->assign('[notification save error]');
+            return;
         }
 
         // on valid credentials, always return ACCEPTED
@@ -114,13 +117,13 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
      * @return Generator
      * @throws Enlight_Event_Exception
      */
-    private function saveNotifications(array $notifications)
+    private function saveTextNotification(array $notifications)
     {
         $notifications = $this->events->filter(
             Event::NOTIFICATION_SAVE_FILTER_NOTIFICATIONS,
             $notifications
         );
 
-        return iterator_count($this->incomingNotificationsManager->save($notifications)) === 0;
+        return iterator_count($this->incomingNotificationsManager->saveTextNotification($notifications)) === 0;
     }
 }

@@ -11,6 +11,7 @@ use AdyenPayment\Components\CompilerPass\NotificationProcessorCompilerPass;
 use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
 use AdyenPayment\Models\Refund;
+use AdyenPayment\Models\TextNotification;
 use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
 use Shopware\Components\Logger;
 use Shopware\Components\Plugin;
@@ -215,6 +216,7 @@ class AdyenPayment extends Plugin
             $entityManager->getClassMetadata(Notification::class),
             $entityManager->getClassMetadata(PaymentInfo::class),
             $entityManager->getClassMetadata(Refund::class),
+            $entityManager->getClassMetadata(TextNotification::class)
         ];
     }
 
