@@ -32,6 +32,7 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
             <argument type="service" id="adyen_payment.components.payment_method_service"/>
+            <argument type="service" id="adyen_payment.serializer.payment_method"/>
         </service>
         <service id="adyen_payment.subscriber.backend_order_subscriber" class="AdyenPayment\Subscriber\BackendOrderSubscriber">
             <tag name="shopware.event_subscriber"/>

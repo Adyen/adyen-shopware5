@@ -25,6 +25,7 @@
             },
         },
         paymentMethodSession: 'paymentMethod',
+        storePaymentMethodSession: 'storePaymentMethod',
         adyenConfiguration: {},
         adyenCheckout: null,
 
@@ -72,6 +73,7 @@
 
                 var data = {
                     'paymentMethod': me.getPaymentMethod(),
+                    'storePaymentMethod': me.getStorePaymentMethod(),
                     'browserInfo': me.getBrowserInfo(),
                     'origin': window.location.origin
                 };
@@ -191,7 +193,7 @@
         },
 
         handlePaymentDataRedirectShopper: function (data) {
-            const me = this;
+            var me = this;
             if ('redirect' === data.action.type || 'qrCode' === data.action.type) {
                 me.adyenCheckout
                     .createFromAction(data.action)
@@ -293,6 +295,12 @@
             var me = this;
 
             return me.sessionStorage.getItem(me.paymentMethodSession);
+        },
+
+        getStorePaymentMethod: function () {
+            var me = this;
+
+            return me.sessionStorage.getItem(me.storePaymentMethodSession);
         },
 
         getAdyenConfigSession: function () {

@@ -26,7 +26,7 @@ class ShopperInfoProvider implements PaymentPayloadProvider
                 'gender' => $context->getOrder()->getCustomer()->getSalutation(),
             ],
             'shopperLocale' => Shopware()->Shop()->getLocale()->getLocale(),
-            'shopperReference' => $context->getOrder()->getCustomer()->getId(),
+            'shopperReference' => $context->getOrder()->getCustomer()->getNumber(),
             'countryCode' => $context->getOrder()->getBilling()->getCountry()->getIso(),
             'billingAddress' => [
                 'city' => $context->getOrder()->getBilling()->getCity(),

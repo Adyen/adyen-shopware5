@@ -50,6 +50,11 @@ class PaymentContext
     private $transaction;
 
     /**
+     * @var bool
+     */
+    private $storePaymentMethod;
+
+    /**
      * PaymentContext constructor.
      * @param array $paymentInfo
      * @param Order $order
@@ -58,6 +63,7 @@ class PaymentContext
      * @param array $shopperInfo
      * @param string $origin
      * @param PaymentInfo $transaction
+     * @param bool $storePaymentMethod
      */
     public function __construct(
         array $paymentInfo,
@@ -66,7 +72,8 @@ class PaymentContext
         array $browserInfo,
         array $shopperInfo,
         string $origin,
-        PaymentInfo $transaction
+        PaymentInfo $transaction,
+        bool $storePaymentMethod
     ) {
         $this->paymentInfo = $paymentInfo;
         $this->order = $order;
@@ -75,51 +82,34 @@ class PaymentContext
         $this->shopperInfo = $shopperInfo;
         $this->origin = $origin;
         $this->transaction = $transaction;
+        $this->storePaymentMethod = $storePaymentMethod;
     }
 
-    /**
-     * @return array
-     */
     public function getPaymentInfo(): array
     {
         return $this->paymentInfo;
     }
 
-    /**
-     * @return Order
-     */
     public function getOrder(): Order
     {
         return $this->order;
     }
 
-    /**
-     * @return sBasket
-     */
     public function getBasket(): sBasket
     {
         return $this->basket;
     }
 
-    /**
-     * @return array
-     */
     public function getBrowserInfo(): array
     {
         return $this->browserInfo;
     }
 
-    /**
-     * @return array
-     */
     public function getShopperInfo(): array
     {
         return $this->shopperInfo;
     }
 
-    /**
-     * @return string
-     */
     public function getOrigin(): string
     {
         return $this->origin;
@@ -128,5 +118,10 @@ class PaymentContext
     public function getTransaction(): PaymentInfo
     {
         return $this->transaction;
+    }
+
+    public function enableStorePaymentMethod(): bool
+    {
+        return $this->storePaymentMethod;
     }
 }

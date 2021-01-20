@@ -1,19 +1,12 @@
 <?php
 
+use Adyen\AdyenException;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\BasketService;
-use AdyenPayment\Components\Calculator\PriceCalculationService;
-use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\Manager\AdyenManager;
 use AdyenPayment\Components\Payload\Chain;
 use AdyenPayment\Components\Payload\PaymentContext;
-use AdyenPayment\Components\Payload\Providers\ApplicationInfoProvider;
-use AdyenPayment\Components\Payload\Providers\BrowserInfoProvider;
-use AdyenPayment\Components\Payload\Providers\LineItemsInfoProvider;
-use AdyenPayment\Components\Payload\Providers\OrderInfoProvider;
-use AdyenPayment\Components\Payload\Providers\PaymentMethodProvider;
-use AdyenPayment\Components\Payload\Providers\ShopperInfoProvider;
 use AdyenPayment\Models\PaymentInfo;
 use Shopware\Components\Logger;
 use Shopware\Models\Order\Order;
@@ -41,28 +34,22 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     private $basketService;
 
     /**
-     * @var Configuration
-     */
-    private $configuration;
-
-    /**
      * @var Logger
      */
     private $logger;
 
     /**
-     * @var PriceCalculationService
+     * @var Chain
      */
-    private $priceCalculationService;
+    private $paymentPayloadProvider;
 
     public function preDispatch()
     {
         $this->adyenManager = $this->get('adyen_payment.components.manager.adyen_manager');
         $this->adyenCheckout = $this->get('adyen_payment.components.adyen.payment.method');
         $this->basketService = $this->get('adyen_payment.components.basket_service');
-        $this->configuration = $this->get('adyen_payment.components.configuration');
         $this->logger = $this->get('adyen_payment.logger');
-        $this->priceCalculationService = $this->get('adyen_payment.components.calculator.price_calculation_service');
+        $this->paymentPayloadProvider = $this->get('adyen_payment.components.payload.payment_payload_provider');
     }
 
     public function ajaxDoPaymentAction()
@@ -72,17 +59,8 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
         $context = $this->createPaymentContext();
 
-        $chain = new Chain(
-            new ApplicationInfoProvider($this->configuration),
-            new ShopperInfoProvider(),
-            new OrderInfoProvider(),
-            new PaymentMethodProvider(),
-            new LineItemsInfoProvider($this->priceCalculationService),
-            new BrowserInfoProvider()
-        );
-
         try {
-            $payload = $chain->provide($context);
+            $payload = $this->paymentPayloadProvider->provide($context);
             $checkout = $this->adyenCheckout->getCheckout();
             $paymentInfo = $checkout->payments($payload);
 
@@ -97,7 +75,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                     'content' => $paymentInfo,
                 ]
             ));
-        } catch (\Adyen\AdyenException $ex) {
+        } catch (AdyenException $ex) {
             $this->logger->debug('AdyenException during doPayment', [
                 'message' => $ex->getMessage(),
                 'file' => $ex->getFile(),
@@ -114,7 +92,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     }
 
     /**
-     * @throws \Adyen\AdyenException
+     * @throws AdyenException
      */
     public function ajaxIdentifyShopperAction()
     {
@@ -122,7 +100,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     }
 
     /**
-     * @throws \Adyen\AdyenException
+     * @throws AdyenException
      */
     public function ajaxChallengeShopperAction()
     {
@@ -136,7 +114,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     }
 
     /**
-     * @throws \Adyen\AdyenException
+     * @throws AdyenException
      */
     private function paymentDetails(string $post, string $detail)
     {
@@ -179,6 +157,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $browserInfo = $this->Request()->getPost('browserInfo');
         $shopperInfo = $this->getShopperInfo();
         $origin = $this->Request()->getPost('origin');
+        $storePaymentMethod = (bool)json_decode($this->Request()->getPost('storePaymentMethod', false), true);
 
         return new PaymentContext(
             $paymentInfo,
@@ -187,7 +166,8 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             $browserInfo,
             $shopperInfo,
             $origin,
-            $transaction
+            $transaction,
+            $storePaymentMethod
         );
     }
 

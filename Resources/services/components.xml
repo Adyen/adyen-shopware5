@@ -36,6 +36,8 @@
             <argument type="service" id="adyen_payment.components.adyen.apifactory"/>
             <argument type="service" id="adyen_payment.components.configuration"/>
             <argument type="service" id="adyen_payment.logger"/>
+            <argument type="service" id="session"/>
+            <argument type="service" id="models"/>
         </service>
         <service id="adyen_payment.components.adyen.refund_service"
                  class="AdyenPayment\Components\Adyen\RefundService">
@@ -71,15 +73,30 @@
             <argument type="service" id="models"/>
         </service>
 
-        <!-- Payload -->
+        <!-- Checkout Payment Payload -->
+        <service id="adyen_payment.components.payload.payment_payload_provider" class="AdyenPayment\Components\Payload\Chain">
+            <argument type="service" id="adyen_payment.components.payload.providers.application_info_provider"/>
+            <argument type="service" id="adyen_payment.components.payload.providers.shopper_info_provider"/>
+            <argument type="service" id="adyen_payment.components.payload.providers.order_info_provider"/>
+            <argument type="service" id="adyen_payment.components.payload.providers.paymentmethod_provider"/>
+            <argument type="service" id="adyen_payment.components.payload.providers.lineitems_info_provider"/>
+            <argument type="service" id="adyen_payment.components.payload.providers.browser_info_provider"/>
+            <argument type="service" id="adyen_payment.components.payload.providers.store_payment"/>
+            <argument type="service" id="adyen_payment.components.payload.providers.recurring_payment"/>
+        </service>
         <service id="adyen_payment.components.payload.chain" class="AdyenPayment\Components\Payload\Chain"/>
-        <service id="adyen_payment.components.payload.payment_payload_provider" class="AdyenPayment\Components\Payload\PaymentPayloadProvider"/>
-        <service id="adyen_payment.components.payload.providers.application_info_provider" class="AdyenPayment\Components\Payload\Providers\ApplicationInfoProvider"/>
+        <service id="adyen_payment.components.payload.providers.application_info_provider" class="AdyenPayment\Components\Payload\Providers\ApplicationInfoProvider">
+            <argument type="service" id="adyen_payment.components.configuration" />
+        </service>
         <service id="adyen_payment.components.payload.providers.browser_info_provider" class="AdyenPayment\Components\Payload\Providers\BrowserInfoProvider"/>
-        <service id="adyen_payment.components.payload.providers.lineitems_info_provider" class="AdyenPayment\Components\Payload\Providers\LineItemsInfoProvider"/>
+        <service id="adyen_payment.components.payload.providers.lineitems_info_provider" class="AdyenPayment\Components\Payload\Providers\LineItemsInfoProvider">
+            <argument type="service" id="adyen_payment.components.calculator.price_calculation_service"/>
+        </service>
         <service id="adyen_payment.components.payload.providers.order_info_provider" class="AdyenPayment\Components\Payload\Providers\OrderInfoProvider"/>
         <service id="adyen_payment.components.payload.providers.paymentmethod_provider" class="AdyenPayment\Components\Payload\Providers\PaymentMethodProvider"/>
         <service id="adyen_payment.components.payload.providers.shopper_info_provider" class="AdyenPayment\Components\Payload\Providers\ShopperInfoProvider"/>
+        <service id="adyen_payment.components.payload.providers.store_payment" class="AdyenPayment\Components\Payload\Providers\StorePaymentProvider"/>
+        <service id="adyen_payment.components.payload.providers.recurring_payment" class="AdyenPayment\Components\Payload\Providers\RecurringPaymentProvider"/>
 
         <!-- Notification Processors -->
         <service id="adyen_payment.components.notification_processor.authorisation"
