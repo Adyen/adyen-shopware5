@@ -11,12 +11,8 @@ class StorePaymentProvider implements PaymentPayloadProvider
 {
     public function provide(PaymentContext $context): array
     {
-        if (!$context->enableStorePaymentMethod()) {
-            return [];
-        }
-
         return [
-            'storePaymentMethod' => true,
+            'storePaymentMethod' => $context->enableStorePaymentMethod(),
         ];
     }
 }

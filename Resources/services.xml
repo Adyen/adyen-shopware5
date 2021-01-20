@@ -3,7 +3,15 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <imports>
-        <import resource="services/*.xml"/>
-        <import resource="services/**/*.xml"/>
+        <!-- register services files explicitly -->
+        <import resource="services/adyen.xml" />
+        <import resource="services/commands.xml" />
+        <import resource="services/components.xml" />
+        <import resource="services/cronjobs.xml" />
+        <import resource="services/loggers.xml" />
+        <import resource="services/managers.xml" />
+        <import resource="services/serializers.xml" />
+        <import resource="services/subscribers.xml" />
+        <import resource="services/validators.xml" />
     </imports>
 </container>
