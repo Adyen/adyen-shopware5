@@ -73,6 +73,7 @@
         adyenCheckout: null,
         changeInfosButton: null,
         paymentMethodSession: 'paymentMethod',
+        storePaymentMethodSession: 'storePaymentMethod',
         adyenConfigSession: 'adyenConfig',
 
         init: function () {
@@ -108,7 +109,6 @@
         },
         onPaymentChangedAfter: function () {
             var me = this;
-            var payment;
 
             //Return when no adyen payment
             if (me.currentSelectedPaymentType.indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
@@ -116,17 +116,14 @@
                 return;
             }
 
-            payment = me.getPaymentMethodByType(me.currentSelectedPaymentType);
-
-            //When details is set load the component
-            if (typeof payment.details !== "undefined") {
+            var payment = me.getPaymentMethodByType(me.currentSelectedPaymentType);
+            if (me.__canHandlePayment(payment)) {
                 $('#' + me.currentSelectedPaymentId)
                     .closest(me.opts.paymentMethodSelector)
                     .find(me.opts.methodBankdataSelector)
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
-
                 $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
-                me.handleComponent(payment.type);
+                me.handleComponent(payment);
 
                 return;
             }
@@ -149,13 +146,31 @@
         getCurrentComponentId: function (currentSelectedPaymentId) {
             return 'component-' + currentSelectedPaymentId;
         },
-        getPaymentMethodByType(type) {
+        getPaymentMethodByType: function (type) {
             var me = this;
-
+            // stored payment methods: pmType contains the id of the payment method
             var pmType = type.split(me.opts.adyenPaymentMethodPrefix).pop();
-            return me.opts.adyenPaymentMethodsResponse['paymentMethods'].find(function (paymentMethod) {
-                return paymentMethod.type === pmType
+            var filteredPaymentMethods = me.opts.adyenPaymentMethodsResponse['paymentMethods'].filter(
+                function (paymentMethod) {
+                    return paymentMethod.type === pmType;
+                }
+            );
+            var paymentMethod = filteredPaymentMethods[0];
+
+            return paymentMethod ? paymentMethod : me.getStoredPaymentMethodById(pmType);
+        },
+        /**
+         * @param {String} storedPaymentMethodId
+         * @return {({} | undefined)}
+         */
+        getStoredPaymentMethodById: function (storedPaymentMethodId) {
+            var me = this;
+            var storedPaymentMethods = me.opts.adyenPaymentMethodsResponse['storedPaymentMethods'] || [];
+            var filteredStoredPaymentMethods = storedPaymentMethods.filter(function (paymentMethod) {
+                return paymentMethod.id === storedPaymentMethodId;
             });
+
+            return filteredStoredPaymentMethods[0] || undefined;
         },
         /**
          * @param {String} paymentType
@@ -163,49 +178,37 @@
          * @return {({} | null)}
          * @private
          */
-        __retrievePaymentMethodDetailByKey(paymentType, detailKey) {
-            const me = this;
-            return me.getPaymentMethodByType(paymentType)?.details
-                ?.find(detail => detail.key === detailKey);
+        __retrievePaymentMethodDetailByKey: function (paymentType, detailKey) {
+            var me = this;
+            var paymentMethod = me.getPaymentMethodByType(paymentType) || {};
+            var details = (paymentMethod && paymentMethod.details) || [];
+            var filteredDetails = details.filter(function (detail) {
+                return detail.key === detailKey
+            });
+
+            return filteredDetails[0] || null;
         },
         setCheckout: function () {
             var me = this;
 
             me.adyenCheckout = new AdyenCheckout(me.adyenConfiguration);
         },
-        handleComponent: function (type) {
+        handleComponent: function (paymentMethod) {
             var me = this;
 
-            if (me.__isGiftCardType(type)) {
-                me.handleGiftCardComponent(type);
+            if ('paywithgoogle' === paymentMethod.type) {
+                me.handleComponentPayWithGoogle(paymentMethod);
                 return;
             }
 
-            if ('paywithgoogle' === type) {
-                me.handleComponentPayWithGoogle(type);
-                return;
-            }
-
-            me.handleComponentGeneral(type);
+            var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
+            me.adyenCheckout
+                .create(adyenCheckoutData.cardType, adyenCheckoutData.paymentMethodData)
+                .mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
-        handleComponentGeneral: function (type) {
-            var me = this;
-            me.adyenCheckout.create(type).mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
-        },
-        handleComponentPayWithGoogle: function (type) {
+        handleComponentPayWithGoogle: function (paymentMethod) {
             var me = this;
             $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
-        },
-        handleGiftCardComponent: function (giftCardType) {
-            const me = this;
-            const pinRequiredDetail = me.__retrievePaymentMethodDetailByKey(giftCardType, 'encryptedSecurityCode');
-
-            me.adyenCheckout
-                .create('giftcard', {
-                    type: giftCardType,
-                    pinRequired: false === pinRequiredDetail?.optional
-                })
-                .mount('#' + me.getCurrentComponentId(me.currentSelectedPaymentId));
         },
         handleOnChange: function (state) {
             var me = this;
@@ -233,12 +236,6 @@
             var paymentMethodContainer = form.find('input[name=payment]:checked').closest(me.opts.paymentMethodSelector);
 
             if (!me.isPaymentMethodValid(paymentMethod)) {
-                return;
-            }
-
-            //Return when redirect
-            var payment = me.getPaymentMethodByType(paymentMethod.val());
-            if (typeof payment.details === "undefined") {
                 return;
             }
 
@@ -270,12 +267,9 @@
                 return false;
             }
 
-            //Return when redirect
-            if (typeof me.getPaymentMethodByType(paymentMethod.val()).details === "undefined") {
-                return false;
-            }
-
-            return true;
+            return me.__canHandlePayment(
+                me.getPaymentMethodByType(paymentMethod.val())
+            );
         },
         updatePaymentInfo: function () {
             var me = this;
@@ -286,14 +280,13 @@
             var paymentMethod = $(me.opts.formSelector).find('input[name=payment]:checked');
             var payment = me.getPaymentMethodByType(paymentMethod.val());
 
-            //When details is set load the component
-            if (typeof payment.details !== "undefined") {
+            if (me.__canHandlePayment(payment)) {
                 $('#' + me.currentSelectedPaymentId)
                     .closest(me.opts.paymentMethodSelector)
                     .find(me.opts.methodBankdataSelector)
                     .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
 
-                me.handleComponent(payment.type);
+                me.handleComponent(payment);
 
                 if (me.changeInfosButton) {
                     me.changeInfosButton.remove();
@@ -304,11 +297,12 @@
         setPaymentSession: function (state) {
             var me = this;
             me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
+            me.sessionStorage.setItem(me.storePaymentMethodSession, state.data.storePaymentMethod || false);
         },
         removePaymentSession: function () {
             var me = this;
-
             me.sessionStorage.removeItem(me.paymentMethodSession);
+            me.sessionStorage.removeItem(me.storePaymentMethodSession);
             $.get(me.opts.resetSessionUrl);
         },
         saveAdyenConfigInSession: function (adyenConfiguration) {
@@ -328,13 +322,86 @@
          * @return {boolean}
          * @private
          */
-        __isGiftCardType(paymentType) {
-            const giftCardGroup = this.opts.adyenPaymentMethodsResponse['groups']?.find(
-                group => this.defaults.giftCardGroupName === group['name']
-            ) ?? {};
+        __isGiftCardType: function (paymentType) {
+            var me = this;
+            var paymentGroups = me.opts.adyenPaymentMethodsResponse['groups'] || [];
+            var filteredGiftCardGroup = paymentGroups.filter(function (group) {
+                return me.defaults.giftCardGroupName === group['name'];
+            });
+            var giftCardGroup = filteredGiftCardGroup[0] || [];
+            var giftCardGroupTypes = (giftCardGroup && giftCardGroup['types']) || [];
+            var filteredTypes = giftCardGroupTypes.filter(function (giftCardGroupType) {
+                return giftCardGroupType === paymentType;
+            });
 
-            return (giftCardGroup['types'] ?? []).includes(paymentType);
+            return filteredTypes.length > 0;
         },
+        /**
+         * paymentType contains the id for a stored payment
+         * @param {string} paymentMethodId
+         * @return {boolean}
+         * @private
+         */
+        __isStoredPaymentMethod: function (paymentMethodId) {
+            return !!this.getStoredPaymentMethodById(paymentMethodId);
+        },
+        __canHandlePayment: function (paymentMethod) {
+            if (this.__isStoredPaymentMethod(paymentMethod.id || '')) {
+                return true;
+            }
+
+            return "undefined" !== typeof paymentMethod.details;
+        },
+        /**
+         * @param  {object} paymentMethod
+         * @return {boolean}
+         * @private
+         */
+        __enableStoreDetails: function (paymentMethod) {
+            // ignore property "paymentMethod.supportsRecurring"
+            return 'scheme' === paymentMethod.type;
+        },
+        /**
+         * Modify AdyenPaymentMethod with additional data for the web-component library
+         * @param paymentMethod Adyen response: Payment Method response
+         * @return  {{cardType: string, paymentMethodData: object}}
+         * @private
+         */
+        __buildCheckoutComponentData: function (paymentMethod) {
+            var defaultData = {
+                cardType: paymentMethod.type,
+                paymentMethodData: paymentMethod
+            };
+
+            if (this.__isStoredPaymentMethod(paymentMethod.id || '')) {
+                return $.extend(true, {}, defaultData, {
+                    paymentMethodData: {
+                        storedPaymentMethodId: paymentMethod.id
+                    }
+                });
+            }
+
+            if (this.__isGiftCardType(paymentMethod.type)) {
+                var pinRequiredDetail = this.__retrievePaymentMethodDetailByKey(
+                    paymentMethod.type,
+                    'encryptedSecurityCode'
+                );
+
+                return $.extend(true, {}, defaultData, {
+                    cardType: 'giftcard',
+                    paymentMethodData: {
+                        type: paymentMethod.type,
+                        pinRequired: false === pinRequiredDetail.optional || false
+                    }
+                });
+            }
+
+            return $.extend(true, {}, defaultData, {
+                paymentMethodData: {
+                    enableStoreDetails: this.__enableStoreDetails(paymentMethod)
+                }
+            });
+        }
     });
 
 })(jQuery);

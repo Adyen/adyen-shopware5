@@ -25,6 +25,7 @@
             },
         },
         paymentMethodSession: 'paymentMethod',
+        storePaymentMethodSession: 'storePaymentMethod',
         adyenConfiguration: {},
         adyenCheckout: null,
 
@@ -72,6 +73,7 @@
 
                 var data = {
                     'paymentMethod': me.getPaymentMethod(),
+                    'storePaymentMethod': me.getStorePaymentMethod(),
                     'browserInfo': me.getBrowserInfo(),
                     'origin': window.location.origin
                 };
@@ -131,7 +133,7 @@
 
         handlePaymentDataIdentifyShopper: function (data) {
             var me = this;
-
+            var paymentData = data.paymentData;
             $(me.opts.placeOrderSelector).parent().append('<div id="AdyenIdentifyShopperThreeDS2"/>');
             me.adyenCheckout
                 .create('threeDS2DeviceFingerprint', {
@@ -141,7 +143,10 @@
                             method: 'POST',
                             dataType: 'json',
                             url: me.opts.adyenAjaxIdentifyShopperUrl,
-                            data: fingerprintData.data.details,
+                            data: {
+                                'details': fingerprintData.data.details,
+                                'paymentData': paymentData
+                            },
                             success: function (response) {
                                 me.handlePaymentData(response);
                             },
@@ -156,7 +161,7 @@
 
         handlePaymentDataChallengeShopper: function (data) {
             var me = this;
-
+            var paymentData = data.paymentData;
             var modal = $.modal.open('<div id="AdyenChallengeShopperThreeDS2"/>', {
                 showCloseButton: false,
                 closeOnOverlay: false,
@@ -171,7 +176,10 @@
                             method: 'POST',
                             dataType: 'json',
                             url: me.opts.adyenAjaxChallengeShopperUrl,
-                            data: challengeData.data.details,
+                            data: {
+                                'details': challengeData.data.details,
+                                'paymentData': paymentData
+                            },
                             success: function (response) {
                                 me.handlePaymentData(response);
                             },
@@ -185,7 +193,7 @@
         },
 
         handlePaymentDataRedirectShopper: function (data) {
-            const me = this;
+            var me = this;
             if ('redirect' === data.action.type || 'qrCode' === data.action.type) {
                 me.adyenCheckout
                     .createFromAction(data.action)
@@ -287,6 +295,12 @@
             var me = this;
 
             return me.sessionStorage.getItem(me.paymentMethodSession);
+        },
+
+        getStorePaymentMethod: function () {
+            var me = this;
+
+            return me.sessionStorage.getItem(me.storePaymentMethodSession);
         },
 
         getAdyenConfigSession: function () {

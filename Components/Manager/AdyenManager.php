@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Components\Manager;
 
+use AdyenPayment\Models\PaymentInfo;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Enlight_Components_Session_Namespace;
 use AdyenPayment\AdyenPayment;
+use Shopware\Models\Order\Order;
 
 /**
  * Class AdyenManager
@@ -32,31 +35,42 @@ class AdyenManager
         $this->session = $session;
     }
 
-    /**
-     * @param $paymentData
-     */
-    public function storePaymentDataInSession($paymentData)
+    public function storePaymentData(PaymentInfo $transaction, string $paymentData)
     {
-        $this->session->offsetSet(AdyenPayment::SESSION_ADYEN_PAYMENT_DATA, $paymentData);
+        $transaction->setPaymentData($paymentData);
+        $this->modelManager->persist($transaction);
+        $this->modelManager->flush();
     }
 
     /**
+     * @param Order|null $order
      * @return string
      */
-    public function getPaymentDataSession(): string
+    public function fetchOrderPaymentData($order): string
     {
-        return $this->session->offsetGet(AdyenPayment::SESSION_ADYEN_PAYMENT_DATA) ?? '';
+        if (!$order) {
+            return '';
+        }
+
+        /* @var PaymentInfo $transaction */
+        $transaction = $this->getPaymentInfoRepository()->findOneBy(['orderId' => $order->getId()]);
+
+        return $transaction ? $transaction->getPaymentData() : '';
     }
 
     public function unsetPaymentDataInSession()
     {
         $this->session->offsetUnset(AdyenPayment::SESSION_ADYEN_PAYMENT);
         $this->session->offsetUnset(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
-        $this->session->offsetUnset(AdyenPayment::SESSION_ADYEN_PAYMENT_DATA);
     }
 
     public function unsetValidPaymentSession()
     {
         $this->session->offsetUnset(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
+    }
+
+    private function getPaymentInfoRepository(): ObjectRepository
+    {
+        return $this->modelManager->getRepository(PaymentInfo::class);
     }
 }

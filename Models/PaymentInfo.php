@@ -65,6 +65,12 @@ class PaymentInfo extends ModelEntity
      */
     private $ordermailVariables;
 
+    /**
+     * @var string
+     * @ORM\Column(name="payment_data", type="text", nullable=true)
+     */
+    private $paymentData;
+
     public function __construct()
     {
         $this->setCreatedAt(new \DateTime('now'));
@@ -81,11 +87,13 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param int $id
+     *
      * @return $this
      */
     public function setId(int $id)
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -99,11 +107,13 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param int $orderId
+     *
      * @return $this
      */
     public function setOrderId(int $orderId)
     {
         $this->orderId = $orderId;
+
         return $this;
     }
 
@@ -118,11 +128,13 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param Order|null $order
+     *
      * @return $this
      */
     public function setOrder(Order $order = null)
     {
         $this->order = $order;
+
         return $this;
     }
 
@@ -138,11 +150,13 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param string $pspReference
+     *
      * @return $this
      */
     public function setPspReference(string $pspReference)
     {
         $this->pspReference = $pspReference;
+
         return $this;
     }
 
@@ -156,11 +170,13 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param \DateTime $createdAt
+     *
      * @return $this
      */
     public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -174,11 +190,13 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param \DateTime $updatedAt
+     *
      * @return $this
      */
     public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -192,11 +210,13 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param string $resultCode
+     *
      * @return $this
      */
     public function setResultCode(string $resultCode)
     {
         $this->resultCode = $resultCode;
+
         return $this;
     }
 
@@ -210,11 +230,25 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @param string|null $ordermailVariables
+     *
      * @return $this
      */
     public function setOrdermailVariables($ordermailVariables)
     {
         $this->ordermailVariables = $ordermailVariables;
+
+        return $this;
+    }
+
+    public function getPaymentData(): string
+    {
+        return $this->paymentData;
+    }
+
+    public function setPaymentData(string $paymentData): self
+    {
+        $this->paymentData = $paymentData;
+
         return $this;
     }
 }

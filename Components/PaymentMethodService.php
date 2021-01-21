@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Components;
 
-use Adyen\AdyenException;
-use Enlight_Components_Session_Namespace;
-use AdyenPayment\Components\Adyen\PaymentMethodService as AdyenPaymentMethodService;
 use AdyenPayment\AdyenPayment;
+use AdyenPayment\Collection\Payment\PaymentMethodCollection;
+use AdyenPayment\Components\Adyen\PaymentMethodService as AdyenPaymentMethodService;
+use AdyenPayment\Models\Payment\PaymentMethod;
 use AdyenPayment\Models\PaymentMethodInfo;
+use Enlight_Components_Session_Namespace;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Components_Snippet_Manager;
 
@@ -151,56 +152,42 @@ class PaymentMethodService
     }
 
     /**
-     * @param $type
-     * @return PaymentMethodInfo
-     * @throws AdyenException
+     * @return PaymentMethodInfo|null
      */
-    public function getAdyenPaymentInfoByType($type, $paymentMethods = null)
-    {
+    public function getAdyenPaymentInfoByType(
+        string $type,
+        PaymentMethodCollection $paymentMethods = null
+    ) {
         if (!$paymentMethods) {
             $paymentMethodOptions = $this->getPaymentMethodOptions();
-            $adyenMethods = $this->adyenPaymentMethodService->getPaymentMethods(
-                $paymentMethodOptions['countryCode'],
-                $paymentMethodOptions['currency'],
-                $paymentMethodOptions['value']
+
+            $paymentMethods = PaymentMethodCollection::fromAdyenMethods(
+                $this->adyenPaymentMethodService->getPaymentMethods(
+                    $paymentMethodOptions['countryCode'],
+                    $paymentMethodOptions['currency'],
+                    $paymentMethodOptions['value']
+                )
             );
-
-            $paymentMethods = $adyenMethods['paymentMethods'];
         }
 
-        foreach ($paymentMethods as $paymentMethod) {
-            if ($paymentMethod['type'] === $type) {
-                $name = $this->snippetManager
-                    ->getNamespace('adyen/method/name')
-                    ->get($type, $paymentMethod['name'], true);
-
-                if (empty($name)) {
-                    $name = $paymentMethod['name'];
-                }
-
-                $description = $this->snippetManager
-                    ->getNamespace('adyen/method/description')
-                    ->get($type);
-
-                $paymentMethodInfo = (new PaymentMethodInfo())->setName($name);
-                if ($description) {
-                    $paymentMethodInfo->setDescription($description);
-                }
-
-                return $paymentMethodInfo;
-            }
+        $paymentMethod = $paymentMethods->fetchByTypeOrId($type);
+        if (!$paymentMethod) {
+            return null;
         }
-        return new PaymentMethodInfo();
-    }
 
-    /**
-     * @param $adyenMethod
-     * @return string
-     */
-    public function getAdyenImage($adyenMethod)
-    {
-        $type = $adyenMethod['type'];
-        return $this->getAdyenImageByType($type);
+        $paymentMethodName = $paymentMethod->getValue('name', '');
+        $name = $this->snippetManager
+            ->getNamespace('adyen/method/name')
+            ->get($type, $paymentMethodName, true);
+        $description = $this->snippetManager
+            ->getNamespace('adyen/method/description')
+            ->get($type);
+
+        return PaymentMethodInfo::create(
+            $name ?: $paymentMethodName,
+            $description ?: '',
+            $paymentMethod->getType()
+        );
     }
 
     /**

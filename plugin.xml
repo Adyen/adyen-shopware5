@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -101,6 +101,38 @@
             Redirect payment methods flow with POST->Transparent controller
             Adding payload and redirectResult GET parameters to transparent redirect
             try/catch block for getting the Shop service from the backend
+        </changes>
+    </changelog>
+    <changelog version="1.7.0">
+        <changes lang="de">
+            Features
+            Bump Web Components to 3.12.1 highest compatible API v51
+            Add merchantReference of order number on returnUrl
+            Payment tokenisation
+
+            Fixes
+            Second shop cannot decrypt api data
+            Store incoming notifications in new DB entity with no extra logic
+            Notifications response
+            Payment data missing
+
+            Other
+            Update main.yml Github Actions
+        </changes>
+        <changes lang="en">
+            Features
+            Bump Web Components to 3.12.1 highest compatible API v51
+            Add merchantReference of order number on returnUrl
+            Payment tokenisation
+
+            Fixes
+            Second shop cannot decrypt api data
+            Store incoming notifications in new DB entity with no extra logic
+            Notifications response
+            Payment data missing
+
+            Other
+            Update main.yml Github Actions
         </changes>
     </changelog>
 </plugin>

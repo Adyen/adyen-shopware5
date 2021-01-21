@@ -4,6 +4,7 @@ namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
 use Adyen\Util\Currency;
+use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
 use Enlight_Controller_Front;
@@ -276,12 +277,23 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $paymentSnippets = $this->snippets->getNamespace('adyen/checkout/payment');
 
-        $snippets = [];
-        $snippets['updatePaymentInformation'] = $paymentSnippets->get(
-            'updatePaymentInformation',
-            'Update your payment information',
-            true
-        );
+        $snippets = [
+            'updatePaymentInformation' => $paymentSnippets->get(
+                'updatePaymentInformation',
+                'Update your payment information',
+                true
+            ),
+            'storedPaymentMethodTitle' => $paymentSnippets->get(
+                'storedPaymentMethodTitle',
+                'Stored payment methods',
+                true
+            ),
+            'paymentMethodTitle' => $paymentSnippets->get(
+                'paymentMethodTitle',
+                'Payment methods',
+                true
+            ),
+        ];
 
         $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
     }
@@ -420,21 +432,20 @@ class CheckoutSubscriber implements SubscriberInterface
         $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
         $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
 
-        $adyenMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
+
         $selectedType = $userData['additional']['user'][AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD];
-        $adyenMethods['paymentMethods'] = array_filter(
-            $adyenMethods['paymentMethods'],
-            function ($element) use ($selectedType) {
-                return ($element['type'] === $selectedType);
-            }
+        $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
+            $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value)
         );
 
-        if (!count($adyenMethods['paymentMethods'])) {
+        $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($selectedType);
+        if (!$paymentMethod) {
             return true;
         }
 
-        if (!array_key_exists('details', reset($adyenMethods['paymentMethods']))) {
-            $subject->View()->assign('sAdyenSetSession', json_encode(reset($adyenMethods['paymentMethods'])));
+        $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($selectedType);
+        if (!$paymentMethod->getValue('details') && !$paymentMethod->isStoredPayment()) {
+            $subject->View()->assign('sAdyenSetSession', json_encode($paymentMethod->getRawData()));
             return false;
         }
 
