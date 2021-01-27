@@ -205,7 +205,7 @@ class CheckoutSubscriber implements SubscriberInterface
         /** @var Shopware_Controllers_Frontend_Checkout $subject */
         $subject = $args->getSubject();
 
-        if (!in_array($subject->Request()->getActionName(), ['shippingPayment'])) {
+        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'confirm'])) {
             return;
         }
         $view = $subject->View();

@@ -18,7 +18,6 @@
 
 {block name='frontend_index_body_attributes'}
     {$smarty.block.parent}
-    {if $mAdyenSnippets}data-AdyenSnippets="{$mAdyenSnippets}"{/if}
     data-adyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
     data-adyenAjaxIdentifyShopperUrl="{url module='frontend' controller='adyen' action='ajaxIdentifyShopper'}"
     data-adyenAjaxChallengeShopperUrl="{url module='frontend' controller='adyen' action='ajaxChallengeShopper'}"
@@ -38,6 +37,12 @@
         data-adyenIsAdyenPayment='true'
     {/if}
 {/block}
+
+{block name='frontend_checkout_confirm_payment_method_panel'}
+    {$smarty.block.parent}
+    {include file="frontend/checkout/adyen_configuration.tpl"}
+{/block}
+
 
 {block name='frontend_checkout_confirm_error_messages'}
     <div data-adyen-checkout-error="true"></div>

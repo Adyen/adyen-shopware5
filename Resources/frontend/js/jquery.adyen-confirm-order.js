@@ -276,13 +276,26 @@
 
             var adyenConfig = me.getAdyenConfigSession();
 
-            me.adyenConfiguration = {
-                locale: adyenConfig.locale,
-                environment: adyenConfig.environment,
-                originKey: adyenConfig.originKey,
-                paymentMethodsResponse: adyenConfig.paymentMethodsResponse,
-                onAdditionalDetails: $.proxy(me.handleOnAdditionalDetails, me),
-            };
+            if (adyenConfig) {
+                //Get the config data from the session
+                me.adyenConfiguration = {
+                    locale: adyenConfig.locale,
+                    environment: adyenConfig.environment,
+                    originKey: adyenConfig.originKey,
+                    paymentMethodsResponse: adyenConfig.paymentMethodsResponse,
+                    onAdditionalDetails: $.proxy(me.handleOnAdditionalDetails, me)
+                };
+            } else {
+                //Get the config data from the CheckoutSubscriber
+                var adyenConfigObj = document.querySelector('.adyen-payment-selection.adyen-config').dataset;
+                me.adyenConfiguration = {
+                    locale: adyenConfigObj.shoplocale,
+                    environment: adyenConfigObj.adyenenvironment,
+                    originKey: adyenConfigObj.adyenoriginkey,
+                    paymentMethodsResponse: JSON.parse(adyenConfigObj.adyenpaymentmethodsresponse),
+                    onAdditionalDetails: $.proxy(me.handleOnAdditionalDetails, me)
+                };
+            }
         },
 
         setCheckout: function () {
