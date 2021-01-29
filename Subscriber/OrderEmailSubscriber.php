@@ -70,6 +70,7 @@ class OrderEmailSubscriber implements SubscriberInterface
                 $this->modelManager->flush($paymentInfo);
             }
         }
+        return $args->getReturn();
     }
 
     public function shouldStopEmailSending(Enlight_Event_EventArgs $args)
