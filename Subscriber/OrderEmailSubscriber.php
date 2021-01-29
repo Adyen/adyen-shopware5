@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use Shopware\Components\Model\ModelManager;
+use Shopware\Models\Order\Order;
 use Shopware_Controllers_Frontend_Checkout;
 
 class OrderEmailSubscriber implements SubscriberInterface
@@ -24,6 +25,10 @@ class OrderEmailSubscriber implements SubscriberInterface
      */
     private $paymentInfoRepository;
     /**
+     * @var ObjectRepository|EntityRepository
+     */
+    private $orderRepository;
+    /**
      * @var OrderMailService
      */
     private $orderMailService;
@@ -34,15 +39,37 @@ class OrderEmailSubscriber implements SubscriberInterface
     ) {
         $this->modelManager = $modelManager;
         $this->paymentInfoRepository = $this->modelManager->getRepository(PaymentInfo::class);
+        $this->orderRepository = $this->modelManager->getRepository(Order::class);
         $this->orderMailService = $orderMailService;
     }
 
     public static function getSubscribedEvents()
     {
         return [
-            'Shopware_Modules_Order_SendMail_Send'                     => 'shouldStopEmailSending',
-            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'onCheckoutDispatch',
+            'Shopware_Modules_Order_SendMail_Send' => 'shouldStopEmailSending',
+            'Shopware_Modules_Order_SaveOrder_ProcessDetails' => 'setPaymentInfoOrderNumber',
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'onCheckoutDispatch'
         ];
+    }
+
+    public function setPaymentInfoOrderNumber(Enlight_Event_EventArgs $args)
+    {
+        $orderId = $args->get('orderId');
+        $paymentInfoId = Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_PAYMENT_INFO_ID);
+
+        if (!empty($orderId)) {
+            $orderNumber = $this->getOrderNumber($orderId);
+            /** @var PaymentInfo $paymentInfo */
+            $paymentInfo = $this->paymentInfoRepository->findOneBy([
+                'id' => $paymentInfoId
+            ]);
+
+            if ($paymentInfo) {
+                $paymentInfo->setOrdernumber($orderNumber);
+                $this->modelManager->persist($paymentInfo);
+                $this->modelManager->flush($paymentInfo);
+            }
+        }
     }
 
     public function shouldStopEmailSending(Enlight_Event_EventArgs $args)
@@ -88,5 +115,13 @@ class OrderEmailSubscriber implements SubscriberInterface
         }
 
         $this->orderMailService->sendOrderConfirmationMail($data['sOrderNumber']);
+    }
+
+    private function getOrderNumber($orderId)
+    {
+        return $this->orderRepository->findOneBy([
+            'id' => $orderId
+        ])->getNumber();
+
     }
 }
