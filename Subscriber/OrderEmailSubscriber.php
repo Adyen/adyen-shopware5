@@ -74,7 +74,6 @@ class OrderEmailSubscriber implements SubscriberInterface
 
     public function shouldStopEmailSending(Enlight_Event_EventArgs $args)
     {
-        $orderId = $args->get('orderId');
         $variables = $args->get('variables');
 
         if (AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD === $variables['additional']['payment']['name']
@@ -83,7 +82,7 @@ class OrderEmailSubscriber implements SubscriberInterface
 
             /** @var PaymentInfo $paymentInfo */
             $paymentInfo = $this->paymentInfoRepository->findOneBy([
-                'orderId' => $orderId
+                'ordernumber' => $variables['ordernumber']
             ]);
 
             if ($paymentInfo && empty($paymentInfo->getOrdermailVariables())) {
