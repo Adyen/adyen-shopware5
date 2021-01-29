@@ -122,6 +122,5 @@ class OrderEmailSubscriber implements SubscriberInterface
         return $this->orderRepository->findOneBy([
             'id' => $orderId
         ])->getNumber();
-
     }
 }
