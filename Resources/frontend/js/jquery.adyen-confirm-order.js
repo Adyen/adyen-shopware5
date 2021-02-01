@@ -283,7 +283,7 @@
                     environment: adyenConfig.environment,
                     originKey: adyenConfig.originKey,
                     paymentMethodsResponse: adyenConfig.paymentMethodsResponse,
-                    onAdditionalDetails: $.proxy(me.handleOnAdditionalDetails, me)
+                    onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
                 };
             } else {
                 //Get the config data from the CheckoutSubscriber
@@ -293,7 +293,7 @@
                     environment: adyenConfigObj.adyenenvironment,
                     originKey: adyenConfigObj.adyenoriginkey,
                     paymentMethodsResponse: JSON.parse(adyenConfigObj.adyenpaymentmethodsresponse),
-                    onAdditionalDetails: $.proxy(me.handleOnAdditionalDetails, me)
+                    onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
                 };
             }
         },
