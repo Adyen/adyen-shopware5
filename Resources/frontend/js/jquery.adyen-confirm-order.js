@@ -274,28 +274,19 @@
         setConfig: function () {
             var me = this;
 
-            var adyenConfig = me.getAdyenConfigSession();
+            var adyenConfigSession = JSON.parse(me.getAdyenConfigSession());
+            var adyenConfigTpl = document.querySelector('.adyen-payment-selection.adyen-config').dataset;
 
-            if (adyenConfig) {
-                //Get the config data from the session
-                me.adyenConfiguration = {
-                    locale: adyenConfig.locale,
-                    environment: adyenConfig.environment,
-                    originKey: adyenConfig.originKey,
-                    paymentMethodsResponse: adyenConfig.paymentMethodsResponse,
-                    onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
-                };
-            } else {
-                //Get the config data from the CheckoutSubscriber
-                var adyenConfigObj = document.querySelector('.adyen-payment-selection.adyen-config').dataset;
-                me.adyenConfiguration = {
-                    locale: adyenConfigObj.shoplocale,
-                    environment: adyenConfigObj.adyenenvironment,
-                    originKey: adyenConfigObj.adyenoriginkey,
-                    paymentMethodsResponse: JSON.parse(adyenConfigObj.adyenpaymentmethodsresponse),
-                    onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
-                };
-            }
+            me.adyenConfiguration = {
+                locale: adyenConfigSession ? adyenConfigSession.locale : adyenConfigTpl.shoplocale,
+                environment: adyenConfigSession ? adyenConfigSession.environment : adyenConfigTpl.adyenenvironment,
+                originKey: adyenConfigSession ? adyenConfigSession.originkey : adyenConfigTpl.adyenoriginkey,
+                paymentMethodsResponse:
+                    adyenConfigSession
+                        ? adyenConfigSession.paymentMethodsResponse
+                        : JSON.parse(adyenConfigTpl.adyenpaymentmethodsresponse),
+                onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
+            };
         },
 
         setCheckout: function () {
