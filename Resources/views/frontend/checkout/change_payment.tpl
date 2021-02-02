@@ -6,16 +6,7 @@
     {assign var="paymentMethods" value=$sPayments.paymentMethods}
     {assign var="storedPaymentMethods" value=$sPayments.storedPaymentMethods}
 
-    {if $sAdyenConfig}
-        <div data-shopLocale='{$sAdyenConfig.shopLocale}'
-             data-adyenOriginKey='{$sAdyenConfig.originKey}'
-             data-adyenEnvironment='{$sAdyenConfig.environment}'
-             data-adyenPaymentMethodsResponse='{$sAdyenConfig.paymentMethods}'
-             data-resetSessionUrl='{url controller="Adyen" action="ResetValidPaymentSession"}'
-             {if $mAdyenSnippets}data-adyensnippets="{$mAdyenSnippets}"{/if}
-             class="adyen-payment-selection">
-        </div>
-    {/if}
+    {include file="frontend/checkout/adyen_configuration.tpl"}
 
     {block name='frontend_checkout_payment_content_adyen_stored_payment_methods'}
         {if !empty($storedPaymentMethods)}

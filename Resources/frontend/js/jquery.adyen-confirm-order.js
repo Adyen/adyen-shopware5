@@ -274,14 +274,18 @@
         setConfig: function () {
             var me = this;
 
-            var adyenConfig = me.getAdyenConfigSession();
+            var adyenConfigSession = JSON.parse(me.getAdyenConfigSession());
+            var adyenConfigTpl = document.querySelector('.adyen-payment-selection.adyen-config').dataset;
 
             me.adyenConfiguration = {
-                locale: adyenConfig.locale,
-                environment: adyenConfig.environment,
-                originKey: adyenConfig.originKey,
-                paymentMethodsResponse: adyenConfig.paymentMethodsResponse,
-                onAdditionalDetails: $.proxy(me.handleOnAdditionalDetails, me),
+                locale: adyenConfigSession ? adyenConfigSession.locale : adyenConfigTpl.shoplocale,
+                environment: adyenConfigSession ? adyenConfigSession.environment : adyenConfigTpl.adyenenvironment,
+                originKey: adyenConfigSession ? adyenConfigSession.originkey : adyenConfigTpl.adyenoriginkey,
+                paymentMethodsResponse:
+                    adyenConfigSession
+                        ? adyenConfigSession.paymentMethodsResponse
+                        : JSON.parse(adyenConfigTpl.adyenpaymentmethodsresponse),
+                onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
             };
         },
 
