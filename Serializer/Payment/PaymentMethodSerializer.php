@@ -40,21 +40,20 @@ final class PaymentMethodSerializer
         $defaultPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::default());
         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
 
-        return [
-            'paymentMethods' => array_merge(
-                $defaultPaymentMethods->map(
-                    function (PaymentMethod $adyenMethod) use ($defaultPaymentMethods) {
-                        return $this->serialize($adyenMethod, $defaultPaymentMethods);
-                    }
-                ),
-                $shopwareMethods
-            ),
-            'storedPaymentMethods' => $storedPaymentMethods->map(
+        // Shopware internally uses array<int, array> for identifying the selected payment
+        return array_merge(
+            $storedPaymentMethods->map(
                 function (PaymentMethod $adyenMethod) use ($storedPaymentMethods) {
                     return $this->serialize($adyenMethod, $storedPaymentMethods);
                 }
             ),
-        ];
+            $defaultPaymentMethods->map(
+                function (PaymentMethod $adyenMethod) use ($defaultPaymentMethods) {
+                    return $this->serialize($adyenMethod, $defaultPaymentMethods);
+                }
+            ),
+            $shopwareMethods
+        );
     }
 
     /**
@@ -79,6 +78,7 @@ final class PaymentMethodSerializer
             'description' => $name,
             'additionaldescription' => $description,
             'image' => $this->paymentMethodService->getAdyenImageByType($paymentMethod->getType()),
+            'isStoredPayment' => $paymentMethod->isStoredPayment(),
             'metadata' => $paymentMethod->getRawData(),
         ];
     }
