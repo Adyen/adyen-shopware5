@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -133,6 +133,20 @@
 
             Other
             Update main.yml Github Actions
+        </changes>
+    </changelog>
+    <changelog version="1.7.1">
+        <changes lang="de">
+            Fixes
+            Properly fetch email variables using orderNumber
+            Get Adyen config data from the CheckoutSubscriber if not present in the session storage
+            Merge all payment methods in one array and filter in template
+        </changes>
+        <changes lang="en">
+            Fixes
+            Properly fetch email variables using orderNumber
+            Get Adyen config data from the CheckoutSubscriber if not present in the session storage
+            Merge all payment methods in one array and filter in template
         </changes>
     </changelog>
 </plugin>
