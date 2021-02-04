@@ -54,7 +54,7 @@
              *
              * @type {String}
              */
-            paymentMethodFormSubmitSelector: '#shippingPaymentForm button[type=submit]',
+            paymentMethodFormSubmitSelector: '#shippingPaymentForm button[type=submit], button[form="shippingPaymentForm"]',
             /**
              * @type {string} the group name of Gift card types
              */
@@ -101,16 +101,25 @@
                 return false;
             }
         },
+        isPaymentElement: function(elementId) {
+            return $('#'+elementId).parents(this.opts.paymentMethodSelector).length > 0;
+        },
         onPaymentChangedBefore: function ($event) {
             var me = this;
+            var selectedPaymentElementId = event.target.id;
 
-            me.currentSelectedPaymentId = event.target.id;
+            // only update when switching payment-methods (not on shipping methods)
+            if (!me.isPaymentElement(selectedPaymentElementId)) {
+                return;
+            }
+
+            me.currentSelectedPaymentId = selectedPaymentElementId;
             me.currentSelectedPaymentType = $(event.target).val();
         },
         onPaymentChangedAfter: function () {
             var me = this;
 
-            //Return when no adyen payment
+            // Return & clear when no adyen payment
             if (me.currentSelectedPaymentType.indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
                 me.sessionStorage.removeItem(me.paymentMethodSession);
                 return;
@@ -264,6 +273,7 @@
 
             //Return when no adyen payment
             if (paymentMethod.val().indexOf(me.opts.adyenPaymentMethodPrefix) === -1) {
+                me.clearPaymentSession();
                 return false;
             }
 
@@ -299,10 +309,14 @@
             me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
             me.sessionStorage.setItem(me.storePaymentMethodSession, state.data.storePaymentMethod || false);
         },
-        removePaymentSession: function () {
+        clearPaymentSession: function () {
             var me = this;
             me.sessionStorage.removeItem(me.paymentMethodSession);
             me.sessionStorage.removeItem(me.storePaymentMethodSession);
+        },
+        removePaymentSession: function () {
+            var me = this;
+            me.clearPaymentSession();
             $.get(me.opts.resetSessionUrl);
         },
         saveAdyenConfigInSession: function (adyenConfiguration) {
