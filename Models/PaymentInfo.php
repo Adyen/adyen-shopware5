@@ -67,6 +67,12 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @var string
+     * @ORM\Column(name="ordernumber", type="string", length=255, nullable=true)
+     */
+    private $ordernumber;
+
+    /**
+     * @var string
      * @ORM\Column(name="payment_data", type="text", nullable=true)
      */
     private $paymentData;
@@ -236,6 +242,26 @@ class PaymentInfo extends ModelEntity
     public function setOrdermailVariables($ordermailVariables)
     {
         $this->ordermailVariables = $ordermailVariables;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOrdernumber()
+    {
+        return $this->ordernumber;
+    }
+
+    /**
+     * @param string|null $ordernumber
+     *
+     * @return $this
+     */
+    public function setOrderNumber($ordernumber)
+    {
+        $this->ordernumber = $ordernumber;
 
         return $this;
     }

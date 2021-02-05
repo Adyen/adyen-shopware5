@@ -3,19 +3,18 @@
 {block name='frontend_checkout_payment_content'}
     {include file="frontend/checkout/adyen_libaries.tpl"}
 
-    {assign var="paymentMethods" value=$sPayments.paymentMethods}
-    {assign var="storedPaymentMethods" value=$sPayments.storedPaymentMethods}
+    {* Filter on storedPayments and default payment methods (SW 5 needs internally array<int, array> for $sPayments) *}
+    {assign var="paymentMethods" value=[]}
+    {assign var="storedPaymentMethods" value=[]}
+    {foreach $sPayments as $paymentMethod}
+        {if 'isStoredPayment'|array_key_exists:$paymentMethod && true === $paymentMethod.isStoredPayment}
+            {$storedPaymentMethods[] = $paymentMethod}
+        {else}
+            {$paymentMethods[] = $paymentMethod}
+        {/if}
+    {/foreach}
 
-    {if $sAdyenConfig}
-        <div data-shopLocale='{$sAdyenConfig.shopLocale}'
-             data-adyenOriginKey='{$sAdyenConfig.originKey}'
-             data-adyenEnvironment='{$sAdyenConfig.environment}'
-             data-adyenPaymentMethodsResponse='{$sAdyenConfig.paymentMethods}'
-             data-resetSessionUrl='{url controller="Adyen" action="ResetValidPaymentSession"}'
-             {if $mAdyenSnippets}data-adyensnippets="{$mAdyenSnippets}"{/if}
-             class="adyen-payment-selection">
-        </div>
-    {/if}
+    {include file="frontend/checkout/adyen_configuration.tpl"}
 
     {block name='frontend_checkout_payment_content_adyen_stored_payment_methods'}
         {if !empty($storedPaymentMethods)}

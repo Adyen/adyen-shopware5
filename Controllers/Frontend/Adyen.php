@@ -204,6 +204,11 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             (bool)(0 < $transaction->getId())
         );
 
+        Shopware()->Session()->offsetSet(
+            AdyenPayment::SESSION_ADYEN_PAYMENT_INFO_ID,
+            $transaction->getId()
+        );
+
         $orderNumber = $this->saveOrder(
             $transaction->getId(),
             $signature,

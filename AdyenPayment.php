@@ -38,6 +38,7 @@ class AdyenPayment extends Plugin
     const SESSION_ADYEN_PAYMENT = 'adyenPayment';
     const SESSION_ADYEN_PAYMENT_VALID = 'adyenPaymentValid';
     const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
+    const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';
 
     /**
      * @return bool
