@@ -435,7 +435,7 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $selectedType = $userData['additional']['user'][AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD];
         
-        if($selectedType === null) {
+        if ($selectedType === null) {
             return true;
         }
         
