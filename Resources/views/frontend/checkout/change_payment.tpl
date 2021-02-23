@@ -18,20 +18,26 @@
 
     {block name='frontend_checkout_payment_content_adyen_stored_payment_methods'}
         {if !empty($storedPaymentMethods)}
-            <h4 class="payment--method-headline panel--title is--underline">
-                {s namespace='adyen/checkout/payment' name='storedPaymentMethodTitle'}{/s}
-            </h4>
+            {if !empty($paymentMethods)}
+                <h4 class="payment--method-headline panel--title is--underline adyen-method-section-title">
+                    {s namespace='adyen/checkout/payment' name='storedPaymentMethodTitle'}{/s}
+                </h4>
+            {/if}
             {assign var=sPayments value=$storedPaymentMethods}
             {$smarty.block.parent}
         {/if}
     {/block}
 
     {block name='frontend_checkout_payment_content_adyen_payment_methods'}
-        <h4 class="payment--method-headline panel--title is--underline">
-            {s namespace='adyen/checkout/payment' name='paymentMethodTitle'}{/s}
-        </h4>
-        {assign var=sPayments value=$paymentMethods}
-        {$smarty.block.parent}
+        {if !empty($paymentMethods)}
+            {if !empty($storedPaymentMethods)}
+                <h4 class="payment--method-headline panel--title is--underline adyen-method-section-title">
+                    {s namespace='adyen/checkout/payment' name='paymentMethodTitle'}{/s}
+                </h4>
+            {/if}
+            {assign var=sPayments value=$paymentMethods}
+            {$smarty.block.parent}
+        {/if}
     {/block}
 
 {/block}
