@@ -1,6 +1,5 @@
 <?php
 
-use AdyenPayment\Components\Manager\AdyenManager;
 use AdyenPayment\Models\Enum\PaymentResultCodes;
 use AdyenPayment\Utils\RequestDataFormatter;
 use Shopware\Components\CSRFWhitelistAware;
@@ -15,7 +14,7 @@ use Shopware\Models\Order\Status;
 class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
     /**
-     * @var AdyenManager
+     * @var \AdyenPayment\Components\Manager\AdyenManager
      */
     private $adyenManager;
 
@@ -38,6 +37,10 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
      * @var Logger
      */
     private $logger;
+    /**
+     * @var \AdyenPayment\Components\Manager\OrderManagerInterface
+     */
+    private $orderManager;
 
 
     /**
@@ -55,6 +58,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         $this->basketService = $this->get('adyen_payment.components.basket_service');
         $this->orderMailService = $this->get('adyen_payment.components.order_mail_service');
         $this->logger = $this->get('adyen_payment.logger');
+        $this->orderManager = $this->get('AdyenPayment\Components\Manager\OrderManager');
     }
 
     /**
@@ -142,9 +146,11 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                 break;
         }
 
-        $order->setPaymentStatus($paymentStatus);
-        $order->setTransactionId($result['pspReference']);
-        $this->getModelManager()->persist($order);
+        $this->orderManager->updateOrderPayment(
+            $order,
+            (string) ($result['pspReference'] ?? ''),
+            $paymentStatus
+        );
     }
 
     /**
