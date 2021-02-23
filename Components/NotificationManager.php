@@ -47,6 +47,7 @@ class NotificationManager
      */
     public function getNextNotificationToHandle()
     {
+        // @todo PW-4149 add clause to skip notifications that should be skipped
         $builder = $this->notificationRepository->createQueryBuilder('n');
         $builder->where("n.status = :statusReceived OR n.status = :statusRetry")
             ->orderBy('n.updatedAt', 'ASC')
