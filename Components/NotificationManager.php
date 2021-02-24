@@ -57,7 +57,7 @@ class NotificationManager
             ->setParameter('processingTime', new \DateTime())
             ->setMaxResults(1);
 
-        return $builder->getQuery()->getSQL();
+        return $builder->getQuery()->getSingleResult();
     }
 
     /**
