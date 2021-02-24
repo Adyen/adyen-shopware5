@@ -56,7 +56,6 @@ class IncomingNotificationManager
      */
     public function convertNotifications(array $textNotifications)
     {
-        // @todo PW-4149 check each one and add field to determine if it's ready for processing or should be skipped
         foreach ($textNotifications as $textNotificationItem) {
             try {
                 if (!empty($textNotificationItem->getTextNotification())) {

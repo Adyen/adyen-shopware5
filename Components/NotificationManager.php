@@ -10,6 +10,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use AdyenPayment\Models\Enum\NotificationStatus;
 use AdyenPayment\Models\Notification;
+use Shopware\Components\Form\Field\Date;
 use Shopware\Components\Model\ModelManager;
 
 /**
@@ -47,15 +48,16 @@ class NotificationManager
      */
     public function getNextNotificationToHandle()
     {
-        // @todo PW-4149 add clause to skip notifications that should be skipped
         $builder = $this->notificationRepository->createQueryBuilder('n');
         $builder->where("n.status = :statusReceived OR n.status = :statusRetry")
+            ->where('(n.processedAt <= :processingTime OR n.processedAt IS NULL)')
             ->orderBy('n.updatedAt', 'ASC')
             ->setParameter('statusReceived', NotificationStatus::STATUS_RECEIVED)
             ->setParameter('statusRetry', NotificationStatus::STATUS_RETRY)
+            ->setParameter('processingTime', new \DateTime())
             ->setMaxResults(1);
 
-        return $builder->getQuery()->getSingleResult();
+        return $builder->getQuery()->getSQL();
     }
 
     /**

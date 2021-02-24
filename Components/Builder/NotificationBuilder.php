@@ -94,6 +94,35 @@ class NotificationBuilder
             $notification->setErrorDetails($params['reason']);
         }
 
+        if (isset($params['eventCode']) && isset($params['success'])) {
+            $notification->setProcessedAt($this->getProcessingTime($notification));
+        }
+
         return $notification;
+    }
+
+    /**
+     * Set delay in processing time for certain notifications.
+     *
+     * @param Notification $notification
+     * @return \DateTime
+     */
+    private function getProcessingTime(Notification $notification): \DateTime
+    {
+        $processedAt = new \DateTime();
+        switch ($notification->getEventCode()) {
+            case 'AUTHORISATION':
+                if (!$notification->isSuccess()) {
+                    $processedAt = $processedAt->add(new \DateInterval('PT30M'));
+                }
+                break;
+            case 'OFFER_CLOSED':
+                $processedAt = $processedAt->add(new \DateInterval('PT30M'));
+                break;
+            default:
+                break;
+        }
+
+        return $processedAt;
     }
 }
