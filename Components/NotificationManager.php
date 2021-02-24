@@ -10,7 +10,6 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use AdyenPayment\Models\Enum\NotificationStatus;
 use AdyenPayment\Models\Notification;
-use Shopware\Components\Form\Field\Date;
 use Shopware\Components\Model\ModelManager;
 
 /**
