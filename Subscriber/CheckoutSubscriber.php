@@ -127,8 +127,10 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     public function checkoutFrontendPreDispatch(Enlight_Event_EventArgs $args)
     {
-        $this->rewritePostPayment($args);
-        $this->unsetPaymentSessions($args);
+        $subject = $args->getSubject();
+
+        $this->rewritePostPayment($subject);
+        $this->unsetPaymentSessions($subject);
     }
 
     /**
@@ -139,17 +141,17 @@ class CheckoutSubscriber implements SubscriberInterface
     {
         $subject = $args->getSubject();
 
-        $this->checkFirstCheckoutStep($args);
-        $this->rewritePaymentData($args);
-        $this->addAdyenConfigOnShipping($args);
-        $this->addAdyenGooglePay($args);
+        $this->checkFirstCheckoutStep($subject);
+        $this->rewritePaymentData($subject);
+        $this->addAdyenConfigOnShipping($subject);
+        $this->addAdyenGooglePay($subject);
 
         if (in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
-            $this->addPaymentSnippets($args);
+            $this->addPaymentSnippets($subject);
         }
 
         if (in_array($subject->Request()->getActionName(), ['confirm'])) {
-            $this->addConfirmSnippets($args);
+            $this->addConfirmSnippets($subject);
         }
     }
 
@@ -197,14 +199,11 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param Enlight_Event_EventArgs $args
+     * @param Shopware_Controllers_Frontend_Checkout $subject
      * @throws AdyenException
      */
-    private function addAdyenConfigOnShipping(Enlight_Event_EventArgs $args)
+    private function addAdyenConfigOnShipping(Shopware_Controllers_Frontend_Checkout $subject)
     {
-        /** @var Shopware_Controllers_Frontend_Checkout $subject */
-        $subject = $args->getSubject();
-
         if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'confirm'])) {
             return;
         }
@@ -228,13 +227,10 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param Enlight_Event_EventArgs $args
+     * @param Shopware_Controllers_Frontend_Checkout $subject
      */
-    private function addConfirmSnippets(Enlight_Event_EventArgs $args)
+    private function addConfirmSnippets(Shopware_Controllers_Frontend_Checkout $subject)
     {
-        /** @var Shopware_Controllers_Frontend_Checkout $subject */
-        $subject = $args->getSubject();
-
         $errorSnippets = $this->snippets->getNamespace('adyen/checkout/error');
 
         $snippets = [];
@@ -268,13 +264,10 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param Enlight_Event_EventArgs $args
+     * @param Shopware_Controllers_Frontend_Checkout $subject
      */
-    private function addPaymentSnippets(Enlight_Event_EventArgs $args)
+    private function addPaymentSnippets(Shopware_Controllers_Frontend_Checkout $subject)
     {
-        /** @var Shopware_Controllers_Frontend_Checkout $subject */
-        $subject = $args->getSubject();
-
         $paymentSnippets = $this->snippets->getNamespace('adyen/checkout/payment');
 
         $snippets = [
@@ -299,13 +292,10 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param Enlight_Event_EventArgs $args
+     * @param Shopware_Controllers_Frontend_Checkout $subject
      */
-    private function rewritePaymentData(Enlight_Event_EventArgs $args)
+    private function rewritePaymentData(Shopware_Controllers_Frontend_Checkout $subject)
     {
-        /** @var Shopware_Controllers_Frontend_Checkout $subject */
-        $subject = $args->getSubject();
-
         if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
             return;
         }
@@ -322,13 +312,10 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param Enlight_Event_EventArgs $args
+     * @param Shopware_Controllers_Frontend_Checkout $subject
      */
-    private function rewritePostPayment(Enlight_Event_EventArgs $args)
+    private function rewritePostPayment(Shopware_Controllers_Frontend_Checkout $subject)
     {
-        /** @var Shopware_Controllers_Frontend_Checkout $subject */
-        $subject = $args->getSubject();
-
         if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
             return;
         }
@@ -354,11 +341,8 @@ class CheckoutSubscriber implements SubscriberInterface
         }
     }
 
-    private function addAdyenGooglePay(Enlight_Event_EventArgs $args)
+    private function addAdyenGooglePay(Shopware_Controllers_Frontend_Checkout $subject)
     {
-        /** @var Shopware_Controllers_Frontend_Checkout $subject */
-        $subject = $args->getSubject();
-
         if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
             return;
         }
@@ -397,11 +381,12 @@ class CheckoutSubscriber implements SubscriberInterface
         $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
     }
 
-    private function checkFirstCheckoutStep(Enlight_Event_EventArgs $args)
+    /**
+     * @param Shopware_Controllers_Frontend_Checkout $subject
+     * @throws AdyenException
+     */
+    private function checkFirstCheckoutStep(Shopware_Controllers_Frontend_Checkout $subject)
     {
-        /** @var Shopware_Controllers_Frontend_Checkout $subject */
-        $subject = $args->getSubject();
-
         if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
             return;
         }
@@ -462,11 +447,8 @@ class CheckoutSubscriber implements SubscriberInterface
         return !$this->session->offsetExists(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
     }
 
-    private function unsetPaymentSessions(Enlight_Event_EventArgs $args)
+    private function unsetPaymentSessions(Shopware_Controllers_Frontend_Checkout $subject)
     {
-        /** @var Shopware_Controllers_Frontend_Checkout $subject */
-        $subject = $args->getSubject();
-
         if ($subject->Request()->getActionName() !== 'finish') {
             return;
         }
