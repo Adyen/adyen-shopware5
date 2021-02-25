@@ -32,7 +32,7 @@ final class OrderManager implements OrderManagerInterface
         $this->modelManager->persist($order);
     }
 
-    public function updateOrderPayment(Order $order, string $pspReference, Status $paymentStatus)
+    public function updatePayment(Order $order, string $pspReference, Status $paymentStatus)
     {
         $order->setPaymentStatus($paymentStatus);
         $order = $order->setTransactionId($pspReference);

@@ -11,5 +11,5 @@ interface OrderManagerInterface
 {
     public function save(Order $order);
     public function updatePspReference(Order $order, string $pspReference);
-    public function updateOrderPayment(Order $order, string $pspReference, Status $paymentStatus);
+    public function updatePayment(Order $order, string $pspReference, Status $paymentStatus);
 }
