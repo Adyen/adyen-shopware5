@@ -99,6 +99,9 @@ class PaymentSubscriber implements SubscriberInterface
         });
 
         $paymentMethodOptions = $this->shopwarePaymentMethodService->getPaymentMethodOptions();
+        if ($paymentMethodOptions['value'] == 0) {
+            return $shopwareMethods;
+        }
         $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
             $this->paymentMethodService->getPaymentMethods(
                 $paymentMethodOptions['countryCode'],

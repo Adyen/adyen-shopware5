@@ -432,13 +432,18 @@ class CheckoutSubscriber implements SubscriberInterface
         $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
         $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
 
+        if (empty((int) $value)) {
+            // @todo remove payment info, don't redirect to shippingPayment
+            return false;
+        }
+
 
         $selectedType = $userData['additional']['user'][AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD];
-        
+
         if ($selectedType === null) {
             return true;
         }
-        
+
         $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
             $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value)
         );
