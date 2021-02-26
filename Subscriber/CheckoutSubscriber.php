@@ -141,6 +141,7 @@ class CheckoutSubscriber implements SubscriberInterface
     {
         $subject = $args->getSubject();
 
+        $this->checkBasketAmount($subject);
         $this->checkFirstCheckoutStep($subject);
         $this->rewritePaymentData($subject);
         $this->addAdyenConfigOnShipping($subject);
@@ -196,6 +197,29 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         return $basket;
+    }
+
+    /**
+     * @param Shopware_Controllers_Frontend_Checkout $subject
+     * @throws \Exception
+     */
+    private function checkBasketAmount(Shopware_Controllers_Frontend_Checkout $subject)
+    {
+        $userData = $subject->View()->getAssign('sUserData');
+        if (!$userData['additional'] ||
+            !$userData['additional']['payment'] ||
+            $userData['additional']['payment']['name'] !== AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD) {
+            return;
+        }
+
+        $basket = $subject->View()->sBasket;
+        if (!$basket) {
+            return;
+        }
+        $value = $basket['sAmount'];
+        if (empty($value)) {
+            $this->revertToDefaultPaymentMethod($subject);
+        }
     }
 
     /**
@@ -418,7 +442,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
 
         if (empty((int) $value)) {
-            // @todo remove payment info, don't redirect to shippingPayment
+            $this->revertToDefaultPaymentMethod($subject);
             return false;
         }
 
@@ -445,6 +469,22 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         return !$this->session->offsetExists(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
+    }
+
+    private function revertToDefaultPaymentMethod(Shopware_Controllers_Frontend_Checkout $subject)
+    {
+        $defaultPaymentId = Shopware()->Config()->get('defaultPayment');
+        $defaultPayment = Shopware()->Modules()->Admin()->sGetPaymentMeanById($defaultPaymentId);
+        if (Shopware()->Modules()->Admin()->sUpdatePayment($defaultPaymentId)) {
+            $this->adyenManager->unsetPaymentDataInSession();
+            $userData = $subject->View()->getAssign('sUserData');
+            $userData['additional']['payment'] = $defaultPayment;
+            unset($userData['additional']['user'][AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD]);
+            $subject->View()->assign('sUserData', $userData);
+            $subject->View()->clearAssign('sAdyenSetSession');
+
+            // @todo add message for user
+        }
     }
 
     private function unsetPaymentSessions(Shopware_Controllers_Frontend_Checkout $subject)
