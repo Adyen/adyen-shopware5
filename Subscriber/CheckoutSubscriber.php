@@ -477,13 +477,11 @@ class CheckoutSubscriber implements SubscriberInterface
         $defaultPayment = Shopware()->Modules()->Admin()->sGetPaymentMeanById($defaultPaymentId);
         if (Shopware()->Modules()->Admin()->sUpdatePayment($defaultPaymentId)) {
             $this->adyenManager->unsetPaymentDataInSession();
+            // Replace Adyen payment method in the template with the default payment method.
             $userData = $subject->View()->getAssign('sUserData');
             $userData['additional']['payment'] = $defaultPayment;
-            unset($userData['additional']['user'][AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD]);
             $subject->View()->assign('sUserData', $userData);
             $subject->View()->clearAssign('sAdyenSetSession');
-
-            // @todo add message for user
         }
     }
 
