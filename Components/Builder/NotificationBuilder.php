@@ -78,6 +78,8 @@ class NotificationBuilder
 
         if (isset($params['paymentMethod'])) {
             $notification->setPaymentMethod($params['paymentMethod']);
+        } elseif (isset($params['additionalData']['paymentMethodVariant'])) {
+            $notification->setPaymentMethod($params['additionalData']['paymentMethodVariant']);
         }
 
         if (isset($params['success'])) {
