@@ -95,7 +95,7 @@ class NotificationBuilder
         }
 
         if (isset($params['eventCode']) && isset($params['success'])) {
-            $notification->setProcessedAt($this->getProcessingTime($notification));
+            $notification->setScheduledProcessingTime($this->getProcessingTime($notification));
         }
 
         return $notification;
@@ -109,20 +109,20 @@ class NotificationBuilder
      */
     private function getProcessingTime(Notification $notification): \DateTime
     {
-        $processedAt = new \DateTime();
+        $processingTime = new \DateTime();
         switch ($notification->getEventCode()) {
             case 'AUTHORISATION':
                 if (!$notification->isSuccess()) {
-                    $processedAt = $processedAt->add(new \DateInterval('PT30M'));
+                    $processingTime = $processingTime->add(new \DateInterval('PT30M'));
                 }
                 break;
             case 'OFFER_CLOSED':
-                $processedAt = $processedAt->add(new \DateInterval('PT30M'));
+                $processingTime = $processingTime->add(new \DateInterval('PT30M'));
                 break;
             default:
                 break;
         }
 
-        return $processedAt;
+        return $processingTime;
     }
 }
