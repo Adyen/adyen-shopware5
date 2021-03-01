@@ -441,7 +441,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
         $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
 
-        if (empty((int) $value)) {
+        if (0 === (int)$value) {
             $this->revertToDefaultPaymentMethod($subject);
             return false;
         }
