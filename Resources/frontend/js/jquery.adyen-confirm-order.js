@@ -96,11 +96,6 @@
                     },
                 });
             } else {
-                if ($('body').data('adyenisadyenpayment')) {
-                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
-                    return;
-                }
-
                 $(me.opts.confirmFormSelector).submit();
             }
         },

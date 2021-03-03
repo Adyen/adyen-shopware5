@@ -33,9 +33,6 @@
     {if $sAdyenSetSession}
         data-adyenSetSession='{$sAdyenSetSession}'
     {/if}
-    {if $sUserData.additional.payment.name == 'adyen_general_payment_method'}
-        data-adyenIsAdyenPayment='true'
-    {/if}
 {/block}
 
 {block name='frontend_checkout_confirm_payment_method_panel'}
