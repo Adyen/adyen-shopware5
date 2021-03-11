@@ -441,12 +441,6 @@ class CheckoutSubscriber implements SubscriberInterface
         $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
         $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
 
-        if (0 === (int)$value) {
-            $this->revertToDefaultPaymentMethod($subject);
-            return false;
-        }
-
-
         $selectedType = $userData['additional']['user'][AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD];
 
         if ($selectedType === null) {
@@ -481,6 +475,7 @@ class CheckoutSubscriber implements SubscriberInterface
             $userData = $subject->View()->getAssign('sUserData');
             $userData['additional']['payment'] = $defaultPayment;
             $subject->View()->assign('sUserData', $userData);
+            $subject->View()->assign('sPayment', $defaultPayment);
             $subject->View()->clearAssign('sAdyenSetSession');
         }
     }
