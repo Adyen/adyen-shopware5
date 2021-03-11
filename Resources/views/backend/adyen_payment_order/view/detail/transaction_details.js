@@ -28,7 +28,7 @@ Ext.define('Shopware.apps.AdyenPaymentOrder.view.detail.TransactionDetails', {
         var me = this;
 
         me.detailsPanel = Ext.create('Ext.form.Panel', {
-            title: 'Transaction details',
+            title: 'Latest notification',
             titleAlign: 'left',
             bodyPadding: 10,
             layout: 'anchor',
