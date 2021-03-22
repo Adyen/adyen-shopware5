@@ -88,7 +88,8 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                     $this->redirect([
                         'controller' => 'checkout',
                         'action' => 'finish',
-                        'sAGB' => true
+                        'sUniqueID' => $order->getTemporaryId(),
+                        'sAGB' => true,
                     ]);
                     break;
                 case PaymentResultCodes::CANCELLED:
