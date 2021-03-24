@@ -15,7 +15,7 @@ class PaymentMethod
      */
     private $rawData;
 
-    public function __construct(PaymentMethodType $type, array $rawData)
+    private function __construct(PaymentMethodType $type, array $rawData)
     {
         $this->paymentMethodType = $type;
         $this->rawData = $rawData;
@@ -64,6 +64,13 @@ class PaymentMethod
     public function getRawData(): array
     {
         return $this->rawData;
+    }
+
+    public function serializeMinimalState(): string
+    {
+        return json_encode([
+            'type' => $this->getType(),
+        ]);
     }
 
     /**

@@ -78,7 +78,6 @@
 
         init: function () {
             var me = this;
-
             me.sessionStorage = StorageManager.getStorage('session');
 
             me.applyDataAttributes();
@@ -126,18 +125,17 @@
             }
 
             var payment = me.getPaymentMethodByType(me.currentSelectedPaymentType);
-            if (me.__canHandlePayment(payment)) {
-                $('#' + me.currentSelectedPaymentId)
-                    .closest(me.opts.paymentMethodSelector)
-                    .find(me.opts.methodBankdataSelector)
-                    .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
-                $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
-                me.handleComponent(payment);
-
+            if (!me.__canHandlePayment(payment)) {
+                me.setPaymentSession(me.__buildMinimalState(payment));
                 return;
             }
 
-            me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(payment));
+            $('#' + me.currentSelectedPaymentId)
+                .closest(me.opts.paymentMethodSelector)
+                .find(me.opts.methodBankdataSelector)
+                .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
+            $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
+            me.handleComponent(payment);
         },
         setConfig: function () {
             var me = this;
@@ -415,6 +413,22 @@
                     enableStoreDetails: this.__enableStoreDetails(paymentMethod)
                 }
             });
+        },
+        /**
+         * Create a minimal state when payment is handled by callback (e.g. PayPal payment)
+         * Use only when web components does NOT handle the payment
+         * @param payment
+         * @return {{data: {paymentMethod: {type}}}}
+         * @private
+         */
+        __buildMinimalState: function(payment) {
+            return {
+                data: {
+                    paymentMethod: {
+                        type: payment.type
+                    }
+                }
+            };
         }
     });
 

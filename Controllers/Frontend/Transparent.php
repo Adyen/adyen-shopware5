@@ -3,20 +3,25 @@
 use AdyenPayment\Utils\RequestDataFormatter;
 use Shopware\Components\CSRFWhitelistAware;
 use Shopware\Components\Logger;
+use Shopware\Components\Routing\RouterInterface;
 
 // phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps, Generic.Files.LineLength.TooLong
 class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
-
     const ALLOWED_PARAMS = ['MD', 'PaRes'];
     /**
      * @var Logger
      */
     private $logger;
+    /**
+     * @var RouterInterface
+     */
+    private $router;
 
     public function preDispatch()
     {
         $this->logger = $this->get('adyen_payment.logger');
+        $this->router = $this->get('router');
     }
 
     public function getWhitelistedCSRFActions()
@@ -31,7 +36,7 @@ class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Fro
      */
     public function redirectAction()
     {
-        $redirectUrl = Shopware()->Router()->assemble([
+        $redirectUrl = $this->router->assemble([
             'controller' => 'process',
             'action' => 'return',
         ]);
@@ -60,6 +65,7 @@ class Shopware_Controllers_Frontend_Transparent extends Shopware_Controllers_Fro
                 $postParams[$allowedParam] = $fullPostParams[$allowedParam];
             }
         }
+
         return array_merge($getParams, $postParams);
     }
 }

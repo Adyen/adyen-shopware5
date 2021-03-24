@@ -134,10 +134,13 @@
         handlePaymentDataIdentifyShopper: function (data) {
             var me = this;
             var paymentData = data.paymentData;
+
             $(me.opts.placeOrderSelector).parent().append('<div id="AdyenIdentifyShopperThreeDS2"/>');
             me.adyenCheckout
                 .create('threeDS2DeviceFingerprint', {
-                    fingerprintToken: data.authentication['threeds2.fingerprintToken'],
+                    token: data.authentication['threeds2.fingerprintToken'],
+                    useOriginalFlow: true,
+                    paymentData: paymentData,
                     onComplete: function (fingerprintData) {
                         $.ajax({
                             method: 'POST',
@@ -167,9 +170,12 @@
                 closeOnOverlay: false,
                 additionalClass: 'adyen-challenge-shopper'
             });
+
             me.adyenCheckout
                 .create('threeDS2Challenge', {
-                    challengeToken: data.authentication['threeds2.challengeToken'],
+                    token: data.authentication['threeds2.challengeToken'],
+                    useOriginalFlow: true,
+                    paymentData: paymentData,
                     onComplete: function (challengeData) {
                         modal.close();
                         $.ajax({
@@ -186,7 +192,7 @@
                         });
                     },
                     onError: function (error) {
-                        console.log(error);
+                        console.error(error);
                     }
                 })
                 .mount('#AdyenChallengeShopperThreeDS2');
