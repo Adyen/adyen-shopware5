@@ -11,6 +11,7 @@ use Shopware\Models\Shop\Shop;
  * Class OriginKeysService
  * @package AdyenPayment\Components\Adyen
  */
+// se-remove die(): remove OriginKeys, replace by ClientKey
 class OriginKeysService
 {
     /**

@@ -13,7 +13,7 @@ use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\DataConversion;
 use AdyenPayment\Components\Manager\AdyenManager;
-use AdyenPayment\Components\OriginKeysService;
+use AdyenPayment\Components\OriginKeysService; // se-remove die()
 use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\AdyenPayment;
 use Shopware\Components\Model\ModelManager;
@@ -73,6 +73,7 @@ class CheckoutSubscriber implements SubscriberInterface
     /**
      * @var OriginKeysService
      */
+// se-remove die()
     private $originKeysService;
 
     /**
@@ -95,7 +96,7 @@ class CheckoutSubscriber implements SubscriberInterface
         Enlight_Controller_Front $front,
         AdyenManager $adyenManager,
         DataConversion $dataConversion,
-        OriginKeysService $originKeysService
+        OriginKeysService $originKeysService // se-remove die()
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
@@ -106,7 +107,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->front = $front;
         $this->adyenManager = $adyenManager;
         $this->dataConversion = $dataConversion;
-        $this->originKeysService = $originKeysService;
+        $this->originKeysService = $originKeysService; // se-remove die()
     }
 
     /**
@@ -218,7 +219,7 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $adyenConfig = [
             "shopLocale" => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
-            "originKey" => $this->getOriginKey($shop),
+            "clientKey" => $this->configuration->getClientKey($shop),
             "environment" => $this->configuration->getEnvironment($shop),
             "paymentMethods" => json_encode($paymentMethods),
             "paymentMethodPrefix" => $this->configuration->getPaymentMethodPrefix($shop),
@@ -463,6 +464,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->adyenManager->unsetPaymentDataInSession();
     }
 
+    // se-remove die(): remove OriginKeys, replace by ClientKey
     private function getOriginKey($shop): string
     {
         if (!$this->configuration->getOriginKey($shop)) {

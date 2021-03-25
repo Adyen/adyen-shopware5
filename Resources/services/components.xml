@@ -27,6 +27,7 @@
             <argument type="service" id="adyen_payment.components.configuration"/>
             <argument type="service" id="adyen_payment.logger"/>
         </service>
+<!-- // se-remove die() -->
         <service id="adyen_payment.components.adyen.origin_keys_service" class="AdyenPayment\Components\Adyen\OriginKeysService">
             <argument type="service" id="adyen_payment.components.adyen.apifactory"/>
             <argument type="service" id="models"/>
@@ -63,6 +64,7 @@
             <argument type="service" id="snippets"/>
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
         </service>
+<!-- // se-remove die() -->
         <service id="adyen_payment.components.origin_keys_service" class="AdyenPayment\Components\OriginKeysService">
             <argument type="service" id="adyen_payment.components.adyen.origin_keys_service"/>
             <argument type="service" id="models"/>

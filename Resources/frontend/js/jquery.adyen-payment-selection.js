@@ -6,7 +6,8 @@
          * Plugin default options.
          */
         defaults: {
-            adyenOriginkey: '',
+            adyenOriginkey: '', // se-remove die()
+            adyenClientKey: '',
             adyenPaymentMethodsResponse: {},
             resetSessionUrl: '',
             /**
@@ -143,7 +144,7 @@
             me.adyenConfiguration = {
                 locale: me.opts.shopLocale,
                 environment: me.opts.adyenEnvironment,
-                originKey: me.opts.adyenOriginkey,
+                clientKey: me.opts.clientKey,
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
                 onChange: $.proxy(me.handleOnChange, me),
             };
@@ -323,7 +324,7 @@
             var data = {
                 locale: adyenConfiguration.locale,
                 environment: adyenConfiguration.environment,
-                originKey: adyenConfiguration.originKey,
+                clientKey: adyenConfiguration.clientKey,
                 paymentMethodsResponse: adyenConfiguration.paymentMethodsResponse
             };
 

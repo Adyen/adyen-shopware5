@@ -14,11 +14,13 @@ use Shopware\Models\Shop\Shop;
  * Class OriginKeysService
  * @package AdyenPayment\Components
  */
+// se-remove die(): remove OriginKeys, replace by ClientKey
 class OriginKeysService
 {
     /**
      * @var Adyen\OriginKeysService
      */
+    // se-remove die()
     private $originKeysService;
 
     /**
@@ -56,6 +58,7 @@ class OriginKeysService
     /**
      * @throws AdyenException
      */
+    // se-remove die(): remove OriginKeys, replace by ClientKey
     public function generateAndSave()
     {
         $plugin = $this->models->getRepository(Plugin::class)->findOneBy(['name' => AdyenPayment::NAME]);

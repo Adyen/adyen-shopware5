@@ -16,6 +16,7 @@ use Shopware_Controllers_Backend_Config;
  * Class BackendConfigSubscriber
  * @package AdyenPayment\Subscriber
  */
+// se-remove die(): remove OriginKeys, replace by ClientKey
 class BackendConfigSubscriber implements SubscriberInterface
 {
     /** @var OriginKeysService */

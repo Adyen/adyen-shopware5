@@ -44,21 +44,15 @@ class Configuration
     }
 
     /**
-     * @param bool $shop
-     * @return string
+     * @param Shop|bool $shop
      */
     public function getEnvironment($shop = false, $lowercase = false): string
     {
-        $environment = Environment::TEST;
-        if ($this->getConfig('environment', $shop) === self::ENV_LIVE) {
-            $environment = Environment::LIVE;
-        }
+        $environment = self::ENV_LIVE === $this->getConfig('environment', $shop)
+            ? Environment::LIVE
+            : Environment::TEST;
 
-        if ($lowercase) {
-            return strtolower($environment);
-        }
-
-        return $environment;
+        return  (true === $lowercase) ? strtolower($environment) : $environment;
     }
 
     /**
@@ -129,13 +123,9 @@ class Configuration
         return (string)$this->getConfig('api_url_prefix', $shop);
     }
 
-    /**
-     * @param bool|Shop $shop
-     * @return string
-     */
-    public function getOriginKey($shop = false): string
+    public function getClientKey(Shop $shop): string
     {
-        return (string)$this->getConfig('origin_key', $shop);
+        return (string)$this->getConfig('client_key_'.$this->getEnvironment($shop, true), $shop);
     }
 
     /**

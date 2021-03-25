@@ -35,6 +35,14 @@
           <name>api_key_live</name>
           <label lang="en">API key (Live)</label>
         </element>
+        <element required="true" type="text" scope="shop">
+          <name>client_key_test</name>
+          <label lang="en">Client key (Test)</label>
+        </element>
+        <element required="true" type="text" scope="shop">
+          <name>client_key_live</name>
+          <label lang="en">Client key (Live)</label>
+        </element>
         <element type="text" scope="shop">
             <name>api_url_prefix</name>
             <label lang="en">API: URL prefix</label>
