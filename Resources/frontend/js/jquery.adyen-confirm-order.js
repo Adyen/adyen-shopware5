@@ -13,8 +13,7 @@
             adyenGoogleConfig: {},
             adyenSetSession: {},
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
-            adyenAjaxIdentifyShopperUrl: '/frontend/adyen/ajaxIdentifyShopper',
-            adyenAjaxChallengeShopperUrl: '/frontend/adyen/ajaxChallengeShopper',
+            adyenAjaxThreeDsUrl: '/frontend/adyen/ajaxThreeDs',
             adyenSnippets: {
                 errorTransactionCancelled: 'Your transaction was cancelled by the Payment Service Provider.',
                 errorTransactionProcessing: 'An error occured while processing your payment.',
@@ -111,10 +110,8 @@
                     me.handlePaymentDataAuthorised(data);
                     break;
                 case 'IdentifyShopper':
-                    me.handlePaymentDataIdentifyShopper(data);
-                    break;
                 case 'ChallengeShopper':
-                    me.handlePaymentDataChallengeShopper(data);
+                    me.handleThreeDs(data);
                     break;
                 case 'Pending':
                 case 'RedirectShopper':
@@ -131,60 +128,30 @@
             $(me.opts.confirmFormSelector).submit();
         },
 
-        handlePaymentDataIdentifyShopper: function (data) {
+        handleThreeDs: function (data) {
             var me = this;
-            var paymentData = data.paymentData;
-
-            $(me.opts.placeOrderSelector).parent().append('<div id="AdyenIdentifyShopperThreeDS2"/>');
-            me.adyenCheckout
-                .create('threeDS2DeviceFingerprint', {
-                    token: data.authentication['threeds2.fingerprintToken'],
-                    useOriginalFlow: true,
-                    paymentData: paymentData,
-                    onComplete: function (fingerprintData) {
-                        $.ajax({
-                            method: 'POST',
-                            dataType: 'json',
-                            url: me.opts.adyenAjaxIdentifyShopperUrl,
-                            data: {
-                                'details': fingerprintData.data.details,
-                                'paymentData': paymentData
-                            },
-                            success: function (response) {
-                                me.handlePaymentData(response);
-                            },
-                        });
-                    },
-                    onError: function (error) {
-                        console.error(error);
-                    }
-                })
-                .mount('#AdyenIdentifyShopperThreeDS2');
-        },
-
-        handlePaymentDataChallengeShopper: function (data) {
-            var me = this;
-            var paymentData = data.paymentData;
-            var modal = $.modal.open('<div id="AdyenChallengeShopperThreeDS2"/>', {
+            var threeDsAction = {
+                resultCode: data.resultCode,
+                type: data.action.type,
+                subtype: data.action.subtype
+            };
+            var modal = $.modal.open('<div id="AdyenThreeDS2"/>', {
                 showCloseButton: false,
                 closeOnOverlay: false,
                 additionalClass: 'adyen-challenge-shopper'
             });
 
             me.adyenCheckout
-                .create('threeDS2Challenge', {
-                    token: data.authentication['threeds2.challengeToken'],
-                    useOriginalFlow: true,
-                    paymentData: paymentData,
-                    onComplete: function (challengeData) {
+                .createFromAction(data.action, {
+                    onAdditionalDetails: function (state) {
                         modal.close();
                         $.ajax({
                             method: 'POST',
                             dataType: 'json',
-                            url: me.opts.adyenAjaxChallengeShopperUrl,
+                            url: me.opts.adyenAjaxThreeDsUrl,
                             data: {
-                                'details': challengeData.data.details,
-                                'paymentData': paymentData
+                                'action': threeDsAction,
+                                'details': state.data.details,
                             },
                             success: function (response) {
                                 me.handlePaymentData(response);
@@ -195,7 +162,7 @@
                         console.error(error);
                     }
                 })
-                .mount('#AdyenChallengeShopperThreeDS2');
+                .mount('#AdyenThreeDS2');
         },
 
         handlePaymentDataRedirectShopper: function (data) {

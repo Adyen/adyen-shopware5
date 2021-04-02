@@ -49,8 +49,8 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
     public function provide(PaymentContext $context): array
     {
         $returnUrl = $this->router->assemble([
-                'controller' => 'transparent',
-                'action' => 'redirect',
+                'controller' => 'process',
+                'action' => 'return',
             ]).'?'.http_build_query([
                 'merchantReference' => $context->getOrder()->getNumber(),
             ]);

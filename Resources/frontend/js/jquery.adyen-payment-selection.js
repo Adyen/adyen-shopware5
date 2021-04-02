@@ -143,7 +143,7 @@
             me.adyenConfiguration = {
                 locale: me.opts.shopLocale,
                 environment: me.opts.adyenEnvironment,
-                clientKey: me.opts.clientKey,
+                clientKey: me.opts.adyenClientKey,
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
                 onChange: $.proxy(me.handleOnChange, me),
             };

@@ -1,5 +1,6 @@
 <?php
 
+use Adyen\AdyenException;
 use AdyenPayment\Components\Manager\AdyenManager;
 use AdyenPayment\Models\Enum\PaymentResultCodes;
 use AdyenPayment\Utils\RequestDataFormatter;
@@ -162,7 +163,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         try {
             $checkout = $this->adyenCheckout->getCheckout();
             $response = $checkout->paymentsDetails($request);
-        } catch (\Adyen\AdyenException $e) {
+        } catch (AdyenException $e) {
             $response['error'] = $e->getMessage();
         }
 
