@@ -286,8 +286,7 @@
             me.adyenConfiguration = {
                 locale: adyenConfigSession ? adyenConfigSession.locale : adyenConfigTpl.shoplocale,
                 environment: adyenConfigSession ? adyenConfigSession.environment : adyenConfigTpl.adyenenvironment,
-                // se-remove die(): update to clientKey
-                originKey: adyenConfigSession ? adyenConfigSession.originkey : adyenConfigTpl.adyenoriginkey,
+                clientKey: adyenConfigSession ? adyenConfigSession.clientKey : adyenConfigTpl.adyenclientkey,
                 paymentMethodsResponse:
                     adyenConfigSession
                         ? adyenConfigSession.paymentMethodsResponse

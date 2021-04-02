@@ -15,9 +15,9 @@ use Shopware\Models\Order\Order;
 class RefundService
 {
     /**
-     * @var ApiFactory
+     * @var ApiClientMap
      */
-    private $apiFactory;
+    private $apiClientMap;
 
     /**
      * @var ModelManager
@@ -33,18 +33,12 @@ class RefundService
      */
     private $paymentInfoRepository;
 
-    /**
-     * PaymentMethodService constructor.
-     * @param ApiFactory $apiFactory
-     * @param ModelManager $modelManager
-     * @param NotificationManager $notificationManager
-     */
     public function __construct(
-        ApiFactory $apiFactory,
+        ApiClientMap $apiClientMap,
         ModelManager $modelManager,
         NotificationManager $notificationManager
     ) {
-        $this->apiFactory = $apiFactory;
+        $this->apiClientMap = $apiClientMap;
         $this->modelManager = $modelManager;
         $this->notificationManager = $notificationManager;
         $this->paymentInfoRepository = $modelManager->getRepository(PaymentInfo::class);
@@ -61,8 +55,9 @@ class RefundService
     {
         /** @var Order $order */
         $order = $this->modelManager->find(Order::class, $orderId);
-        $apiClient = $this->apiFactory->provide($order->getShop());
-        $modification = new Modification($apiClient);
+        $modification = new Modification(
+            $this->apiClientMap->lookup($order->getShop())
+        );
 
         /** @var PaymentInfo $paymentInfo */
         $paymentInfo = $this->paymentInfoRepository->findOneBy([

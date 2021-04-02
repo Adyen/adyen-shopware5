@@ -2,13 +2,6 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/config.xsd">
     <elements>
-        <element type="text" scope="shop">
-            <name>origin_key</name>
-            <label lang="en">Origin key</label>
-            <options>
-                <hidden>true</hidden>
-            </options>
-        </element>
         <element required="true" type="select" scope="shop">
             <name>environment</name>
             <label lang="en">Environment</label>
@@ -93,8 +86,14 @@
                   container.configurationForm,
                   false,
                   function () {
+                    var matches = me.name.match(/values\[(\d)\].*/) || [];
+                    var shopId = matches[1] || 1;
+
                     Ext.Ajax.request({
                       url: 'TestAdyenApi/run',
+                       params: {
+                            shopId: shopId
+                       },
                       success: function (response) {
                         var value = Ext.decode(response.responseText);
                         Shopware.Msg.createGrowlMessage('success', value.responseText)

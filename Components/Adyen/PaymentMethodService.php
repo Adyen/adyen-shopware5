@@ -20,6 +20,10 @@ use Shopware\Models\Customer\Customer;
 class PaymentMethodService
 {
     /**
+     * @var ApiClientMap
+     */
+    private $apiClientMap;
+    /**
      * @var Configuration
      */
     private $configuration;
@@ -32,10 +36,6 @@ class PaymentMethodService
      */
     private $logger;
     /**
-     * @var ApiFactory
-     */
-    private $apiFactory;
-    /**
      * @var Enlight_Components_Session_Namespace
      */
     private $session;
@@ -45,13 +45,13 @@ class PaymentMethodService
     private $modelManager;
 
     public function __construct(
-        ApiFactory $apiFactory,
+        ApiClientMap $apiClientMap,
         Configuration $configuration,
         LoggerInterface $logger,
         Enlight_Components_Session_Namespace $session,
         ModelManager $modelManager
     ) {
-        $this->apiFactory = $apiFactory;
+        $this->apiClientMap = $apiClientMap;
         $this->configuration = $configuration;
         $this->logger = $logger;
         $this->session = $session;
@@ -131,9 +131,11 @@ class PaymentMethodService
      */
     public function getCheckout(): Checkout
     {
-        $apiClient = $this->apiFactory->provide(Shopware()->Shop());
-
-        return new Checkout($apiClient);
+        return new Checkout(
+            $this->apiClientMap->lookup(
+                Shopware()->Shop()
+            )
+        );
     }
 
     private function provideCustomerNumber(): string

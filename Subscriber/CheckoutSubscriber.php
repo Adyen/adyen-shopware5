@@ -13,7 +13,6 @@ use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\DataConversion;
 use AdyenPayment\Components\Manager\AdyenManager;
-use AdyenPayment\Components\OriginKeysService; // se-remove die()
 use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\AdyenPayment;
 use Shopware\Components\Model\ModelManager;
@@ -70,22 +69,7 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var DataConversion
      */
     private $dataConversion;
-    /**
-     * @var OriginKeysService
-     */
-// se-remove die()
-    private $originKeysService;
 
-    /**
-     * CheckoutSubscriber constructor.
-     * @param Configuration $configuration
-     * @param PaymentMethodService $paymentMethodService
-     * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
-     * @param Enlight_Components_Session_Namespace $session
-     * @param ModelManager $modelManager
-     * @param Shopware_Components_Snippet_Manager $snippets
-     * @param Enlight_Controller_Front $front
-     */
     public function __construct(
         Configuration $configuration,
         PaymentMethodService $paymentMethodService,
@@ -95,8 +79,7 @@ class CheckoutSubscriber implements SubscriberInterface
         Shopware_Components_Snippet_Manager $snippets,
         Enlight_Controller_Front $front,
         AdyenManager $adyenManager,
-        DataConversion $dataConversion,
-        OriginKeysService $originKeysService // se-remove die()
+        DataConversion $dataConversion
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
@@ -107,7 +90,6 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->front = $front;
         $this->adyenManager = $adyenManager;
         $this->dataConversion = $dataConversion;
-        $this->originKeysService = $originKeysService; // se-remove die()
     }
 
     /**
@@ -462,15 +444,5 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         $this->adyenManager->unsetPaymentDataInSession();
-    }
-
-    // se-remove die(): remove OriginKeys, replace by ClientKey
-    private function getOriginKey($shop): string
-    {
-        if (!$this->configuration->getOriginKey($shop)) {
-            $this->originKeysService->generateAndSave();
-        }
-
-        return $this->configuration->getOriginKey($shop);
     }
 }

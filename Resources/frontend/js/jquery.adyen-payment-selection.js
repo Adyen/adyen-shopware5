@@ -6,7 +6,6 @@
          * Plugin default options.
          */
         defaults: {
-            adyenOriginkey: '', // se-remove die()
             adyenClientKey: '',
             adyenPaymentMethodsResponse: {},
             resetSessionUrl: '',

@@ -14,12 +14,6 @@
             <argument type="service" id="adyen_payment.components.payment_method_service"/>
             <argument type="service" id="session"/>
         </service>
-        <service id="adyen_payment.subscriber.backend_config_subscriber" class="AdyenPayment\Subscriber\BackendConfigSubscriber">
-            <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="adyen_payment.components.origin_keys_service"/>
-            <argument type="service" id="adyen_payment.logger"/>
-            <argument type="service" id="adyen_payment.components.shopware_version_check"/>
-        </service>
         <service id="adyen_payment.subscriber.backend_javascript_subscriber" class="AdyenPayment\Subscriber\BackendJavascriptSubscriber">
             <tag name="shopware.event_subscriber"/>
             <argument>%adyen_payment.plugin_dir%</argument>
@@ -55,7 +49,6 @@
             <argument type="service" id="front" />
             <argument type="service" id="adyen_payment.components.manager.adyen_manager" />
             <argument type="service" id="adyen_payment.components.data_conversion" />
-            <argument type="service" id="adyen_payment.components.origin_keys_service"/>
         </service>
         <service id="adyen_payment.subscriber.frontend_payment_name_subscriber" class="AdyenPayment\Subscriber\FrontendPaymentNameSubscriber">
             <tag name="shopware.event_subscriber"/>
