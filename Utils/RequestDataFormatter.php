@@ -7,9 +7,6 @@ namespace AdyenPayment\Utils;
 final class RequestDataFormatter
 {
     const ALLOWED_PAYMENT_DETAIL_V67_KEYS = [
-        'MD' => null,
-        'PaReq' => null,
-        'PaRes' => null,
         'billingToken' => null,
         'cupsecureplus.smscode' => null,
         'facilitatorAccessToken' => null,
