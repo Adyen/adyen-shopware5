@@ -60,7 +60,7 @@ class ApiConfigValidator
         $shopApiKey = $this->configuration->getApiKey($shop);
         $shopMerchantAccount = $this->configuration->getMerchantAccount($shop);
         if ('' === $shopApiKey) {
-            $violations->add(ConstraintViolationFactory::create('Missing configuration: Api key.'));
+            $violations->add(ConstraintViolationFactory::create('Missing configuration: API key.'));
         }
 
         if ('' === $shopMerchantAccount) {
