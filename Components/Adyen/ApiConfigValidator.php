@@ -42,7 +42,7 @@ class ApiConfigValidator
         $shop = $this->shopRepository->find($shopId);
         if (!$shop) {
             return new ConstraintViolationList([
-                ConstraintViolationFactory::create('Shop not found for id "'.$shopId.'".'),
+                ConstraintViolationFactory::create('Shop not found for ID "'.$shopId.'".'),
             ]);
         }
 
