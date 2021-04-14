@@ -59,17 +59,24 @@ class BasketService
     private $voucherCodeRepository;
 
     /**
+     * @var \Enlight_Components_Db_Adapter_Pdo_Mysql
+     */
+    private $db;
+
+    /**
      * BasketService constructor.
      * @param ContainerAwareEventManager $events
      * @param ModelManager $modelManager
      */
     public function __construct(
         ContainerAwareEventManager $events,
-        ModelManager $modelManager
+        ModelManager $modelManager,
+        \Enlight_Components_Db_Adapter_Pdo_Mysql $db
     ) {
         $this->sBasket = Shopware()->Modules()->Basket();
         $this->events = $events;
         $this->modelManager = $modelManager;
+        $this->db = $db;
 
         $this->statusRepository = $modelManager->getRepository(Status::class);
         $this->orderRepository = $modelManager->getRepository(Order::class);
@@ -194,10 +201,58 @@ class BasketService
      */
     private function addArticle(Detail $orderDetail)
     {
-        $this->sBasket->sAddArticle(
+        $basketDetailId = $this->sBasket->sAddArticle(
             $orderDetail->getArticleNumber(),
             $orderDetail->getQuantity()
         );
+
+        $this->copyDetailAttributes($orderDetail->getId(), $basketDetailId);
+    }
+
+    /**
+     * Copies attributes from the supplied order detail article ID to a basket detail ID
+     *
+     * @param $basketDetailId
+     * @param $orderDetailId
+     * @throws \Zend_Db_Adapter_Exception
+     */
+    private function copyDetailAttributes($orderDetailId, $basketDetailId)
+    {
+        // Getting all attributes from order detail
+        $orderDetailAttributesResult = $this->db
+            ->select()
+            ->from('s_order_details_attributes')
+            ->where('detailID=?', $orderDetailId)
+            ->query()
+            ->fetchAll();
+        $orderDetailAttributes = $orderDetailAttributesResult[0];
+
+        // Getting order attributes columns to possibly fill
+        $basketAttributesColumns = $this->modelManager
+            ->getClassMetadata('Shopware\Models\Attribute\OrderDetail')
+            ->getColumnNames();
+
+        // These columns shouldn't be translated from the order detail to the basket detail
+        $columnsToSkip = [
+            'id',
+            'detailID'
+        ];
+        $attributes = array_diff($basketAttributesColumns, $columnsToSkip);
+
+        // Updating the basket attributes with the order attribute values
+        $attributeValues = [];
+        foreach ($attributes as $attribute) {
+            if (!empty($orderDetailAttributes[$attribute])) {
+                $attributeValues[$attribute] = $orderDetailAttributes[$attribute];
+            }
+        }
+        if (count($attributeValues) > 0) {
+            $this->db->update(
+                's_order_basket_attributes',
+                $attributeValues,
+                ['basketID = ?' => $basketDetailId]
+            );
+        }
     }
 
     /**
