@@ -24,8 +24,8 @@ class AuthenticationValidator implements NotificationValidatorInterface
      */
     public function validate(array $notifications)
     {
-        $authUsername = $_SERVER['PHP_AUTH_USER'] ?? '';
-        $authPassword = $_SERVER['PHP_AUTH_PW'] ?? '';
+        $authUsername = $_SERVER['PHP_AUTH_USER'] ?? $_SERVER['HTTP_PHP_AUTH_USER'] ?? '';
+        $authPassword = $_SERVER['PHP_AUTH_PW'] ?? $_SERVER['HTTP_PHP_AUTH_PW'] ?? '';
 
         if (!$authUsername || !$authPassword) {
             throw InvalidAuthenticationException::missingAuthentication();
