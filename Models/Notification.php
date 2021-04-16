@@ -66,7 +66,7 @@ class Notification extends ModelEntity implements \JsonSerializable
 
     /**
      * @var string
-     * @ORM\Column(name="paymentMethod", type="text")
+     * @ORM\Column(name="paymentMethod", type="text", nullable=true)
      */
     private $paymentMethod;
 
