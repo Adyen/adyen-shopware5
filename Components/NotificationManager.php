@@ -49,9 +49,11 @@ class NotificationManager
     {
         $builder = $this->notificationRepository->createQueryBuilder('n');
         $builder->where("n.status = :statusReceived OR n.status = :statusRetry")
+            ->andWhere('(n.scheduledProcessingTime <= :processingTime OR n.scheduledProcessingTime IS NULL)')
             ->orderBy('n.updatedAt', 'ASC')
             ->setParameter('statusReceived', NotificationStatus::STATUS_RECEIVED)
             ->setParameter('statusRetry', NotificationStatus::STATUS_RETRY)
+            ->setParameter('processingTime', new \DateTime())
             ->setMaxResults(1);
 
         return $builder->getQuery()->getSingleResult();

@@ -25,9 +25,9 @@ class OrderMailService
 
     /**
      * Sends the mail after a payment is confirmed
-     * @param string|int $orderNumber
+     * @param string $orderNumber
      */
-    public function sendOrderConfirmationMail($orderNumber)
+    public function sendOrderConfirmationMail(string $orderNumber)
     {
         $order = $this->basketService->getOrderByOrderNumber($orderNumber);
         if (!$order) {

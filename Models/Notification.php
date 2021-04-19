@@ -53,6 +53,12 @@ class Notification extends ModelEntity implements \JsonSerializable
     private $updatedAt;
 
     /**
+     * @var \DateTime
+     * @ORM\Column(name="scheduled_processing_time", type="datetime", nullable=true)
+     */
+    private $scheduledProcessingTime;
+
+    /**
      * @var string
      * @ORM\Column(name="status", type="text")
      */
@@ -214,6 +220,24 @@ class Notification extends ModelEntity implements \JsonSerializable
     public function setUpdatedAt(\DateTime $updatedAt): Notification
     {
         $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getScheduledProcessingTime(): \DateTime
+    {
+        return $this->scheduledProcessingTime;
+    }
+
+    /**
+     * @param \DateTime $scheduledProcessingTime
+     * @return Notification
+     */
+    public function setScheduledProcessingTime(\DateTime $scheduledProcessingTime): Notification
+    {
+        $this->scheduledProcessingTime = $scheduledProcessingTime;
         return $this;
     }
 

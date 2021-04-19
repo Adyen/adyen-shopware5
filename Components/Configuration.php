@@ -183,6 +183,15 @@ class Configuration
     }
 
     /**
+     * @param bool $shop
+     * @return string
+     */
+    public function getManualReviewRejectAction($shop = false): string
+    {
+        return (string)$this->getConfig('manual_review_rejected_action', $shop);
+    }
+
+    /**
      * @return string
      */
     public function getPaymentMethodPrefix(): string

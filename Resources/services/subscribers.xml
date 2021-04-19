@@ -59,5 +59,9 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="adyen_payment.logger.notifications"/>
         </service>
+        <service id="AdyenPayment\Subscriber\Notification\UpdateOrderPsPSubscriber">
+            <argument type="service" id="AdyenPayment\Components\Manager\OrderManager"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
     </services>
 </container>

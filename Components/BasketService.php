@@ -78,14 +78,14 @@ class BasketService
     }
 
     /**
-     * @param int $orderNumber
+     * @param string $orderNumber
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Enlight_Event_Exception
      * @throws \Enlight_Exception
      * @throws \Zend_Db_Adapter_Exception
      */
-    public function cancelAndRestoreByOrderNumber(int $orderNumber)
+    public function cancelAndRestoreByOrderNumber(string $orderNumber)
     {
         $order = $this->getOrderByOrderNumber($orderNumber);
         if (!$order) {
@@ -97,10 +97,10 @@ class BasketService
     }
 
     /**
-     * @param int $orderNumber
-     * @return Order|null
+     * @param string $orderNumber
+     * @return Order|null|object
      */
-    public function getOrderByOrderNumber(int $orderNumber)
+    public function getOrderByOrderNumber(string $orderNumber)
     {
         return $this->orderRepository->findOneBy(['number' => $orderNumber]);
     }

@@ -73,6 +73,21 @@
           <label lang="en">Enable Payment Methods cache</label>
           <description lang="en">Caches the payment methods active in Adyen Customer Area for better performance.</description>
         </element>
+        <element required="true" type="select" scope="shop">
+            <name>manual_review_rejected_action</name>
+            <label lang="en">Manual Review Rejected Action</label>
+            <description lang="en">Select which action to perform on the order if a risk rule sends a payment to case management and is rejected. See https://docs.adyen.com/risk-management/case-management for more information.</description>
+            <store>
+                <option>
+                    <value>None</value>
+                    <label lang="en">None</label>
+                </option>
+                <option>
+                    <value>Cancel</value>
+                    <label lang="en">Cancel</label>
+                </option>
+            </store>
+        </element>
         <element type="button">
             <name>testAPIconnection</name>
             <label lang="en">Test API connection</label>

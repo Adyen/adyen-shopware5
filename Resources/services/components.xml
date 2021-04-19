@@ -165,6 +165,19 @@
             <argument type="service" id="events"/>
             <argument type="service" id="adyen_payment.components.payment_status_update"/>
         </service>
+        <service id="adyen_payment.components.notification_processor.manual_review_reject"
+                 class="AdyenPayment\Components\NotificationProcessor\ManualReviewReject">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="adyen_payment.logger.notifications"/>
+            <argument type="service" id="events"/>
+            <argument type="service" id="adyen_payment.components.payment_status_update"/>
+            <argument type="service" id="adyen_payment.components.configuration"/>
+        </service>
+        <service id="adyen_payment.components.notification_processor.manual_review_accept"
+                 class="AdyenPayment\Components\NotificationProcessor\ManualReviewAccept">
+            <tag name="adyen.payment.notificationprocessor"/>
+            <argument type="service" id="events"/>
+        </service>
         <service id="adyen_payment.components.shopware_version_check" class="AdyenPayment\Components\ShopwareVersionCheck">
             <argument type="service" id="service_container" />
             <argument type="service" id="adyen_payment.logger"/>

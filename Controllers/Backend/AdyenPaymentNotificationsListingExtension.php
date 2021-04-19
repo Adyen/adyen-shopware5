@@ -19,9 +19,7 @@ class Shopware_Controllers_Backend_AdyenPaymentNotificationsListingExtension ext
         $builder = parent::getListQuery();
 
         $builder->leftJoin('notification.order', 'nOrder')
-            ->addSelect(['nOrder'])
-            ->where("notification.status != :notificationStatus")
-            ->setParameter('notificationStatus', NotificationStatus::STATUS_HANDLED);
+            ->addSelect(['nOrder']);
 
         return $builder;
     }

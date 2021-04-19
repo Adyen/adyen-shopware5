@@ -12,6 +12,7 @@
             adyenType: '',
             adyenGoogleConfig: {},
             adyenSetSession: {},
+            adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxThreeDsUrl: '/frontend/adyen/ajaxThreeDs',
             adyenSnippets: {
@@ -49,8 +50,15 @@
 
         checkSetSession: function () {
             var me = this;
-            if (!$.isEmptyObject(me.opts.adyenSetSession)) {
-                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenSetSession));
+            if (me.opts.adyenIsAdyenPayment) {
+                if (!$.isEmptyObject(me.opts.adyenSetSession)) {
+                    me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenSetSession));
+                } else if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
+                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
+                    return;
+                }
+            } else {
+                me.sessionStorage.removeItem(me.paymentMethodSession);
             }
         },
 
@@ -93,7 +101,7 @@
                     },
                 });
             } else {
-                if ($('body').data('adyenisadyenpayment')) {
+                if (me.opts.adyenIsAdyenPayment) {
                     this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
                     return;
                 }
