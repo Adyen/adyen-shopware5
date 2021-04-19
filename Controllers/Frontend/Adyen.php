@@ -103,20 +103,27 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     public function ajaxThreeDsAction()
     {
-        $this->Request()->setHeader('Content-Type', 'application/json');
-        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
-
-        $postData = (array) $this->Request()->getPost();
-        $payload = array_intersect_key($postData, ['details' => true]);
-        $threeDSResult = (string) ($payload['details']['threeDSResult'] ?? '');
+        $threeDSResult = (string) ($this->Request()->getPost()['details']['threeDSResult'] ?? '');
         if ('' === $threeDSResult) {
-            $this->logger->error('3DS2 missing data', [
+            $this->logger->error('3DS missing data', [
                 'action' => $postData['action'] ?? [],
                 'threeDSResult' => substr($threeDSResult, -5),
                 'paymentData' => substr($postData['paymentData'] ?? '', -5),
             ]);
         }
 
+        $this->paymentDetailsAction();
+    }
+
+    /**
+     * @throws AdyenException
+     */
+    public function paymentDetailsAction()
+    {
+        $this->Request()->setHeader('Content-Type', 'application/json');
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
+        $payload = array_intersect_key($this->Request()->getPost(), ['details' => true]);
         $checkout = $this->adyenCheckout->getCheckout();
         $paymentInfo = $checkout->paymentsDetails($payload);
         $this->handlePaymentData($paymentInfo);
