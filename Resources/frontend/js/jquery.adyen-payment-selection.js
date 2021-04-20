@@ -6,7 +6,7 @@
          * Plugin default options.
          */
         defaults: {
-            adyenOriginkey: '',
+            adyenClientKey: '',
             adyenPaymentMethodsResponse: {},
             resetSessionUrl: '',
             /**
@@ -78,7 +78,6 @@
 
         init: function () {
             var me = this;
-
             me.sessionStorage = StorageManager.getStorage('session');
 
             me.applyDataAttributes();
@@ -127,19 +126,22 @@
             }
 
             var payment = me.getPaymentMethodByType(me.currentSelectedPaymentType);
-            if (!me.__hasActivePaymentMethod()) {
-                $('#' + me.currentSelectedPaymentId)
-                    .closest(me.opts.paymentMethodSelector)
-                    .find(me.opts.methodBankdataSelector)
-                    .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
-                $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
-                me.handleComponent(payment);
-
+            if (!me.__canHandlePayment(payment)) {
+                me.setPaymentSession(me.__buildMinimalState(payment));
                 return;
             }
 
-            me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(payment));
-            me.enableUpdatePaymentInfoButton();
+            if (me.__hasActivePaymentMethod()) {
+                me.enableUpdatePaymentInfoButton();
+                return;
+            }
+
+            $('#' + me.currentSelectedPaymentId)
+                .closest(me.opts.paymentMethodSelector)
+                .find(me.opts.methodBankdataSelector)
+                .prop('id', me.getCurrentComponentId(me.currentSelectedPaymentId));
+            $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
+            me.handleComponent(payment);
         },
         setConfig: function () {
             var me = this;
@@ -147,7 +149,7 @@
             me.adyenConfiguration = {
                 locale: me.opts.shopLocale,
                 environment: me.opts.adyenEnvironment,
-                originKey: me.opts.adyenOriginkey,
+                clientKey: me.opts.adyenClientKey,
                 paymentMethodsResponse: me.opts.adyenPaymentMethodsResponse,
                 onChange: $.proxy(me.handleOnChange, me),
             };
@@ -321,7 +323,7 @@
             var data = {
                 locale: adyenConfiguration.locale,
                 environment: adyenConfiguration.environment,
-                originKey: adyenConfiguration.originKey,
+                clientKey: adyenConfiguration.clientKey,
                 paymentMethodsResponse: adyenConfiguration.paymentMethodsResponse
             };
 
@@ -333,6 +335,11 @@
                 .find('input[name=payment]:checked')
                 .closest(me.opts.paymentMethodSelector);
             if (!paymentMethodContainer) {
+                return;
+            }
+
+            // minimal state has no info that needs updating
+            if (me.__hasActiveMinimalPaymentMethodState()) {
                 return;
             }
 
@@ -383,6 +390,19 @@
             }
 
             return true;
+        },
+        /**
+         * @return {boolean}
+         * @private
+         */
+        __hasActiveMinimalPaymentMethodState: function () {
+            if (!this.__hasActivePaymentMethod()) {
+                return false;
+            }
+            var storedPaymentMethod =  this.sessionStorage.getItem(this.paymentMethodSession);
+            var keys = Object.keys(storedPaymentMethod);
+
+            return 1 === keys.length && 'type' === keys[0]; // Minimal state structure @see __buildMinimalState()
         },
         /**
          * @param {string} paymentMethodType
@@ -453,6 +473,36 @@
                     enableStoreDetails: this.__enableStoreDetails(paymentMethod)
                 }
             });
+        },
+        /**
+         * Create a minimal state when payment is handled by callback (e.g. PayPal payment)
+         * Use only when web components does NOT handle the payment
+         * @param payment
+         * @return {{data: {paymentMethod: {type}}}}
+         * @private
+         */
+        __buildMinimalState: function(payment) {
+            return {
+                data: {
+                    paymentMethod: {
+                        type: payment.type
+                    }
+                }
+            };
+        },
+        /**
+         * Create a minimal state when payment is handled by callback (e.g. PayPal payment)
+         * Use only when web components does NOT handle the payment
+         * @param payment
+         * @return {{data: {paymentMethod: {type}}}}
+         * @private
+         */
+        __buildStateFromPaymentMethod: function(paymentMethod) {
+            return {
+                data: {
+                    paymentMethod: paymentMethod
+                }
+            };
         }
     });
 

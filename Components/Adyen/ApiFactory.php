@@ -13,6 +13,7 @@ use Shopware\Models\Shop\Shop;
 
 /**
  * Class ApiFactory
+ *
  * @package AdyenPayment\Components\Adyen
  */
 class ApiFactory
@@ -27,16 +28,6 @@ class ApiFactory
      */
     private $logger;
 
-    /**
-     * @var Client[]
-     */
-    private $apiClients = [];
-
-    /**
-     * ApiFactory constructor.
-     * @param Configuration $configuration
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         Configuration $configuration,
         LoggerInterface $logger
@@ -50,28 +41,24 @@ class ApiFactory
      */
     public function provide(Shop $shop): Client
     {
-        if (!array_key_exists($shop->getId(), $this->apiClients)) {
-            $this->apiClients[$shop->getId()] = $this->buildStorefrontApiClient($shop);
-        }
-
-        return $this->apiClients[$shop->getId()];
+        return $this->createClient(
+            $this->configuration->getMerchantAccount($shop),
+            $this->configuration->getApiKey($shop),
+            $this->configuration->getEnvironment($shop),
+            $this->configuration->getApiUrlPrefix($shop)
+        );
     }
 
-    /**
-     * @throws AdyenException
-     */
-    private function buildStorefrontApiClient(Shop $shop): Client
+    private function createClient(string $merchantAccount, string $apiKey, string $environment, $prefix = null): Client
     {
-        $urlPrefix = Environment::LIVE === $this->configuration->getEnvironment($shop)
-            ? $this->configuration->getApiUrlPrefix($shop)
-            : null;
+        $urlPrefix = Environment::LIVE === $environment ? $prefix : null;
 
-        $apiClient = new Client();
-        $apiClient->setMerchantAccount($this->configuration->getMerchantAccount($shop));
-        $apiClient->setXApiKey($this->configuration->getApiKey($shop));
-        $apiClient->setEnvironment($this->configuration->getEnvironment($shop), $urlPrefix);
-        $apiClient->setLogger($this->logger);
+        $adyenClient = new Client();
+        $adyenClient->setMerchantAccount($merchantAccount);
+        $adyenClient->setXApiKey($apiKey);
+        $adyenClient->setEnvironment($environment, $urlPrefix);
+        $adyenClient->setLogger($this->logger);
 
-        return $apiClient;
+        return $adyenClient;
     }
 }

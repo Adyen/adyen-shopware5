@@ -69,6 +69,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                 $paymentInfo['paymentData'] ?? ''
             );
             $this->handlePaymentData($paymentInfo);
+
             $this->Response()->setBody(json_encode(
                 [
                     'status' => 'success',
@@ -91,22 +92,6 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         }
     }
 
-    /**
-     * @throws AdyenException
-     */
-    public function ajaxIdentifyShopperAction()
-    {
-        $this->paymentDetails('threeds2_fingerprint', 'threeds2.fingerprint');
-    }
-
-    /**
-     * @throws AdyenException
-     */
-    public function ajaxChallengeShopperAction()
-    {
-        $this->paymentDetails('threeds2_challengeResult', 'threeds2.challengeResult');
-    }
-
     public function resetValidPaymentSessionAction()
     {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
@@ -116,31 +101,33 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     /**
      * @throws AdyenException
      */
-    private function paymentDetails(string $post, string $detail)
+    public function ajaxThreeDsAction()
+    {
+        $threeDSResult = (string) ($this->Request()->getPost()['details']['threeDSResult'] ?? '');
+        if ('' === $threeDSResult) {
+            $this->logger->error('3DS missing data', [
+                'action' => $postData['action'] ?? [],
+                'threeDSResult' => substr($threeDSResult, -5),
+                'paymentData' => substr($postData['paymentData'] ?? '', -5),
+            ]);
+        }
+
+        $this->paymentDetailsAction();
+    }
+
+    /**
+     * @throws AdyenException
+     */
+    public function paymentDetailsAction()
     {
         $this->Request()->setHeader('Content-Type', 'application/json');
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
-        $postData = $this->Request()->getPost();
-        $threeDsDetail = (string) ($postData['details'][$detail] ?? $postData['details'][$post] ?? '');
-        $paymentData = (string) $postData['paymentData'] ?? '';
-        if (!$threeDsDetail || !$paymentData) {
-            $this->logger->error('3DS2 missing data', [
-                $detail => substr($threeDsDetail, -5),
-                'paymentData' => substr($paymentData, -5),
-            ]);
-        }
-
-        $payload = [
-            'paymentData' => $paymentData,
-            'details' => [
-                $detail => $threeDsDetail,
-            ],
-        ];
-
+        $payload = array_intersect_key($this->Request()->getPost(), ['details' => true]);
         $checkout = $this->adyenCheckout->getCheckout();
         $paymentInfo = $checkout->paymentsDetails($payload);
         $this->handlePaymentData($paymentInfo);
+
         $this->Response()->setBody(json_encode($paymentInfo));
     }
 
