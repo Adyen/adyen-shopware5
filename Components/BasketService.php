@@ -237,7 +237,9 @@ class BasketService
             'articleID' => $optionData->getArticleId(),
             'quantity' => $optionData->getQuantity(),
             'price' => $optionData->getPrice(),
-            'netprice' => $optionData->getPrice() === null ? 0 : $optionData->getPrice() / (1 + ($optionData->getTaxRate() / 100)),
+            'netprice' => $optionData->getPrice() === null
+                ? 0
+                : $optionData->getPrice() / (1 + ($optionData->getTaxRate() / 100)),
             'tax_rate' => $optionData->getTaxRate(),
             'modus' => $optionData->getMode(),
             'esdarticle' => $optionData->getEsdArticle(),
