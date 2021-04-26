@@ -287,11 +287,26 @@ class BasketService
             }
         }
         if (count($attributeValues) > 0) {
-            $this->db->update(
-                's_order_basket_attributes',
-                $attributeValues,
-                ['basketID = ?' => $basketDetailId]
-            );
+            // Check if there's a s_order_basket_attributes row to update or if it needs to be inserted
+            $basketDetailsRow = $this->db
+                ->select()
+                ->from('s_order_basket_attributes')
+                ->where('basketID=?', $basketDetailId)
+                ->query()
+                ->fetchAll();
+
+            if (count($basketDetailsRow) > 0) {
+                $this->db->update(
+                    's_order_basket_attributes',
+                    $attributeValues,
+                    ['basketID = ?' => $basketDetailId]
+                );
+            } else {
+                $this->db->insert(
+                    's_order_basket_attributes',
+                    array_merge($attributeValues, ['basketID' => $basketDetailId])
+                );
+            }
         }
     }
 
