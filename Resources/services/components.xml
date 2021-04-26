@@ -15,6 +15,7 @@
             <argument type="service" id="events"/>
             <argument type="service" id="models"/>
             <argument type="service" id="db"/>
+            <argument type="service" id="session"/>
         </service>
         <service id="adyen_payment.components.configuration" class="AdyenPayment\Components\Configuration">
             <argument type="service" id="shopware.plugin.cached_config_reader"/>

@@ -64,6 +64,11 @@ class BasketService
     private $db;
 
     /**
+     * @var \Enlight_Components_Session_Namespace
+     */
+    private $session;
+
+    /**
      * BasketService constructor.
      * @param ContainerAwareEventManager $events
      * @param ModelManager $modelManager
@@ -71,12 +76,14 @@ class BasketService
     public function __construct(
         ContainerAwareEventManager $events,
         ModelManager $modelManager,
-        \Enlight_Components_Db_Adapter_Pdo_Mysql $db
+        \Enlight_Components_Db_Adapter_Pdo_Mysql $db,
+        \Enlight_Components_Session_Namespace $session
     ) {
         $this->sBasket = Shopware()->Modules()->Basket();
         $this->events = $events;
         $this->modelManager = $modelManager;
         $this->db = $db;
+        $this->session = $session;
 
         $this->statusRepository = $modelManager->getRepository(Status::class);
         $this->orderRepository = $modelManager->getRepository(Order::class);
@@ -173,6 +180,7 @@ class BasketService
 
         switch ($orderDetailFiltered->getMode()) {
             case self::MODE_PRODUCT:
+            case self::MODE_SURCHARGE_DISCOUNT:
                 $this->addArticle($orderDetailFiltered);
                 break;
             case self::MODE_PREMIUM_PRODUCT:
@@ -182,7 +190,6 @@ class BasketService
                 $this->addVoucher($orderDetailFiltered);
                 break;
             case self::MODE_REBATE:
-            case self::MODE_SURCHARGE_DISCOUNT:
                 break;
         }
 
@@ -201,22 +208,55 @@ class BasketService
      */
     private function addArticle(Detail $orderDetail)
     {
-        $basketDetailId = $this->sBasket->sAddArticle(
-            $orderDetail->getArticleNumber(),
-            $orderDetail->getQuantity()
-        );
+        if (empty($orderDetail->getArticleNumber())) {
+            // The order item doesn't have an article number, add it to the basket manually
+            $basketDetailId = $this->insertInToBasket($orderDetail);
+        } else {
+            $basketDetailId = $this->sBasket->sAddArticle(
+                $orderDetail->getArticleNumber(),
+                $orderDetail->getQuantity()
+            );
+        }
 
         $this->copyDetailAttributes($orderDetail->getId(), $basketDetailId);
     }
 
     /**
-     * Copies attributes from the supplied order detail article ID to a basket detail ID
+     * Inserts data from a order detail row into a basket detail and returns the inserted ID
      *
-     * @param $basketDetailId
-     * @param $orderDetailId
+     * @param Detail $optionData
+     * @return int
      * @throws \Zend_Db_Adapter_Exception
      */
-    private function copyDetailAttributes($orderDetailId, $basketDetailId)
+    private function insertInToBasket(Detail $optionData): int
+    {
+        $this->db->insert('s_order_basket', [
+            'sessionID' => $this->session->get('sessionId'),
+            'userID' => $this->session->get('sUserId') || 0,
+            'articlename' => $optionData->getArticleName(),
+            'articleID' => $optionData->getArticleId(),
+            'quantity' => $optionData->getQuantity(),
+            'price' => $optionData->getPrice(),
+            'netprice' => $optionData->getPrice() === null ? 0 : $optionData->getPrice() / (1 + ($optionData->getTaxRate() / 100)),
+            'tax_rate' => $optionData->getTaxRate(),
+            'modus' => $optionData->getMode(),
+            'esdarticle' => $optionData->getEsdArticle(),
+            'config' => $optionData->getConfig(),
+            'datum' => (new \DateTime())->format('Y-m-d H:i:s'),
+            'currencyFactor' => Shopware()->Shop()->getCurrency()->getFactor()
+        ]);
+
+        return $this->db->lastInsertId();
+    }
+
+    /**
+     * Copies attributes from the supplied order detail article ID to a basket detail ID
+     *
+     * @param int $orderDetailId
+     * @param int $basketDetailId
+     * @throws \Zend_Db_Adapter_Exception
+     */
+    private function copyDetailAttributes(int $orderDetailId, int $basketDetailId)
     {
         // Getting all attributes from order detail
         $orderDetailAttributesResult = $this->db
