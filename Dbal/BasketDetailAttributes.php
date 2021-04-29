@@ -39,4 +39,16 @@ class BasketDetailAttributes
             array_merge($attributeValues, ['basketID' => $basketDetailId])
         );
     }
+
+    public function hasBasketDetails(string $basketDetailId): bool
+    {
+        return count(
+            $this->db
+                ->select()
+                ->from('s_order_basket_attributes')
+                ->where('basketID=?', $basketDetailId)
+                ->query()
+                ->fetchAll()
+        ) > 0;
+    }
 }

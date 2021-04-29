@@ -7,8 +7,8 @@
             id="adyen_payment.basket.restore.detail_attributes_restorer"
             class="AdyenPayment\Basket\Restore\DetailAttributesRestorer"
         >
-            <argument type="service" id="db"/>
             <argument type="service" id="models"/>
+            <argument type="service" id="adyen_payment.dbal.basket_detail_attribute_writer"/>
             <argument type="service" id="adyen_payment.dbal.order_detail_attribute_provider"/>
         </service>
     </services>
