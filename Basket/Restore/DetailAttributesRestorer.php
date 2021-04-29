@@ -1,9 +1,8 @@
 <?php
 
-
 namespace AdyenPayment\Basket\Restore;
 
-
+use AdyenPayment\Dbal\OrderDetailAttributeProvider;
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
 use Shopware\Components\Model\ModelManager;
 use Zend_Db_Adapter_Exception;
@@ -20,12 +19,19 @@ class DetailAttributesRestorer
      */
     private $modelManager;
 
+    /**
+     * @var OrderDetailAttributeProvider
+     */
+    private $orderDetailAttributeProvider;
+
     public function __construct(
         Enlight_Components_Db_Adapter_Pdo_Mysql $db,
-        ModelManager $modelManager
+        ModelManager $modelManager,
+        OrderDetailAttributeProvider $orderDetailAttributeProvider
     ) {
         $this->db = $db;
         $this->modelManager = $modelManager;
+        $this->orderDetailAttributeProvider = $orderDetailAttributeProvider;
     }
 
     /**
@@ -37,26 +43,16 @@ class DetailAttributesRestorer
      */
     public function restore(int $orderDetailId, int $basketDetailId)
     {
-        // Getting all attributes from order detail
-        $orderDetailAttributesResult = $this->db
-            ->select()
-            ->from('s_order_details_attributes')
-            ->where('detailID=?', $orderDetailId)
-            ->query()
-            ->fetchAll();
-        $orderDetailAttributes = $orderDetailAttributesResult[0];
+        $orderDetailAttributes = $this->orderDetailAttributeProvider->fetchByOrderDetailId($orderDetailId);
+        if (!count($orderDetailAttributes)) {
+            return;
+        }
 
-        // Getting order attributes columns to possibly fill
-        $basketAttributesColumns = $this->modelManager
-            ->getClassMetadata('Shopware\Models\Attribute\OrderDetail')
-            ->getColumnNames();
+        $attributes = $this->provideFillableAttributeColumns();
 
-        // These columns shouldn't be translated from the order detail to the basket detail
-        $columnsToSkip = [
-            'id',
-            'detailID'
-        ];
-        $attributes = array_diff($basketAttributesColumns, $columnsToSkip);
+        if (!count($attributes)) {
+            return;
+        }
 
         // Updating the basket attributes with the order attribute values
         $attributeValues = [];
@@ -87,5 +83,23 @@ class DetailAttributesRestorer
                 );
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    private function provideFillableAttributeColumns(): array
+    {
+        // Getting order attributes columns to possibly fill
+        $basketAttributesColumns = $this->modelManager
+            ->getClassMetadata('Shopware\Models\Attribute\OrderDetail')
+            ->getColumnNames();
+
+        // These columns shouldn't be translated from the order detail to the basket detail
+        $columnsToSkip = [
+            'id',
+            'detailID'
+        ];
+        return array_diff($basketAttributesColumns, $columnsToSkip);
     }
 }
