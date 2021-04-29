@@ -204,12 +204,14 @@ class BasketService
      * @param Detail $orderDetail
      * @throws \Enlight_Event_Exception
      * @throws \Enlight_Exception
-     * @throws \Zend_Db_Adapter_Exception
+     * @throws \Zend_Db_Select_Exception
+     * @throws \Zend_Db_Statement_Exception|\Zend_Db_Adapter_Exception
      */
     private function addArticle(Detail $orderDetail)
     {
-        if (empty($orderDetail->getArticleNumber())) {
-            // The order item doesn't have an article number, add it to the basket manually
+        if (empty($orderDetail->getArticleNumber()) || !$this->isArticlesDetails($orderDetail->getArticleNumber())) {
+            // The order item doesn't have an article number or it isn't a regular Shopware article
+            // add it to the basket manually
             $basketDetailId = $this->insertInToBasket($orderDetail);
         } else {
             $basketDetailId = $this->sBasket->sAddArticle(
@@ -219,6 +221,25 @@ class BasketService
         }
 
         $this->copyDetailAttributes($orderDetail->getId(), $basketDetailId);
+    }
+
+    /**
+     * Searches in the s_articles_details table with the ordernumber column and returns true if an article is found
+     *
+     * @param string $articleDetailNumber
+     * @return bool
+     * @throws \Zend_Db_Select_Exception
+     * @throws \Zend_Db_Statement_Exception
+     */
+    private function isArticlesDetails(string $articleDetailNumber): bool
+    {
+        $result = $this->db->select()
+            ->from('s_articles_details')
+            ->where('ordernumber=?', $articleDetailNumber)
+            ->query()
+            ->fetch();
+
+        return !empty($result);
     }
 
     /**
