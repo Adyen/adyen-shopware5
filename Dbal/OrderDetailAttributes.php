@@ -4,7 +4,7 @@ namespace AdyenPayment\Dbal;
 
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
 
-class OrderDetailAttributeProvider
+class OrderDetailAttributes
 {
     /**
      * @var Enlight_Components_Db_Adapter_Pdo_Mysql

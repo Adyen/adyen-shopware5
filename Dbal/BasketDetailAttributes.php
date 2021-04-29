@@ -5,7 +5,7 @@ namespace AdyenPayment\Dbal;
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
 use Zend_Db_Adapter_Exception;
 
-class BasketDetailAttributeWriter
+class BasketDetailAttributes
 {
     /**
      * @var Enlight_Components_Db_Adapter_Pdo_Mysql

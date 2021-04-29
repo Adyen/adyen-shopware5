@@ -5,13 +5,13 @@
     <services>
         <service
             id="adyen_payment.dbal.order_detail_attribute_provider"
-            class="AdyenPayment\Dbal\OrderDetailAttributeProvider"
+            class="AdyenPayment\Dbal\OrderDetailAttributes"
         >
             <argument type="service" id="db"/>
         </service>
         <service
             id="adyen_payment.dbal.basket_detail_attribute_writer"
-            class="AdyenPayment\Dbal\BasketDetailAttributeWriter"
+            class="AdyenPayment\Dbal\BasketDetailAttributes"
         >
             <argument type="service" id="db"/>
         </service>

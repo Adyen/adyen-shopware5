@@ -2,8 +2,8 @@
 
 namespace AdyenPayment\Basket\Restore;
 
-use AdyenPayment\Dbal\BasketDetailAttributeWriter;
-use AdyenPayment\Dbal\OrderDetailAttributeProvider;
+use AdyenPayment\Dbal\BasketDetailAttributes;
+use AdyenPayment\Dbal\OrderDetailAttributes;
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
 use Shopware\Components\Model\ModelManager;
 use Zend_Db_Adapter_Exception;
@@ -11,9 +11,9 @@ use Zend_Db_Adapter_Exception;
 class DetailAttributesRestorer
 {
     /**
-     * @var BasketDetailAttributeWriter
+     * @var BasketDetailAttributes
      */
-    private $basketDetailAttributeWriter;
+    private $basketDetailAttributes;
 
     /**
      * @var Enlight_Components_Db_Adapter_Pdo_Mysql
@@ -26,20 +26,20 @@ class DetailAttributesRestorer
     private $modelManager;
 
     /**
-     * @var OrderDetailAttributeProvider
+     * @var OrderDetailAttributes
      */
-    private $orderDetailAttributeProvider;
+    private $orderDetailAttributes;
 
     public function __construct(
         Enlight_Components_Db_Adapter_Pdo_Mysql $db,
         ModelManager $modelManager,
-        BasketDetailAttributeWriter $basketDetailAttributeWriter,
-        OrderDetailAttributeProvider $orderDetailAttributeProvider
+        BasketDetailAttributes $basketDetailAttributes,
+        OrderDetailAttributes $orderDetailAttributes
     ) {
         $this->db = $db;
         $this->modelManager = $modelManager;
-        $this->basketDetailAttributeWriter = $basketDetailAttributeWriter;
-        $this->orderDetailAttributeProvider = $orderDetailAttributeProvider;
+        $this->basketDetailAttributes = $basketDetailAttributes;
+        $this->orderDetailAttributes = $orderDetailAttributes;
     }
 
     /**
@@ -51,7 +51,7 @@ class DetailAttributesRestorer
      */
     public function restore(int $orderDetailId, int $basketDetailId)
     {
-        $orderDetailAttributes = $this->orderDetailAttributeProvider->fetchByOrderDetailId($orderDetailId);
+        $orderDetailAttributes = $this->orderDetailAttributes->fetchByOrderDetailId($orderDetailId);
         if (!count($orderDetailAttributes)) {
             return;
         }
@@ -82,9 +82,9 @@ class DetailAttributesRestorer
             ->fetchAll();
 
         if (count($basketDetailsRow) > 0) {
-            $this->basketDetailAttributeWriter->update($basketDetailId, $attributeValues);
+            $this->basketDetailAttributes->update($basketDetailId, $attributeValues);
         } else {
-            $this->basketDetailAttributeWriter->insert($basketDetailId, $attributeValues);
+            $this->basketDetailAttributes->insert($basketDetailId, $attributeValues);
         }
     }
 
