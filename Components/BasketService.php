@@ -4,13 +4,27 @@ namespace AdyenPayment\Components;
 
 use AdyenPayment\Basket\Restore\DetailAttributesRestorer;
 use AdyenPayment\Models\Event;
+use DateTime;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use Enlight_Components_Db_Adapter_Pdo_Mysql;
+use Enlight_Components_Session_Namespace;
+use Enlight_Event_Exception;
+use Enlight_Exception;
+use sBasket;
 use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Detail;
 use Shopware\Models\Order\Order;
 use Shopware\Models\Order\Status;
 use Shopware\Models\Voucher\Code;
+use Shopware\Models\Voucher\Repository;
 use Shopware\Models\Voucher\Voucher;
+use Zend_Db_Adapter_Exception;
+use Zend_Db_Select_Exception;
+use Zend_Db_Statement_Exception;
 
 /**
  * Class BasketService
@@ -25,7 +39,7 @@ class BasketService
     const MODE_SURCHARGE_DISCOUNT = 4;
 
     /**
-     * @var \sBasket
+     * @var sBasket
      */
     private $sBasket;
 
@@ -40,32 +54,32 @@ class BasketService
     private $modelManager;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var ObjectRepository|EntityRepository
      */
     private $statusRepository;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository|\Shopware\Models\Order\Repository
+     * @var ObjectRepository|EntityRepository|\Shopware\Models\Order\Repository
      */
     private $orderRepository;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository|\Shopware\Models\Voucher\Repository
+     * @var ObjectRepository|EntityRepository|Repository
      */
     private $voucherRepository;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var ObjectRepository|EntityRepository
      */
     private $voucherCodeRepository;
 
     /**
-     * @var \Enlight_Components_Db_Adapter_Pdo_Mysql
+     * @var Enlight_Components_Db_Adapter_Pdo_Mysql
      */
     private $db;
 
     /**
-     * @var \Enlight_Components_Session_Namespace
+     * @var Enlight_Components_Session_Namespace
      */
     private $session;
 
@@ -78,15 +92,15 @@ class BasketService
      * BasketService constructor.
      * @param ContainerAwareEventManager $events
      * @param ModelManager $modelManager
-     * @param \Enlight_Components_Db_Adapter_Pdo_Mysql $db
-     * @param \Enlight_Components_Session_Namespace $session
+     * @param Enlight_Components_Db_Adapter_Pdo_Mysql $db
+     * @param Enlight_Components_Session_Namespace $session
      * @param DetailAttributesRestorer $detailAttributesRestorer
      */
     public function __construct(
         ContainerAwareEventManager $events,
         ModelManager $modelManager,
-        \Enlight_Components_Db_Adapter_Pdo_Mysql $db,
-        \Enlight_Components_Session_Namespace $session,
+        Enlight_Components_Db_Adapter_Pdo_Mysql $db,
+        Enlight_Components_Session_Namespace $session,
         DetailAttributesRestorer $detailAttributesRestorer
     ) {
         $this->sBasket = Shopware()->Modules()->Basket();
@@ -104,11 +118,11 @@ class BasketService
 
     /**
      * @param string $orderNumber
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Enlight_Event_Exception
-     * @throws \Enlight_Exception
-     * @throws \Zend_Db_Adapter_Exception
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
      */
     public function cancelAndRestoreByOrderNumber(string $orderNumber)
     {
@@ -125,16 +139,16 @@ class BasketService
      * @param string $orderNumber
      * @return Order|null|object
      */
-    public function getOrderByOrderNumber(string $orderNumber)
+    public function getOrderByOrderNumber(string $orderNumber): Order
     {
         return $this->orderRepository->findOneBy(['number' => $orderNumber]);
     }
 
     /**
      * @param Order $order
-     * @throws \Enlight_Event_Exception
-     * @throws \Enlight_Exception
-     * @throws \Zend_Db_Adapter_Exception
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
      */
     public function restoreFromOrder(Order $order)
     {
@@ -153,8 +167,8 @@ class BasketService
 
     /**
      * @param Order $order
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function cancelOrder(Order $order)
     {
@@ -170,7 +184,7 @@ class BasketService
     /**
      * @param Order $order
      * @param Detail $orderDetail
-     * @throws \Enlight_Event_Exception
+     * @throws Enlight_Event_Exception
      */
     private function processOrderDetail(Order $order, Detail $orderDetail)
     {
@@ -213,10 +227,11 @@ class BasketService
 
     /**
      * @param Detail $orderDetail
-     * @throws \Enlight_Event_Exception
-     * @throws \Enlight_Exception
-     * @throws \Zend_Db_Select_Exception
-     * @throws \Zend_Db_Statement_Exception|\Zend_Db_Adapter_Exception
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
+     * @throws Zend_Db_Select_Exception
+     * @throws Zend_Db_Statement_Exception
      */
     private function addArticle(Detail $orderDetail)
     {
@@ -239,8 +254,8 @@ class BasketService
      *
      * @param string $articleDetailNumber
      * @return bool
-     * @throws \Zend_Db_Select_Exception
-     * @throws \Zend_Db_Statement_Exception
+     * @throws Zend_Db_Select_Exception
+     * @throws Zend_Db_Statement_Exception
      */
     private function isArticlesDetails(string $articleDetailNumber): bool
     {
@@ -258,7 +273,7 @@ class BasketService
      *
      * @param Detail $optionData
      * @return int
-     * @throws \Zend_Db_Adapter_Exception
+     * @throws Zend_Db_Adapter_Exception
      */
     private function insertInToBasket(Detail $optionData): int
     {
@@ -276,7 +291,7 @@ class BasketService
             'modus' => $optionData->getMode(),
             'esdarticle' => $optionData->getEsdArticle(),
             'config' => $optionData->getConfig(),
-            'datum' => (new \DateTime())->format('Y-m-d H:i:s'),
+            'datum' => (new DateTime())->format('Y-m-d H:i:s'),
             'currencyFactor' => Shopware()->Shop()->getCurrency()->getFactor()
         ]);
 
@@ -285,7 +300,7 @@ class BasketService
 
     /**
      * @param Detail $orderDetail
-     * @throws \Zend_Db_Adapter_Exception
+     * @throws Zend_Db_Adapter_Exception
      */
     private function addPremium(Detail $orderDetail)
     {
@@ -295,11 +310,11 @@ class BasketService
 
     /**
      * @param Detail $orderDetail
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Enlight_Event_Exception
-     * @throws \Enlight_Exception
-     * @throws \Zend_Db_Adapter_Exception
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
      */
     private function addVoucher(Detail $orderDetail)
     {
