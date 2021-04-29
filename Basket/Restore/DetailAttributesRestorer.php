@@ -2,6 +2,7 @@
 
 namespace AdyenPayment\Basket\Restore;
 
+use AdyenPayment\Dbal\BasketDetailAttributeWriter;
 use AdyenPayment\Dbal\OrderDetailAttributeProvider;
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
 use Shopware\Components\Model\ModelManager;
@@ -9,6 +10,11 @@ use Zend_Db_Adapter_Exception;
 
 class DetailAttributesRestorer
 {
+    /**
+     * @var BasketDetailAttributeWriter
+     */
+    private $basketDetailAttributeWriter;
+
     /**
      * @var Enlight_Components_Db_Adapter_Pdo_Mysql
      */
@@ -27,10 +33,12 @@ class DetailAttributesRestorer
     public function __construct(
         Enlight_Components_Db_Adapter_Pdo_Mysql $db,
         ModelManager $modelManager,
+        BasketDetailAttributeWriter $basketDetailAttributeWriter,
         OrderDetailAttributeProvider $orderDetailAttributeProvider
     ) {
         $this->db = $db;
         $this->modelManager = $modelManager;
+        $this->basketDetailAttributeWriter = $basketDetailAttributeWriter;
         $this->orderDetailAttributeProvider = $orderDetailAttributeProvider;
     }
 
@@ -74,16 +82,9 @@ class DetailAttributesRestorer
             ->fetchAll();
 
         if (count($basketDetailsRow) > 0) {
-            $this->db->update(
-                's_order_basket_attributes',
-                $attributeValues,
-                ['basketID = ?' => $basketDetailId]
-            );
+            $this->basketDetailAttributeWriter->update($basketDetailId, $attributeValues);
         } else {
-            $this->db->insert(
-                's_order_basket_attributes',
-                array_merge($attributeValues, ['basketID' => $basketDetailId])
-            );
+            $this->basketDetailAttributeWriter->insert($basketDetailId, $attributeValues);
         }
     }
 

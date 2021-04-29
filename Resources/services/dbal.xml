@@ -9,5 +9,11 @@
         >
             <argument type="service" id="db"/>
         </service>
+        <service
+            id="adyen_payment.dbal.basket_detail_attribute_writer"
+            class="AdyenPayment\Dbal\BasketDetailAttributeWriter"
+        >
+            <argument type="service" id="db"/>
+        </service>
     </services>
 </container>
