@@ -12,6 +12,7 @@
             adyenType: '',
             adyenGoogleConfig: {},
             adyenSetSession: {},
+            adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxIdentifyShopperUrl: '/frontend/adyen/ajaxIdentifyShopper',
             adyenAjaxChallengeShopperUrl: '/frontend/adyen/ajaxChallengeShopper',
@@ -50,8 +51,15 @@
 
         checkSetSession: function () {
             var me = this;
-            if (!$.isEmptyObject(me.opts.adyenSetSession)) {
-                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenSetSession));
+            if (me.opts.adyenIsAdyenPayment) {
+                if (!$.isEmptyObject(me.opts.adyenSetSession)) {
+                    me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenSetSession));
+                } else if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
+                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
+                    return;
+                }
+            } else {
+                me.sessionStorage.removeItem(me.paymentMethodSession);
             }
         },
 
@@ -75,7 +83,8 @@
                     'paymentMethod': me.getPaymentMethod(),
                     'storePaymentMethod': me.getStorePaymentMethod(),
                     'browserInfo': me.getBrowserInfo(),
-                    'origin': window.location.origin
+                    'origin': window.location.origin,
+                    'sComment': me.getComment(),
                 };
 
                 $.ajax({
@@ -94,7 +103,7 @@
                     },
                 });
             } else {
-                if ($('body').data('adyenisadyenpayment')) {
+                if (me.opts.adyenIsAdyenPayment) {
                     this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
                     return;
                 }
@@ -293,6 +302,10 @@
             var me = this;
 
             me.adyenCheckout = new AdyenCheckout(me.adyenConfiguration);
+        },
+
+        getComment: function() {
+            return $('[data-storagekeyname="sComment"]').val();
         },
 
         getPaymentMethod: function () {

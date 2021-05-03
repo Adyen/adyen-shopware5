@@ -114,7 +114,7 @@ class OrderEmailSubscriber implements SubscriberInterface
             return;
         }
 
-        $this->orderMailService->sendOrderConfirmationMail($data['sOrderNumber']);
+        $this->orderMailService->sendOrderConfirmationMail(strval($data['sOrderNumber']));
     }
 
     private function getOrderNumber($orderId)

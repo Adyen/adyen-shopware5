@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -147,6 +147,40 @@
             Properly fetch email variables using orderNumber
             Get Adyen config data from the CheckoutSubscriber if not present in the session storage
             Merge all payment methods in one array and filter in template
+        </changes>
+    </changelog>
+    <changelog version="1.7.2">
+        <changes lang="de">
+            Fixes
+            Early return in CheckoutSubscriber for users that have no Adyen payment preselected
+            Add processing time to notifications
+            Add PSP reference on authorization success notification
+            Support for MANUAL_REVIEW_ACCEPT and MANUAL_REVIEW_REJECT notifications
+            Hide Adyen payment methods for 0 amount transactions
+            Adding second notification filter where clause as andWhere
+            Showing all notifications in order details
+            Changing cancelAndRestoreByOrderNumber arg type to string
+            Implement needed sUniqueID for Checkout finish page
+            Update AuthenticationValidator.php to check HTTP_PHP_AUTH_USER besides PHP_AUTH_USER
+            Making the notification entity's paymentMethod column nullable
+            Add comments to order if available
+            Copying order detail attributes to basket detail on failed payment
+        </changes>
+        <changes lang="en">
+            Fixes
+            Early return in CheckoutSubscriber for users that have no Adyen payment preselected
+            Add processing time to notifications
+            Add PSP reference on authorization success notification
+            Support for MANUAL_REVIEW_ACCEPT and MANUAL_REVIEW_REJECT notifications
+            Hide Adyen payment methods for 0 amount transactions
+            Adding second notification filter where clause as andWhere
+            Showing all notifications in order details
+            Changing cancelAndRestoreByOrderNumber arg type to string
+            Implement needed sUniqueID for Checkout finish page
+            Update AuthenticationValidator.php to check HTTP_PHP_AUTH_USER besides PHP_AUTH_USER
+            Making the notification entity's paymentMethod column nullable
+            Add comments to order if available
+            Copying order detail attributes to basket detail on failed payment
         </changes>
     </changelog>
 </plugin>

@@ -53,6 +53,12 @@ class Notification extends ModelEntity implements \JsonSerializable
     private $updatedAt;
 
     /**
+     * @var \DateTime
+     * @ORM\Column(name="scheduled_processing_time", type="datetime", nullable=true)
+     */
+    private $scheduledProcessingTime;
+
+    /**
      * @var string
      * @ORM\Column(name="status", type="text")
      */
@@ -60,7 +66,7 @@ class Notification extends ModelEntity implements \JsonSerializable
 
     /**
      * @var string
-     * @ORM\Column(name="paymentMethod", type="text")
+     * @ORM\Column(name="paymentMethod", type="text", nullable=true)
      */
     private $paymentMethod;
 
@@ -218,6 +224,24 @@ class Notification extends ModelEntity implements \JsonSerializable
     }
 
     /**
+     * @return \DateTime
+     */
+    public function getScheduledProcessingTime(): \DateTime
+    {
+        return $this->scheduledProcessingTime;
+    }
+
+    /**
+     * @param \DateTime $scheduledProcessingTime
+     * @return Notification
+     */
+    public function setScheduledProcessingTime(\DateTime $scheduledProcessingTime): Notification
+    {
+        $this->scheduledProcessingTime = $scheduledProcessingTime;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getStatus(): string
@@ -238,7 +262,7 @@ class Notification extends ModelEntity implements \JsonSerializable
     /**
      * @return string
      */
-    public function getPaymentMethod(): string
+    public function getPaymentMethod(): ?string
     {
         return $this->paymentMethod;
     }

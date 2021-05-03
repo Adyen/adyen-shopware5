@@ -19,11 +19,7 @@ Ext.define('Shopware.apps.AdyenPaymentOrder.view.detail.Window', {
         var me = this,
             result = me.callParent();
 
-        if (!me.record.raw.adyenTransaction) {
-            return result;
-        }
-
-        result.add(me.createAdyenTab());
+        result.add(me.createAdyenTab(!!me.record.raw.adyenTransaction));
 
         return result;
     },
@@ -31,33 +27,35 @@ Ext.define('Shopware.apps.AdyenPaymentOrder.view.detail.Window', {
     /**
      * Generate Adyen Tab
      */
-    createAdyenTab: function () {
+    createAdyenTab: function (enableTab) {
         var me = this;
 
         var transactionStore = Ext.create('Shopware.apps.AdyenPaymentNotificationsListingExtension.store.Notification');
 
-        me.transactionDetails = Ext.create('Shopware.apps.AdyenPaymentOrder.view.detail.TransactionDetails', {
-            store: transactionStore,
-            layout: {
-                type: 'vbox',
-                align: 'stretch'
-            },
-            region: 'north'
-        });
-
-        me.transactionTabsDetail = Ext.create('Shopware.apps.AdyenPaymentOrder.view.detail.TransactionTabs', {
-            region: 'center',
-            store: transactionStore,
-            record: me.record
-        });
+        let items = [];
+        if (enableTab) {
+            items.push(
+                    Ext.create('Shopware.apps.AdyenPaymentOrder.view.detail.TransactionDetails', {
+                        store: transactionStore,
+                        layout: {
+                            type: 'vbox',
+                            align: 'stretch'
+                        },
+                        region: 'north'
+                    }),
+                    Ext.create('Shopware.apps.AdyenPaymentOrder.view.detail.TransactionTabs', {
+                        region: 'center',
+                        store: transactionStore,
+                        record: me.record
+                    })
+            );
+        }
 
         me.adyenTransactionTab = Ext.create('Ext.container.Container', {
-            title: 'Adyen Transactions',
+            title: 'Adyen Notifications',
             layout: 'border',
-            items: [
-                me.transactionDetails,
-                me.transactionTabsDetail
-            ]
+            items: items,
+            disabled: !enableTab
         });
 
         me.adyenTransactionTab.addListener('activate', function () {

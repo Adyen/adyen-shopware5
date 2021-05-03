@@ -81,7 +81,6 @@ class ProcessNotifications implements SubscriberInterface
     public function runCronjob(Shopware_Components_Cron_CronJob $job)
     {
         $textNotifications = $this->fifoTextNotificationLoader->get();
-
         $this->incomingNotificationManager->convertNotifications($textNotifications);
 
         /** @var \Generator<NotificationProcessorFeedback> $feedback */

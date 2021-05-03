@@ -78,6 +78,8 @@ class NotificationBuilder
 
         if (isset($params['paymentMethod'])) {
             $notification->setPaymentMethod($params['paymentMethod']);
+        } elseif (isset($params['additionalData']['paymentMethodVariant'])) {
+            $notification->setPaymentMethod($params['additionalData']['paymentMethodVariant']);
         }
 
         if (isset($params['success'])) {
@@ -94,6 +96,35 @@ class NotificationBuilder
             $notification->setErrorDetails($params['reason']);
         }
 
+        if (isset($params['eventCode']) && isset($params['success'])) {
+            $notification->setScheduledProcessingTime($this->getProcessingTime($notification));
+        }
+
         return $notification;
+    }
+
+    /**
+     * Set delay in processing time for certain notifications.
+     *
+     * @param Notification $notification
+     * @return \DateTime
+     */
+    private function getProcessingTime(Notification $notification): \DateTime
+    {
+        $processingTime = new \DateTime();
+        switch ($notification->getEventCode()) {
+            case 'AUTHORISATION':
+                if (!$notification->isSuccess()) {
+                    $processingTime = $processingTime->add(new \DateInterval('PT30M'));
+                }
+                break;
+            case 'OFFER_CLOSED':
+                $processingTime = $processingTime->add(new \DateInterval('PT30M'));
+                break;
+            default:
+                break;
+        }
+
+        return $processingTime;
     }
 }

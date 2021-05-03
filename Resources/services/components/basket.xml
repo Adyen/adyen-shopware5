@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service
+            id="adyen_payment.basket.restore.detail_attributes_restorer"
+            class="AdyenPayment\Basket\Restore\DetailAttributesRestorer"
+        >
+            <argument type="service" id="models"/>
+            <argument type="service" id="adyen_payment.dbal.basket_detail_attribute_writer"/>
+            <argument type="service" id="adyen_payment.dbal.order_detail_attribute_provider"/>
+        </service>
+    </services>
+</container>

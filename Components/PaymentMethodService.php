@@ -216,6 +216,9 @@ class PaymentMethodService
         }
 
         $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
+        if (!$value) {
+            $value = Shopware()->Modules()->Basket()->sGetAmount()['totalAmount'];
+        }
 
         $paymentMethodOptions['countryCode'] = $countryCode;
         $paymentMethodOptions['currency'] = $currency;
