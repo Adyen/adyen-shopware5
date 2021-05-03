@@ -2,6 +2,9 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <imports>
+        <import resource="./components/basket.xml"/>
+    </imports>
     <services>
         <!-- Components -->
         <service id="adyen_payment.components.data_conversion" class="AdyenPayment\Components\DataConversion"/>
@@ -14,6 +17,9 @@
         <service id="adyen_payment.components.basket_service" class="AdyenPayment\Components\BasketService">
             <argument type="service" id="events"/>
             <argument type="service" id="models"/>
+            <argument type="service" id="db"/>
+            <argument type="service" id="session"/>
+            <argument type="service" id="adyen_payment.basket.restore.detail_attributes_restorer"/>
         </service>
         <service id="adyen_payment.components.configuration" class="AdyenPayment\Components\Configuration">
             <argument type="service" id="shopware.plugin.cached_config_reader"/>

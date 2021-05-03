@@ -262,7 +262,7 @@ class Notification extends ModelEntity implements \JsonSerializable
     /**
      * @return string
      */
-    public function getPaymentMethod(): string
+    public function getPaymentMethod(): ?string
     {
         return $this->paymentMethod;
     }
