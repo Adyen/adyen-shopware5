@@ -83,7 +83,8 @@
                     'paymentMethod': me.getPaymentMethod(),
                     'storePaymentMethod': me.getStorePaymentMethod(),
                     'browserInfo': me.getBrowserInfo(),
-                    'origin': window.location.origin
+                    'origin': window.location.origin,
+                    'sComment': me.getComment(),
                 };
 
                 $.ajax({
@@ -301,6 +302,10 @@
             var me = this;
 
             me.adyenCheckout = new AdyenCheckout(me.adyenConfiguration);
+        },
+
+        getComment: function() {
+            return $('[data-storagekeyname="sComment"]').val();
         },
 
         getPaymentMethod: function () {

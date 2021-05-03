@@ -209,6 +209,10 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             $transaction->getId()
         );
 
+        if ($this->Request()->getParam('sComment') !== null) {
+            Shopware()->Session()->offsetSet('sComment', $this->Request()->getParam('sComment'));
+        }
+
         $orderNumber = $this->saveOrder(
             $transaction->getId(),
             $signature,
