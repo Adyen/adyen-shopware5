@@ -281,6 +281,7 @@ class BasketService
             'sessionID' => $this->session->get('sessionId'),
             'userID' => $this->session->get('sUserId') || 0,
             'articlename' => $optionData->getArticleName(),
+            'ordernumber' => $optionData->getArticleNumber(),
             'articleID' => $optionData->getArticleId(),
             'quantity' => $optionData->getQuantity(),
             'price' => $optionData->getPrice(),
