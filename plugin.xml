@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>1.7.2</version>
+    <version>1.7.3</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -181,6 +181,16 @@
             Making the notification entity's paymentMethod column nullable
             Add comments to order if available
             Copying order detail attributes to basket detail on failed payment
+        </changes>
+    </changelog>
+    <changelog version="1.7.3">
+        <changes lang="de">
+            Fixes
+            Restore article order number to the basket after failed payment
+        </changes>
+        <changes lang="en">
+            Fixes
+            Restore article order number to the basket after failed payment
         </changes>
     </changelog>
 </plugin>
