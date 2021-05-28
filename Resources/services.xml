@@ -14,5 +14,6 @@
         <import resource="services/serializers.xml" />
         <import resource="services/subscribers.xml" />
         <import resource="services/validators.xml" />
+        <import resource="services/rules.xml" />
     </imports>
 </container>

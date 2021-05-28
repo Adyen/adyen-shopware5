@@ -29,17 +29,16 @@
             <argument type="service" id="models"/>
             <argument type="service" id="adyen_payment.components.basket_service"/>
         </service>
-        <service id="adyen_payment.components.adyen.apifactory" class="AdyenPayment\Components\Adyen\ApiFactory">
+        <service id="AdyenPayment\Components\Adyen\ApiFactory">
             <argument type="service" id="adyen_payment.components.configuration"/>
             <argument type="service" id="adyen_payment.logger"/>
         </service>
-        <service id="adyen_payment.components.adyen.origin_keys_service" class="AdyenPayment\Components\Adyen\OriginKeysService">
-            <argument type="service" id="adyen_payment.components.adyen.apifactory"/>
-            <argument type="service" id="models"/>
+        <service id="AdyenPayment\Components\Adyen\ApiClientMap">
+            <argument type="service" id="AdyenPayment\Components\Adyen\ApiFactory" />
         </service>
         <service id="adyen_payment.components.adyen.payment.method"
                  class="AdyenPayment\Components\Adyen\PaymentMethodService">
-            <argument type="service" id="adyen_payment.components.adyen.apifactory"/>
+            <argument type="service" id="AdyenPayment\Components\Adyen\ApiClientMap"/>
             <argument type="service" id="adyen_payment.components.configuration"/>
             <argument type="service" id="adyen_payment.logger"/>
             <argument type="service" id="session"/>
@@ -47,7 +46,7 @@
         </service>
         <service id="adyen_payment.components.adyen.refund_service"
                  class="AdyenPayment\Components\Adyen\RefundService">
-            <argument type="service" id="adyen_payment.components.adyen.apifactory"/>
+            <argument type="service" id="AdyenPayment\Components\Adyen\ApiClientMap" />
             <argument type="service" id="models"/>
             <argument type="service" id="adyen_payment.components.notification_manager"/>
         </service>
@@ -69,12 +68,6 @@
             <argument type="service" id="snippets"/>
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
         </service>
-        <service id="adyen_payment.components.origin_keys_service" class="AdyenPayment\Components\OriginKeysService">
-            <argument type="service" id="adyen_payment.components.adyen.origin_keys_service"/>
-            <argument type="service" id="models"/>
-            <argument type="service" id="shopware.plugin.config_writer"/>
-            <argument type="service" id="adyen_payment.components.shopware_version_check"/>
-        </service>
         <service id="adyen_payment.components.builder.notification_builder" class="AdyenPayment\Components\Builder\NotificationBuilder">
             <argument type="service" id="models"/>
         </service>
@@ -92,6 +85,8 @@
         </service>
         <service id="adyen_payment.components.payload.chain" class="AdyenPayment\Components\Payload\Chain"/>
         <service id="adyen_payment.components.payload.providers.application_info_provider" class="AdyenPayment\Components\Payload\Providers\ApplicationInfoProvider">
+            <argument type="service" id="router" />
+            <argument type="service" id="models" />
             <argument type="service" id="adyen_payment.components.configuration" />
         </service>
         <service id="adyen_payment.components.payload.providers.browser_info_provider" class="AdyenPayment\Components\Payload\Providers\BrowserInfoProvider"/>

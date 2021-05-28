@@ -1,6 +1,6 @@
 {if $sAdyenConfig}
     <div data-shopLocale='{$sAdyenConfig.shopLocale}'
-         data-adyenOriginKey='{$sAdyenConfig.originKey}'
+         data-adyenClientKey='{$sAdyenConfig.clientKey}'
          data-adyenEnvironment='{$sAdyenConfig.environment}'
          data-adyenPaymentMethodsResponse='{$sAdyenConfig.paymentMethods}'
          data-resetSessionUrl='{url controller="Adyen" action="ResetValidPaymentSession"}'

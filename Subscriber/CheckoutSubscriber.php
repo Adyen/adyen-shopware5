@@ -13,7 +13,6 @@ use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\DataConversion;
 use AdyenPayment\Components\Manager\AdyenManager;
-use AdyenPayment\Components\OriginKeysService;
 use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\AdyenPayment;
 use Shopware\Components\Model\ModelManager;
@@ -70,21 +69,7 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var DataConversion
      */
     private $dataConversion;
-    /**
-     * @var OriginKeysService
-     */
-    private $originKeysService;
 
-    /**
-     * CheckoutSubscriber constructor.
-     * @param Configuration $configuration
-     * @param PaymentMethodService $paymentMethodService
-     * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
-     * @param Enlight_Components_Session_Namespace $session
-     * @param ModelManager $modelManager
-     * @param Shopware_Components_Snippet_Manager $snippets
-     * @param Enlight_Controller_Front $front
-     */
     public function __construct(
         Configuration $configuration,
         PaymentMethodService $paymentMethodService,
@@ -94,8 +79,7 @@ class CheckoutSubscriber implements SubscriberInterface
         Shopware_Components_Snippet_Manager $snippets,
         Enlight_Controller_Front $front,
         AdyenManager $adyenManager,
-        DataConversion $dataConversion,
-        OriginKeysService $originKeysService
+        DataConversion $dataConversion
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
@@ -106,7 +90,6 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->front = $front;
         $this->adyenManager = $adyenManager;
         $this->dataConversion = $dataConversion;
-        $this->originKeysService = $originKeysService;
     }
 
     /**
@@ -241,7 +224,7 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $adyenConfig = [
             "shopLocale" => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
-            "originKey" => $this->getOriginKey($shop),
+            "clientKey" => $this->configuration->getClientKey($shop),
             "environment" => $this->configuration->getEnvironment($shop),
             "paymentMethods" => json_encode($paymentMethods),
             "paymentMethodPrefix" => $this->configuration->getPaymentMethodPrefix($shop),
@@ -456,9 +439,9 @@ class CheckoutSubscriber implements SubscriberInterface
             return true;
         }
 
-        $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($selectedType);
         if (!$paymentMethod->getValue('details') && !$paymentMethod->isStoredPayment()) {
-            $subject->View()->assign('sAdyenSetSession', json_encode($paymentMethod->getRawData()));
+            $subject->View()->assign('sAdyenSetSession', $paymentMethod->serializeMinimalState());
+
             return false;
         }
 
@@ -487,14 +470,5 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         $this->adyenManager->unsetPaymentDataInSession();
-    }
-
-    private function getOriginKey($shop): string
-    {
-        if (!$this->configuration->getOriginKey($shop)) {
-            $this->originKeysService->generateAndSave();
-        }
-
-        return $this->configuration->getOriginKey($shop);
     }
 }
