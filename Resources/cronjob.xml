@@ -12,7 +12,7 @@
         <name>Adyen: Import Payment Methods</name>
         <action>AdyenPayment_CronJob_ImportPaymentMethods</action>
         <active>true</active>
-        <interval>1800</interval>
+        <interval>86400</interval>
         <disableOnError>false</disableOnError>
     </cronjob>
 </cronjobs>
