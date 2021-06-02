@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Subscriber\Cronjob;
 
 use AdyenPayment\Import\PaymentMethodImporterInterface;
+use AdyenPayment\Models\Event;
 use Enlight\Event\SubscriberInterface;
 
 class ImportPaymentMethodSubscriber implements SubscriberInterface
@@ -22,7 +23,7 @@ class ImportPaymentMethodSubscriber implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'AdyenPayment_CronJob_ImportPaymentMethods' => '__invoke'
+            Event::cronImportPaymentMethods()->getName()=> '__invoke',
         ];
     }
 
