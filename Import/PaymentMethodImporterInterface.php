@@ -6,5 +6,5 @@ namespace AdyenPayment\Import;
 
 interface PaymentMethodImporterInterface
 {
-    public function __invoke();
+    public function __invoke(): \Generator;
 }
