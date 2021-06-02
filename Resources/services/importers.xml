@@ -3,7 +3,12 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="AdyenPayment\Import\PaymentMethodImporter" />
+        <service id="AdyenPayment\Import\PaymentMethodImporter"/>
+        <service id="AdyenPayment\Import\TraceablePaymentMethodImporter"
+                 decorates="AdyenPayment\Import\PaymentMethodImporter">
+            <argument type="service" id="AdyenPayment\Import\TraceablePaymentMethodImporter.inner"/>
+            <argument type="service" id="adyen_payment.logger"/>
+        </service>
     </services>
 </container>
 

@@ -6,7 +6,7 @@ namespace AdyenPayment\Import;
 
 class PaymentMethodImporter implements PaymentMethodImporterInterface
 {
-    public function __invoke()
+    public function __invoke(): \Generator
     {
         // TODO actual importer
     }
