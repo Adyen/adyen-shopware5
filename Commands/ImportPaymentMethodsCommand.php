@@ -33,18 +33,16 @@ class ImportPaymentMethodsCommand extends ShopwareCommand
         $counter = 0;
         $io = new SymfonyStyle($input, $output);
 
-
-        throw new \Exception('TODO: create implementation');
-
         // TODO following is pseude-code, update with actual implementation (Generator)
         foreach ($this->paymentMethodImporter->__invoke() as $importPaymentMethod) {
             ++$counter;
 
-            $io->text(sprintf(
-                'Imported payment method %s for store %s',
-                $importPaymentMethod->getPaymentMethodName(),
-                $importPaymentMethod->getStoreName()
-            ));
+            $io->text($importPaymentMethod);
+//            $io->text(sprintf(
+//                'Imported payment method %s for store %s',
+//                $importPaymentMethod->getPaymentMethodName(),
+//                $importPaymentMethod->getStoreName()
+//            ));
         }
 
         $io->success(sprintf('Successfully imported %s Payment Methods', $counter));
