@@ -29,6 +29,6 @@ class ImportPaymentMethodSubscriber implements SubscriberInterface
 
     public function __invoke(\Shopware_Components_Cron_CronJob $job)
     {
-        ($this->paymentMethodImporter)();
+        iterator_to_array(($this->paymentMethodImporter)());
     }
 }

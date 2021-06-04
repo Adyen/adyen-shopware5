@@ -15,6 +15,7 @@
         <import resource="services/subscribers-cronjob.xml" />
         <import resource="services/validators.xml" />
         <import resource="services/rules.xml" />
+        <import resource="services/providers.xml" />
         <import resource="services/importers.xml" />
     </imports>
 </container>
