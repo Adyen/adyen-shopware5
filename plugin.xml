@@ -193,4 +193,18 @@
             Restore article order number to the basket after failed payment
         </changes>
     </changelog>
+    <changelog version="2.0.0">
+        <changes lang="de">
+            Features
+            Upgrade to API v67 and Adyen Web Components Library
+            Fixes
+            Inserting payment method selection as user attribute if no user attribute exists
+        </changes>
+        <changes lang="de">
+            Features
+            Upgrade to API v67 and Adyen Web Components Library
+            Fixes
+            Inserting payment method selection as user attribute if no user attribute exists
+        </changes>
+    </changelog>
 </plugin>
