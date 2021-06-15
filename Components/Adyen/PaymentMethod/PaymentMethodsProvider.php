@@ -2,21 +2,16 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Provider;
+namespace AdyenPayment\Components\Adyen\PaymentMethod;
 
 use Adyen\AdyenException;
 use Adyen\Service\Checkout;
-use AdyenPayment\Components\Adyen\ApiClientMap;
 use AdyenPayment\Components\Adyen\ApiFactory;
 use AdyenPayment\Components\Configuration;
 use Shopware\Models\Shop\Shop;
 
-class PaymentMethodsProvider
+final class PaymentMethodsProvider
 {
-    /**
-     * @var ApiClientMap
-     */
-    private $apiClientMap;
     /**
      * @var Configuration
      */
@@ -27,17 +22,15 @@ class PaymentMethodsProvider
     private $adyenApiFactory;
 
     public function __construct(
-        ApiClientMap $apiClientMap,
         Configuration $configuration,
         ApiFactory $adyenApiFactory
     )
     {
-        $this->apiClientMap = $apiClientMap;
         $this->configuration = $configuration;
         $this->adyenApiFactory = $adyenApiFactory;
     }
 
-    public function getPaymentMethods(Shop $shop): array {
+    public function __invoke(Shop $shop): array {
         $adyenClient = $this->adyenApiFactory->provide($shop);
         $checkout = new Checkout($adyenClient);
 
@@ -45,24 +38,11 @@ class PaymentMethodsProvider
             $paymentMethods = $checkout->paymentMethods([
                 'merchantAccount' => $this->configuration->getMerchantAccount($shop),
             ]);
-            print_r($paymentMethods);
-            die();
         } catch (AdyenException $e) {
+            // TODO fix exception handling
             return [];
         }
 
         return $paymentMethods;
-    }
-
-    /**
-     * @throws AdyenException
-     */
-    public function getCheckout(): Checkout
-    {
-        return new Checkout(
-            $this->apiClientMap->lookup(
-                Shopware()->Shop()
-            )
-        );
     }
 }
