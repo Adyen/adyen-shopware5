@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="AdyenPayment\Doctrine\Writer\PaymentMethodWriter">
+            <argument type="service" id="models"/>
+            <argument type="service" id="adyen_payment.dbal.payment_attributes"/>
+            <argument type="expression">service('models').getRepository('Shopware\\Models\\Payment\\Payment')</argument>
+            <argument type="expression">service('models').getRepository('Shopware\\Models\\Country\\Country')</argument>
+            <argument type="service" id="shopware_attribute.data_persister"/>
+            <argument type="service" id="shopware_attribute.crud_service"/>
+        </service>
+    </services>
+</container>
