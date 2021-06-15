@@ -15,5 +15,11 @@
         >
             <argument type="service" id="db"/>
         </service>
+        <service
+                id="adyen_payment.dbal.payment_attributes"
+                class="AdyenPayment\Dbal\PaymentAttributes"
+        >
+            <argument type="service" id="db"/>
+        </service>
     </services>
 </container>
