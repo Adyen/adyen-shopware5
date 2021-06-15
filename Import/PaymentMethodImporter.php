@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Import;
 
-use AdyenPayment\Provider\PaymentMethodsProvider;
+use AdyenPayment\Components\Adyen\Mapper\PaymentMethodMapper;
+use AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsProvider;
+use AdyenPayment\Doctrine\Writer\PaymentMethodWriter;
+use AdyenPayment\Models\PaymentMethod\ImportResult;
+use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Shopware\Components\Model\ModelManager;
+use Shopware\Models\Shop\Shop;
 
 class PaymentMethodImporter implements PaymentMethodImporterInterface
 {
@@ -17,46 +23,69 @@ class PaymentMethodImporter implements PaymentMethodImporterInterface
      * @var ObjectRepository
      */
     private $shopRepository;
+    /**
+     * @var UsedFallbackConfigRule
+     */
+    private $usedFallbackConfigRule;
+    /**
+     * @var PaymentMethodMapper
+     */
+    private $paymentMethodMapper;
+    /**
+     * @var PaymentMethodWriter
+     */
+    private $paymentMethodWriter;
+    /** @var ModelManager */
+    private $entityManager;
 
     public function __construct(
         PaymentMethodsProvider $paymentMethodsProvider,
-        ObjectRepository $shopRepository
+        ObjectRepository $shopRepository,
+        UsedFallbackConfigRule $usedFallbackConfigRule,
+        PaymentMethodMapper $paymentMethodMapper,
+        PaymentMethodWriter $paymentMethodWriter,
+        ModelManager $entityManager
     )
     {
         $this->paymentMethodsProvider = $paymentMethodsProvider;
         $this->shopRepository = $shopRepository;
+        $this->usedFallbackConfigRule = $usedFallbackConfigRule;
+        $this->paymentMethodMapper = $paymentMethodMapper;
+        $this->paymentMethodWriter = $paymentMethodWriter;
+        $this->entityManager = $entityManager;
+
     }
 
-//    public function __invoke(): \Generator
-//    {
-//        // TODO actual importer
-//        try {
-//            $models->persist();
-//            yield $result;
-//        } catch (\Exception $exception) {
-//            $exception->getMessage();
-//            yield (new Result())
-//                ->setSuccess(false)
-//                ->setException($exception);
-//        }
-//    }
     public function __invoke(): \Generator
     {
-        // TODO actual importer
         $shops = $this->shopRepository->findAll();
 
+        /** @var Shop $shop */
         foreach($shops as $shop) {
-            try {
-                // 1. fetch
-                $paymentMethods = $this->paymentMethodsProvider->getPaymentMethods($shop);
+            $shopId = $shop->getId();
 
-                yield $paymentMethods;
-            } catch (\Exception $exception) {
-//            $exception->getMessage();
-//            yield (new Result())
-//                ->setSuccess(false)
-//                ->setException($exception);
-                yield 'nok';
+            if (false === ($this->usedFallbackConfigRule)($shopId)) {
+                try {
+                    $generator = $this->paymentMethodMapper->mapFromAdyen(
+                        ($this->paymentMethodsProvider)($shop)
+                    );
+
+                    foreach ($generator as $adyenPaymentMethod) {
+                        $importResult = $this->paymentMethodWriter->saveAsShopwarePaymentMethod(
+                            $adyenPaymentMethod,
+                            $shop
+                        );
+                        yield $importResult;
+                    }
+
+                    $this->entityManager->flush();
+                } catch (\Exception $exception) {
+                    yield ImportResult::fromException(
+                        $shop,
+                        $adyenPaymentMethod,
+                        $exception
+                    );
+                }
             }
         }
     }
