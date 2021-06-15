@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Import;
 
+use AdyenPayment\Models\PaymentMethod\ImportResult;
 use Psr\Log\LoggerInterface;
 
 class TraceablePaymentMethodImporter implements PaymentMethodImporterInterface
@@ -27,26 +28,28 @@ class TraceablePaymentMethodImporter implements PaymentMethodImporterInterface
 
     public function __invoke(): \Generator
     {
-        foreach (($this->paymentMethodImporter)() as $importPaymentMethod) {
-            $this->log($importPaymentMethod);
-            yield $importPaymentMethod;
+        foreach (($this->paymentMethodImporter)() as $importResult) {
+            $this->log($importResult);
+            yield $importResult;
         }
     }
 
-    private function log(/*TODO: type*/$importPaymentMethod)
+    private function log(ImportResult $importResult)
     {
-        if ($importPaymentMethod->isSuccessful()) {
+        if ($importResult->isSuccess()) {
             $this->logger->info('Adyen payment method imported', [
-                'storefront' => $importPaymentMethod->getStoreFrontName(), // values: "Main" OR "specific storefront"
-                'payment method' => $importPaymentMethod->getName(),
+                'shop id' => $importResult->getShop()->getId(),
+                'shop name' => $importResult->getShop()->getName(),
+                'payment method' => $importResult->getPaymentMethod()->getType(),
             ]);
 
             return;
         }
 
         $this->logger->error('Adyen payment method could not be imported', [
-            'storefront' => $importPaymentMethod->getStoreFrontName(), // values: "Main" OR "specific storefront"
-            'payment method' => $importPaymentMethod->getName(),
+            'shop id' => $importResult->getShop()->getId(),
+            'shop name' => $importResult->getShop()->getName(),
+            'payment method' => $importResult->getPaymentMethod()->getType(),
         ]);
     }
 }
