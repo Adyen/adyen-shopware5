@@ -16,6 +16,8 @@
         <import resource="services/validators.xml" />
         <import resource="services/rules.xml" />
         <import resource="services/providers.xml" />
+        <import resource="services/mapper.xml" />
+        <import resource="services/doctrine.xml"/>
         <import resource="services/importers.xml" />
     </imports>
 </container>
