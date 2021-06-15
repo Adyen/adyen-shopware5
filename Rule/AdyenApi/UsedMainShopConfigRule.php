@@ -9,18 +9,15 @@ use Doctrine\Common\Persistence\ObjectRepository;
 class UsedMainShopConfigRule implements MainShopRule
 {
     /**
-     * @var ObjectRepository
+     * @var UsedFallbackConfigRule
      */
-    private $shopRepository;
-    /**
-     * @var MainShopConfigRule
-     */
-    private $mainShopConfigRuleChain;
+    private $usedFallbackConfigRule;
 
-    public function __construct(ObjectRepository $shopRepository, MainShopConfigRule $mainShopConfigRule)
+    public function __construct(
+        UsedFallbackConfigRule $usedFallbackConfigRule
+    )
     {
-        $this->shopRepository = $shopRepository;
-        $this->mainShopConfigRuleChain = $mainShopConfigRule;
+        $this->usedFallbackConfigRule = $usedFallbackConfigRule;
     }
 
     public function __invoke(int $shopId): bool
@@ -29,9 +26,6 @@ class UsedMainShopConfigRule implements MainShopRule
             return true;
         }
 
-        return ($this->mainShopConfigRuleChain)(
-            $this->shopRepository->find($shopId),
-            $this->shopRepository->find(1)
-        );
+        return ($this->usedFallbackConfigRule)($shopId);
     }
 }
