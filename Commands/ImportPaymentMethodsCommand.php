@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Commands;
 
 use AdyenPayment\Import\PaymentMethodImporterInterface;
+use AdyenPayment\Models\PaymentMethod\ImportResult;
 use Shopware\Commands\ShopwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,19 +34,27 @@ class ImportPaymentMethodsCommand extends ShopwareCommand
         $counter = 0;
         $io = new SymfonyStyle($input, $output);
 
-        // TODO following is pseude-code, update with actual implementation (Generator)
+        /** @var ImportResult $importPaymentMethod */
         foreach ($this->paymentMethodImporter->__invoke() as $importPaymentMethod) {
             ++$counter;
 
-            $io->text($importPaymentMethod);
-//            $io->text(sprintf(
-//                'Imported payment method %s for store %s',
-//                $importPaymentMethod->getPaymentMethodName(),
-//                $importPaymentMethod->getStoreName()
-//            ));
+            if ($importPaymentMethod->isUpdated()) {
+                $io->text(sprintf(
+                    'Updated payment method %s for store %s',
+                    $importPaymentMethod->getPaymentMethod()->getType(),
+                    $importPaymentMethod->getShop()->getName()
+                ));
+                continue;
+            }
+
+            $io->text(sprintf(
+                'Imported payment method %s for store %s',
+                $importPaymentMethod->getPaymentMethod()->getType(),
+                $importPaymentMethod->getShop()->getName()
+            ));
         }
 
-        $io->success(sprintf('Successfully imported %s Payment Methods', $counter));
+        $io->success(sprintf('Successfully imported %s Payment Method(s)', $counter));
 
         return 0;
     }
