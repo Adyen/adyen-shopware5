@@ -7,7 +7,8 @@ use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\Payload\PaymentContext;
 use AdyenPayment\Components\Payload\PaymentPayloadProvider;
 use AdyenPayment\Models\Enum\Channel;
-use Shopware\Components\Model\ModelManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Shopware\Components\Routing\RouterInterface;
 use Shopware\Models\Plugin\Plugin;
 
 /**
@@ -18,18 +19,26 @@ use Shopware\Models\Plugin\Plugin;
 class ApplicationInfoProvider implements PaymentPayloadProvider
 {
     /**
-     * @var ModelManager
+     * @var EntityManagerInterface
      */
     private $modelManager;
     /**
      * @var Configuration
      */
     private $configuration;
+    /**
+     * @var RouterInterface
+     */
+    private $router;
 
-    public function __construct(Configuration $configuration)
-    {
+    public function __construct(
+        RouterInterface $router,
+        EntityManagerInterface $modelManager,
+        Configuration $configuration
+    ) {
+        $this->router = $router;
+        $this->modelManager = $modelManager;
         $this->configuration = $configuration;
-        $this->modelManager = Shopware()->Container()->get('models');
     }
 
     /**
@@ -39,13 +48,12 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
      */
     public function provide(PaymentContext $context): array
     {
-        $returnUrl = Shopware()->Router()->assemble([
-            'controller' => 'transparent',
-            'action' => 'redirect',
-        ]).'?'.http_build_query([
-          'merchantReference' => $context->getOrder()->getNumber(),
-        ]);
-
+        $returnUrl = $this->router->assemble([
+                'controller' => 'process',
+                'action' => 'return',
+            ]).'?'.http_build_query([
+                'merchantReference' => $context->getOrder()->getNumber(),
+            ]);
         $plugin = $this->modelManager->getRepository(Plugin::class)->findOneBy(['name' => AdyenPayment::NAME]);
 
         return [

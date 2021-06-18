@@ -6,16 +6,21 @@ namespace AdyenPayment\Utils;
 
 final class RequestDataFormatter
 {
-    const SHOPWARE_KEYS = ['module' => null, 'controller' => null, 'action' => null];
-
-    public static function forRedirect(array $data): array
-    {
-        if (!$data) {
-            return [];
-        }
-
-        return array_diff_key($data, self::SHOPWARE_KEYS);
-    }
+    const ALLOWED_PAYMENT_DETAIL_V67_KEYS = [
+        'billingToken' => null,
+        'cupsecureplus.smscode' => null,
+        'facilitatorAccessToken' => null,
+        'oneTimePasscode' => null,
+        'orderID' => null,
+        'payerID' => null,
+        'payload' => null,
+        'paymentID' => null,
+        'paymentStatus' => null,
+        'redirectResult' => null,
+        'threeDSResult' => null,
+        'threeds2.challengeResult' => null,
+        'threeds2.fingerprint' => null,
+    ];
 
     public static function forPaymentDetails(array $data): array
     {
@@ -23,6 +28,6 @@ final class RequestDataFormatter
             return [];
         }
 
-        return array_diff_key($data, array_merge(self::SHOPWARE_KEYS, ['merchantReference' => null]));
+        return array_intersect_key($data, self::ALLOWED_PAYMENT_DETAIL_V67_KEYS);
     }
 }
