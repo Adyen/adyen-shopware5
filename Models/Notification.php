@@ -102,7 +102,7 @@ class Notification extends ModelEntity implements \JsonSerializable
 
     /**
      * @var string
-     * @ORM\Column(name="error_details", type="text")
+     * @ORM\Column(name="error_details", type="text", nullable=true)
      */
     private $errorDetails;
 
