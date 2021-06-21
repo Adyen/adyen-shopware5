@@ -55,48 +55,42 @@ final class PaymentMethodWriter
         Shop $shop
     ): ImportResult {
 
-        try {
-            $shops = new ArrayCollection([$shop]);
-            $countries = $this->fetchCountryList();
+        $shops = new ArrayCollection([$shop]);
+        $countries = $this->fetchCountryList();
 
-            $existingPaymentAttribute = $this->paymentAttributes->fetchByAdyenType($adyenPaymentMethod->getType());
-            $existingPaymentMethod = null;
-            if (count($existingPaymentAttribute) !== 0) {
-                $existingPaymentMethod = $this->paymentRepository->findOneBy([
-                    'id' => $existingPaymentAttribute['paymentmeanID']
-                ]);
-            }
+        $existingPaymentAttribute = $this->paymentAttributes->fetchByAdyenType($adyenPaymentMethod->getType());
+        $existingPaymentMethod = null;
+        if (count($existingPaymentAttribute) !== 0) {
+            $existingPaymentMethod = $this->paymentRepository->findOneBy([
+                'id' => $existingPaymentAttribute['paymentmeanID']
+            ]);
+        }
 
-            if ($existingPaymentMethod) {
-                $existingPaymentMethod = $existingPaymentMethod->updateFromAdyenPaymentMethod(
-                    $adyenPaymentMethod,
-                    $shops,
-                    $countries
-                );
-                $this->storeAdyenPaymentMethodType(
-                    $existingPaymentMethod->getId(),
-                    $adyenPaymentMethod->getType()
-                );
-
-                return ImportResult::success($shop, $adyenPaymentMethod, true);
-            }
-
-            $shopwarePaymentModel = Payment::createFromAdyenPaymentMethod($adyenPaymentMethod, $shops, $countries);
-
-            $this->entityManager->persist($shopwarePaymentModel);
-            $this->entityManager->flush();
-
+        if ($existingPaymentMethod) {
+            $existingPaymentMethod = $existingPaymentMethod->updateFromAdyenPaymentMethod(
+                $adyenPaymentMethod,
+                $shops,
+                $countries
+            );
             $this->storeAdyenPaymentMethodType(
-                $shopwarePaymentModel->getId(),
+                $existingPaymentMethod->getId(),
                 $adyenPaymentMethod->getType()
             );
 
-            return ImportResult::success($shop, $adyenPaymentMethod, false);
-        } catch(\Doctrine\ORM\ORMException $exception) {
-            throw new $exception;
-        } catch(\Exception $exception) {
-            throw new $exception;
+            return ImportResult::success($shop, $adyenPaymentMethod, true);
         }
+
+        $shopwarePaymentModel = Payment::createFromAdyenPaymentMethod($adyenPaymentMethod, $shops, $countries);
+
+        $this->entityManager->persist($shopwarePaymentModel);
+        $this->entityManager->flush();
+
+        $this->storeAdyenPaymentMethodType(
+            $shopwarePaymentModel->getId(),
+            $adyenPaymentMethod->getType()
+        );
+
+        return ImportResult::success($shop, $adyenPaymentMethod, false);
     }
 
     private function fetchCountryList(): ArrayCollection
