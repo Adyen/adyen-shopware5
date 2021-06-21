@@ -108,8 +108,7 @@ final class PaymentMethodWriter
             AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL => $adyenPaymentMethodType
         ];
 
-        // We need to set the payment attribute to readOnly false,
-        // otherwise it does not save the payment attribute.
+        // update read only "false" to allow model changes
         $this->setReadonlyOnAdyenTypePaymentAttribute(false);
 
         $this->dataPersister->persist(
