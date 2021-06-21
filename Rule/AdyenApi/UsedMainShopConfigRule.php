@@ -6,7 +6,7 @@ namespace AdyenPayment\Rule\AdyenApi;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 
-class UsedMainShopConfigRule implements MainShopRule
+final class UsedMainShopConfigRule implements MainShopRule
 {
     /**
      * @var UsedFallbackConfigRuleInterface

@@ -7,7 +7,7 @@ namespace AdyenPayment\Models\PaymentMethod;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use Shopware\Models\Shop\Shop;
 
-class ImportResult
+final class ImportResult
 {
     /** @var Shop */
     private $shop;

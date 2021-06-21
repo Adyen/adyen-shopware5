@@ -7,7 +7,7 @@ namespace AdyenPayment\Rule\AdyenApi;
 use AdyenPayment\Components\Configuration;
 use Shopware\Models\Shop\Shop;
 
-class IsMainShopApiKeyRule implements MainShopConfigRule
+final class IsMainShopApiKeyRule implements MainShopConfigRule
 {
     /**
      * @var Configuration

@@ -8,7 +8,7 @@ use AdyenPayment\Import\PaymentMethodImporterInterface;
 use AdyenPayment\Models\Event;
 use Enlight\Event\SubscriberInterface;
 
-class ImportPaymentMethodSubscriber implements SubscriberInterface
+final class ImportPaymentMethodSubscriber implements SubscriberInterface
 {
     /**
      * @var PaymentMethodImporterInterface
