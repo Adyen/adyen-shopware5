@@ -6,7 +6,7 @@ namespace AdyenPayment\Rule\AdyenApi;
 
 use Shopware\Models\Shop\Shop;
 
-class MainShopConfigRuleChain implements MainShopConfigRule
+final class MainShopConfigRuleChain implements MainShopConfigRule
 {
     /**
      * @var MainShopConfigRule[]
