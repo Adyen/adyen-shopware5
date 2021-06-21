@@ -9,12 +9,12 @@ use Doctrine\Common\Persistence\ObjectRepository;
 class UsedMainShopConfigRule implements MainShopRule
 {
     /**
-     * @var UsedFallbackConfigRule
+     * @var UsedFallbackConfigRuleInterface
      */
     private $usedFallbackConfigRule;
 
     public function __construct(
-        UsedFallbackConfigRule $usedFallbackConfigRule
+        UsedFallbackConfigRuleInterface $usedFallbackConfigRule
     )
     {
         $this->usedFallbackConfigRule = $usedFallbackConfigRule;

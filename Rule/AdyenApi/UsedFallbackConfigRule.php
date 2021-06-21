@@ -6,7 +6,7 @@ namespace AdyenPayment\Rule\AdyenApi;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 
-class UsedFallbackConfigRule
+final class UsedFallbackConfigRule implements UsedFallbackConfigRuleInterface
 {
     /**
      * @var ObjectRepository

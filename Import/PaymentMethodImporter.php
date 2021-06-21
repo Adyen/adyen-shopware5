@@ -8,7 +8,7 @@ use AdyenPayment\Components\Adyen\Mapper\PaymentMethodMapper;
 use AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsProvider;
 use AdyenPayment\Doctrine\Writer\PaymentMethodWriter;
 use AdyenPayment\Models\PaymentMethod\ImportResult;
-use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule;
+use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Shop\Shop;
@@ -24,7 +24,7 @@ class PaymentMethodImporter implements PaymentMethodImporterInterface
      */
     private $shopRepository;
     /**
-     * @var UsedFallbackConfigRule
+     * @var UsedFallbackConfigRuleInterface
      */
     private $usedFallbackConfigRule;
     /**
@@ -41,7 +41,7 @@ class PaymentMethodImporter implements PaymentMethodImporterInterface
     public function __construct(
         PaymentMethodsProvider $paymentMethodsProvider,
         ObjectRepository $shopRepository,
-        UsedFallbackConfigRule $usedFallbackConfigRule,
+        UsedFallbackConfigRuleInterface $usedFallbackConfigRule,
         PaymentMethodMapper $paymentMethodMapper,
         PaymentMethodWriter $paymentMethodWriter,
         ModelManager $entityManager
