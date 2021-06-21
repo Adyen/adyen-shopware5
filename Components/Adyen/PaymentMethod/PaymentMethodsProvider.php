@@ -10,7 +10,7 @@ use AdyenPayment\Components\Adyen\ApiFactory;
 use AdyenPayment\Components\Configuration;
 use Shopware\Models\Shop\Shop;
 
-final class PaymentMethodsProvider
+final class PaymentMethodsProvider implements PaymentMethodsProviderInterface
 {
     /**
      * @var Configuration
