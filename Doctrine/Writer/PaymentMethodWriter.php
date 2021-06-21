@@ -101,7 +101,6 @@ final class PaymentMethodWriter
     private function storeAdyenPaymentMethodType(
         int $paymentMeanId,
         string $adyenPaymentMethodType
-
     ) {
         $data = [
             '_table' => "s_core_paymentmeans_attributes",
