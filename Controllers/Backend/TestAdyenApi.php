@@ -13,7 +13,7 @@ class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Bac
      */
     private $apiConfigValidator;
     /**
-     * @var \AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule
+     * @var \AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface
      */
     private $usedFallbackConfigRule;
 
