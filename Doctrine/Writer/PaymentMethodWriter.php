@@ -109,22 +109,17 @@ final class PaymentMethodWriter
             AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL => $adyenPaymentMethodType
         ];
 
-        try {
-            // We need to set the payment attribute to readOnly false,
-            // otherwise it does not save the payment attribute.
-            $this->setReadonlyOnAdyenTypePaymentAttribute(false);
+        // We need to set the payment attribute to readOnly false,
+        // otherwise it does not save the payment attribute.
+        $this->setReadonlyOnAdyenTypePaymentAttribute(false);
 
-            $this->dataPersister->persist(
-                $data,
-                "s_core_paymentmeans_attributes",
-                $paymentMeanId
-            );
+        $this->dataPersister->persist(
+            $data,
+            "s_core_paymentmeans_attributes",
+            $paymentMeanId
+        );
 
-            $this->setReadonlyOnAdyenTypePaymentAttribute(true);
-        } catch (\Exception $exception) {
-            throw new $exception;
-        }
-
+        $this->setReadonlyOnAdyenTypePaymentAttribute(true);
     }
 
     private function setReadonlyOnAdyenTypePaymentAttribute(bool $readOnly)
