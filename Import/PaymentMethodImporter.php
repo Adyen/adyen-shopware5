@@ -45,15 +45,13 @@ class PaymentMethodImporter implements PaymentMethodImporterInterface
         PaymentMethodMapper $paymentMethodMapper,
         PaymentMethodWriter $paymentMethodWriter,
         ModelManager $entityManager
-    )
-    {
+    ) {
         $this->paymentMethodsProvider = $paymentMethodsProvider;
         $this->shopRepository = $shopRepository;
         $this->usedFallbackConfigRule = $usedFallbackConfigRule;
         $this->paymentMethodMapper = $paymentMethodMapper;
         $this->paymentMethodWriter = $paymentMethodWriter;
         $this->entityManager = $entityManager;
-
     }
 
     public function __invoke(): \Generator
