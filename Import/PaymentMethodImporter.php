@@ -62,28 +62,30 @@ class PaymentMethodImporter implements PaymentMethodImporterInterface
         foreach($shops as $shop) {
             $shopId = $shop->getId();
 
-            if (false === ($this->usedFallbackConfigRule)($shopId)) {
-                try {
-                    $generator = $this->paymentMethodMapper->mapFromAdyen(
-                        ($this->paymentMethodsProvider)($shop)
-                    );
+            if (true === ($this->usedFallbackConfigRule)($shopId)) {
+                continue;
+            }
 
-                    foreach ($generator as $adyenPaymentMethod) {
-                        $importResult = $this->paymentMethodWriter->saveAsShopwarePaymentMethod(
-                            $adyenPaymentMethod,
-                            $shop
-                        );
-                        yield $importResult;
-                    }
+            try {
+                $generator = $this->paymentMethodMapper->mapFromAdyen(
+                    ($this->paymentMethodsProvider)($shop)
+                );
 
-                    $this->entityManager->flush();
-                } catch (\Exception $exception) {
-                    yield ImportResult::fromException(
-                        $shop,
+                foreach ($generator as $adyenPaymentMethod) {
+                    $importResult = $this->paymentMethodWriter->saveAsShopwarePaymentMethod(
                         $adyenPaymentMethod,
-                        $exception
+                        $shop
                     );
+                    yield $importResult;
                 }
+
+                $this->entityManager->flush();
+            } catch (\Exception $exception) {
+                yield ImportResult::fromException(
+                    $shop,
+                    $adyenPaymentMethod,
+                    $exception
+                );
             }
         }
     }
