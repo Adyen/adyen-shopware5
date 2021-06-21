@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>1.7.3</version>
+    <version>2.0.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -191,6 +191,20 @@
         <changes lang="en">
             Fixes
             Restore article order number to the basket after failed payment
+        </changes>
+    </changelog>
+    <changelog version="2.0.0">
+        <changes lang="de">
+            Features
+            Upgrade to API v67 and Adyen Web Components Library
+            Fixes
+            Inserting payment method selection as user attribute if no user attribute exists
+        </changes>
+        <changes lang="de">
+            Features
+            Upgrade to API v67 and Adyen Web Components Library
+            Fixes
+            Inserting payment method selection as user attribute if no user attribute exists
         </changes>
     </changelog>
 </plugin>

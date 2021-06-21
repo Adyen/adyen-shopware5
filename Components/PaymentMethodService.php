@@ -120,17 +120,37 @@ class PaymentMethodService
     /**
      * @param int $userId
      * @param $payment
-     * @return bool
      */
     public function setUserAdyenMethod(int $userId, $payment)
     {
         $qb = $this->modelManager->getDBALQueryBuilder();
-        $qb->update('s_user_attributes', 'a')
-            ->set('a.' . AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD, ':payment')
-            ->where('a.userId = :customerId')
-            ->setParameter('payment', $payment)
+
+        $result = $qb->select(AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD)
+            ->from('s_user_attributes')
+            ->where('userId = :customerId')
             ->setParameter('customerId', $userId)
-            ->execute();
+            ->execute()
+            ->fetch();
+
+        if (empty($result)) {
+            $qb->insert('s_user_attributes')
+                ->values(
+                    array(
+                        AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD => ':payment',
+                        'userId' => ':customerId'
+                    )
+                )
+                ->setParameter('payment', $payment)
+                ->setParameter('customerId', $userId)
+                ->execute();
+        } else {
+            $qb->update('s_user_attributes', 'a')
+                ->set('a.' . AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD, ':payment')
+                ->where('a.userId = :customerId')
+                ->setParameter('payment', $payment)
+                ->setParameter('customerId', $userId)
+                ->execute();
+        }
     }
 
     /**
