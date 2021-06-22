@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Doctrine\Writer;
 
 use AdyenPayment\AdyenPayment;
-use AdyenPayment\Dbal\PaymentAttributes;
+use AdyenPayment\Dbal\Provider\Payment\Attributes\PaymentAttributeProvider;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use AdyenPayment\Models\PaymentMethod\ImportResult;
 use Doctrine\Common\Cache\Cache;
@@ -22,7 +22,7 @@ final class PaymentMethodWriter
 {
     /** @var ModelManager */
     private $entityManager;
-    /** @var PaymentAttributes */
+    /** @var PaymentAttributeProvider */
     private $paymentAttributes;
     /** @var ModelRepository */
     private $paymentRepository;
@@ -35,7 +35,7 @@ final class PaymentMethodWriter
 
     public function __construct(
         ModelManager $entityManager,
-        PaymentAttributes $paymentAttributes,
+        PaymentAttributeProvider $paymentAttributes,
         ModelRepository $paymentRepository,
         ModelRepository $countryRepository,
         DataPersisterInterface $dataPersister,
