@@ -6,6 +6,7 @@ namespace AdyenPayment\Doctrine\Writer;
 
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Dbal\Provider\Payment\PaymentMeanProviderInterface;
+use AdyenPayment\Import\PaymentAttributeUpdaterInterface;
 use AdyenPayment\Models\Payment\PaymentFactoryInterface;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use AdyenPayment\Models\PaymentMethod\ImportResult;
@@ -25,23 +26,23 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
     private $paymentMeanProvider;
     /** @var DataPersisterInterface */
     private $dataPersister;
-    /** @var CrudServiceInterface */
-    private $crudService;
     /** @var PaymentFactoryInterface */
     private $paymentFactory;
+    /** @var PaymentAttributeUpdaterInterface */
+    private $paymentAttributeUpdater;
 
     public function __construct(
         ModelManager $entityManager,
         PaymentMeanProviderInterface $paymentMeanProvider,
         DataPersisterInterface $dataPersister,
-        CrudServiceInterface $crudService,
-        PaymentFactoryInterface $paymentFactory
+        PaymentFactoryInterface $paymentFactory,
+        PaymentAttributeUpdaterInterface $paymentAttributeUpdater
     ) {
         $this->entityManager = $entityManager;
         $this->paymentMeanProvider = $paymentMeanProvider;
         $this->dataPersister = $dataPersister;
-        $this->crudService = $crudService;
         $this->paymentFactory = $paymentFactory;
+        $this->paymentAttributeUpdater = $paymentAttributeUpdater;
     }
 
     public function __invoke(
@@ -83,7 +84,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
         ];
 
         // update read only "false" to allow model changes
-        $this->setReadonlyOnAdyenTypePaymentAttribute(false);
+        $this->paymentAttributeUpdater->setReadonlyOnAdyenTypePaymentAttribute(false);
 
         $this->dataPersister->persist(
             $data,
@@ -91,33 +92,6 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
             $paymentMeanId
         );
 
-        $this->setReadonlyOnAdyenTypePaymentAttribute(true);
-    }
-
-    private function setReadonlyOnAdyenTypePaymentAttribute(bool $readOnly)
-    {
-        $this->crudService->update(
-            's_core_paymentmeans_attributes',
-            AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL,
-            TypeMapping::TYPE_STRING,
-            [
-                'displayInBackend' => true,
-                'readonly' => $readOnly,
-                'label' => 'Adyen payment type'
-            ]
-        );
-
-        $this->rebuildPaymentAttributeModel();
-    }
-
-    private function rebuildPaymentAttributeModel()
-    {
-        /** @var Cache $metaDataCache */
-        $metaDataCache = $this->entityManager->getConfiguration()->getMetadataCacheImpl();
-        if ($metaDataCache) {
-            $metaDataCache->deleteAll();
-        }
-
-        $this->entityManager->generateAttributeModels(['s_core_paymentmeans_attributes']);
+        $this->paymentAttributeUpdater->setReadonlyOnAdyenTypePaymentAttribute(true);
     }
 }
