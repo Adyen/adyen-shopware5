@@ -6,6 +6,7 @@
     <service id="AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsProvider">
         <argument type="service" id="adyen_payment.components.configuration"/>
         <argument type="service" id="AdyenPayment\Components\Adyen\ApiFactory" />
+        <argument type="service" id="adyen_payment.logger.notifications"/>
     </service>
 </services>
 </container>
