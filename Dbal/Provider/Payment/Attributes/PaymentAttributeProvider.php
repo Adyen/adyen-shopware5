@@ -18,14 +18,22 @@ final class PaymentAttributeProvider
         $this->db = $db;
     }
 
-    public function fetchByAdyenType(string $adyenType): array
+    /**
+     * @param string $adyenType
+     * @return int | null
+     */
+    public function fetchPaymentMeanIdByAdyenType(string $adyenType)
     {
+        if ('' === $adyenType) {
+            return null;
+        }
+
         $paymentAttributesResult = $this->db
             ->select()
             ->from('s_core_paymentmeans_attributes')
             ->where('adyen_type=?', $adyenType)
             ->query()
             ->fetchAll();
-        return $paymentAttributesResult[0] ?? [];
+        return $paymentAttributesResult[0]['paymentmeanID'] ?? null;
     }
 }
