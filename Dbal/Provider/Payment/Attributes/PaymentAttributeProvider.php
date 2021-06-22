@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Dbal;
+namespace AdyenPayment\Dbal\Provider\Payment\Attributes;
 
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
 
-class PaymentAttributes
+final class PaymentAttributeProvider
 {
     /**
      * @var Enlight_Components_Db_Adapter_Pdo_Mysql
