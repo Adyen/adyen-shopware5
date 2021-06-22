@@ -10,7 +10,7 @@ final class PluginType
 {
     private static $ADYEN = 2;
 
-    /** @var int|null */
+    /** @var int */
     private $type;
 
     public function __construct($pluginType)
@@ -23,7 +23,7 @@ final class PluginType
     }
 
     /**
-     * @return int|null
+     * @return int
      */
     public function getType()
     {
