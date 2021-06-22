@@ -8,6 +8,7 @@ use Adyen\AdyenException;
 use Adyen\Service\Checkout;
 use AdyenPayment\Components\Adyen\ApiFactory;
 use AdyenPayment\Components\Configuration;
+use Psr\Log\LoggerInterface;
 use Shopware\Models\Shop\Shop;
 
 final class PaymentMethodsProvider implements PaymentMethodsProviderInterface
@@ -20,6 +21,10 @@ final class PaymentMethodsProvider implements PaymentMethodsProviderInterface
      * @var ApiFactory
      */
     private $adyenApiFactory;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     public function __construct(
         Configuration $configuration,
@@ -31,16 +36,18 @@ final class PaymentMethodsProvider implements PaymentMethodsProviderInterface
     }
 
     public function __invoke(Shop $shop): array {
-        $adyenClient = $this->adyenApiFactory->provide($shop);
-        $checkout = new Checkout($adyenClient);
-
         try {
+            $adyenClient = $this->adyenApiFactory->provide($shop);
+            $checkout = new Checkout($adyenClient);
+
             $paymentMethods = $checkout->paymentMethods([
                 'merchantAccount' => $this->configuration->getMerchantAccount($shop),
             ]);
         } catch (AdyenException $e) {
-            // TODO fix exception handling
-            return [];
+            $this->logger->error($e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'previous' => $e->getPrevious()
+            ]);
         }
 
         return $paymentMethods;
