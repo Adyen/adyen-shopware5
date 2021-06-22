@@ -13,7 +13,7 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Shop\Shop;
 
-class PaymentMethodImporter implements PaymentMethodImporterInterface
+final class PaymentMethodImporter implements PaymentMethodImporterInterface
 {
     /**
      * @var PaymentMethodsProviderInterface
@@ -45,7 +45,8 @@ class PaymentMethodImporter implements PaymentMethodImporterInterface
         PaymentMethodMapperInterface $paymentMethodMapper,
         PaymentMethodWriter $paymentMethodWriter,
         ModelManager $entityManager
-    ) {
+    )
+    {
         $this->paymentMethodsProvider = $paymentMethodsProvider;
         $this->shopRepository = $shopRepository;
         $this->usedFallbackConfigRule = $usedFallbackConfigRule;
@@ -54,39 +55,53 @@ class PaymentMethodImporter implements PaymentMethodImporterInterface
         $this->entityManager = $entityManager;
     }
 
-    public function __invoke(): \Generator
+    public function importAll(): \Generator
     {
-        $shops = $this->shopRepository->findAll();
-
         /** @var Shop $shop */
-        foreach($shops as $shop) {
-            $shopId = $shop->getId();
-
-            if (true === ($this->usedFallbackConfigRule)($shopId)) {
+        foreach ($this->shopRepository->findAll() as $shop) {
+            if (true === ($this->usedFallbackConfigRule)($shop->getId())) {
                 continue;
             }
 
-            try {
-                $generator = $this->paymentMethodMapper->mapFromAdyen(
-                    ($this->paymentMethodsProvider)($shop)
-                );
+            yield from $this->import($shop);
+        }
+        $this->entityManager->flush();
+    }
 
-                foreach ($generator as $adyenPaymentMethod) {
-                    $importResult = $this->paymentMethodWriter->saveAsShopwarePaymentMethod(
-                        $adyenPaymentMethod,
-                        $shop
-                    );
-                    yield $importResult;
-                }
+    public function importForShop(Shop $shop): \Generator
+    {
+        yield from $this->import($shop);
 
-                $this->entityManager->flush();
-            } catch (\Exception $exception) {
-                yield ImportResult::fromException(
-                    $shop,
+        $this->entityManager->flush();
+    }
+
+    private function import(Shop $shop): \Generator
+    {
+        try {
+            $generator = $this->paymentMethodMapper->mapFromAdyen(
+                ($this->paymentMethodsProvider)($shop)
+            );
+
+            foreach ($generator as $adyenPaymentMethod) {
+                yield $this->paymentMethodWriter->saveAsShopwarePaymentMethod(
                     $adyenPaymentMethod,
-                    $exception
+                    $shop
                 );
             }
+        } catch (\Exception $exception) {
+            yield ImportResult::fromException(
+                $shop,
+                $adyenPaymentMethod ?? null,
+                $exception
+            );
         }
     }
 }
+
+
+/***
+ * ik hoor u wel
+ *
+ * effe kort samengevat:
+ * ik zou in het cli command o
+ */

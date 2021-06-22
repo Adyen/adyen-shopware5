@@ -11,7 +11,7 @@ final class ImportResult
 {
     /** @var Shop */
     private $shop;
-    /** @var PaymentMethod */
+    /** @var null | PaymentMethod */
     private $paymentMethod;
     /** @var bool */
     private $success;
@@ -38,9 +38,12 @@ final class ImportResult
         return $new;
     }
 
+    /**
+     * @param PaymentMethod | null $paymentMethod
+     */
     public static function fromException(
         Shop $shop,
-        PaymentMethod $paymentMethod,
+        $paymentMethod,
         \Exception $exception
     )
     {
@@ -58,7 +61,10 @@ final class ImportResult
         return $this->shop;
     }
 
-    public function getPaymentMethod(): PaymentMethod
+    /**
+     * @return null|PaymentMethod
+     */
+    public function getPaymentMethod()
     {
         return $this->paymentMethod;
     }
@@ -66,11 +72,6 @@ final class ImportResult
     public function isSuccess(): bool
     {
         return $this->success;
-    }
-
-    public function isUpdated(): bool
-    {
-        return $this->updated;
     }
 
     /**
