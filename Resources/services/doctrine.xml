@@ -7,8 +7,8 @@
             <argument type="service" id="models"/>
             <argument type="service" id="adyen_payment.dbal.payment_attributes"/>
             <argument type="service" id="shopware_attribute.data_persister"/>
-            <argument type="service" id="shopware_attribute.crud_service"/>
             <argument type="service" id="AdyenPayment\Models\Payment\PaymentFactory" />
+            <argument type="service" id="AdyenPayment\Import\PaymentAttributeUpdater" />
         </service>
     </services>
 </container>
