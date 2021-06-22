@@ -8,7 +8,7 @@ use AdyenPayment\Models\PaymentMethod\ImportResult;
 use Psr\Log\LoggerInterface;
 use Shopware\Models\Shop\Shop;
 
-class TraceablePaymentMethodImporter implements PaymentMethodImporterInterface
+final class TraceablePaymentMethodImporter implements PaymentMethodImporterInterface
 {
     /**
      * @var PaymentMethodImporterInterface

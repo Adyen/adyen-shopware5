@@ -11,11 +11,11 @@
             <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentMethodWriter"/>
             <argument type="service" id="models"/>
         </service>
-<!--        <service id="AdyenPayment\Import\TraceablePaymentMethodImporter"-->
-<!--                 decorates="AdyenPayment\Import\PaymentMethodImporter">-->
-<!--            <argument type="service" id="AdyenPayment\Import\TraceablePaymentMethodImporter.inner"/>-->
-<!--            <argument type="service" id="adyen_payment.logger"/>-->
-<!--        </service>-->
+        <service id="AdyenPayment\Import\TraceablePaymentMethodImporter"
+                 decorates="AdyenPayment\Import\PaymentMethodImporter">
+            <argument type="service" id="AdyenPayment\Import\TraceablePaymentMethodImporter.inner"/>
+            <argument type="service" id="adyen_payment.logger"/>
+        </service>
     </services>
 </container>
 

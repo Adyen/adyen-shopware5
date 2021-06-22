@@ -58,11 +58,11 @@ final class PaymentMethodWriter
         $shops = new ArrayCollection([$shop]);
         $countries = $this->fetchCountryList();
 
-        $existingPaymentAttribute = $this->paymentAttributes->fetchByAdyenType($adyenPaymentMethod->getType());
+        $existingPaymentMeanId = $this->paymentAttributes->fetchPaymentMeanIdByAdyenType($adyenPaymentMethod->getType());
         $existingPaymentMethod = null;
-        if (count($existingPaymentAttribute) !== 0) {
+        if (null !== $existingPaymentMeanId) {
             $existingPaymentMethod = $this->paymentRepository->findOneBy([
-                'id' => $existingPaymentAttribute['paymentmeanID']
+                'id' => $existingPaymentMeanId
             ]);
         }
 
