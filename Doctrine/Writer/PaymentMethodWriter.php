@@ -77,7 +77,7 @@ final class PaymentMethodWriter
                 $adyenPaymentMethod->getType()
             );
 
-            return ImportResult::success($shop, $adyenPaymentMethod, true);
+            return ImportResult::success($shop, $adyenPaymentMethod);
         }
 
         $shopwarePaymentModel = Payment::createFromAdyenPaymentMethod($adyenPaymentMethod, $shops, $countries);
@@ -90,7 +90,7 @@ final class PaymentMethodWriter
             $adyenPaymentMethod->getType()
         );
 
-        return ImportResult::success($shop, $adyenPaymentMethod, false);
+        return ImportResult::success($shop, $adyenPaymentMethod);
     }
 
     private function fetchCountryList(): ArrayCollection
