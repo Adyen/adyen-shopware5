@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Doctrine\Enum;
+namespace AdyenPayment\Models\Enum\PaymentMethod;
 
 final class SourceType
 {
