@@ -6,7 +6,7 @@ namespace AdyenPayment\Import;
 
 use AdyenPayment\Components\Adyen\Mapper\PaymentMethodMapperInterface;
 use AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsProviderInterface;
-use AdyenPayment\Doctrine\Writer\PaymentMethodWriter;
+use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
 use AdyenPayment\Models\PaymentMethod\ImportResult;
 use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -32,7 +32,7 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
      */
     private $paymentMethodMapper;
     /**
-     * @var PaymentMethodWriter
+     * @var PaymentMethodWriterInterface
      */
     private $paymentMethodWriter;
     /** @var ModelManager */
@@ -43,7 +43,7 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
         ObjectRepository $shopRepository,
         UsedFallbackConfigRuleInterface $usedFallbackConfigRule,
         PaymentMethodMapperInterface $paymentMethodMapper,
-        PaymentMethodWriter $paymentMethodWriter,
+        PaymentMethodWriterInterface $paymentMethodWriter,
         ModelManager $entityManager
     )
     {
@@ -83,7 +83,7 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
             );
 
             foreach ($generator as $adyenPaymentMethod) {
-                yield $this->paymentMethodWriter->saveAsShopwarePaymentMethod(
+                yield $this->paymentMethodWriter->__invoke(
                     $adyenPaymentMethod,
                     $shop
                 );

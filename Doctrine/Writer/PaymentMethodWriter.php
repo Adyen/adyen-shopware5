@@ -5,97 +5,71 @@ declare(strict_types=1);
 namespace AdyenPayment\Doctrine\Writer;
 
 use AdyenPayment\AdyenPayment;
-use AdyenPayment\Dbal\Provider\Payment\Attributes\PaymentAttributeProvider;
+use AdyenPayment\Dbal\Provider\Payment\PaymentMeanProviderInterface;
+use AdyenPayment\Models\Payment\PaymentFactoryInterface;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use AdyenPayment\Models\PaymentMethod\ImportResult;
 use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Collections\ArrayCollection;
 use Shopware\Bundle\AttributeBundle\Service\CrudServiceInterface;
 use Shopware\Bundle\AttributeBundle\Service\DataPersisterInterface;
 use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
 use Shopware\Components\Model\ModelManager;
-use Shopware\Components\Model\ModelRepository;
 use Shopware\Models\Payment\Payment;
 use Shopware\Models\Shop\Shop;
 
-final class PaymentMethodWriter
+final class PaymentMethodWriter implements PaymentMethodWriterInterface
 {
     /** @var ModelManager */
     private $entityManager;
-    /** @var PaymentAttributeProvider */
-    private $paymentAttributes;
-    /** @var ModelRepository */
-    private $paymentRepository;
-    /** @var ModelRepository */
-    private $countryRepository;
+    /** @var PaymentMeanProviderInterface */
+    private $paymentMeanProvider;
     /** @var DataPersisterInterface */
     private $dataPersister;
     /** @var CrudServiceInterface */
     private $crudService;
+    /** @var PaymentFactoryInterface */
+    private $paymentFactory;
 
     public function __construct(
         ModelManager $entityManager,
-        PaymentAttributeProvider $paymentAttributes,
-        ModelRepository $paymentRepository,
-        ModelRepository $countryRepository,
+        PaymentMeanProviderInterface $paymentMeanProvider,
         DataPersisterInterface $dataPersister,
-        CrudServiceInterface $crudService
-    )
-    {
+        CrudServiceInterface $crudService,
+        PaymentFactoryInterface $paymentFactory
+    ) {
         $this->entityManager = $entityManager;
-        $this->paymentAttributes = $paymentAttributes;
-        $this->paymentRepository = $paymentRepository;
-        $this->countryRepository = $countryRepository;
+        $this->paymentMeanProvider = $paymentMeanProvider;
         $this->dataPersister = $dataPersister;
         $this->crudService = $crudService;
+        $this->paymentFactory = $paymentFactory;
     }
 
-    public function saveAsShopwarePaymentMethod(
+    public function __invoke(
         PaymentMethod $adyenPaymentMethod,
         Shop $shop
     ): ImportResult {
-
-        $shops = new ArrayCollection([$shop]);
-        $countries = $this->fetchCountryList();
-
-        $existingPaymentMeanId = $this->paymentAttributes->fetchPaymentMeanIdByAdyenType($adyenPaymentMethod->getType());
-        $existingPaymentMethod = null;
-        if (null !== $existingPaymentMeanId) {
-            $existingPaymentMethod = $this->paymentRepository->findOneBy([
-                'id' => $existingPaymentMeanId
-            ]);
-        }
-
-        if ($existingPaymentMethod) {
-            $existingPaymentMethod = $existingPaymentMethod->updateFromAdyenPaymentMethod(
-                $adyenPaymentMethod,
-                $shops,
-                $countries
-            );
-            $this->storeAdyenPaymentMethodType(
-                $existingPaymentMethod->getId(),
-                $adyenPaymentMethod->getType()
-            );
-
-            return ImportResult::success($shop, $adyenPaymentMethod);
-        }
-
-        $shopwarePaymentModel = Payment::createFromAdyenPaymentMethod($adyenPaymentMethod, $shops, $countries);
-
-        $this->entityManager->persist($shopwarePaymentModel);
-        $this->entityManager->flush();
+        $payment = $this->write($adyenPaymentMethod, $shop);
 
         $this->storeAdyenPaymentMethodType(
-            $shopwarePaymentModel->getId(),
+            $payment->getId(),
             $adyenPaymentMethod->getType()
         );
 
         return ImportResult::success($shop, $adyenPaymentMethod);
     }
 
-    private function fetchCountryList(): ArrayCollection
+    private function write(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
     {
-        return new ArrayCollection($this->countryRepository->findAll());
+        $swPayment = $this->paymentMeanProvider->provideByAdyenType($adyenPaymentMethod->getType());
+
+        $payment = null !== $swPayment
+            ? $this->paymentFactory->updateFromAdyen($swPayment, $adyenPaymentMethod, $shop)
+            : $this->paymentFactory->createFromAdyen($adyenPaymentMethod, $shop);
+
+        $this->entityManager->persist($payment);
+        $this->entityManager->flush();
+
+        return $payment;
     }
 
     private function storeAdyenPaymentMethodType(
