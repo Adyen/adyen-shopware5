@@ -34,23 +34,14 @@ final class ImportPaymentMethodsCommand extends ShopwareCommand
         $counter = 0;
         $io = new SymfonyStyle($input, $output);
 
-        /** @var ImportResult $importPaymentMethod */
-        foreach ($this->paymentMethodImporter->__invoke() as $importPaymentMethod) {
+        /** @var ImportResult $importResult */
+        foreach ($this->paymentMethodImporter->importAll() as $importResult) {
             ++$counter;
-
-            if ($importPaymentMethod->isUpdated()) {
-                $io->text(sprintf(
-                    'Updated payment method %s for store %s',
-                    $importPaymentMethod->getPaymentMethod()->getType(),
-                    $importPaymentMethod->getShop()->getName()
-                ));
-                continue;
-            }
 
             $io->text(sprintf(
                 'Imported payment method %s for store %s',
-                $importPaymentMethod->getPaymentMethod()->getType(),
-                $importPaymentMethod->getShop()->getName()
+                $importResult->getPaymentMethod() ? $importResult->getPaymentMethod()->getType() : 'n/a',
+                $importResult->getShop()->getName()
             ));
         }
 

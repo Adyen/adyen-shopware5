@@ -6,6 +6,7 @@ namespace AdyenPayment\Import;
 
 use AdyenPayment\Models\PaymentMethod\ImportResult;
 use Psr\Log\LoggerInterface;
+use Shopware\Models\Shop\Shop;
 
 class TraceablePaymentMethodImporter implements PaymentMethodImporterInterface
 {
@@ -26,9 +27,17 @@ class TraceablePaymentMethodImporter implements PaymentMethodImporterInterface
         $this->logger = $logger;
     }
 
-    public function __invoke(): \Generator
+    public function importAll(): \Generator
     {
-        foreach (($this->paymentMethodImporter)() as $importResult) {
+        foreach ($this->paymentMethodImporter->importAll() as $importResult) {
+            $this->log($importResult);
+            yield $importResult;
+        }
+    }
+
+    public function importForShop(Shop $shop): \Generator
+    {
+        foreach ($this->paymentMethodImporter->importForShop($shop) as $importResult) {
             $this->log($importResult);
             yield $importResult;
         }
