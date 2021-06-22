@@ -97,11 +97,3 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
         }
     }
 }
-
-
-/***
- * ik hoor u wel
- *
- * effe kort samengevat:
- * ik zou in het cli command o
- */

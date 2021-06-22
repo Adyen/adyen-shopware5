@@ -15,8 +15,6 @@ final class ImportResult
     private $paymentMethod;
     /** @var bool */
     private $success;
-    /** @var bool */
-    private $updated;
     /** @var null | \Exception */
     private $exception = null;
 
@@ -26,14 +24,12 @@ final class ImportResult
 
     public static function success(
         Shop $shop,
-        PaymentMethod $paymentMethod,
-        bool $updated
-    ) {
+        PaymentMethod $paymentMethod
+    ): ImportResult {
         $new = new self();
         $new->shop = $shop;
         $new->paymentMethod = $paymentMethod;
         $new->success = true;
-        $new->updated = $updated;
 
         return $new;
     }
@@ -45,8 +41,7 @@ final class ImportResult
         Shop $shop,
         $paymentMethod,
         \Exception $exception
-    )
-    {
+    ): ImportResult {
         $new = new self();
         $new->shop = $shop;
         $new->paymentMethod = $paymentMethod;

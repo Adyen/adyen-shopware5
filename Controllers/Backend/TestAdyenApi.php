@@ -1,7 +1,7 @@
 <?php
 
 use AdyenPayment\Components\Adyen\ApiConfigValidator;
-use AdyenPayment\Rule\AdyenApi\UsedMainShopConfigRule;
+use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
@@ -13,7 +13,7 @@ class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Bac
      */
     private $apiConfigValidator;
     /**
-     * @var \AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface
+     * @var UsedFallbackConfigRuleInterface
      */
     private $usedFallbackConfigRule;
 
