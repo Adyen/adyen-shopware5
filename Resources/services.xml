@@ -19,5 +19,6 @@
         <import resource="services/mapper.xml" />
         <import resource="services/doctrine.xml"/>
         <import resource="services/importers.xml" />
+        <import resource="services/factory.xml" />
     </imports>
 </container>
