@@ -24,9 +24,6 @@ final class SourceType
         $this->type = $sourceType;
     }
 
-    /**
-     * @return int
-     */
     public function getType(): int
     {
         return $this->type;
