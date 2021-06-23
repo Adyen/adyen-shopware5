@@ -8,10 +8,6 @@ use AdyenPayment\Models\Payment\PaymentMethod;
 
 class PaymentMethodMapper implements PaymentMethodMapperInterface
 {
-    /**
-     * @param array $data
-     * @return \Generator | PaymentMethod[]
-     */
     public function mapFromAdyen(array $data): \Generator
     {
         if ($data['paymentMethods'] ?? []) {
