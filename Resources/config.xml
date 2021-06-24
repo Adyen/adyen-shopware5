@@ -144,6 +144,7 @@
                                     Shopware.Msg.createGrowlMessage('success', value.responseText)
                                 },
                                 failure: function(response) {
+                                    console.log(response);
                                     if (response.status === 404) {
                                         Shopware.Msg.createGrowlMessage('Plugin Manager', 'A problem occurred while importing Adyen payment methods');
                                     } else {
