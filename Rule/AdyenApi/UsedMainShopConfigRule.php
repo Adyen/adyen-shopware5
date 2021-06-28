@@ -15,8 +15,7 @@ final class UsedMainShopConfigRule implements MainShopRule
 
     public function __construct(
         UsedFallbackConfigRuleInterface $usedFallbackConfigRule
-    )
-    {
+    ) {
         $this->usedFallbackConfigRule = $usedFallbackConfigRule;
     }
 

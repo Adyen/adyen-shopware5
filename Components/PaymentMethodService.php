@@ -19,7 +19,6 @@ use Shopware_Components_Snippet_Manager;
  */
 class PaymentMethodService
 {
-
     const PM_LOGO_FILENAME = [
         'scheme' => 'card',
         'yandex_money' => 'yandex'
