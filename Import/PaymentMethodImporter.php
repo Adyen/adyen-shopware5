@@ -45,8 +45,7 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
         PaymentMethodMapperInterface $paymentMethodMapper,
         PaymentMethodWriterInterface $paymentMethodWriter,
         ModelManager $entityManager
-    )
-    {
+    ) {
         $this->paymentMethodsProvider = $paymentMethodsProvider;
         $this->shopRepository = $shopRepository;
         $this->usedFallbackConfigRule = $usedFallbackConfigRule;

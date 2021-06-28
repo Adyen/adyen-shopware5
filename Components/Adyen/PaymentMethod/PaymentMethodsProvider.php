@@ -29,13 +29,13 @@ final class PaymentMethodsProvider implements PaymentMethodsProviderInterface
     public function __construct(
         Configuration $configuration,
         ApiFactory $adyenApiFactory
-    )
-    {
+    ) {
         $this->configuration = $configuration;
         $this->adyenApiFactory = $adyenApiFactory;
     }
 
-    public function __invoke(Shop $shop): array {
+    public function __invoke(Shop $shop): array
+    {
         try {
             $adyenClient = $this->adyenApiFactory->provide($shop);
             $checkout = new Checkout($adyenClient);

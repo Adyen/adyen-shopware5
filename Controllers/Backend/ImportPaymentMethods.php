@@ -27,17 +27,16 @@ class Shopware_Controllers_Backend_ImportPaymentMethods extends Shopware_Control
         try {
             $counter = 0;
 
-            foreach ($this->paymentMethodImporter->importAll() as $importResult) {
-                ++$counter;
-            }
+            $counter = count(iterator_to_array(
+                $this->paymentMethodImporter->importAll()
+            ));
 
             $this->response->setHttpResponseCode(Response::HTTP_OK);
             $this->View()->assign('responseText', sprintf(
                 'Imported successfully %s payment method(s)',
                 $counter
             ));
-        } catch (Exception $e)
-        {
+        } catch (Exception $e) {
             $this->logger->error($e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -45,10 +44,9 @@ class Shopware_Controllers_Backend_ImportPaymentMethods extends Shopware_Control
             $this->View()->assign(
                 'responseText',
                 sprintf(
-                    'Import of payment methods failed.'
+                    'Import of payment methods failed. Please check the logs for more details.'
                 )
             );
         }
-
     }
 }
