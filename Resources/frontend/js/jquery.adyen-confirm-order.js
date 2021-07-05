@@ -14,7 +14,7 @@
             adyenSetSession: {},
             adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
-            adyenAjaxThreeDsUrl: '/frontend/adyen/ajaxThreeDs',
+            adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
             adyenSnippets: {
                 errorTransactionCancelled: 'Your transaction was cancelled by the Payment Service Provider.',
                 errorTransactionProcessing: 'An error occured while processing your payment.',
@@ -120,11 +120,9 @@
                     break;
                 case 'IdentifyShopper':
                 case 'ChallengeShopper':
-                    me.handleThreeDs(data);
-                    break;
                 case 'Pending':
                 case 'RedirectShopper':
-                    me.handlePaymentDataRedirectShopper(data);
+                    me.handlePaymentDataCreateFromAction(data);
                     break;
                 default:
                     me.handlePaymentDataError(data);
@@ -137,17 +135,17 @@
             $(me.opts.confirmFormSelector).submit();
         },
 
-        handleThreeDs: function (data) {
+        handlePaymentDataCreateFromAction: function (data) {
             var me = this;
-            var threeDsAction = {
+            var payload = {
                 resultCode: data.resultCode,
                 type: data.action.type,
                 subtype: data.action.subtype
             };
-            var modal = $.modal.open('<div id="AdyenThreeDS2"/>', {
+            var modal = $.modal.open('<div id="AdyenModal"/>', {
                 showCloseButton: false,
                 closeOnOverlay: false,
-                additionalClass: 'adyen-challenge-shopper'
+                additionalClass: 'adyen-modal'
             });
 
             me.adyenCheckout
@@ -157,9 +155,9 @@
                         $.ajax({
                             method: 'POST',
                             dataType: 'json',
-                            url: me.opts.adyenAjaxThreeDsUrl,
+                            url: me.opts.adyenAjaxPaymentDetails,
                             data: {
-                                'action': threeDsAction,
+                                'action': payload,
                                 'details': state.data.details,
                             },
                             success: function (response) {
@@ -171,7 +169,7 @@
                         console.error(error);
                     }
                 })
-                .mount('#AdyenThreeDS2');
+                .mount('#AdyenModal');
         },
 
         handlePaymentDataRedirectShopper: function (data) {
