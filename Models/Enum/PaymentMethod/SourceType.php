@@ -7,15 +7,16 @@ namespace AdyenPayment\Models\Enum\PaymentMethod;
 final class SourceType
 {
     // @see Shopware/Models/Payment/Payment.php
+    private static $DEFAULT_PAYMENT = NULL;
     private static $SELF_CREATED = 1;
     private static $ADYEN = 2;
 
     /**
-     * @var int
+     * @var int | null
      */
     private $type;
 
-    public function __construct(int $sourceType)
+    private function __construct($sourceType)
     {
         if (!self::isTypeAllowed($sourceType)) {
             throw new \InvalidArgumentException('Invalid source type: "' . $sourceType . '"');
@@ -24,7 +25,10 @@ final class SourceType
         $this->type = $sourceType;
     }
 
-    public function getType(): int
+    /**
+     * @return int|null
+     */
+    public function getType()
     {
         return $this->type;
     }
@@ -34,7 +38,7 @@ final class SourceType
         return $sourceType->getType() === $this->type;
     }
 
-    public static function load(int $sourceType): self
+    public static function load($sourceType): self
     {
         return new self($sourceType);
     }
@@ -49,7 +53,7 @@ final class SourceType
         return new self(self::$ADYEN);
     }
 
-    public static function isTypeAllowed(int $sourceType): bool
+    public static function isTypeAllowed($sourceType): bool
     {
         return in_array($sourceType, self::availableTypes(), true);
     }
@@ -62,6 +66,7 @@ final class SourceType
     public static function availableTypes(): array
     {
         return [
+            self::$DEFAULT_PAYMENT,
             self::$SELF_CREATED,
             self::$ADYEN
         ];

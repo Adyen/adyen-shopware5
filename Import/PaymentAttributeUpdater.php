@@ -25,18 +25,20 @@ class PaymentAttributeUpdater implements PaymentAttributeUpdaterInterface
         $this->entityManager = $entityManager;
     }
 
-    public function setReadonlyOnAdyenTypePaymentAttribute(bool $readOnly)
+    public function setReadonlyOnAdyenPaymentAttributes(array $columns, bool $readOnly)
     {
-        $this->crudService->update(
-            's_core_paymentmeans_attributes',
-            AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL,
-            TypeMapping::TYPE_STRING,
-            [
-                'displayInBackend' => true,
-                'readonly' => $readOnly,
-                'label' => 'Adyen payment type'
-            ]
-        );
+        foreach ($columns as $column) {
+            $this->crudService->update(
+                's_core_paymentmeans_attributes',
+                $column,
+                TypeMapping::TYPE_STRING,
+                [
+                    'displayInBackend' => true,
+                    'readonly' => $readOnly,
+                    'label' => 'Adyen payment type'
+                ]
+            );
+        }
 
         $this->rebuildPaymentAttributeModel();
     }

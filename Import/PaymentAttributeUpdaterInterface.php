@@ -6,5 +6,8 @@ namespace AdyenPayment\Import;
 
 interface PaymentAttributeUpdaterInterface
 {
-    public function setReadonlyOnAdyenTypePaymentAttribute(bool $readOnly);
+    /**
+     * @param string[] $columns
+     */
+    public function setReadonlyOnAdyenPaymentAttributes(array $columns, bool $readOnly);
 }
