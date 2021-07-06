@@ -20,5 +20,6 @@
         <import resource="services/doctrine.xml"/>
         <import resource="services/importers.xml" />
         <import resource="services/factory.xml" />
+        <import resource="services/enrichers.xml" />
     </imports>
 </container>
