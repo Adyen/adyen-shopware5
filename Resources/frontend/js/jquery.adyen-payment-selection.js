@@ -419,6 +419,7 @@
                 return true;
             }
 
+            // not all adyen payment methods have "details", these cannot be handled by webcomponents (e.g. Paypal)
             return "undefined" !== typeof paymentMethod.metadata.details;
         },
         /**
