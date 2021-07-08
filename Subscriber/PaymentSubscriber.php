@@ -61,7 +61,7 @@ class PaymentSubscriber implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'replaceAdyenMethods',
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'enrichAdyenPaymentMethods',
             'Shopware_Controllers_Frontend_Checkout::getSelectedPayment::before' => 'beforeGetSelectedPayment',
         ];
     }
@@ -82,8 +82,7 @@ class PaymentSubscriber implements SubscriberInterface
      * @return array
      * @throws AdyenException
      */
-    // TODO change method name to enrich...
-    public function replaceAdyenMethods(Enlight_Event_EventArgs $args): array
+    public function enrichAdyenPaymentMethods(Enlight_Event_EventArgs $args): array
     {
         $shopwareMethods = $args->getReturn();
 
