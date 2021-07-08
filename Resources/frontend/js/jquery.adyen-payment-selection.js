@@ -186,7 +186,7 @@
          */
         __retrievePaymentMethodDetailByKey: function (paymentMethod, detailKey) {
             var me = this;
-            var details = (paymentMethod && paymentMethod.metadata.details) || [];
+            var details = (paymentMethod && paymentMethod.metadata && paymentMethod.metadata.details) || [];
             var filteredDetails = details.filter(function (detail) {
                 return detail.key === detailKey
             });
