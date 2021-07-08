@@ -43,13 +43,13 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
 
     /**
      * @param PaymentMethod $adyenMethod
-     * @return string|null
+     * @return string
      */
     private function enrichDescription(PaymentMethod $adyenMethod)
     {
         $description = $this->snippets
             ->getNamespace('adyen/method/description')
-            ->get($adyenMethod->getType());
+            ->get($adyenMethod->getType()) ?? '';
 
         if (!$adyenMethod->isStoredPayment()) {
             return $description;
