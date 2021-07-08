@@ -8,8 +8,5 @@ use AdyenPayment\Models\Payment\PaymentMethod;
 
 interface PaymentMethodEnricherInterface
 {
-    /**
-     * @return array enriched $shopwareMethod
-     */
     public function enrichPaymentMethod(array $shopwareMethod, PaymentMethod $paymentMethod): array;
 }
