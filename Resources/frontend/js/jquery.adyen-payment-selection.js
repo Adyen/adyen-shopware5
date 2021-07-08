@@ -443,7 +443,7 @@
                 paymentMethodData: paymentMethod
             };
 
-            if (this.__isStoredPaymentMethod(paymentMethod || '')) {
+            if (this.__isStoredPaymentMethod(paymentMethod || {})) {
                 return $.extend(true, {}, defaultData, {
                     paymentMethodData: {
                         storedPaymentMethodId: paymentMethod.id
