@@ -42,7 +42,7 @@ final class PaymentAttributesWriter implements PaymentAttributesWriterInterface
         ];
 
         // update read only "false" to allow model changes
-        $this->paymentAttributeUpdater->setReadonlyOnAdyenPaymentAttributes($attributesColumns,false);
+        $this->paymentAttributeUpdater->updateReadonlyOnAdyenPaymentAttributes($attributesColumns,false);
 
         $this->dataPersister->persist(
             $data,
@@ -50,6 +50,6 @@ final class PaymentAttributesWriter implements PaymentAttributesWriterInterface
             $paymentMeanId
         );
 
-        $this->paymentAttributeUpdater->setReadonlyOnAdyenPaymentAttributes($attributesColumns, true);
+        $this->paymentAttributeUpdater->updateReadonlyOnAdyenPaymentAttributes($attributesColumns, true);
     }
 }
