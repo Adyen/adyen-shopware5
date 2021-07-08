@@ -112,14 +112,14 @@
                 return;
             }
 
-            me.selectedPaymentElementId = selectedPaymentElementId; // TODO returns: payment_mean155
-            me.selectedPaymentId = $(event.target).val(); // TODO returns: 155
+            me.selectedPaymentElementId = selectedPaymentElementId;
+            me.selectedPaymentId = $(event.target).val();
         },
         onPaymentChangedAfter: function () {
             var me = this;
 
             // Return & clear when no adyen payment
-            var payment = me.getPaymentMethodById(me.selectedPaymentId); // TODO returns object payment
+            var payment = me.getPaymentMethodById(me.selectedPaymentId);
 
             if (!me.__isAdyenPaymentMethod(payment)) {
                 me.clearPaymentSession();
@@ -480,7 +480,6 @@
          * @private
          */
         __buildMinimalState: function (payment) {
-            console.log('build minimal state');
             return {
                 data: {
                     paymentMethod: {
