@@ -40,32 +40,6 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
         ]);
     }
 
-    public function enrichStoredPaymentMethod(PaymentMethod $paymentMethod): array
-    {
-        $paymentMethodName = $paymentMethod->getValue('name', '');
-        $name = $this->snippets
-            ->getNamespace('adyen/method/name')
-            ->get($paymentMethod->getType(), $paymentMethodName, true);
-
-        return [
-            'id' => $this->provideId($paymentMethod),
-            'name' => $paymentMethod->getType(),
-            'description' => $name,
-            'additionaldescription' => $this->enrichDescription($paymentMethod),
-            'image' => $this->paymentMethodService->getAdyenImageByType($paymentMethod->getType()),
-            'isStoredPayment' => $paymentMethod->isStoredPayment(),
-            'metadata' => $paymentMethod->getRawData()
-        ];
-    }
-
-    /**
-     * Default payment methods do not have an id,  type is used
-     * Stored payment methods have an id which is used
-     */
-    private function provideId(PaymentMethod $adyenMethod): string
-    {
-        return Configuration::PAYMENT_PREFIX.($adyenMethod->getId() ?: $adyenMethod->getType());
-    }
 
     /**
      * @param PaymentMethod $adyenMethod

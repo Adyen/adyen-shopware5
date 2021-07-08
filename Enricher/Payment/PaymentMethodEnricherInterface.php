@@ -12,5 +12,4 @@ interface PaymentMethodEnricherInterface
      * @return array enriched $shopwareMethod
      */
     public function enrichPaymentMethod(array $shopwareMethod, PaymentMethod $paymentMethod): array;
-    public function enrichStoredPaymentMethod(PaymentMethod $paymentMethod): array;
 }
