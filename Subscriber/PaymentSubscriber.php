@@ -9,8 +9,10 @@ use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
+use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Models\Payment\PaymentMethodType;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
@@ -39,6 +41,10 @@ class PaymentSubscriber implements SubscriberInterface
      * @var PaymentMethodEnricherInterface
      */
     private $paymentMethodEnricher;
+    /**
+     * @var PaymentMethodWriterInterface
+     */
+    private $paymentMethodWriter;
 
     /**
      * PaymentSubscriber constructor.
@@ -50,12 +56,14 @@ class PaymentSubscriber implements SubscriberInterface
     public function __construct(
         PaymentMethodService $paymentMethodService,
         ShopwarePaymentMethodService $shopwarePaymentMethodService,
-        PaymentMethodEnricherInterface $paymentMethodEnricher
+        PaymentMethodEnricherInterface $paymentMethodEnricher,
+        PaymentMethodWriterInterface $paymentMethodWriter
     )
     {
         $this->paymentMethodService = $paymentMethodService;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
         $this->paymentMethodEnricher = $paymentMethodEnricher;
+        $this->paymentMethodWriter = $paymentMethodWriter;
     }
 
     public static function getSubscribedEvents(): array
@@ -115,7 +123,12 @@ class PaymentSubscriber implements SubscriberInterface
         );
 
         // TODO: stored payment methods need to follow default shopware way
-        // $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
+         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
+         foreach ($storedPaymentMethods as $storedPaymentMethod) {
+             var_dump($storedPaymentMethod);
+         }
+         $this->saveStoredPaymentMethods($storedPaymentMethods);
+        die();
 
         $paymentMethodEnricher = $this->paymentMethodEnricher;
 
@@ -144,5 +157,12 @@ class PaymentSubscriber implements SubscriberInterface
         }, $shopwareMethods));
 
         return $shopwareMethods;
+    }
+
+    private function saveStoredPaymentMethods(PaymentMethodCollection $storedPaymentMethods)
+    {
+        foreach($storedPaymentMethods as $storedPaymentMethod) {
+             $this->paymentMethodWriter()->__invoke($storedPaymentMethod, $shop);
+        }
     }
 }
