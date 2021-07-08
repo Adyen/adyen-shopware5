@@ -7,7 +7,6 @@
          */
         defaults: {
             adyenClientKey: '',
-            adyenPaymentMethodsResponse: {}, // TODO: check if still needed
             enrichedPaymentMethods: {},
             resetSessionUrl: '',
             /**
@@ -178,19 +177,6 @@
             var paymentMethod = me.opts.enrichedPaymentMethods[id] || {};
 
             return paymentMethod;
-        },
-        /**
-         * @param {String} storedPaymentMethodId
-         * @return {({} | undefined)}
-         */
-        getStoredPaymentMethodById: function (storedPaymentMethodId) {
-            var me = this;
-            var storedPaymentMethods = me.opts.adyenPaymentMethodsResponse['storedPaymentMethods'] || [];
-            var filteredStoredPaymentMethods = storedPaymentMethods.filter(function (paymentMethod) {
-                return paymentMethod.id === storedPaymentMethodId;
-            });
-
-            return filteredStoredPaymentMethods[0] || undefined;
         },
         /**
          * @param {object} paymentMethod
@@ -365,7 +351,7 @@
          */
         __isGiftCardType: function (paymentType) {
             var me = this;
-            var paymentGroups = me.opts.adyenPaymentMethodsResponse['groups'] || [];
+            var paymentGroups = me.adyenConfiguration.paymentMethodsResponse['groups'] || [];
             var filteredGiftCardGroup = paymentGroups.filter(function (group) {
                 return me.defaults.giftCardGroupName === group['name'];
             });
