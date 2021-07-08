@@ -297,7 +297,6 @@
         setPaymentSession: function (state) {
             var me = this;
             me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
-            // TODO verify storePaymentSession
             me.sessionStorage.setItem(me.storePaymentMethodSession, state.data.storePaymentMethod || false);
         },
         clearPaymentSession: function () {
