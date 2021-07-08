@@ -119,6 +119,7 @@ class PaymentSubscriber implements SubscriberInterface
 
         $paymentMethodEnricher = $this->paymentMethodEnricher;
 
+        // TODO: refactor to a collection or more clean structure
         $shopwareMethods = array_filter(array_map(static function (array $shopwareMethod)
         use (
             $adyenPaymentMethods,
