@@ -9,5 +9,5 @@ interface PaymentAttributeUpdaterInterface
     /**
      * @param string[] $columns
      */
-    public function setReadonlyOnAdyenPaymentAttributes(array $columns, bool $readOnly);
+    public function updateReadonlyOnAdyenPaymentAttributes(array $columns, bool $readOnly);
 }
