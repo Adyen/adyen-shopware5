@@ -27,7 +27,6 @@
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
             <argument type="service" id="adyen_payment.components.payment_method_service"/>
             <argument type="service" id="adyen_payment.enricher.payment_method"/>
-            <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentMethodWriter"/>
         </service>
         <service id="adyen_payment.subscriber.backend_order_subscriber" class="AdyenPayment\Subscriber\BackendOrderSubscriber">
             <tag name="shopware.event_subscriber"/>
@@ -63,6 +62,14 @@
         <service id="AdyenPayment\Subscriber\Notification\UpdateOrderPsPSubscriber">
             <argument type="service" id="AdyenPayment\Components\Manager\OrderManager"/>
             <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\ImportSubShopPaymentMethodsSubscriber">
+            <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
+            <argument type="service" id="AdyenPayment\Rule\AdyenApi\IsMainShopConfigRule"/>
+            <argument type="service" id="adyen_payment.dbal.writer.payment.payment_mean_writer"/>
+            <argument type="service" id="AdyenPayment\Import\PaymentMethodImporter" />
+            <tag name="shopware.event_subscriber"/>
+            <tag name="kernel.event_subscriber"/>
         </service>
     </services>
 </container>
