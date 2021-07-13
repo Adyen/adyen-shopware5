@@ -86,6 +86,10 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
                     $adyenPaymentMethod,
                     $shop
                 );
+
+                //TODO
+                // add service
+                // that checks adding payment methods on subshop
             }
         } catch (\Exception $exception) {
             yield ImportResult::fromException(
