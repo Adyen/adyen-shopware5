@@ -41,10 +41,6 @@ class PaymentSubscriber implements SubscriberInterface
      * @var PaymentMethodEnricherInterface
      */
     private $paymentMethodEnricher;
-    /**
-     * @var PaymentMethodWriterInterface
-     */
-    private $paymentMethodWriter;
 
     /**
      * PaymentSubscriber constructor.
@@ -56,14 +52,12 @@ class PaymentSubscriber implements SubscriberInterface
     public function __construct(
         PaymentMethodService $paymentMethodService,
         ShopwarePaymentMethodService $shopwarePaymentMethodService,
-        PaymentMethodEnricherInterface $paymentMethodEnricher,
-        PaymentMethodWriterInterface $paymentMethodWriter
+        PaymentMethodEnricherInterface $paymentMethodEnricher
     )
     {
         $this->paymentMethodService = $paymentMethodService;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
         $this->paymentMethodEnricher = $paymentMethodEnricher;
-        $this->paymentMethodWriter = $paymentMethodWriter;
     }
 
     public static function getSubscribedEvents(): array
@@ -123,12 +117,7 @@ class PaymentSubscriber implements SubscriberInterface
         );
 
         // TODO: stored payment methods need to follow default shopware way
-         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
-         foreach ($storedPaymentMethods as $storedPaymentMethod) {
-             var_dump($storedPaymentMethod);
-         }
-         $this->saveStoredPaymentMethods($storedPaymentMethods);
-        die();
+//         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
 
         $paymentMethodEnricher = $this->paymentMethodEnricher;
 
@@ -157,12 +146,5 @@ class PaymentSubscriber implements SubscriberInterface
         }, $shopwareMethods));
 
         return $shopwareMethods;
-    }
-
-    private function saveStoredPaymentMethods(PaymentMethodCollection $storedPaymentMethods)
-    {
-        foreach($storedPaymentMethods as $storedPaymentMethod) {
-             $this->paymentMethodWriter()->__invoke($storedPaymentMethod, $shop);
-        }
     }
 }
