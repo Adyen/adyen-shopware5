@@ -66,7 +66,7 @@
         <service id="AdyenPayment\Subscriber\ImportSubShopPaymentMethodsSubscriber">
             <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
             <argument type="service" id="AdyenPayment\Rule\AdyenApi\IsMainShopConfigRule"/>
-            <argument type="service" id="adyen_payment.dbal.writer.payment.payment_mean_writer"/>
+            <argument type="service" id="adyen_payment.dbal.writer.payment.payment_means_subshops_writer"/>
             <argument type="service" id="AdyenPayment\Import\PaymentMethodImporter" />
             <tag name="shopware.event_subscriber"/>
             <tag name="kernel.event_subscriber"/>
