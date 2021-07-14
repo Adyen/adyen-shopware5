@@ -71,5 +71,10 @@
             <tag name="shopware.event_subscriber"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+        <service id="AdyenPayment\Subscriber\RemoveSubShopPaymentMethodsSubscriber">
+            <argument type="service" id="adyen_payment.dbal.remover.payment.payment_means_subshops_remover"/>
+            <tag name="shopware.event_subscriber"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 </container>
