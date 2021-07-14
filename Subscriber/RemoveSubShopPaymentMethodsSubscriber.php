@@ -53,8 +53,8 @@ final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
 
     private function isSubShopDeleted($id, $response, string $action): bool
     {
-        return (null !== $id)
-            && (Response::HTTP_OK === $response->getHttpResponseCode())
-            && ($this::DELETE_VALUES_ACTION === $action ?? false);
+        return null !== $id
+            && Response::HTTP_OK === $response->getHttpResponseCode()
+            && self::DELETE_VALUES_ACTION === $action;
     }
 }

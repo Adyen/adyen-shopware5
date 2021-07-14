@@ -84,8 +84,8 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
 
     private function isNewSubShopAdded($id, $response, string $action): bool
     {
-        return (null === $id)
-            && (Response::HTTP_OK === $response->getHttpResponseCode())
-            && ($this::SAVE_VALUES_ACTION === $action ?? false);
+        return null === $id
+            && Response::HTTP_OK === $response->getHttpResponseCode()
+            && self::SAVE_VALUES_ACTION === $action;
     }
 }
