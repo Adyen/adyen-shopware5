@@ -27,13 +27,13 @@ final class PaymentAttributesWriter implements PaymentAttributesWriterInterface
 
     public function storeAdyenPaymentMethodType(
         int $paymentMeanId,
-        PaymentMethod $adyenPaymentMethodType
+        PaymentMethod $adyenPaymentMethod
     ) {
         $data = [
             '_table' => "s_core_paymentmeans_attributes",
             '_foreignKey' => $paymentMeanId,
-            AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL => $adyenPaymentMethodType->getType(),
-            AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID => $adyenPaymentMethodType->getId(),
+            AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL => $adyenPaymentMethod->getType(),
+            AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID => $adyenPaymentMethod->getId(),
         ];
 
         $attributesColumns = [
