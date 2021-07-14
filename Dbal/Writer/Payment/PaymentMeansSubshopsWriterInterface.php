@@ -6,5 +6,5 @@ namespace AdyenPayment\Dbal\Writer\Payment;
 
 interface PaymentMeansSubshopsWriterInterface
 {
-    public function updateAdyenPaymentMethodBySubshopId(int $subshopId);
+    public function registerAdyenPaymentMethodForSubshop(int $subshopId);
 }

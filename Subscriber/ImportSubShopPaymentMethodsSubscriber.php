@@ -64,7 +64,7 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
         $mainShop = $this->shopRepository->find(1);
 
         if (($this->mainShopConfigRuleChain)($shop, $mainShop)) {
-            $this->paymentMeansSubshopsWriter->updateAdyenPaymentMethodBySubshopId($shop->getId());
+            $this->paymentMeansSubshopsWriter->registerAdyenPaymentMethodForSubshop($shop->getId());
             return;
         }
 
