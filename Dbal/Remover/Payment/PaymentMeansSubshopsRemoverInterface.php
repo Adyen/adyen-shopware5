@@ -6,5 +6,5 @@ namespace AdyenPayment\Dbal\Remover\Payment;
 
 interface PaymentMeansSubshopsRemoverInterface
 {
-    public function deleteAllAdyenPaymentMethodsForSubshop(int $subshopId);
+    public function removeBySubShopId(int $subshopId);
 }

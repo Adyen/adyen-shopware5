@@ -18,7 +18,7 @@ final class PaymentMeansSubshopsRemover implements PaymentMeansSubshopsRemoverIn
         $this->db = $db;
     }
 
-    public function deleteAllAdyenPaymentMethodsForSubshop(int $subshopId)
+    public function removeBySubShopId(int $subshopId)
     {
         $this->db->executeQuery(
             'DELETE FROM s_core_paymentmeans_subshops
