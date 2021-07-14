@@ -9,7 +9,7 @@ use AdyenPayment\Import\PaymentAttributeUpdaterInterface;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use Shopware\Bundle\AttributeBundle\Service\DataPersisterInterface;
 
-final class PaymentAttributesWriter implements PaymentAttributesWriterInterface
+final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
 {
     /** @var DataPersisterInterface */
     private $dataPersister;
