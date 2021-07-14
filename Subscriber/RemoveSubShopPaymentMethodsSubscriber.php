@@ -41,7 +41,7 @@ final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
             return;
         }
 
-        $this->paymentMeansSubshopsRemover->deleteAdyenPaymentMethodsForSubshop($args->get('request')->getParam('id'));
+        $this->paymentMeansSubshopsRemover->deleteAllAdyenPaymentMethodsForSubshop($args->get('request')->getParam('id'));
     }
 
     private function isSubShopDeleted($id, $response, string $action): bool
