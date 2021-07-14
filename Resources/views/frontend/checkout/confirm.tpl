@@ -19,8 +19,7 @@
 {block name='frontend_index_body_attributes'}
     {$smarty.block.parent}
     data-adyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
-    data-adyenAjaxIdentifyShopperUrl="{url module='frontend' controller='adyen' action='ajaxIdentifyShopper'}"
-    data-adyenAjaxChallengeShopperUrl="{url module='frontend' controller='adyen' action='ajaxChallengeShopper'}"
+    data-adyenAjaxThreeDsUrl="{url module='frontend' controller='adyen' action='ajaxThreeDs'}"
     {if $mAdyenSnippets}
         data-adyenSnippets="{$mAdyenSnippets}"
     {/if}
