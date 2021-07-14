@@ -9,7 +9,7 @@ use Enlight_Components_Db_Adapter_Pdo_Mysql;
 use Shopware\Components\Model\ModelRepository;
 use Shopware\Models\Payment\Payment;
 
-final class PaymentMeanWriter implements PaymentMeanWriterInterface
+final class PaymentMeansSubshopsWriter implements PaymentMeansSubshopsWriterInterface
 {
     /**
      * @var Enlight_Components_Db_Adapter_Pdo_Mysql

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
-use AdyenPayment\Dbal\Writer\Payment\PaymentMeanWriterInterface;
+use AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubshopsWriterInterface;
 use AdyenPayment\Import\PaymentMethodImporterInterface;
 use AdyenPayment\Rule\AdyenApi\MainShopConfigRule;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -25,9 +25,9 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
      */
     private $mainShopConfigRuleChain;
     /**
-     * @var PaymentMeanWriterInterface
+     * @var PaymentMeansSubshopsWriterInterface
      */
-    private $paymentMeanWriter;
+    private $paymentMeansSubshopsWriter;
     /**
      * @var PaymentMethodImporterInterface
      */
@@ -36,13 +36,13 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
     public function __construct(
         ObjectRepository $shopRepository,
         MainShopConfigRule $mainShopConfigRule,
-        PaymentMeanWriterInterface $paymentMeanWriter,
+        PaymentMeansSubshopsWriterInterface $paymentMeansSubshopsWriter,
         PaymentMethodImporterInterface $paymentMethodImporter
     )
     {
         $this->shopRepository = $shopRepository;
         $this->mainShopConfigRuleChain = $mainShopConfigRule;
-        $this->paymentMeanWriter = $paymentMeanWriter;
+        $this->paymentMeansSubshopsWriter = $paymentMeansSubshopsWriter;
         $this->paymentMethodImporter = $paymentMethodImporter;
     }
 
@@ -64,7 +64,7 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
         $mainShop = $this->shopRepository->find(1);
 
         if (($this->mainShopConfigRuleChain)($shop, $mainShop)) {
-            $this->paymentMeanWriter->updateAdyenPaymentMethodBySubshopId($shop->getId());
+            $this->paymentMeansSubshopsWriter->updateAdyenPaymentMethodBySubshopId($shop->getId());
             return;
         }
 
