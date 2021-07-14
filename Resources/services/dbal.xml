@@ -27,5 +27,10 @@
             class="AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubshopsWriter">
             <argument type="service" id="db"/>
         </service>
+        <service
+                id="adyen_payment.dbal.remover.payment.payment_means_subshops_remover"
+                class="AdyenPayment\Dbal\Remover\Payment\PaymentMeansSubshopsRemover">
+            <argument type="service" id="db"/>
+        </service>
     </services>
 </container>
