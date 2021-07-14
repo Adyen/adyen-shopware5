@@ -100,6 +100,8 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
     /**
      * @throws AdyenException
+     * @deprecated will be removed in 3.0.0 to move closer to a generic implementation,
+     * use paymentDetailsAction() instead
      */
     public function ajaxThreeDsAction()
     {
