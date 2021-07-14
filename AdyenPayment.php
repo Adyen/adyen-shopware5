@@ -34,6 +34,8 @@ class AdyenPayment extends Plugin
     const NAME = 'AdyenPayment';
     const ADYEN_GENERAL_PAYMENT_METHOD = 'adyen_general_payment_method';
     const ADYEN_PAYMENT_PAYMENT_METHOD = 'adyen_payment_payment_method';
+    const ADYEN_PAYMENT_METHOD_LABEL = 'adyen_type';
+    const ADYEN_PAYMENT_STORED_METHOD_ID = 'adyen_stored_method_id';
 
     const SESSION_ADYEN_PAYMENT = 'adyenPayment';
     const SESSION_ADYEN_PAYMENT_VALID = 'adyenPaymentValid';
@@ -183,6 +185,8 @@ class AdyenPayment extends Plugin
     {
         $crudService = $this->container->get('shopware_attribute.crud_service');
         $crudService->delete('s_user_attributes', self::ADYEN_PAYMENT_PAYMENT_METHOD);
+        $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_PAYMENT_METHOD_LABEL);
+        $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_PAYMENT_STORED_METHOD_ID);
 
         $this->rebuildAttributeModels();
     }
@@ -200,6 +204,26 @@ class AdyenPayment extends Plugin
             [
                 'displayInBackend' => true,
                 'label' => 'Adyen Payment Method'
+            ]
+        );
+        $crudService->update(
+            's_core_paymentmeans_attributes',
+            self::ADYEN_PAYMENT_METHOD_LABEL,
+            TypeMapping::TYPE_STRING,
+            [
+                'displayInBackend' => true,
+                'readonly' => true,
+                'label' => 'Adyen payment type'
+            ]
+        );
+        $crudService->update(
+            's_core_paymentmeans_attributes',
+            self::ADYEN_PAYMENT_STORED_METHOD_ID,
+            TypeMapping::TYPE_STRING,
+            [
+                'displayInBackend' => true,
+                'readonly' => true,
+                'label' => 'Adyen stored payment method id'
             ]
         );
 
@@ -246,7 +270,7 @@ class AdyenPayment extends Plugin
             $metaDataCache->deleteAll();
         }
 
-        $this->container->get('models')->generateAttributeModels(['s_user_attributes']);
+        $this->container->get('models')->generateAttributeModels(['s_user_attributes', 's_core_paymentmeans_attributes']);
     }
 }
 

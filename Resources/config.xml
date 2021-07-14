@@ -129,5 +129,34 @@
 				</handler>
             </options>
         </element>
+        <element type="button">
+            <name>importPaymentMethod</name>
+            <label lang="en">Import Adyen payment methods</label>
+            <options>
+                <handler>
+                    <![CDATA[
+                        function() {
+                            Ext.Ajax.request({
+                                url: 'ImportPaymentMethods/import',
+                                params: {},
+                                success: function(response) {
+                                    var value = Ext.decode(response.responseText);
+                                    Shopware.Msg.createGrowlMessage('success', value.responseText)
+                                },
+                                failure: function(response) {
+                                    console.log(response);
+                                    if (response.status === 404) {
+                                        Shopware.Msg.createGrowlMessage('Plugin Manager', 'A problem occurred while importing Adyen payment methods');
+                                    } else {
+                                        var value = Ext.decode(response.responseText);
+                                        Shopware.Msg.createGrowlMessage('failure', value.responseText)
+                                    }
+                                }
+                            });
+                        }
+                    ]]>
+                </handler>
+            </options>
+        </element>
     </elements>
 </config>

@@ -4,6 +4,7 @@ namespace AdyenPayment\Models;
 
 /**
  * Class Event
+ *
  * @package AdyenPayment\Models
  */
 class Event
@@ -31,4 +32,79 @@ class Event
     const BASKET_BEFORE_PROCESS_ORDER_DETAIL = 'Adyen_Basket_Before_ProcessOrderDetail';
     const BASKET_STOPPED_PROCESS_ORDER_DETAIL = 'Adyen_Basket_Stopped_ProcessOrderDetail';
     const BASKET_AFTER_PROCESS_ORDER_DETAIL = 'Adyen_Basket_After_ProcessOrderDetail';
+
+    private static $CRON_PROCESS_NOTIFICATIONS = 'Shopware_CronJob_AdyenPaymentProcessNotifications';
+    private static $CRON_IMPORT_PAYMENT_METHODS = 'AdyenPayment_CronJob_ImportPaymentMethods';
+
+    /**
+     * @var string
+     */
+    private $name;
+
+    private function __construct(string $name)
+    {
+        if (!in_array($name, $this->availableEventNames())) {
+            throw new \InvalidArgumentException('Invalid Event name: "'.$name.'"');
+        }
+
+        $this->name = $name;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function equals(Event $event): bool
+    {
+        return $event->getName() === $this->name;
+    }
+
+    public static function load(string $name): self
+    {
+        return new self($name);
+    }
+
+    public static function cronImportPaymentMethods(): self
+    {
+        return new self(self::$CRON_IMPORT_PAYMENT_METHODS);
+    }
+
+    public static function cronProcessNotifications(): self
+    {
+        return new self(self::$CRON_PROCESS_NOTIFICATIONS);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function availableEventNames(): array
+    {
+        return [
+            self::$CRON_PROCESS_NOTIFICATIONS,
+            self::$CRON_IMPORT_PAYMENT_METHODS,
+
+            self::NOTIFICATION_RECEIVE,
+            self::NOTIFICATION_SAVE_FILTER_NOTIFICATIONS,
+            self::NOTIFICATION_FIND_HANDLERS,
+            self::NOTIFICATION_PROCESS,
+            self::NOTIFICATION_NO_ORDER_FOUND,
+            self::NOTIFICATION_PROCESS_AUTHORISATION,
+            self::NOTIFICATION_PROCESS_CANCELLATION,
+            self::NOTIFICATION_PROCESS_CAPTURE,
+            self::NOTIFICATION_PROCESS_CAPTURE_FAILED,
+            self::NOTIFICATION_PROCESS_OFFER_CLOSED,
+            self::NOTIFICATION_PROCESS_REFUND,
+            self::NOTIFICATION_PROCESS_REFUND_FAILED,
+            self::NOTIFICATION_PROCESS_REFUNDED_REVERSED,
+            self::NOTIFICATION_PROCESS_CHARGEBACK,
+            self::NOTIFICATION_PROCESS_CHARGEBACK_REVERSED,
+            self::ORDER_STATUS_CHANGED,
+            self::ORDER_PAYMENT_STATUS_CHANGED,
+            self::BASKET_RESTORE_FROM_ORDER,
+            self::BASKET_BEFORE_PROCESS_ORDER_DETAIL,
+            self::BASKET_STOPPED_PROCESS_ORDER_DETAIL,
+            self::BASKET_AFTER_PROCESS_ORDER_DETAIL,
+        ];
+    }
 }

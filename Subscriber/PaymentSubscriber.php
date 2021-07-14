@@ -9,9 +9,13 @@ use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
-use AdyenPayment\Serializer\Payment\PaymentMethodSerializer;
+use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
+use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
+use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Models\Payment\PaymentMethodType;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
+use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 /**
  * Class PaymentSubscriber
@@ -34,31 +38,32 @@ class PaymentSubscriber implements SubscriberInterface
      */
     private $skipReplaceAdyenMethods = false;
     /**
-     * @var PaymentMethodSerializer
+     * @var PaymentMethodEnricherInterface
      */
-    private $paymentMethodSerializer;
+    private $paymentMethodEnricher;
 
     /**
      * PaymentSubscriber constructor.
      *
-     * @param PaymentMethodService         $paymentMethodService
+     * @param PaymentMethodService $paymentMethodService
      * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
-     * @param PaymentMethodSerializer      $paymentMethodConverter
+     * @param PaymentMethodEnricherInterface $paymentMethodEnricher
      */
     public function __construct(
         PaymentMethodService $paymentMethodService,
         ShopwarePaymentMethodService $shopwarePaymentMethodService,
-        PaymentMethodSerializer $paymentMethodConverter
-    ) {
+        PaymentMethodEnricherInterface $paymentMethodEnricher
+    )
+    {
         $this->paymentMethodService = $paymentMethodService;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
-        $this->paymentMethodSerializer = $paymentMethodConverter;
+        $this->paymentMethodEnricher = $paymentMethodEnricher;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'replaceAdyenMethods',
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'enrichAdyenPaymentMethods',
             'Shopware_Controllers_Frontend_Checkout::getSelectedPayment::before' => 'beforeGetSelectedPayment',
         ];
     }
@@ -79,7 +84,7 @@ class PaymentSubscriber implements SubscriberInterface
      * @return array
      * @throws AdyenException
      */
-    public function replaceAdyenMethods(Enlight_Event_EventArgs $args): array
+    public function enrichAdyenPaymentMethods(Enlight_Event_EventArgs $args): array
     {
         $shopwareMethods = $args->getReturn();
 
@@ -102,6 +107,7 @@ class PaymentSubscriber implements SubscriberInterface
         if ($paymentMethodOptions['value'] == 0) {
             return $shopwareMethods;
         }
+
         $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
             $this->paymentMethodService->getPaymentMethods(
                 $paymentMethodOptions['countryCode'],
@@ -110,10 +116,35 @@ class PaymentSubscriber implements SubscriberInterface
             )
         );
 
-        if (!$adyenPaymentMethods->count()) {
-            return $shopwareMethods;
-        }
+        // TODO: stored payment methods need to follow default shopware way
+//         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
 
-        return ($this->paymentMethodSerializer)($shopwareMethods, $adyenPaymentMethods);
+        $paymentMethodEnricher = $this->paymentMethodEnricher;
+
+        // TODO: refactor to a collection or more clean structure
+        $shopwareMethods = array_filter(array_map(static function (array $shopwareMethod)
+        use (
+            $adyenPaymentMethods,
+            $paymentMethodEnricher
+        ) {
+            $source = (int)($shopwareMethod['source'] ?? null);
+            if (SourceType::adyenType()->getType() !== $source) {
+                return $shopwareMethod;
+            }
+
+            /** @var Attribute $attribute */
+            $attribute = $shopwareMethod['attribute'];
+            $typeOrId = $attribute->get(AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID)
+                ?: $attribute->get(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL);
+
+            $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($typeOrId);
+            if (!$paymentMethod) {
+                return [];
+            }
+
+            return $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod, $paymentMethod);
+        }, $shopwareMethods));
+
+        return $shopwareMethods;
     }
 }

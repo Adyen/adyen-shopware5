@@ -1,7 +1,7 @@
 <?php
 
 use AdyenPayment\Components\Adyen\ApiConfigValidator;
-use AdyenPayment\Rule\AdyenApi\UsedMainShopConfigRule;
+use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
@@ -13,16 +13,16 @@ class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Bac
      */
     private $apiConfigValidator;
     /**
-     * @var UsedMainShopConfigRule
+     * @var UsedFallbackConfigRuleInterface
      */
-    private $usedMainShopConfigRule;
+    private $usedFallbackConfigRule;
 
     public function preDispatch()
     {
         parent::preDispatch();
 
         $this->apiConfigValidator = $this->get('AdyenPayment\Components\Adyen\ApiConfigValidator');
-        $this->usedMainShopConfigRule = $this->get('AdyenPayment\Rule\AdyenApi\UsedMainShopConfigRule');
+        $this->usedFallbackConfigRule = $this->get('AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule');
     }
 
     public function runAction()
@@ -41,7 +41,7 @@ class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Bac
             return;
         }
 
-        $usedFallback = (1 !== $shopId && ($this->usedMainShopConfigRule)($shopId));
+        $usedFallback = ($this->usedFallbackConfigRule)($shopId);
         $this->response->setHttpResponseCode(Response::HTTP_OK);
         $this->View()->assign('responseText', sprintf(
             '%sAdyen API connection successful.',

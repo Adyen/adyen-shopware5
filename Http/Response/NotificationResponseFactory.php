@@ -32,7 +32,7 @@ class NotificationResponseFactory
         }
 
         return new JsonResponse(Zend_Json::encode(array_map(function ($value) {
-            return $value instanceof \DateTimeInterface ? $value->format(\DateTimeInterface::ISO8601) : $value;
+            return $value instanceof \DateTimeInterface ? $value->format(\DateTime::ISO8601) : $value;
         }, $data)));
     }
 }

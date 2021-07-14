@@ -6,6 +6,7 @@ use AdyenPayment\Components\FifoNotificationLoader;
 use AdyenPayment\Components\FifoTextNotificationLoader;
 use AdyenPayment\Components\IncomingNotificationManager;
 use AdyenPayment\Components\NotificationProcessor;
+use AdyenPayment\Models\Event;
 use AdyenPayment\Models\Feedback\NotificationProcessorFeedback;
 use Enlight\Event\SubscriberInterface;
 use Psr\Log\LoggerInterface;
@@ -69,7 +70,7 @@ class ProcessNotifications implements SubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'Shopware_CronJob_AdyenPaymentProcessNotifications' => 'runCronjob'
+            Event::cronProcessNotifications()->getName() => 'runCronjob',
         ];
     }
 

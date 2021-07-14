@@ -5,9 +5,14 @@
     <services>
         <!-- Console commands -->
         <service class="AdyenPayment\Commands\ProcessNotifications" id="adyen_payment.commands.process_notifications">
-            <tag name="console.command" />
             <argument type="service" id="adyen_payment.components.fifo_notification_loader"/>
             <argument type="service" id="adyen_payment.components.notification_processor"/>
+            <tag name="console.command" command="adyen:payment:process:notifications" />
+        </service>
+
+        <service id="AdyenPayment\Commands\ImportPaymentMethodsCommand">
+            <argument type="service" id="AdyenPayment\Import\PaymentMethodImporter" />
+            <tag name="console.command" command="adyen:import:payment-methods" />
         </service>
     </services>
 </container>
