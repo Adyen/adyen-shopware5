@@ -67,8 +67,8 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
         }
 
         /** @var Shop $shop */
-        $shop = $this->shopRepository->findBy([], ['id' => 'desc'], 1);
-        if (!count($shop)) {
+        $shop = $this->shopRepository->findBy([], ['id' => 'desc'], 1)[0] ?? null;
+        if (null === $shop) {
             return;
         }
 
