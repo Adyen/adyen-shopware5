@@ -55,15 +55,26 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
 
     public function __invoke(\Enlight_Event_EventArgs $args)
     {
-        if (!$this->isNewSubShopAdded($args->get('request')->getParam('id'), $args->get('response'), $args->get('request')->getActionName())) {
+        $request = $args->get('request') ?? false;
+        $response = $args->get('response') ?? false;
+
+        if (!$request || !$response) {
+            return;
+        }
+
+        if (!$this->isNewSubShopAdded($request->getParam('id'), $response, $request->getActionName())) {
             return;
         }
 
         /** @var Shop $shop */
-        $shop = $this->shopRepository->findBy([], ['id' => 'desc'], 1)[0];
+        $shop = $this->shopRepository->findBy([], ['id' => 'desc'], 1);
+        if (!count($shop)) {
+            return;
+        }
+
         $mainShop = $this->shopRepository->find(1);
 
-        if (($this->mainShopConfigRuleChain)($shop, $mainShop)) {
+        if (($this->mainShopConfigRuleChain)($shop[0], $mainShop)) {
             $this->paymentMeansSubshopsWriter->registerAdyenPaymentMethodForSubshop($shop->getId());
             return;
         }
@@ -75,11 +86,6 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
     {
         return (null === $id)
             && (Response::HTTP_OK === $response->getHttpResponseCode())
-            && ($this->isSaveValuesActionTriggered($action));
-    }
-
-    private function isSaveValuesActionTriggered(string $action): bool
-    {
-        return $this::SAVE_VALUES_ACTION === $action ?? false;
+            && ($this::SAVE_VALUES_ACTION === $action ?? false);
     }
 }

@@ -33,26 +33,28 @@ final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
 
     public function __invoke(\Enlight_Event_EventArgs $args)
     {
+        $request = $args->get('request') ?? false;
+        $response = $args->get('response') ?? false;
+
+        if (!$request || !$response) {
+            return;
+        }
+
         if (!$this->isSubShopDeleted(
-            $args->get('request')->getParam('id'),
-            $args->get('response'),
-            $args->get('request')->getActionName())
+            $request->getParam('id'),
+            $response,
+            $request->getActionName())
         ) {
             return;
         }
 
-        $this->paymentMeansSubshopsRemover->deleteAllAdyenPaymentMethodsForSubshop($args->get('request')->getParam('id'));
+        $this->paymentMeansSubshopsRemover->removeBySubShopId($request->getParam('id'));
     }
 
     private function isSubShopDeleted($id, $response, string $action): bool
     {
         return (null !== $id)
             && (Response::HTTP_OK === $response->getHttpResponseCode())
-            && ($this->isDeleteValuesActionTriggered($action));
-    }
-
-    private function isDeleteValuesActionTriggered(string $action): bool
-    {
-        return $this::DELETE_VALUES_ACTION === $action ?? false;
+            && ($this::DELETE_VALUES_ACTION === $action ?? false);
     }
 }
