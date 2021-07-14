@@ -6,8 +6,6 @@ namespace AdyenPayment\Dbal\Writer\Payment;
 
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
-use Shopware\Components\Model\ModelRepository;
-use Shopware\Models\Payment\Payment;
 
 final class PaymentMeansSubshopsWriter implements PaymentMeansSubshopsWriterInterface
 {
@@ -15,36 +13,25 @@ final class PaymentMeansSubshopsWriter implements PaymentMeansSubshopsWriterInte
      * @var Enlight_Components_Db_Adapter_Pdo_Mysql
      */
     private $db;
-    /**
-     * @var ModelRepository
-     */
-    private $paymentRepository;
 
     public function __construct(
-        Enlight_Components_Db_Adapter_Pdo_Mysql $db,
-        ModelRepository $paymentRepository
+        Enlight_Components_Db_Adapter_Pdo_Mysql $db
     )
     {
         $this->db = $db;
-        $this->paymentRepository = $paymentRepository;
     }
 
-    public function updateAdyenPaymentMethodBySubshopId(int $subshopId)
+    public function registerAdyenPaymentMethodForSubshop(int $subshopId)
     {
-        $adyenPaymentMethods = $this->paymentRepository->findBy(
-            ['source' => SourceType::adyenType()->getType()]
+        $this->db->executeQuery(
+            'INSERT INTO s_core_paymentmeans_subshops (paymentID, subshopID) 
+                    SELECT id as paymentID, :subshopID as subshopID
+                    FROM s_core_paymentmeans 
+                    WHERE s_core_paymentmeans.source = :adyenSource;',
+            [
+                ':subshopID' => $subshopId,
+                ':adyenSource' => SourceType::adyenType()->getType()
+            ]
         );
-
-        /** @var Payment $adyenPaymentMethod */
-        foreach ($adyenPaymentMethods as $adyenPaymentMethod) {
-            $result = $this->db->executeQuery(
-                'INSERT INTO s_core_paymentmeans_subshops (paymentID, subshopID)
-                        VALUES (:paymentID, :subshopID)',
-                [
-                    ':paymentID' => $adyenPaymentMethod->getId(),
-                    ':subshopID' => $subshopId
-                ]
-            );
-        }
     }
 }

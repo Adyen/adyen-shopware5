@@ -26,7 +26,6 @@
             id="adyen_payment.dbal.writer.payment.payment_means_subshops_writer"
             class="AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubshopsWriter">
             <argument type="service" id="db"/>
-            <argument type="expression">service('models').getRepository('Shopware\\Models\\Payment\\Payment')</argument>
         </service>
     </services>
 </container>
