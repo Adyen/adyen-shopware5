@@ -7,9 +7,9 @@
             <argument type="service" id="models"/>
             <argument type="service" id="adyen_payment.dbal.payment_attributes"/>
             <argument type="service" id="AdyenPayment\Models\Payment\PaymentFactory" />
-            <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentAttributesWriter"/>
+            <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentAttributeWriter"/>
         </service>
-        <service id="AdyenPayment\Doctrine\Writer\PaymentAttributesWriter">
+        <service id="AdyenPayment\Doctrine\Writer\PaymentAttributeWriter">
             <argument type="service" id="shopware_attribute.data_persister"/>
             <argument type="service" id="AdyenPayment\Import\PaymentAttributeUpdater"/>
         </service>

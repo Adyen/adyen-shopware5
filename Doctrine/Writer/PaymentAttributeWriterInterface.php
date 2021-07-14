@@ -6,7 +6,7 @@ namespace AdyenPayment\Doctrine\Writer;
 
 use AdyenPayment\Models\Payment\PaymentMethod;
 
-interface PaymentAttributesWriterInterface
+interface PaymentAttributeWriterInterface
 {
     public function storeAdyenPaymentMethodType(int $paymentMeanId, PaymentMethod $adyenPaymentMethod);
 }
