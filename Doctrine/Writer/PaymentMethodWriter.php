@@ -50,7 +50,6 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
             return ImportResult::success($shop, $adyenPaymentMethod);
         }
 
-        // normaal
         $payment = $this->write($adyenPaymentMethod, $shop);
 
         $this->paymentAttributeWriter->storeAdyenPaymentMethodType(

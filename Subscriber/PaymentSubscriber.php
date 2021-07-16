@@ -131,7 +131,6 @@ class PaymentSubscriber implements SubscriberInterface
             )
         );
 
-        // TODO: stored payment methods need to follow default shopware way
          $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
          $this->saveStoredPaymentMethods($storedPaymentMethods);
 
