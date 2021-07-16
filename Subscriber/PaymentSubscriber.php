@@ -13,9 +13,11 @@ use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMethodType;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
+use Shopware\Models\Shop\Shop;
 
 /**
  * Class PaymentSubscriber
@@ -41,6 +43,14 @@ class PaymentSubscriber implements SubscriberInterface
      * @var PaymentMethodEnricherInterface
      */
     private $paymentMethodEnricher;
+    /**
+     * @var PaymentMethodWriterInterface
+     */
+    private $paymentMethodWriter;
+    /**
+     * @var ObjectRepository
+     */
+    private $shopRepository;
 
     /**
      * PaymentSubscriber constructor.
@@ -48,16 +58,21 @@ class PaymentSubscriber implements SubscriberInterface
      * @param PaymentMethodService $paymentMethodService
      * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
      * @param PaymentMethodEnricherInterface $paymentMethodEnricher
+     * @param PaymentMethodWriterInterface $paymentMethodWriter
      */
     public function __construct(
         PaymentMethodService $paymentMethodService,
         ShopwarePaymentMethodService $shopwarePaymentMethodService,
-        PaymentMethodEnricherInterface $paymentMethodEnricher
+        PaymentMethodEnricherInterface $paymentMethodEnricher,
+        PaymentMethodWriterInterface $paymentMethodWriter,
+        ObjectRepository $shopRepository
     )
     {
         $this->paymentMethodService = $paymentMethodService;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
         $this->paymentMethodEnricher = $paymentMethodEnricher;
+        $this->paymentMethodWriter = $paymentMethodWriter;
+        $this->shopRepository = $shopRepository;
     }
 
     public static function getSubscribedEvents(): array
@@ -117,7 +132,8 @@ class PaymentSubscriber implements SubscriberInterface
         );
 
         // TODO: stored payment methods need to follow default shopware way
-//         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
+         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
+         $this->saveStoredPaymentMethods($storedPaymentMethods);
 
         $paymentMethodEnricher = $this->paymentMethodEnricher;
 
@@ -146,5 +162,24 @@ class PaymentSubscriber implements SubscriberInterface
         }, $shopwareMethods));
 
         return $shopwareMethods;
+    }
+
+    private function saveStoredPaymentMethods(PaymentMethodCollection $storedPaymentMethods)
+    {
+        // Detached shop cannot be saved with ORM relation mapping
+        // the actual shop entity needs to be fetched.
+        $shopId = Shopware()->Shop() ? Shopware()->Shop()->getId() : 0;
+        if (0 === $shopId) {
+            return;
+        }
+
+        $shop = $this->shopRepository->find($shopId);
+        if (null === $shop) {
+            return;
+        }
+
+        foreach($storedPaymentMethods as $storedPaymentMethod) {
+            $this->paymentMethodWriter->__invoke($storedPaymentMethod, $shop);
+        }
     }
 }

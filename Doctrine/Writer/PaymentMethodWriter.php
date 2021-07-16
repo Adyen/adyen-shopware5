@@ -39,6 +39,18 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
         PaymentMethod $adyenPaymentMethod,
         Shop $shop
     ): ImportResult {
+        if ($adyenPaymentMethod->isStoredPayment()) {
+            $payment = $this->writeStoredPaymentMethod($adyenPaymentMethod, $shop);
+
+            $this->paymentAttributeWriter->storeAdyenPaymentMethodType(
+                $payment->getId(),
+                $adyenPaymentMethod
+            );
+
+            return ImportResult::success($shop, $adyenPaymentMethod);
+        }
+
+        // normaal
         $payment = $this->write($adyenPaymentMethod, $shop);
 
         $this->paymentAttributeWriter->storeAdyenPaymentMethodType(
@@ -56,6 +68,21 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
         $payment = null !== $swPayment
             ? $this->paymentFactory->updateFromAdyen($swPayment, $adyenPaymentMethod, $shop)
             : $this->paymentFactory->createFromAdyen($adyenPaymentMethod, $shop);
+
+        $this->entityManager->persist($payment);
+        $this->entityManager->flush();
+
+        return $payment;
+    }
+
+    private function writeStoredPaymentMethod(PaymentMethod $adyenStoredPaymentMethod, Shop $shop): Payment
+    {
+        $adyenStoredPaymentMethodId = $adyenStoredPaymentMethod->getRawData()['id'] ?? '';
+        $swPayment = $this->paymentMeanProvider->provideByAdyenStoredPaymentMethodId($adyenStoredPaymentMethodId);
+
+        $payment = null !== $swPayment
+            ? $this->paymentFactory->updateFromStoredAdyen($swPayment, $adyenStoredPaymentMethod, $shop)
+            : $this->paymentFactory->createFromStoredAdyen($adyenStoredPaymentMethod, $shop);
 
         $this->entityManager->persist($payment);
         $this->entityManager->flush();
