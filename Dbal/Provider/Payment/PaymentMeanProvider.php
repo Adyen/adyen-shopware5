@@ -38,8 +38,8 @@ final class PaymentMeanProvider implements PaymentMeanProviderInterface
             'SELECT paymentmeanID FROM s_core_paymentmeans_attributes WHERE adyen_type = :adyenType',
             [':adyenType' => $adyenType]
         );
-        $paymentMeanId = (int) $result->fetchColumn();
-        if (!$paymentMeanId) {
+        $paymentMeanId = $result->fetchColumn() === '' ? null : (int) $result->fetchColumn();
+        if (null === $paymentMeanId) {
             return null;
         }
 
