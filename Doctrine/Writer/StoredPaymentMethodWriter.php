@@ -13,7 +13,7 @@ use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Payment\Payment;
 use Shopware\Models\Shop\Shop;
 
-final class PaymentMethodWriter implements PaymentMethodWriterInterface
+class StoredPaymentMethodWriter implements StoredPaymentMethodWriterInterface
 {
     /** @var ModelManager */
     private $entityManager;
@@ -23,56 +23,48 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
     private $paymentFactory;
     /** @var PaymentAttributeWriterInterface */
     private $paymentAttributeWriter;
-    /** @var StoredPaymentMethodWriterInterface */
-    private $storedPaymentMethodWriter;
 
     public function __construct(
         ModelManager $entityManager,
         PaymentMeanProviderInterface $paymentMeanProvider,
         PaymentFactoryInterface $paymentFactory,
-        PaymentAttributeWriterInterface $paymentAttributeWriter,
-        StoredPaymentMethodWriterInterface $storedPaymentMethodWriter
-    ) {
+        PaymentAttributeWriterInterface $paymentAttributeWriter
+    )
+    {
         $this->entityManager = $entityManager;
         $this->paymentMeanProvider = $paymentMeanProvider;
         $this->paymentFactory = $paymentFactory;
         $this->paymentAttributeWriter = $paymentAttributeWriter;
-        $this->storedPaymentMethodWriter = $storedPaymentMethodWriter;
     }
 
-    public function __invoke(
-        PaymentMethod $adyenPaymentMethod,
-        Shop $shop
-    ): ImportResult {
-        if ($adyenPaymentMethod->isStoredPayment()) {
-            return $this->storedPaymentMethodWriter->__invoke($adyenPaymentMethod, $shop);
-        }
-
-        $payment = $this->write($adyenPaymentMethod, $shop);
+    public function __invoke(PaymentMethod $adyenStoredPaymentMethod, Shop $shop): ImportResult
+    {
+        $payment = $this->writeStoredPaymentMethod($adyenStoredPaymentMethod, $shop);
 
         if (null === $payment->getId()) {
             return ImportResult::fromException(
                 $shop,
-                $adyenPaymentMethod,
+                $adyenStoredPaymentMethod,
                 ImportPaymentMethodException::missingId()
             );
         }
 
         $this->paymentAttributeWriter->storeAdyenPaymentMethodType(
             $payment->getId(),
-            $adyenPaymentMethod
+            $adyenStoredPaymentMethod
         );
 
-        return ImportResult::success($shop, $adyenPaymentMethod);
+        return ImportResult::success($shop, $adyenStoredPaymentMethod);
     }
 
-    private function write(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
+    private function writeStoredPaymentMethod(PaymentMethod $adyenStoredPaymentMethod, Shop $shop): Payment
     {
-        $swPayment = $this->paymentMeanProvider->provideByAdyenType($adyenPaymentMethod->getType());
+        $adyenStoredPaymentMethodId = $adyenStoredPaymentMethod->getStoredPaymentMethodId();
+        $swPayment = $this->paymentMeanProvider->provideByAdyenStoredPaymentMethodId($adyenStoredPaymentMethodId);
 
         $payment = null !== $swPayment
-            ? $this->paymentFactory->updateFromAdyen($swPayment, $adyenPaymentMethod, $shop)
-            : $this->paymentFactory->createFromAdyen($adyenPaymentMethod, $shop);
+            ? $this->paymentFactory->updateFromStoredAdyen($swPayment, $adyenStoredPaymentMethod, $shop)
+            : $this->paymentFactory->createFromStoredAdyen($adyenStoredPaymentMethod, $shop);
 
         $this->entityManager->persist($payment);
         $this->entityManager->flush();

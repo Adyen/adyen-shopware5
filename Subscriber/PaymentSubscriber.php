@@ -11,6 +11,7 @@ use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
+use AdyenPayment\Exceptions\ImportPaymentMethodException;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMethodType;
 use Doctrine\Common\Persistence\ObjectRepository;
