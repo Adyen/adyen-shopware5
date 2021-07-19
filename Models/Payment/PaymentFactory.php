@@ -42,7 +42,7 @@ class PaymentFactory implements PaymentFactoryInterface
         return $new;
     }
 
-    public function createFromStoredAdyen(
+    public function createStoredFromAdyen(
         PaymentMethod $adyenPaymentMethod,
         Shop $shop
     ): Payment {
@@ -85,7 +85,7 @@ class PaymentFactory implements PaymentFactoryInterface
         return $payment;
     }
 
-    public function updateFromStoredAdyen(
+    public function updateStoredFromAdyen(
         Payment $payment,
         PaymentMethod $adyenPaymentMethod,
         Shop $shop

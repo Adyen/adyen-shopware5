@@ -63,8 +63,8 @@ class StoredPaymentMethodWriter implements StoredPaymentMethodWriterInterface
         $swPayment = $this->paymentMeanProvider->provideByAdyenStoredPaymentMethodId($adyenStoredPaymentMethodId);
 
         $payment = null !== $swPayment
-            ? $this->paymentFactory->updateFromStoredAdyen($swPayment, $adyenStoredPaymentMethod, $shop)
-            : $this->paymentFactory->createFromStoredAdyen($adyenStoredPaymentMethod, $shop);
+            ? $this->paymentFactory->updateStoredFromAdyen($swPayment, $adyenStoredPaymentMethod, $shop)
+            : $this->paymentFactory->createStoredFromAdyen($adyenStoredPaymentMethod, $shop);
 
         $this->entityManager->persist($payment);
         $this->entityManager->flush();
