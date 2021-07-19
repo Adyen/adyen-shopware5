@@ -10,7 +10,6 @@
         <import resource="services/dbal.xml" />
         <import resource="services/loggers.xml" />
         <import resource="services/managers.xml" />
-        <import resource="services/serializers.xml" />
         <import resource="services/subscribers.xml" />
         <import resource="services/subscribers-cronjob.xml" />
         <import resource="services/validators.xml" />
