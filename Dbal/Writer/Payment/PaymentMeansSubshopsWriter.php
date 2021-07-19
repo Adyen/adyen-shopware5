@@ -16,8 +16,7 @@ final class PaymentMeansSubshopsWriter implements PaymentMeansSubshopsWriterInte
 
     public function __construct(
         Enlight_Components_Db_Adapter_Pdo_Mysql $db
-    )
-    {
+    ) {
         $this->db = $db;
     }
 

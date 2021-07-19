@@ -38,8 +38,7 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
         MainShopConfigRule $mainShopConfigRule,
         PaymentMeansSubshopsWriterInterface $paymentMeansSubshopsWriter,
         PaymentMethodImporterInterface $paymentMethodImporter
-    )
-    {
+    ) {
         $this->shopRepository = $shopRepository;
         $this->mainShopConfigRuleChain = $mainShopConfigRule;
         $this->paymentMeansSubshopsWriter = $paymentMeansSubshopsWriter;

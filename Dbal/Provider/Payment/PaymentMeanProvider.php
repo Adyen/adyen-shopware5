@@ -48,7 +48,7 @@ final class PaymentMeanProvider implements PaymentMeanProviderInterface
 
     public function provideByAdyenStoredPaymentMethodId(string $adyenStoredPaymentMethodId)
     {
-        if  ('' === $adyenStoredPaymentMethodId) {
+        if ('' === $adyenStoredPaymentMethodId) {
             return null;
         }
 

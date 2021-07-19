@@ -19,8 +19,7 @@ final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
 
     public function __construct(
         PaymentMeansSubshopsRemoverInterface $paymentMeansSubshopsRemover
-    )
-    {
+    ) {
         $this->paymentMeansSubshopsRemover = $paymentMeansSubshopsRemover;
     }
 
@@ -43,7 +42,8 @@ final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
         if (!$this->isSubShopDeleted(
             $request->getParam('id'),
             $response,
-            $request->getActionName())
+            $request->getActionName()
+        )
         ) {
             return;
         }

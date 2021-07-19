@@ -29,8 +29,7 @@ class StoredPaymentMethodWriter implements StoredPaymentMethodWriterInterface
         PaymentMeanProviderInterface $paymentMeanProvider,
         PaymentFactoryInterface $paymentFactory,
         PaymentAttributeWriterInterface $paymentAttributeWriter
-    )
-    {
+    ) {
         $this->entityManager = $entityManager;
         $this->paymentMeanProvider = $paymentMeanProvider;
         $this->paymentFactory = $paymentFactory;

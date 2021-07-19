@@ -7,7 +7,7 @@ namespace AdyenPayment\Models\Enum\PaymentMethod;
 final class SourceType
 {
     // @see Shopware/Models/Payment/Payment.php
-    private static $DEFAULT_PAYMENT = NULL;
+    private static $DEFAULT_PAYMENT = null;
     private static $SELF_CREATED = 1;
     private static $ADYEN = 2;
 

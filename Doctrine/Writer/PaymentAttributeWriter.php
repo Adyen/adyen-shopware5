@@ -19,8 +19,7 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
     public function __construct(
         DataPersisterInterface $dataPersister,
         PaymentAttributeUpdaterInterface $paymentAttributeUpdater
-    )
-    {
+    ) {
         $this->dataPersister = $dataPersister;
         $this->paymentAttributeUpdater = $paymentAttributeUpdater;
     }
@@ -46,7 +45,7 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
         ];
 
         // update read only "false" to allow model changes
-        $this->paymentAttributeUpdater->updateReadonlyOnAdyenPaymentAttributes($attributesColumns,false);
+        $this->paymentAttributeUpdater->updateReadonlyOnAdyenPaymentAttributes($attributesColumns, false);
 
         $this->dataPersister->persist(
             $data,

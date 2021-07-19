@@ -20,8 +20,7 @@ class TracebleStoredPaymentMethodWriterDecorator implements StoredPaymentMethodW
     public function __construct(
         StoredPaymentMethodWriterInterface $storedPaymentMethodWriter,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->storedPaymentMethodWriter = $storedPaymentMethodWriter;
         $this->logger = $logger;
     }

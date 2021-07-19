@@ -67,8 +67,7 @@ class PaymentSubscriber implements SubscriberInterface
         PaymentMethodEnricherInterface $paymentMethodEnricher,
         PaymentMethodWriterInterface $paymentMethodWriter,
         ObjectRepository $shopRepository
-    )
-    {
+    ) {
         $this->paymentMethodService = $paymentMethodService;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
         $this->paymentMethodEnricher = $paymentMethodEnricher;
@@ -132,14 +131,13 @@ class PaymentSubscriber implements SubscriberInterface
             )
         );
 
-         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
-         $this->saveStoredPaymentMethods($storedPaymentMethods);
+        $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
+        $this->saveStoredPaymentMethods($storedPaymentMethods);
 
         $paymentMethodEnricher = $this->paymentMethodEnricher;
 
         // TODO: refactor to a collection or more clean structure
-        $shopwareMethods = array_filter(array_map(static function (array $shopwareMethod)
-        use (
+        $shopwareMethods = array_filter(array_map(static function (array $shopwareMethod) use (
             $adyenPaymentMethods,
             $paymentMethodEnricher
         ) {
@@ -178,7 +176,7 @@ class PaymentSubscriber implements SubscriberInterface
             return;
         }
 
-        foreach($storedPaymentMethods as $storedPaymentMethod) {
+        foreach ($storedPaymentMethods as $storedPaymentMethod) {
             $this->paymentMethodWriter->__invoke($storedPaymentMethod, $shop);
         }
     }
