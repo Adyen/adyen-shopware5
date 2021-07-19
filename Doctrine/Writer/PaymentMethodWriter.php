@@ -76,7 +76,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
 
     private function writeStoredPaymentMethod(PaymentMethod $adyenStoredPaymentMethod, Shop $shop): Payment
     {
-        $adyenStoredPaymentMethodId = $adyenStoredPaymentMethod->getRawData()['id'] ?? '';
+        $adyenStoredPaymentMethodId = $adyenStoredPaymentMethod->getStoredPaymentMethodId();
         $swPayment = $this->paymentMeanProvider->provideByAdyenStoredPaymentMethodId($adyenStoredPaymentMethodId);
 
         $payment = null !== $swPayment

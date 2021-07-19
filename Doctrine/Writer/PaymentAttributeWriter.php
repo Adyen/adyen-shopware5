@@ -30,14 +30,14 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
         PaymentMethod $adyenPaymentMethod
     ) {
         if ($adyenPaymentMethod->isStoredPayment()) {
-            $storedPaymentMethodId = $adyenPaymentMethod->getRawData()['id'] ?? '';
+            $storedPaymentMethodId = $adyenPaymentMethod->getStoredPaymentMethodId();
         }
 
         $data = [
             '_table' => "s_core_paymentmeans_attributes",
             '_foreignKey' => $paymentMeanId,
             AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL => $adyenPaymentMethod->getType(),
-            AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID => $storedPaymentMethodId ?? '',
+            AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID => $storedPaymentMethodId,
         ];
 
         $attributesColumns = [

@@ -82,4 +82,9 @@ class PaymentMethod
     {
         return $this->rawData[$key] ?? $fallback;
     }
+
+    public function getStoredPaymentMethodId(): string
+    {
+        return $this->rawData['id'] ?? '';
+    }
 }
