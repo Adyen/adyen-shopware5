@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Import;
+namespace AdyenPayment\Dbal\Updater;
 
 interface PaymentAttributeUpdaterInterface
 {

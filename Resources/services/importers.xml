@@ -16,10 +16,6 @@
             <argument type="service" id="AdyenPayment\Import\TraceablePaymentMethodImporter.inner"/>
             <argument type="service" id="adyen_payment.logger"/>
         </service>
-        <service id="AdyenPayment\Import\PaymentAttributeUpdater">
-            <argument type="service" id="shopware_attribute.crud_service"/>
-            <argument type="service" id="models"/>
-        </service>
     </services>
 </container>
 

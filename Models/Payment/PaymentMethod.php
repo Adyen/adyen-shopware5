@@ -85,6 +85,6 @@ class PaymentMethod
 
     public function getStoredPaymentMethodId(): string
     {
-        return $this->rawData['id'] ?? '';
+        return (string) ($this->rawData['id'] ?? '');
     }
 }

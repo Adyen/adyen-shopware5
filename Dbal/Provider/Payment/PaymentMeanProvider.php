@@ -39,7 +39,7 @@ final class PaymentMeanProvider implements PaymentMeanProviderInterface
             [':adyenType' => $adyenType]
         );
         $paymentMeanId = $result->fetchColumn() === '' ? null : (int) $result->fetchColumn();
-        if (null === $paymentMeanId) {
+        if (0 === $paymentMeanId) {
             return null;
         }
 

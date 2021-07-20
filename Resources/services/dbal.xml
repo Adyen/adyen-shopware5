@@ -32,5 +32,9 @@
                 class="AdyenPayment\Dbal\Remover\Payment\PaymentMeansSubshopsRemover">
             <argument type="service" id="db"/>
         </service>
+        <service id="AdyenPayment\Dbal\Updater\PaymentAttributeUpdater">
+            <argument type="service" id="shopware_attribute.crud_service"/>
+            <argument type="service" id="models"/>
+        </service>
     </services>
 </container>

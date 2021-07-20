@@ -54,7 +54,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
             return ImportResult::fromException(
                 $shop,
                 $adyenPaymentMethod,
-                ImportPaymentMethodException::missingId()
+                ImportPaymentMethodException::missingId($adyenPaymentMethod, $shop)
             );
         }
 

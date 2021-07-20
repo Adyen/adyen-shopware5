@@ -44,7 +44,7 @@ class StoredPaymentMethodWriter implements StoredPaymentMethodWriterInterface
             return ImportResult::fromException(
                 $shop,
                 $adyenStoredPaymentMethod,
-                ImportPaymentMethodException::missingId()
+                ImportPaymentMethodException::missingId($adyenStoredPaymentMethod, $shop)
             );
         }
 
