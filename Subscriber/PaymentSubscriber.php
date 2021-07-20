@@ -114,6 +114,7 @@ class PaymentSubscriber implements SubscriberInterface
             return $shopwareMethods;
         }
 
+        // TODO check
         $shopwareMethods = array_filter($shopwareMethods, function ($method) {
             return $method['name'] !== AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD;
         });

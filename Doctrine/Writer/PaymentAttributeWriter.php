@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Doctrine\Writer;
 
 use AdyenPayment\AdyenPayment;
-use AdyenPayment\Import\PaymentAttributeUpdaterInterface;
+use AdyenPayment\Dbal\Updater\PaymentAttributeUpdaterInterface;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use Shopware\Bundle\AttributeBundle\Service\DataPersisterInterface;
 

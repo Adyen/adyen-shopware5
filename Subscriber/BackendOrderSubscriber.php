@@ -88,6 +88,7 @@ class BackendOrderSubscriber implements SubscriberInterface
             $order['adyenNotification'] = null;
             $order['adyenRefundable'] = false;
 
+            // TODO check
             if ($order['payment']['name'] !== AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD) {
                 continue;
             }
