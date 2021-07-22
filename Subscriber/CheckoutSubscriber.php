@@ -381,7 +381,7 @@ class CheckoutSubscriber implements SubscriberInterface
                 'merchantName' => Shopware()->Shop()->getName()
             ],
         ];
-        if ($this->configuration->getEnvironment() === strtolower(Configuration::ENV_LIVE)) {
+        if ($this->configuration->getEnvironment() === Configuration::ENV_LIVE) {
             $adyenGoogleConfig['environment'] = 'PRODUCTION';
             $adyenGoogleConfig['configuration']['merchantIdentifier'] = $this->configuration->getGoogleMerchantId();
         }
