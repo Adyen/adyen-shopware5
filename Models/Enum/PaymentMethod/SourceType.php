@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Models\Enum\PaymentMethod;
 
+/**
+ * @see \Shopware\Models\Payment\Payment::$source
+ */
 final class SourceType
 {
-    // @see Shopware/Models/Payment/Payment.php
-    private static $DEFAULT_PAYMENT = null;
-    private static $SELF_CREATED = 1;
-    private static $ADYEN = 2;
+    private static $DEFAULT_PAYMENT = null; // Shopware default payment mean source
+    private static $SELF_CREATED = 1; // User created payment mean source
+    private static $ADYEN = 2; // Adyen specific payment mean
 
     /**
      * @var int | null

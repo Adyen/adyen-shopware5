@@ -10,15 +10,17 @@ class PaymentMethodMapper implements PaymentMethodMapperInterface
 {
     public function mapFromAdyen(array $data): \Generator
     {
-        if ($data['paymentMethods'] ?? []) {
-            foreach ($data['paymentMethods'] as $paymentMethod) {
+        $paymentMethods = $data['paymentMethods'] ?? [];
+        if (count($paymentMethods) > 0) {
+            foreach ($paymentMethods as $paymentMethod) {
                 yield PaymentMethod::fromRawPaymentData($paymentMethod);
             }
         }
 
-        if ($data['storedPaymentMethods'] ?? []) {
-            foreach ($data['storedPaymentMethods'] as $paymentMethod) {
-                yield PaymentMethod::fromRawPaymentData($paymentMethod);
+        $storedPaymentMethods = $data['storedPaymentMethods'] ?? [];
+        if (count($storedPaymentMethods)) {
+            foreach ($storedPaymentMethods as $storedPaymentMethod) {
+                yield PaymentMethod::fromRawPaymentData($storedPaymentMethod);
             }
         }
     }

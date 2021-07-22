@@ -70,7 +70,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
     {
         $swPayment = $this->paymentMeanProvider->provideByAdyenType($adyenPaymentMethod->getType());
 
-        $payment = null !== $swPayment
+        $payment = !is_null($swPayment)
             ? $this->paymentFactory->updateFromAdyen($swPayment, $adyenPaymentMethod, $shop)
             : $this->paymentFactory->createFromAdyen($adyenPaymentMethod, $shop);
 

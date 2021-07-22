@@ -40,8 +40,9 @@ final class PaymentMethodsProvider implements PaymentMethodsProviderInterface
             $adyenClient = $this->adyenApiFactory->provide($shop);
             $checkout = new Checkout($adyenClient);
 
+            $merchantAccount = $this->configuration->getMerchantAccount($shop);
             $paymentMethods = $checkout->paymentMethods([
-                'merchantAccount' => $merchantAccount = $this->configuration->getMerchantAccount($shop),
+                'merchantAccount' => $merchantAccount,
             ]);
         } catch (AdyenException $e) {
             $this->logger->error($e->getMessage(), [
