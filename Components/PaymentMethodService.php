@@ -68,28 +68,6 @@ class PaymentMethodService
         $this->adyenPaymentMethodService = $adyenPaymentMethodService;
     }
 
-    // TODO remove
-//
-//    /**
-//     * @return int
-//     */
-//    public function getAdyenPaymentId()
-//    {
-//        if ($this->adyenId) {
-//            return (int)$this->adyenId;
-//        }
-//
-//        $this->adyenId = $this->modelManager->getDBALQueryBuilder()
-//            ->select(['id'])
-//            ->from('s_core_paymentmeans', 'p')
-//            ->where('name = :name')
-//            ->setParameter('name', AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD)
-//            ->setMaxResults(1)
-//            ->execute()
-//            ->fetchColumn();
-//        return (int)$this->adyenId;
-//    }
-
     /**
      * @param bool $prependAdyen
      * @return string

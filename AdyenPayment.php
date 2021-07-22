@@ -37,7 +37,6 @@ class AdyenPayment extends Plugin
     const ADYEN_PAYMENT_METHOD_LABEL = 'adyen_type';
     const ADYEN_PAYMENT_STORED_METHOD_ID = 'adyen_stored_method_id';
 
-    const SESSION_ADYEN_PAYMENT = 'adyenPayment';
     const SESSION_ADYEN_PAYMENT_VALID = 'adyenPaymentValid';
     const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
     const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';
@@ -117,9 +116,6 @@ class AdyenPayment extends Plugin
      */
     public function uninstall(UninstallContext $context)
     {
-//        TODO remove
-//        $this->deactivatePaymentMethods();
-
         if (!$context->keepUserData()) {
             $this->uninstallAttributes($context);
 
@@ -139,50 +135,8 @@ class AdyenPayment extends Plugin
      */
     public function deactivate(DeactivateContext $context)
     {
-        // TODO remove
-//        $this->deactivatePaymentMethods();
-
         $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
     }
-
-    // TODO remove
-//
-//    /**
-//     * @param ActivateContext $context
-//     */
-//    public function activate(ActivateContext $context)
-//    {
-//        /** @var PaymentInstaller $installer */
-//        $installer = $this->container->get('shopware.plugin_payment_installer');
-//
-//        $paymentOptions[] = $this->getPaymentOptions();
-//
-//        foreach ($paymentOptions as $key => $options) {
-//            $installer->createOrUpdate($context->getPlugin(), $options);
-//        }
-//
-//        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
-//    }
-
-//    TODO remove
-//
-//    /**
-//     * Deactivate all Adyen payment methods
-//     */
-//    private function deactivatePaymentMethods()
-//    {
-//        $em = $this->container->get('models');
-//        $qb = $em->createQueryBuilder();
-//
-//        $query = $qb->update('Shopware\Models\Payment\Payment', 'p')
-//            ->set('p.active', '?1')
-//            ->where($qb->expr()->like('p.name', '?2'))
-//            ->setParameter(1, false)
-//            ->setParameter(2, self::ADYEN_GENERAL_PAYMENT_METHOD)
-//            ->getQuery();
-//
-//        $query->execute();
-//    }
 
     /**
      * @param UninstallContext $uninstallContext
@@ -191,8 +145,6 @@ class AdyenPayment extends Plugin
     private function uninstallAttributes(UninstallContext $uninstallContext)
     {
         $crudService = $this->container->get('shopware_attribute.crud_service');
-//        TODO remove
-//        $crudService->delete('s_user_attributes', self::ADYEN_PAYMENT_PAYMENT_METHOD);
         $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_PAYMENT_METHOD_LABEL);
         $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_PAYMENT_STORED_METHOD_ID);
 
@@ -205,16 +157,6 @@ class AdyenPayment extends Plugin
     private function installAttributes()
     {
         $crudService = $this->container->get('shopware_attribute.crud_service');
-//        TODO remove
-//        $crudService->update(
-//            's_user_attributes',
-//            self::ADYEN_PAYMENT_PAYMENT_METHOD,
-//            TypeMapping::TYPE_STRING,
-//            [
-//                'displayInBackend' => true,
-//                'label' => 'Adyen Payment Method'
-//            ]
-//        );
         $crudService->update(
             's_core_paymentmeans_attributes',
             self::ADYEN_PAYMENT_METHOD_LABEL,
@@ -253,25 +195,6 @@ class AdyenPayment extends Plugin
             $entityManager->getClassMetadata(TextNotification::class)
         ];
     }
-
-    // TODO remove
-//
-//    /**
-//     * @return array
-//     */
-//    private function getPaymentOptions()
-//    {
-//        $options = [
-//            'name' => self::ADYEN_GENERAL_PAYMENT_METHOD,
-//            'description' => 'Adyen payment methods',
-//            'action' => null,
-//            'active' => 1,
-//            'position' => 0,
-//            'additionalDescription' => ''
-//        ];
-//
-//        return $options;
-//    }
 
     private function rebuildAttributeModels()
     {
