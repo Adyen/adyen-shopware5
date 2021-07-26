@@ -257,6 +257,11 @@
             var adyenConfigSession = JSON.parse(me.getAdyenConfigSession());
             var adyenConfigTpl = document.querySelector('.adyen-payment-selection.adyen-config').dataset;
 
+            console.log({
+                'pmr': adyenConfigSession.paymentMethodsResponse,
+                'json pmr': JSON.parse(adyenConfigTpl.adyenpaymentmethodsresponse)
+            });
+
             me.adyenConfiguration = {
                 locale: adyenConfigSession ? adyenConfigSession.locale : adyenConfigTpl.shoplocale,
                 environment: adyenConfigSession ? adyenConfigSession.environment : adyenConfigTpl.adyenenvironment,

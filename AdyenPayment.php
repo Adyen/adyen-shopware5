@@ -37,6 +37,7 @@ class AdyenPayment extends Plugin
     const ADYEN_PAYMENT_METHOD_LABEL = 'adyen_type';
     const ADYEN_PAYMENT_STORED_METHOD_ID = 'adyen_stored_method_id';
 
+    const SESSION_ADYEN_PAYMENT = 'adyenPayment';
     const SESSION_ADYEN_PAYMENT_VALID = 'adyenPaymentValid';
     const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
     const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';

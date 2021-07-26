@@ -16,11 +16,7 @@
         </service>
         <service id="adyen_payment.subscriber.payment" class="AdyenPayment\Subscriber\PaymentSubscriber">
             <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
-            <argument type="service" id="adyen_payment.components.payment_method_service"/>
-            <argument type="service" id="adyen_payment.enricher.payment_method"/>
-            <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentMethodWriter"/>
-            <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
+            <argument type="service" id="adyen_payment.components.adyen.payment_method.payment_methods_enricher_service" />
         </service>
         <service id="adyen_payment.subscriber.backend_order_subscriber" class="AdyenPayment\Subscriber\BackendOrderSubscriber">
             <tag name="shopware.event_subscriber"/>
@@ -31,6 +27,18 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="models"/>
             <argument type="service" id="adyen_payment.components.order_mail_service"/>
+        </service>
+        <service id="adyen_payment.subscriber.checkout" class="AdyenPayment\Subscriber\CheckoutSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="adyen_payment.components.configuration"/>
+            <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
+<!--            <argument type="service" id="session"/>-->
+<!--            <argument type="service" id="models"/>-->
+<!--            <argument type="service" id="adyen_payment.components.payment_method_service"/>-->
+<!--            <argument type="service" id="snippets"/>-->
+<!--            <argument type="service" id="front" />-->
+<!--            <argument type="service" id="adyen_payment.components.manager.adyen_manager" />-->
+            <argument type="service" id="adyen_payment.components.data_conversion" />
         </service>
         <service id="adyen_payment.subscriber.notification.log_incoming_notification" class="AdyenPayment\Subscriber\Notification\LogIncomingNotification">
             <tag name="shopware.event_subscriber"/>
