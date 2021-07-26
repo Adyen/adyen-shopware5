@@ -240,8 +240,14 @@ class CheckoutSubscriber implements SubscriberInterface
         $value = $view->getAssign('sBasket')['AmountNumeric'];
 
         // TODO fix
-//        $paymentMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
-        $enrichedPaymentMethods = $this->paymentMethodsEnricherService->__invoke();
+        //        $paymentMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
+
+        // option one: dump the contents of the event $subject and see if the shopware payment means are available
+        // this is a deprecated way: there must be an alternative
+        $enrichedPaymentMethods = ($this->paymentMethodsEnricherService)($subject->getPayments()); // \Shopware_Controllers_Frontend_Checkout::getPayments
+
+        // get them from the event object: fro the view (feels a bit dirty but could workd)
+        $enrichedPaymentMethods = ($this->paymentMethodsEnricherService)($subject->View()->getAssign('sPayments'));
 
         $shop = Shopware()->Shop();
 
