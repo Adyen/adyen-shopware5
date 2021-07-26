@@ -17,6 +17,7 @@ use AdyenPayment\Components\DataConversion;
 use AdyenPayment\Components\Manager\AdyenManager;
 use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\AdyenPayment;
+use sAdmin;
 use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Components_Snippet_Manager;
@@ -76,7 +77,12 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var PaymentMethodsEnricherServiceInterface
      */
     private $paymentMethodsEnricherService;
-//
+
+    /**
+     * @var sAdmin
+     */
+    private $admin;
+
     public function __construct(
         Configuration $configuration,
         PaymentMethodService $paymentMethodService,
@@ -239,15 +245,8 @@ class CheckoutSubscriber implements SubscriberInterface
         $currency = $view->getAssign('sBasket')['sCurrencyName'];
         $value = $view->getAssign('sBasket')['AmountNumeric'];
 
-        // TODO fix
-        //        $paymentMethods = $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value);
-
-        // option one: dump the contents of the event $subject and see if the shopware payment means are available
-        // this is a deprecated way: there must be an alternative
-        $enrichedPaymentMethods = ($this->paymentMethodsEnricherService)($subject->getPayments()); // \Shopware_Controllers_Frontend_Checkout::getPayments
-
-        // get them from the event object: fro the view (feels a bit dirty but could workd)
-        $enrichedPaymentMethods = ($this->paymentMethodsEnricherService)($subject->View()->getAssign('sPayments'));
+        $this->admin = Shopware()->Modules()->Admin();
+        $enrichedPaymentMethods = $this->paymentMethodsEnricherService->__invoke($this->admin->sGetPaymentMeans());
 
         $shop = Shopware()->Shop();
 
@@ -255,8 +254,6 @@ class CheckoutSubscriber implements SubscriberInterface
             "shopLocale" => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
             "clientKey" => $this->configuration->getClientKey($shop),
             "environment" => $this->configuration->getEnvironment($shop),
-            // TODO fix
-//            "paymentMethods" => json_encode($paymentMethods),
             "enrichedPaymentMethods" => $enrichedPaymentMethods,
             "paymentMethodPrefix" => $this->configuration->getPaymentMethodPrefix($shop),
         ];
