@@ -257,19 +257,23 @@
             var adyenConfigSession = JSON.parse(me.getAdyenConfigSession());
             var adyenConfigTpl = document.querySelector('.adyen-payment-selection.adyen-config').dataset;
 
-            console.log({
-                'pmr': adyenConfigSession.paymentMethodsResponse,
-                'json pmr': JSON.parse(adyenConfigTpl.adyenpaymentmethodsresponse)
-            });
+            var adyenPaymentMethodsResponseConfig = Object.values(me.opts.enrichedPaymentMethods).reduce(
+                function (rawAdyen, enrichedPaymentMethod) {
+                    var isAdyenPaymentMethod = enrichedPaymentMethod.isAdyenPaymentMethod || false;
+                    if (true === isAdyenPaymentMethod) {
+                        rawAdyen.push(enrichedPaymentMethod.metadata);
+                    }
+
+                    return rawAdyen;
+                },
+                []
+            );
 
             me.adyenConfiguration = {
                 locale: adyenConfigSession ? adyenConfigSession.locale : adyenConfigTpl.shoplocale,
                 environment: adyenConfigSession ? adyenConfigSession.environment : adyenConfigTpl.adyenenvironment,
                 clientKey: adyenConfigSession ? adyenConfigSession.clientKey : adyenConfigTpl.adyenclientkey,
-                paymentMethodsResponse:
-                    adyenConfigSession
-                        ? adyenConfigSession.paymentMethodsResponse
-                        : JSON.parse(adyenConfigTpl.adyenpaymentmethodsresponse),
+                paymentMethodsResponse: Object.assign({}, adyenPaymentMethodsResponseConfig),
                 onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
             };
         },
