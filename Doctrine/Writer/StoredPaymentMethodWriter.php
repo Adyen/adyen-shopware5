@@ -38,22 +38,11 @@ class StoredPaymentMethodWriter implements StoredPaymentMethodWriterInterface
 
     public function __invoke(PaymentMethod $adyenStoredPaymentMethod, Shop $shop): ImportResult
     {
-        $importResult = $this->writeStoredPaymentMethod($adyenStoredPaymentMethod, $shop);
-
-        if (!$importResult->isSuccess()) {
-            return $importResult;
-        }
-
-        return ImportResult::success($shop, $adyenStoredPaymentMethod, ImportStatus::createdType());
-    }
-
-    private function writeStoredPaymentMethod(PaymentMethod $adyenStoredPaymentMethod, Shop $shop): ImportResult
-    {
         $adyenStoredPaymentMethodId = $adyenStoredPaymentMethod->getStoredPaymentMethodId();
         $swPayment = $this->paymentMeanProvider->provideByAdyenStoredPaymentMethodId($adyenStoredPaymentMethodId);
 
         if (null !== $swPayment) {
-            return ImportResult::success($shop, $swPayment, ImportStatus::notChangedType());
+            return ImportResult::success($shop, $swPayment, ImportStatus::notImportedStatus());
         }
 
         $payment = $this->paymentFactory->createStoredFromAdyen($adyenStoredPaymentMethod, $shop);
@@ -74,6 +63,6 @@ class StoredPaymentMethodWriter implements StoredPaymentMethodWriterInterface
             $adyenStoredPaymentMethod
         );
 
-        return ImportResult::success($shop, $adyenStoredPaymentMethod, ImportStatus::createdType());
+        return ImportResult::success($shop, $adyenStoredPaymentMethod, ImportStatus::createdStatus());
     }
 }
