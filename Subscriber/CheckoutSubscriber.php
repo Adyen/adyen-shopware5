@@ -53,11 +53,11 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var ShopwarePaymentMethodService
      */
     private $shopwarePaymentMethodService;
-//
-//    /**
-//     * @var Shopware_Components_Snippet_Manager
-//     */
-//    private $snippets;
+
+    /**
+     * @var Shopware_Components_Snippet_Manager
+     */
+    private $snippets;
 //
 //    /**
 //     * @var \Enlight_Controller_Front
@@ -89,7 +89,7 @@ class CheckoutSubscriber implements SubscriberInterface
 //        Enlight_Components_Session_Namespace $session,
 //        ModelManager $modelManager,
         ShopwarePaymentMethodService $shopwarePaymentMethodService,
-//        Shopware_Components_Snippet_Manager $snippets,
+        Shopware_Components_Snippet_Manager $snippets,
 //        Enlight_Controller_Front $front,
 //        AdyenManager $adyenManager,
         DataConversion $dataConversion,
@@ -100,7 +100,7 @@ class CheckoutSubscriber implements SubscriberInterface
 //        $this->session = $session;
 //        $this->modelManager = $modelManager;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
-//        $this->snippets = $snippets;
+        $this->snippets = $snippets;
 //        $this->front = $front;
 //        $this->adyenManager = $adyenManager;
         $this->dataConversion = $dataConversion;
@@ -145,14 +145,14 @@ class CheckoutSubscriber implements SubscriberInterface
 //        $this->rewritePaymentData($subject);
         $this->addAdyenConfigOnShipping($subject);
         $this->addAdyenGooglePay($subject);
-//
-//        if (in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
-//            $this->addPaymentSnippets($subject);
-//        }
-//
-//        if (in_array($subject->Request()->getActionName(), ['confirm'])) {
-//            $this->addConfirmSnippets($subject);
-//        }
+
+        if (in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
+            $this->addPaymentSnippets($subject);
+        }
+
+        if (in_array($subject->Request()->getActionName(), ['confirm'])) {
+            $this->addConfirmSnippets($subject);
+        }
     }
 
 //    TODO remove
@@ -261,76 +261,70 @@ class CheckoutSubscriber implements SubscriberInterface
         $view->assign('sAdyenConfig', $adyenConfig);
     }
 
+    /**
+     * @param Shopware_Controllers_Frontend_Checkout $subject
+     */
+    private function addConfirmSnippets(Shopware_Controllers_Frontend_Checkout $subject)
+    {
+        $errorSnippets = $this->snippets->getNamespace('adyen/checkout/error');
 
-//    TODO remove
-//
-//    /**
-//     * @param Shopware_Controllers_Frontend_Checkout $subject
-//     */
-//    private function addConfirmSnippets(Shopware_Controllers_Frontend_Checkout $subject)
-//    {
-//        $errorSnippets = $this->snippets->getNamespace('adyen/checkout/error');
-//
-//        $snippets = [];
-//        $snippets['errorTransactionCancelled'] = $errorSnippets->get(
-//            'errorTransactionCancelled',
-//            'Your transaction was cancelled by the Payment Service Provider.',
-//            true
-//        );
-//        $snippets['errorTransactionProcessing'] = $errorSnippets->get(
-//            'errorTransactionProcessing',
-//            'An error occured while processing your payment.',
-//            true
-//        );
-//        $snippets['errorTransactionRefused'] = $errorSnippets->get(
-//            'errorTransactionRefused',
-//            'Your transaction was refused by the Payment Service Provider.',
-//            true
-//        );
-//        $snippets['errorTransactionUnknown'] = $errorSnippets->get(
-//            'errorTransactionUnknown',
-//            'Your transaction was cancelled due to an unknown reason.',
-//            true
-//        );
-//        $snippets['errorTransactionNoSession'] = $errorSnippets->get(
-//            'errorTransactionNoSession',
-//            'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
-//            true
-//        );
-//
-//        $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
-//    }
-//
+        $snippets = [];
+        $snippets['errorTransactionCancelled'] = $errorSnippets->get(
+            'errorTransactionCancelled',
+            'Your transaction was cancelled by the Payment Service Provider.',
+            true
+        );
+        $snippets['errorTransactionProcessing'] = $errorSnippets->get(
+            'errorTransactionProcessing',
+            'An error occured while processing your payment.',
+            true
+        );
+        $snippets['errorTransactionRefused'] = $errorSnippets->get(
+            'errorTransactionRefused',
+            'Your transaction was refused by the Payment Service Provider.',
+            true
+        );
+        $snippets['errorTransactionUnknown'] = $errorSnippets->get(
+            'errorTransactionUnknown',
+            'Your transaction was cancelled due to an unknown reason.',
+            true
+        );
+        $snippets['errorTransactionNoSession'] = $errorSnippets->get(
+            'errorTransactionNoSession',
+            'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
+            true
+        );
 
-//    TODO remove
-//
-//    /**
-//     * @param Shopware_Controllers_Frontend_Checkout $subject
-//     */
-//    private function addPaymentSnippets(Shopware_Controllers_Frontend_Checkout $subject)
-//    {
-//        $paymentSnippets = $this->snippets->getNamespace('adyen/checkout/payment');
-//
-//        $snippets = [
-//            'updatePaymentInformation' => $paymentSnippets->get(
-//                'updatePaymentInformation',
-//                'Update your payment information',
-//                true
-//            ),
-//            'storedPaymentMethodTitle' => $paymentSnippets->get(
-//                'storedPaymentMethodTitle',
-//                'Stored payment methods',
-//                true
-//            ),
-//            'paymentMethodTitle' => $paymentSnippets->get(
-//                'paymentMethodTitle',
-//                'Payment methods',
-//                true
-//            ),
-//        ];
-//
-//        $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
-//    }
+        $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
+    }
+
+    /**
+     * @param Shopware_Controllers_Frontend_Checkout $subject
+     */
+    private function addPaymentSnippets(Shopware_Controllers_Frontend_Checkout $subject)
+    {
+        $paymentSnippets = $this->snippets->getNamespace('adyen/checkout/payment');
+
+        $snippets = [
+            'updatePaymentInformation' => $paymentSnippets->get(
+                'updatePaymentInformation',
+                'Update your payment information',
+                true
+            ),
+            'storedPaymentMethodTitle' => $paymentSnippets->get(
+                'storedPaymentMethodTitle',
+                'Stored payment methods',
+                true
+            ),
+            'paymentMethodTitle' => $paymentSnippets->get(
+                'paymentMethodTitle',
+                'Payment methods',
+                true
+            ),
+        ];
+
+        $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
+    }
 //
 
 //    TODO remove
