@@ -141,7 +141,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $subject = $args->getSubject();
 
 //        $this->checkBasketAmount($subject);
-//        $this->checkFirstCheckoutStep($subject);
+        $this->checkFirstCheckoutStep($subject);
 //        $this->rewritePaymentData($subject);
         $this->addAdyenConfigOnShipping($subject);
 //        $this->addAdyenGooglePay($subject);
@@ -434,72 +434,63 @@ class CheckoutSubscriber implements SubscriberInterface
 
 //    TODO remove
 //
-//    /**
-//     * @param Shopware_Controllers_Frontend_Checkout $subject
-//     * @throws AdyenException
-//     */
-//    private function checkFirstCheckoutStep(Shopware_Controllers_Frontend_Checkout $subject)
-//    {
-//        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
-//            return;
-//        }
-//
-//        if ($this->shouldRedirectToStep2($subject)) {
-//            $subject->forward(
-//                'shippingPayment',
-//                'checkout'
-//            );
-//        }
-//    }
-//
+    /**
+     * @param Shopware_Controllers_Frontend_Checkout $subject
+     * @throws AdyenException
+     */
+    private function checkFirstCheckoutStep(Shopware_Controllers_Frontend_Checkout $subject)
+    {
+        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+            return;
+        }
 
-//    //    TODO remove
-//    /**
-//     * @param Shopware_Controllers_Frontend_Checkout $subject
-//     * @return bool
-//     * @throws AdyenException
-//     */
-//    private function shouldRedirectToStep2(Shopware_Controllers_Frontend_Checkout $subject): bool
-//    {
-//        // is shopware payment adyen
-//        // zoja doe verder
-//        // zonee
-//
-//        $userData = $subject->View()->getAssign('sUserData');
-//        if (!$userData['additional'] ||
-//            !$userData['additional']['payment'] ||
-//            $userData['additional']['payment']['name'] !== AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD) {
-//            return false;
-//        }
-//
-//        $countryCode = Shopware()->Session()->sOrderVariables['sUserData']['additional']['country']['countryiso'];
-//        $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
-//        $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
-//
-//        $selectedType = $userData['additional']['user'][AdyenPayment::ADYEN_PAYMENT_PAYMENT_METHOD];
-//
-//        if ($selectedType === null) {
-//            return true;
-//        }
-//
-//        $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
-//            $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value)
-//        );
-//
-//        $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($selectedType);
-//        if (!$paymentMethod) {
-//            return true;
-//        }
-//
-//        if (!$paymentMethod->getValue('details') && !$paymentMethod->isStoredPayment()) {
-//            $subject->View()->assign('sAdyenSetSession', $paymentMethod->serializeMinimalState());
-//
-//            return false;
-//        }
-//
-//        return !$this->session->offsetExists(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
-//    }
-//
+        if ($this->shouldRedirectToStep2($subject)) {
+            $subject->forward(
+                'shippingPayment',
+                'checkout'
+            );
+        }
+    }
+
+
+    /**
+     * @param Shopware_Controllers_Frontend_Checkout $subject
+     * @return bool
+     * @throws AdyenException
+     */
+    private function shouldRedirectToStep2(Shopware_Controllers_Frontend_Checkout $subject): bool
+    {
+        $userData = $subject->View()->getAssign('sUserData');
+
+        if (!$userData['additional'] ||
+            !$userData['additional']['payment'] ||
+            (int) $userData['additional']['payment']['source'] !== SourceType::adyenType()->getType()) {
+            return false;
+        }
+
+        $countryCode = Shopware()->Session()->sOrderVariables['sUserData']['additional']['country']['countryiso'];
+        $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
+        $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
+
+        $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
+            $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value)
+        );
+
+            $selectedId = $userData['additional']['payment']['id'];
+        $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($selectedId);
+        if (!$paymentMethod) {
+            return true;
+        }
+
+        if (!$paymentMethod->getValue('details') && !$paymentMethod->isStoredPayment()) {
+            $subject->View()->assign('sAdyenSetSession', $paymentMethod->serializeMinimalState());
+
+            return false;
+        }
+
+        return !$this->session->offsetExists(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
+    }
+
 //
 //    private function revertToDefaultPaymentMethod(Shopware_Controllers_Frontend_Checkout $subject)
 //    {
