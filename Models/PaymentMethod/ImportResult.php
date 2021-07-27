@@ -52,7 +52,7 @@ final class ImportResult
         $new->paymentMethod = $paymentMethod;
         $new->success = false;
         $new->exception = $exception;
-        $new->status = ImportStatus::notImportedStatus();
+        $new->status = ImportStatus::notHandledStatus();
 
         return $new;
     }

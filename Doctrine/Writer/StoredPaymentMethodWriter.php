@@ -42,7 +42,7 @@ class StoredPaymentMethodWriter implements StoredPaymentMethodWriterInterface
         $swPayment = $this->paymentMeanProvider->provideByAdyenStoredPaymentMethodId($adyenStoredPaymentMethodId);
 
         if (null !== $swPayment) {
-            return ImportResult::success($shop, $swPayment, ImportStatus::notImportedStatus());
+            return ImportResult::success($shop, $swPayment, ImportStatus::notChangedStatus());
         }
 
         $payment = $this->paymentFactory->createStoredFromAdyen($adyenStoredPaymentMethod, $shop);

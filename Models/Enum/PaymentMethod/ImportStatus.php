@@ -10,16 +10,14 @@ final class ImportStatus
 {
     private static $CREATED = 'CREATED';
     private static $NOT_CHANGED = 'NOT_CHANGED';
-    private static $NOT_IMPORTED = 'NOT_IMPORTED';
+    private static $NOT_HANDLED = 'NOT_HANDLED';
 
     /** @var string */
     private $status;
 
-    public function __construct($status)
+    public function __construct(string $status)
     {
-        Assertion::string($status);
-
-        if (!self::isStatusAllowed($status)) {
+        if (!self::availableStatuses($status)) {
             throw new \InvalidArgumentException('Invalid import status: "' . $status . '"');
         }
 
@@ -51,25 +49,19 @@ final class ImportStatus
         return new self(self::$NOT_CHANGED);
     }
 
-    public static function notImportedStatus()
+    public static function notHandledStatus()
     {
-        return new self(self::$NOT_IMPORTED);
+        return new self(self::$NOT_HANDLED);
     }
 
-    public static function isStatusAllowed(string $status): bool
+    public static function availableStatuses(string $status): bool
     {
-        return in_array($status, self::availableStatuses(), true);
-    }
-
-    /**
-     * @return string[]
-     */
-    public static function availableStatuses(): array
-    {
-        return [
+        $availableStatuses = [
             self::$CREATED,
             self::$NOT_CHANGED,
-            self::$NOT_IMPORTED
+            self::$NOT_HANDLED
         ];
+
+        return in_array($status, $availableStatuses, true);
     }
 }
