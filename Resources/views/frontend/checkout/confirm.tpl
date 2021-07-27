@@ -29,10 +29,11 @@
     {if $sAdyenGoogleConfig}
         data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
     {/if}
+    {* TODO: fix   *}
     {if $sAdyenSetSession}
         data-adyenSetSession='{$sAdyenSetSession}'
     {/if}
-    {if $sUserData.additional.payment.name == 'adyen_general_payment_method'}
+    {if $sUserData.additional.payment.source == 2}
         data-adyenIsAdyenPayment='true'
     {/if}
 {/block}

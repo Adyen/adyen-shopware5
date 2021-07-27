@@ -5,21 +5,9 @@ declare(strict_types=1);
 namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
-use AdyenPayment\AdyenPayment;
-use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsEnricherServiceInterface;
-use AdyenPayment\Components\Adyen\PaymentMethodService;
-use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
-use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
-use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
-use AdyenPayment\Exceptions\ImportPaymentMethodException;
-use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
-use AdyenPayment\Models\Payment\PaymentMethodType;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
-use Shopware\Models\Shop\Shop;
 
 /**
  * Class PaymentSubscriber

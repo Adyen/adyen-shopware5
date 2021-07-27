@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Models\PaymentMethod;
 
+use AdyenPayment\Models\Enum\PaymentMethod\ImportStatus;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use Shopware\Models\Shop\Shop;
 
@@ -17,6 +18,8 @@ final class ImportResult
     private $success;
     /** @var null | \Exception */
     private $exception = null;
+    /** @var ImportStatus */
+    private $status;
 
     private function __construct()
     {
@@ -24,12 +27,14 @@ final class ImportResult
 
     public static function success(
         Shop $shop,
-        PaymentMethod $paymentMethod
+        PaymentMethod $paymentMethod,
+        ImportStatus $importStatus
     ): ImportResult {
         $new = new self();
         $new->shop = $shop;
         $new->paymentMethod = $paymentMethod;
         $new->success = true;
+        $new->status = $importStatus;
 
         return $new;
     }
@@ -47,6 +52,7 @@ final class ImportResult
         $new->paymentMethod = $paymentMethod;
         $new->success = false;
         $new->exception = $exception;
+        $new->status = ImportStatus::notChangedType();
 
         return $new;
     }
@@ -75,5 +81,13 @@ final class ImportResult
     public function getException(): \Exception
     {
         return $this->exception;
+    }
+
+    /**
+     * @return ImportStatus
+     */
+    public function getStatus(): ImportStatus
+    {
+        return $this->status;
     }
 }

@@ -453,8 +453,7 @@ class CheckoutSubscriber implements SubscriberInterface
 //    }
 //
 
-//    TODO remove
-//
+//    //    TODO remove
 //    /**
 //     * @param Shopware_Controllers_Frontend_Checkout $subject
 //     * @return bool
@@ -462,6 +461,10 @@ class CheckoutSubscriber implements SubscriberInterface
 //     */
 //    private function shouldRedirectToStep2(Shopware_Controllers_Frontend_Checkout $subject): bool
 //    {
+//        // is shopware payment adyen
+//        // zoja doe verder
+//        // zonee
+//
 //        $userData = $subject->View()->getAssign('sUserData');
 //        if (!$userData['additional'] ||
 //            !$userData['additional']['payment'] ||
@@ -497,8 +500,6 @@ class CheckoutSubscriber implements SubscriberInterface
 //        return !$this->session->offsetExists(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
 //    }
 //
-
-//    TODO remove
 //
 //    private function revertToDefaultPaymentMethod(Shopware_Controllers_Frontend_Checkout $subject)
 //    {
@@ -514,7 +515,7 @@ class CheckoutSubscriber implements SubscriberInterface
 //            $subject->View()->clearAssign('sAdyenSetSession');
 //        }
 //    }
-//
+
 
 //    private function unsetPaymentSessions(Shopware_Controllers_Frontend_Checkout $subject)
 //    {

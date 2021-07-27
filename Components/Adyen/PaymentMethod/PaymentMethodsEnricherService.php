@@ -44,8 +44,7 @@ class PaymentMethodsEnricherService implements PaymentMethodsEnricherServiceInte
         PaymentMethodEnricherInterface $paymentMethodEnricher,
         PaymentMethodWriterInterface $paymentMethodWriter,
         ObjectRepository $shopRepository
-    )
-    {
+    ) {
         $this->paymentMethodService = $paymentMethodService;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
         $this->paymentMethodEnricher = $paymentMethodEnricher;
