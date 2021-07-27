@@ -39,10 +39,10 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     protected $paymentMethodService;
 
-//    /**
-//     * @var Enlight_Components_Session_Namespace
-//     */
-//    private $session;
+    /**
+     * @var Enlight_Components_Session_Namespace
+     */
+    private $session;
 //
 //    /**
 //     * @var ModelManager
@@ -64,10 +64,10 @@ class CheckoutSubscriber implements SubscriberInterface
 //     */
 //    private $front;
 //
-//    /**
-//     * @var AdyenManager
-//     */
-//    private $adyenManager;
+    /**
+     * @var AdyenManager
+     */
+    private $adyenManager;
 //
     /**
      * @var DataConversion
@@ -86,23 +86,23 @@ class CheckoutSubscriber implements SubscriberInterface
     public function __construct(
         Configuration $configuration,
         PaymentMethodService $paymentMethodService,
-//        Enlight_Components_Session_Namespace $session,
+        Enlight_Components_Session_Namespace $session,
 //        ModelManager $modelManager,
         ShopwarePaymentMethodService $shopwarePaymentMethodService,
         Shopware_Components_Snippet_Manager $snippets,
 //        Enlight_Controller_Front $front,
-//        AdyenManager $adyenManager,
+        AdyenManager $adyenManager,
         DataConversion $dataConversion,
         PaymentMethodsEnricherServiceInterface $paymentMethodsEnricherService
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
-//        $this->session = $session;
+        $this->session = $session;
 //        $this->modelManager = $modelManager;
         $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
         $this->snippets = $snippets;
 //        $this->front = $front;
-//        $this->adyenManager = $adyenManager;
+        $this->adyenManager = $adyenManager;
         $this->dataConversion = $dataConversion;
         $this->paymentMethodsEnricherService = $paymentMethodsEnricherService;
     }
@@ -140,7 +140,7 @@ class CheckoutSubscriber implements SubscriberInterface
     {
         $subject = $args->getSubject();
 
-//        $this->checkBasketAmount($subject);
+        $this->checkBasketAmount($subject);
         $this->checkFirstCheckoutStep($subject);
 //        $this->rewritePaymentData($subject);
         $this->addAdyenConfigOnShipping($subject);
@@ -204,31 +204,30 @@ class CheckoutSubscriber implements SubscriberInterface
 //    }
 //
 
-//    TODO remove
-//
-//    /**
-//     * @param Shopware_Controllers_Frontend_Checkout $subject
-//     * @throws \Exception
-//     */
-//    private function checkBasketAmount(Shopware_Controllers_Frontend_Checkout $subject)
-//    {
-//        $userData = $subject->View()->getAssign('sUserData');
-//        if (!$userData['additional'] ||
-//            !$userData['additional']['payment'] ||
-//            $userData['additional']['payment']['name'] !== AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD) {
-//            return;
-//        }
-//
-//        $basket = $subject->View()->sBasket;
-//        if (!$basket) {
-//            return;
-//        }
-//        $value = $basket['sAmount'];
-//        if (empty($value)) {
-//            $this->revertToDefaultPaymentMethod($subject);
-//        }
-//    }
-//
+    /**
+     * @param Shopware_Controllers_Frontend_Checkout $subject
+     * @throws \Exception
+     */
+    private function checkBasketAmount(Shopware_Controllers_Frontend_Checkout $subject)
+    {
+        $userData = $subject->View()->getAssign('sUserData');
+
+        if (!$userData['additional'] ||
+            !$userData['additional']['payment'] ||
+            (int) $userData['additional']['payment']['source'] !== SourceType::adyenType()->getType()) {
+            return;
+        }
+
+        $basket = $subject->View()->sBasket;
+        if (!$basket) {
+            return;
+        }
+        $value = $basket['sAmount'];
+        if (empty($value)) {
+            $this->revertToDefaultPaymentMethod($subject);
+        }
+    }
+
 
     /**
      * @param Shopware_Controllers_Frontend_Checkout $subject
@@ -479,21 +478,21 @@ class CheckoutSubscriber implements SubscriberInterface
         return !$this->session->offsetExists(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
     }
 
-//
-//    private function revertToDefaultPaymentMethod(Shopware_Controllers_Frontend_Checkout $subject)
-//    {
-//        $defaultPaymentId = Shopware()->Config()->get('defaultPayment');
-//        $defaultPayment = Shopware()->Modules()->Admin()->sGetPaymentMeanById($defaultPaymentId);
-//        if (Shopware()->Modules()->Admin()->sUpdatePayment($defaultPaymentId)) {
-//            $this->adyenManager->unsetPaymentDataInSession();
-//            // Replace Adyen payment method in the template with the default payment method.
-//            $userData = $subject->View()->getAssign('sUserData');
-//            $userData['additional']['payment'] = $defaultPayment;
-//            $subject->View()->assign('sUserData', $userData);
-//            $subject->View()->assign('sPayment', $defaultPayment);
-//            $subject->View()->clearAssign('sAdyenSetSession');
-//        }
-//    }
+
+    private function revertToDefaultPaymentMethod(Shopware_Controllers_Frontend_Checkout $subject)
+    {
+        $defaultPaymentId = Shopware()->Config()->get('defaultPayment');
+        $defaultPayment = Shopware()->Modules()->Admin()->sGetPaymentMeanById($defaultPaymentId);
+        if (Shopware()->Modules()->Admin()->sUpdatePayment($defaultPaymentId)) {
+            $this->adyenManager->unsetPaymentDataInSession();
+            // Replace Adyen payment method in the template with the default payment method.
+            $userData = $subject->View()->getAssign('sUserData');
+            $userData['additional']['payment'] = $defaultPayment;
+            $subject->View()->assign('sUserData', $userData);
+            $subject->View()->assign('sPayment', $defaultPayment);
+            $subject->View()->clearAssign('sAdyenSetSession');
+        }
+    }
 
 
 //    private function unsetPaymentSessions(Shopware_Controllers_Frontend_Checkout $subject)

@@ -58,6 +58,12 @@ class AdyenManager
         return $transaction ? $transaction->getPaymentData() : '';
     }
 
+    public function unsetPaymentDataInSession()
+    {
+        $this->session->offsetUnset(AdyenPayment::SESSION_ADYEN_PAYMENT);
+        $this->session->offsetUnset(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
+    }
+
     public function unsetValidPaymentSession()
     {
         $this->session->offsetUnset(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);

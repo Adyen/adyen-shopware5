@@ -32,12 +32,12 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="adyen_payment.components.configuration"/>
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
-<!--            <argument type="service" id="session"/>-->
+            <argument type="service" id="session"/>
 <!--            <argument type="service" id="models"/>-->
             <argument type="service" id="adyen_payment.components.payment_method_service"/>
             <argument type="service" id="snippets"/>
 <!--            <argument type="service" id="front" />-->
-<!--            <argument type="service" id="adyen_payment.components.manager.adyen_manager" />-->
+            <argument type="service" id="adyen_payment.components.manager.adyen_manager" />
             <argument type="service" id="adyen_payment.components.data_conversion" />
             <argument type="service" id="adyen_payment.components.adyen.payment_method.payment_methods_enricher_service"/>
         </service>
