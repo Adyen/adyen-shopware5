@@ -39,20 +39,20 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     protected $paymentMethodService;
 
-    /**
-     * @var Enlight_Components_Session_Namespace
-     */
-    private $session;
+//    /**
+//     * @var Enlight_Components_Session_Namespace
+//     */
+//    private $session;
 //
 //    /**
 //     * @var ModelManager
 //     */
 //    private $modelManager;
 //
-//    /**
-//     * @var ShopwarePaymentMethodService
-//     */
-//    private $shopwarePaymentMethodService;
+    /**
+     * @var ShopwarePaymentMethodService
+     */
+    private $shopwarePaymentMethodService;
 //
 //    /**
 //     * @var Shopware_Components_Snippet_Manager
@@ -88,7 +88,7 @@ class CheckoutSubscriber implements SubscriberInterface
         PaymentMethodService $paymentMethodService,
 //        Enlight_Components_Session_Namespace $session,
 //        ModelManager $modelManager,
-//        ShopwarePaymentMethodService $shopwarePaymentMethodService,
+        ShopwarePaymentMethodService $shopwarePaymentMethodService,
 //        Shopware_Components_Snippet_Manager $snippets,
 //        Enlight_Controller_Front $front,
 //        AdyenManager $adyenManager,
@@ -99,7 +99,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->paymentMethodService = $paymentMethodService;
 //        $this->session = $session;
 //        $this->modelManager = $modelManager;
-//        $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
+        $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
 //        $this->snippets = $snippets;
 //        $this->front = $front;
 //        $this->adyenManager = $adyenManager;
@@ -144,7 +144,7 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->checkFirstCheckoutStep($subject);
 //        $this->rewritePaymentData($subject);
         $this->addAdyenConfigOnShipping($subject);
-//        $this->addAdyenGooglePay($subject);
+        $this->addAdyenGooglePay($subject);
 //
 //        if (in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
 //            $this->addPaymentSnippets($subject);
@@ -388,52 +388,46 @@ class CheckoutSubscriber implements SubscriberInterface
 //        }
 //    }
 
+    private function addAdyenGooglePay(Shopware_Controllers_Frontend_Checkout $subject)
+    {
+        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+            return;
+        }
 
-//    TODO remove
-//
-//    private function addAdyenGooglePay(Shopware_Controllers_Frontend_Checkout $subject)
-//    {
-//        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
-//            return;
-//        }
-//
-//        $userData = $subject->View()->getAssign('sUserData');
-//        if (!$userData['additional'] ||
-//            !$userData['additional']['payment'] ||
-//            $userData['additional']['payment']['name'] !== AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD) {
-//            return;
-//        }
-//
-//        $basket = $subject->View()->getAssign('sBasket');
-//        if (!$basket) {
-//            return;
-//        }
-//
-//        if ($this->shopwarePaymentMethodService->getActiveUserAdyenMethod(false) !== 'paywithgoogle') {
-//            return;
-//        }
-//
-//        $currencyUtil = new Currency();
-//        $adyenGoogleConfig = [
-//            'environment' => 'TEST',
-//            'showPayButton' => true,
-//            'currencyCode' => $basket['sCurrencyName'],
-//            'amount' => $currencyUtil->sanitize($basket['AmountNumeric'], $basket['sCurrencyName']),
-//            'configuration' => [
-//                'gatewayMerchantId' => $this->configuration->getMerchantAccount(),
-//                'merchantName' => Shopware()->Shop()->getName()
-//            ],
-//        ];
-//        if ($this->configuration->getEnvironment() === Configuration::ENV_LIVE) {
-//            $adyenGoogleConfig['environment'] = 'PRODUCTION';
-//            $adyenGoogleConfig['configuration']['merchantIdentifier'] = $this->configuration->getGoogleMerchantId();
-//        }
-//        $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
-//    }
-//
+        $userData = $subject->View()->getAssign('sUserData');
+        if (!$userData['additional'] ||
+            !$userData['additional']['payment'] ||
+            (int) $userData['additional']['payment']['source'] !== SourceType::adyenType()->getType()) {
+            return;
+        }
 
-//    TODO remove
-//
+        $basket = $subject->View()->getAssign('sBasket');
+        if (!$basket) {
+            return;
+        }
+
+        if ($this->shopwarePaymentMethodService->getActiveUserAdyenMethod(false) !== 'paywithgoogle') {
+            return;
+        }
+
+        $currencyUtil = new Currency();
+        $adyenGoogleConfig = [
+            'environment' => 'TEST',
+            'showPayButton' => true,
+            'currencyCode' => $basket['sCurrencyName'],
+            'amount' => $currencyUtil->sanitize($basket['AmountNumeric'], $basket['sCurrencyName']),
+            'configuration' => [
+                'gatewayMerchantId' => $this->configuration->getMerchantAccount(),
+                'merchantName' => Shopware()->Shop()->getName()
+            ],
+        ];
+        if ($this->configuration->getEnvironment() === Configuration::ENV_LIVE) {
+            $adyenGoogleConfig['environment'] = 'PRODUCTION';
+            $adyenGoogleConfig['configuration']['merchantIdentifier'] = $this->configuration->getGoogleMerchantId();
+        }
+        $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
+    }
+
     /**
      * @param Shopware_Controllers_Frontend_Checkout $subject
      * @throws AdyenException

@@ -34,7 +34,7 @@
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
 <!--            <argument type="service" id="session"/>-->
 <!--            <argument type="service" id="models"/>-->
-<!--            <argument type="service" id="adyen_payment.components.payment_method_service"/>-->
+            <argument type="service" id="adyen_payment.components.payment_method_service"/>
 <!--            <argument type="service" id="snippets"/>-->
 <!--            <argument type="service" id="front" />-->
 <!--            <argument type="service" id="adyen_payment.components.manager.adyen_manager" />-->
