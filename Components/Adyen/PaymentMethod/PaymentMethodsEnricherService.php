@@ -54,9 +54,8 @@ class PaymentMethodsEnricherService implements PaymentMethodsEnricherServiceInte
 
     public function __invoke(array $shopwareMethods): array
     {
-        // TODO check
         $shopwareMethods = array_filter($shopwareMethods, function ($method) {
-            return $method['name'] !== AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD;
+            return (int) $method['source'] !== SourceType::adyenType()->getType();
         });
 
         $paymentMethodOptions = $this->shopwarePaymentMethodService->getPaymentMethodOptions();

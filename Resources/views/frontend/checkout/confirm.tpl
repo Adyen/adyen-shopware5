@@ -26,10 +26,7 @@
     {if $sUserData.additional.payment.type}
         data-adyenType="{$sUserData.additional.payment.type}"
     {/if}
-    {if $sAdyenGoogleConfig}
-        data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
-    {/if}
-    {* TODO: fix   *}
+    {* TODO: bespreken afhankelijk van details   *}
     {if $sAdyenSetSession}
         data-adyenSetSession='{$sAdyenSetSession}'
     {/if}

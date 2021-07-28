@@ -2,12 +2,12 @@
 
 namespace AdyenPayment\Subscriber;
 
+use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use AdyenPayment\Components\NotificationManager;
-use AdyenPayment\AdyenPayment;
 use AdyenPayment\Models\PaymentInfo;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Controllers_Backend_Order;
@@ -88,8 +88,7 @@ class BackendOrderSubscriber implements SubscriberInterface
             $order['adyenNotification'] = null;
             $order['adyenRefundable'] = false;
 
-            // TODO check
-            if ($order['payment']['name'] !== AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD) {
+            if ((int) $order['payment']['source'] !== SourceType::adyenType()->getType()) {
                 continue;
             }
 

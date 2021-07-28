@@ -17,10 +17,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 class Configuration
 {
-    const ENV_TEST = 'TEST';
     const ENV_LIVE = 'LIVE';
-    const PAYMENT_PREFIX = 'adyen_';
-    const PAYMENT_LENGHT = 6;
 
     /**
      * @var CachedConfigReader
@@ -166,15 +163,6 @@ class Configuration
 
     /**
      * @param bool $shop
-     * @return string
-     */
-    public function getGoogleMerchantId($shop = false): string
-    {
-        return (string)$this->getConfig('google_merchant_id', $shop);
-    }
-
-    /**
-     * @param bool $shop
      * @return bool
      */
     public function isPaymentmethodsCacheEnabled($shop = false): bool
@@ -189,14 +177,6 @@ class Configuration
     public function getManualReviewRejectAction($shop = false): string
     {
         return (string)$this->getConfig('manual_review_rejected_action', $shop);
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentMethodPrefix(): string
-    {
-        return (string)self::PAYMENT_PREFIX;
     }
 
     /**

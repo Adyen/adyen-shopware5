@@ -7,8 +7,6 @@ namespace AdyenPayment\Components\Manager;
 use AdyenPayment\Models\PaymentInfo;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Enlight_Components_Session_Namespace;
-use AdyenPayment\AdyenPayment;
 use Shopware\Models\Order\Order;
 
 /**
@@ -22,17 +20,10 @@ class AdyenManager
      */
     private $modelManager;
 
-    /**
-     * @var Enlight_Components_Session_Namespace
-     */
-    private $session;
-
     public function __construct(
-        EntityManagerInterface $modelManager,
-        Enlight_Components_Session_Namespace $session
+        EntityManagerInterface $modelManager
     ) {
         $this->modelManager = $modelManager;
-        $this->session = $session;
     }
 
     public function storePaymentData(PaymentInfo $transaction, string $paymentData)
@@ -56,17 +47,6 @@ class AdyenManager
         $transaction = $this->getPaymentInfoRepository()->findOneBy(['orderId' => $order->getId()]);
 
         return $transaction ? $transaction->getPaymentData() : '';
-    }
-
-    public function unsetPaymentDataInSession()
-    {
-        $this->session->offsetUnset(AdyenPayment::SESSION_ADYEN_PAYMENT);
-        $this->session->offsetUnset(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
-    }
-
-    public function unsetValidPaymentSession()
-    {
-        $this->session->offsetUnset(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
     }
 
     private function getPaymentInfoRepository(): ObjectRepository

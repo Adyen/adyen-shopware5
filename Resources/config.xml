@@ -64,10 +64,6 @@
           <name>notification_auth_password_live</name>
           <label lang="en">Notification Auth Password (Live)</label>
         </element>
-        <element type="text" scope="shop">
-            <name>google_merchant_id</name>
-            <label lang="en">Google Merchant ID</label>
-        </element>
         <element type="boolean" scope="shop">
           <name>paymentmethods_cache</name>
           <label lang="en">Enable Payment Methods cache</label>

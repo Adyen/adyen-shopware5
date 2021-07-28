@@ -63,10 +63,6 @@
             <argument type="service" id="events"/>
         </service>
         <service id="adyen_payment.components.payment_method_service" class="AdyenPayment\Components\PaymentMethodService">
-            <argument type="service" id="models"/>
-            <argument type="service" id="session"/>
-            <argument type="service" id="snippets"/>
-            <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
         </service>
         <service id="adyen_payment.components.builder.notification_builder" class="AdyenPayment\Components\Builder\NotificationBuilder">
             <argument type="service" id="models"/>

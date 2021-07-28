@@ -10,8 +10,7 @@
             confirmFormSelector: '#confirm--form',
             mountRedirectSelector: '.is--act-confirm',
             adyenType: '',
-            adyenGoogleConfig: {},
-            adyenSetSession: {},
+            adyenSetSession: {}, // TODO check
             adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
@@ -21,7 +20,6 @@
                 errorTransactionRefused: 'Your transaction was refused by the Payment Service Provider.',
                 errorTransactionUnknown: 'Your transaction was cancelled due to an unknown reason.',
                 errorTransactionNoSession: 'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
-                errorGooglePayNotAvailable: 'Google Pay is currently not available.',
             },
         },
         paymentMethodSession: 'paymentMethod',
@@ -32,36 +30,22 @@
         init: function () {
             var me = this;
 
-            me.sessionStorage = StorageManager.getStorage('session');
+            me.sessionStorage = StorageManager.getStorage('session'); // TODO weg
 
             me.applyDataAttributes();
-            me.eventListeners();
-            me.checkSetSession();
-            me.setConfig();
+            me.eventListeners(); // TODO ok
+            me.setConfig(); //
             me.setCheckout();
-            me.handleCheckoutButton();
         },
 
+        // TODO ok
         eventListeners: function () {
             var me = this;
 
             me._on(me.opts.placeOrderSelector, 'click', $.proxy(me.onPlaceOrder, me));
         },
 
-        checkSetSession: function () {
-            var me = this;
-            if (me.opts.adyenIsAdyenPayment) {
-                if (!$.isEmptyObject(me.opts.adyenSetSession)) {
-                    me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenSetSession));
-                } else if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
-                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
-                    return;
-                }
-            } else {
-                me.sessionStorage.removeItem(me.paymentMethodSession);
-            }
-        },
-
+        // TODO ok
         onPlaceOrder: function (event) {
             var me = this;
 
@@ -71,6 +55,7 @@
 
             me.clearAdyenError();
 
+            // TODO bespreken, mag normaal weg
             if (me.sessionStorage.getItem(me.paymentMethodSession)) {
                 if (!$(me.opts.confirmFormSelector)[0].checkValidity()) {
                     return;
@@ -79,11 +64,11 @@
                 $.loadingIndicator.open();
 
                 var data = {
-                    'paymentMethod': me.getPaymentMethod(),
-                    'storePaymentMethod': me.getStorePaymentMethod(),
+                    'paymentMethod': me.getPaymentMethod(), // TODO normaal ophalen via id
+                    'storePaymentMethod': me.getStorePaymentMethod(), // TODO normaal ophalen via id
                     'browserInfo': me.getBrowserInfo(),
                     'origin': window.location.origin,
-                    'sComment': me.getComment(),
+                    'sComment': me.getComment()
                 };
 
                 $.ajax({
@@ -99,9 +84,9 @@
                         }
 
                         $.loadingIndicator.close();
-                    },
+                    }
                 });
-            } else {
+            } else { // TODO mag weg door if die wegvalt
                 if (me.opts.adyenIsAdyenPayment) {
                     this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
                     return;
@@ -111,6 +96,7 @@
             }
         },
 
+        // TODO ok
         handlePaymentData: function (data) {
             var me = this;
 
@@ -130,11 +116,13 @@
             }
         },
 
+        // TODO ok
         handlePaymentDataAuthorised: function (data) {
             var me = this;
             $(me.opts.confirmFormSelector).submit();
         },
 
+        // TODO ok
         handlePaymentDataCreateFromAction: function (data) {
             var me = this;
             var payload = {
@@ -172,6 +160,7 @@
                 .mount('#AdyenModal');
         },
 
+        // TODO ok
         handlePaymentDataRedirectShopper: function (data) {
             var me = this;
             if ('redirect' === data.action.type || 'qrCode' === data.action.type) {
@@ -181,6 +170,7 @@
             }
         },
 
+        // TODO ok
         handlePaymentDataError: function (data) {
             var me = this;
 
@@ -201,40 +191,8 @@
                     break;
             }
         },
-        handleCheckoutButton: function () {
-            var me = this;
 
-            if (me.opts.adyenType === 'paywithgoogle') {
-                me.replaceCheckoutButtonForGooglePay();
-            }
-        },
-
-        replaceCheckoutButtonForGooglePay: function () {
-            var me = this;
-
-            var orderButton = $(me.opts.placeOrderSelector);
-            orderButton.parent().append(
-                $('<div />')
-                    .attr('id', 'AdyenGooglePayButton')
-                    .addClass('right')
-            );
-            orderButton.remove();
-
-            me.opts.adyenGoogleConfig.onSubmit = function (state, component) {
-                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
-                me.onPlaceOrder();
-            };
-
-            var googlepay = me.adyenCheckout.create("paywithgoogle", me.opts.adyenGoogleConfig);
-            googlepay
-                .isAvailable()
-                .then(function () {
-                    googlepay.mount("#AdyenGooglePayButton");
-                })
-                .catch(function (e) {
-                    this.addAdyenError(me.opts.adyenSnippets.errorGooglePayNotAvailable);
-                });
-        },
+        // TODO ok
         addAdyenError: function (message) {
             var me = this;
             $.publish('plugin/AdyenPaymentCheckoutError/addError', message);
@@ -247,14 +205,15 @@
                 .remove();
         },
 
+        // TODO ok
         clearAdyenError: function () {
             $.publish('plugin/AdyenPaymentCheckoutError/cleanErrors');
         },
 
+        // TODO ok
         setConfig: function () {
             var me = this;
 
-            var adyenConfigSession = JSON.parse(me.getAdyenConfigSession());
             var adyenConfigTpl = document.querySelector('.adyen-payment-selection.adyen-config').dataset;
 
             var adyenPaymentMethodsResponseConfig = Object.values(me.opts.enrichedPaymentMethods).reduce(
@@ -270,30 +229,34 @@
             );
 
             me.adyenConfiguration = {
-                locale: adyenConfigSession ? adyenConfigSession.locale : adyenConfigTpl.shoplocale,
-                environment: adyenConfigSession ? adyenConfigSession.environment : adyenConfigTpl.adyenenvironment,
-                clientKey: adyenConfigSession ? adyenConfigSession.clientKey : adyenConfigTpl.adyenclientkey,
+                locale: adyenConfigTpl.shoplocale,
+                environment: adyenConfigTpl.adyenenvironment,
+                clientKey: adyenConfigTpl.adyenclientkey,
                 paymentMethodsResponse: Object.assign({}, adyenPaymentMethodsResponseConfig),
                 onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
             };
         },
 
+        // TODO ok
         setCheckout: function () {
             var me = this;
 
             me.adyenCheckout = new AdyenCheckout(me.adyenConfiguration);
         },
 
+        // TODO ok
         getComment: function() {
             return $('[data-storagekeyname="sComment"]').val();
         },
 
+        // TODO bespreken, mag normaal weg, ophalen via id
         getPaymentMethod: function () {
             var me = this;
 
             return me.sessionStorage.getItem(me.paymentMethodSession);
         },
 
+        // TODO bespreken, mag normaal weg, ophalen via id en type
         getStorePaymentMethod: function () {
             var me = this;
 
@@ -306,6 +269,7 @@
             return me.sessionStorage.getItem('adyenConfig');
         },
 
+        // TODO ok
         getBrowserInfo: function () {
             return {
                 'language': navigator.language,
@@ -318,9 +282,9 @@
             };
         },
 
+        // TODO ok
         handleOnAdditionalDetails: function (state, component) {
             $.loadingIndicator.close();
-        },
-
+        }
     });
 })(jQuery);

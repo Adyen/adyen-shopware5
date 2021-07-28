@@ -3,23 +3,17 @@
 namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
-use Adyen\Util\Currency;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsEnricherServiceInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
-use Enlight_Controller_Front;
 use Enlight_Event_EventArgs;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\DataConversion;
-use AdyenPayment\Components\Manager\AdyenManager;
-use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\AdyenPayment;
 use sAdmin;
-use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
-use Shopware\Components\Model\ModelManager;
 use Shopware_Components_Snippet_Manager;
 use Shopware_Controllers_Frontend_Checkout;
 
@@ -43,32 +37,12 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var Enlight_Components_Session_Namespace
      */
     private $session;
-//
-//    /**
-//     * @var ModelManager
-//     */
-//    private $modelManager;
-//
-    /**
-     * @var ShopwarePaymentMethodService
-     */
-    private $shopwarePaymentMethodService;
 
     /**
      * @var Shopware_Components_Snippet_Manager
      */
     private $snippets;
-//
-//    /**
-//     * @var \Enlight_Controller_Front
-//     */
-//    private $front;
-//
-    /**
-     * @var AdyenManager
-     */
-    private $adyenManager;
-//
+
     /**
      * @var DataConversion
      */
@@ -87,22 +61,14 @@ class CheckoutSubscriber implements SubscriberInterface
         Configuration $configuration,
         PaymentMethodService $paymentMethodService,
         Enlight_Components_Session_Namespace $session,
-//        ModelManager $modelManager,
-        ShopwarePaymentMethodService $shopwarePaymentMethodService,
         Shopware_Components_Snippet_Manager $snippets,
-//        Enlight_Controller_Front $front,
-        AdyenManager $adyenManager,
         DataConversion $dataConversion,
-        PaymentMethodsEnricherServiceInterface $paymentMethodsEnricherService
+        PaymentMethodsEnricherServiceInterface $paymentMethodsEnricherService,
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
         $this->session = $session;
-//        $this->modelManager = $modelManager;
-        $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
         $this->snippets = $snippets;
-//        $this->front = $front;
-        $this->adyenManager = $adyenManager;
         $this->dataConversion = $dataConversion;
         $this->paymentMethodsEnricherService = $paymentMethodsEnricherService;
     }
@@ -113,22 +79,8 @@ class CheckoutSubscriber implements SubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'Enlight_Controller_Action_PreDispatch_Frontend_Checkout' => 'checkoutFrontendPreDispatch',
             'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'checkoutFrontendPostDispatch',
-//            'sAdmin::sUpdatePayment::after' => 'sAdminAfterSUpdatePayment',
-//            'sAdmin::sGetDispatchBasket::after' => 'sAdminAfterSGetDispatchBasket',
         ];
-    }
-
-    /**
-     * @param Enlight_Event_EventArgs $args
-     */
-    public function checkoutFrontendPreDispatch(Enlight_Event_EventArgs $args)
-    {
-        $subject = $args->getSubject();
-//
-//        $this->rewritePostPayment($subject);
-//        $this->unsetPaymentSessions($subject);
     }
 
 
@@ -140,11 +92,9 @@ class CheckoutSubscriber implements SubscriberInterface
     {
         $subject = $args->getSubject();
 
-        $this->checkBasketAmount($subject);
-        $this->checkFirstCheckoutStep($subject);
-//        $this->rewritePaymentData($subject);
-        $this->addAdyenConfigOnShipping($subject);
-        $this->addAdyenGooglePay($subject);
+        $this->checkBasketAmount($subject); // TODO probably needs to stay, depends on investigation
+        $this->checkFirstCheckoutStep($subject); // TODO needs to stay, as redirectToStep2 stays
+        $this->addAdyenConfigOnShipping($subject); // TODO needs to stay
 
         if (in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
             $this->addPaymentSnippets($subject);
@@ -154,55 +104,6 @@ class CheckoutSubscriber implements SubscriberInterface
             $this->addConfirmSnippets($subject);
         }
     }
-
-//    TODO remove
-//
-//    /**
-//     * @param \Enlight_Hook_HookArgs $args
-//     * @return void
-//     */
-//    public function sAdminAfterSUpdatePayment(\Enlight_Hook_HookArgs $args)
-//    {
-//        $paymentId = $args->get('paymentId');
-//        if (!$paymentId) {
-//            $paymentId = $this->front->Request()->getPost('sPayment');
-//        }
-//
-//        if ($paymentId !== $this->shopwarePaymentMethodService->getAdyenPaymentId()) {
-//            return;
-//        }
-//
-//        $userId = (int)$this->session->offsetGet('sUserId');
-//        if (empty($userId)) {
-//            return;
-//        }
-//
-//        $adyenPayment = Shopware()->Front()->Request()->getParams()['adyenPayment'];
-//        if (!$adyenPayment) {
-//            return;
-//        }
-//
-//        $this->shopwarePaymentMethodService->setUserAdyenMethod($userId, $adyenPayment);
-//    }
-//
-
-//    TODO remove
-//
-//    /**
-//     * @param \Enlight_Hook_HookArgs $args
-//     * @return mixed
-//     */
-//    public function sAdminAfterSGetDispatchBasket(\Enlight_Hook_HookArgs $args)
-//    {
-//        $basket = $args->getReturn();
-//
-//        if ($this->shopwarePaymentMethodService->isAdyenMethod($basket['paymentID'])) {
-//            $basket['paymentID'] = $this->shopwarePaymentMethodService->getAdyenPaymentId();
-//        }
-//
-//        return $basket;
-//    }
-//
 
     /**
      * @param Shopware_Controllers_Frontend_Checkout $subject
@@ -224,7 +125,7 @@ class CheckoutSubscriber implements SubscriberInterface
         }
         $value = $basket['sAmount'];
         if (empty($value)) {
-            $this->revertToDefaultPaymentMethod($subject);
+            $this->revertToDefaultPaymentMethod($subject); // TODO probably needs to stay
         }
     }
 
@@ -238,14 +139,11 @@ class CheckoutSubscriber implements SubscriberInterface
         if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'confirm'])) {
             return;
         }
-        $view = $subject->View();
-
-        $countryCode = $view->getAssign('sUserData')['additional']['country']['countryiso'];
-        $currency = $view->getAssign('sBasket')['sCurrencyName'];
-        $value = $view->getAssign('sBasket')['AmountNumeric'];
 
         $this->admin = Shopware()->Modules()->Admin();
-        $enrichedPaymentMethods = $this->paymentMethodsEnricherService->__invoke($this->admin->sGetPaymentMeans());
+        $enrichedPaymentMethods = $this->paymentMethodsEnricherService->__invoke(
+            $this->admin->sGetPaymentMeans()
+        );
 
         $shop = Shopware()->Shop();
 
@@ -254,9 +152,9 @@ class CheckoutSubscriber implements SubscriberInterface
             "clientKey" => $this->configuration->getClientKey($shop),
             "environment" => $this->configuration->getEnvironment($shop),
             "enrichedPaymentMethods" => $enrichedPaymentMethods,
-            "paymentMethodPrefix" => $this->configuration->getPaymentMethodPrefix($shop),
         ];
 
+        $view = $subject->View();
         $view->assign('sAdyenConfig', $adyenConfig);
     }
 
@@ -324,102 +222,6 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
     }
-//
-
-//    TODO remove
-//
-//    /**
-//     * @param Shopware_Controllers_Frontend_Checkout $subject
-//     */
-//    private function rewritePaymentData(Shopware_Controllers_Frontend_Checkout $subject)
-//    {
-//        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
-//            return;
-//        }
-//
-//        $formData = $subject->View()->getAssign('sFormData');
-//        if (!$formData['payment']) {
-//            return;
-//        }
-//        if ((int)$formData['payment'] !== $this->shopwarePaymentMethodService->getAdyenPaymentId()) {
-//            return;
-//        }
-//        $formData['payment'] = $this->shopwarePaymentMethodService->getActiveUserAdyenMethod();
-//        $subject->View()->assign('sFormData', $formData);
-//    }
-//
-
-//    TODO remove
-//
-//    /**
-//     * @param Shopware_Controllers_Frontend_Checkout $subject
-//     */
-//    private function rewritePostPayment(Shopware_Controllers_Frontend_Checkout $subject)
-//    {
-//        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
-//            return;
-//        }
-//
-//        $payment = $subject->Request()->get('payment');
-//        if (!$payment || !is_string($payment)) {
-//            return;
-//        }
-//
-//        $this->session->offsetSet(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID, false);
-//        if ($this->shopwarePaymentMethodService->isAdyenMethod($payment)) {
-//            $paymentId = $this->shopwarePaymentMethodService->getAdyenPaymentId();
-//            $adyenPayment = $this->shopwarePaymentMethodService->getAdyenMethod($payment);
-//
-//            $subject->Request()->setParams([
-//                'payment' => $paymentId,
-//                'adyenPayment' => $adyenPayment
-//            ]);
-//            $subject->Request()->setPost('payment', $paymentId);
-//            $subject->Request()->setPost('adyenPayment', $adyenPayment);
-//            $this->session->offsetSet(AdyenPayment::SESSION_ADYEN_PAYMENT, $adyenPayment);
-//            $this->session->offsetSet(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID, true);
-//        }
-//    }
-
-    private function addAdyenGooglePay(Shopware_Controllers_Frontend_Checkout $subject)
-    {
-        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
-            return;
-        }
-
-        $userData = $subject->View()->getAssign('sUserData');
-        if (!$userData['additional'] ||
-            !$userData['additional']['payment'] ||
-            (int) $userData['additional']['payment']['source'] !== SourceType::adyenType()->getType()) {
-            return;
-        }
-
-        $basket = $subject->View()->getAssign('sBasket');
-        if (!$basket) {
-            return;
-        }
-
-        if ($this->shopwarePaymentMethodService->getActiveUserAdyenMethod(false) !== 'paywithgoogle') {
-            return;
-        }
-
-        $currencyUtil = new Currency();
-        $adyenGoogleConfig = [
-            'environment' => 'TEST',
-            'showPayButton' => true,
-            'currencyCode' => $basket['sCurrencyName'],
-            'amount' => $currencyUtil->sanitize($basket['AmountNumeric'], $basket['sCurrencyName']),
-            'configuration' => [
-                'gatewayMerchantId' => $this->configuration->getMerchantAccount(),
-                'merchantName' => Shopware()->Shop()->getName()
-            ],
-        ];
-        if ($this->configuration->getEnvironment() === Configuration::ENV_LIVE) {
-            $adyenGoogleConfig['environment'] = 'PRODUCTION';
-            $adyenGoogleConfig['configuration']['merchantIdentifier'] = $this->configuration->getGoogleMerchantId();
-        }
-        $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
-    }
 
     /**
      * @param Shopware_Controllers_Frontend_Checkout $subject
@@ -440,6 +242,9 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
 
+    //TODO: investigate if we can store the details (raw data),
+    // so we don't need to make a new call to adyen
+    // and check if we can remove session
     /**
      * @param Shopware_Controllers_Frontend_Checkout $subject
      * @return bool
@@ -463,44 +268,37 @@ class CheckoutSubscriber implements SubscriberInterface
             $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value)
         );
 
-            $selectedId = $userData['additional']['payment']['id'];
+        $selectedId = $userData['additional']['payment']['id'];
         $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($selectedId);
         if (!$paymentMethod) {
             return true;
         }
 
+        //TODO: payment details are also used in
         if (!$paymentMethod->getValue('details') && !$paymentMethod->isStoredPayment()) {
-            $subject->View()->assign('sAdyenSetSession', $paymentMethod->serializeMinimalState());
+            $subject->View()->assign('sAdyenSetSession', $paymentMethod->serializeMinimalState()); // TODO check
 
             return false;
         }
 
+        //TODO already removed session const
+        // find a fix for return
         return !$this->session->offsetExists(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
     }
 
 
+    // TODO: investigate deeper
     private function revertToDefaultPaymentMethod(Shopware_Controllers_Frontend_Checkout $subject)
     {
         $defaultPaymentId = Shopware()->Config()->get('defaultPayment');
         $defaultPayment = Shopware()->Modules()->Admin()->sGetPaymentMeanById($defaultPaymentId);
         if (Shopware()->Modules()->Admin()->sUpdatePayment($defaultPaymentId)) {
-            $this->adyenManager->unsetPaymentDataInSession();
             // Replace Adyen payment method in the template with the default payment method.
             $userData = $subject->View()->getAssign('sUserData');
             $userData['additional']['payment'] = $defaultPayment;
             $subject->View()->assign('sUserData', $userData);
             $subject->View()->assign('sPayment', $defaultPayment);
-            $subject->View()->clearAssign('sAdyenSetSession');
+            $subject->View()->clearAssign('sAdyenSetSession'); // TODO needs further investigation, as used/set in shouldRedirectToStep2
         }
     }
-
-
-//    private function unsetPaymentSessions(Shopware_Controllers_Frontend_Checkout $subject)
-//    {
-//        if ($subject->Request()->getActionName() !== 'finish') {
-//            return;
-//        }
-//
-//        $this->adyenManager->unsetPaymentDataInSession();
-//    }
 }

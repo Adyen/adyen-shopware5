@@ -15,12 +15,10 @@ use AdyenPayment\Models\TextNotification;
 use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
 use Shopware\Components\Logger;
 use Shopware\Components\Plugin;
-use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\Context\UpdateContext;
-use Shopware\Components\Plugin\PaymentInstaller;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -32,13 +30,10 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 class AdyenPayment extends Plugin
 {
     const NAME = 'AdyenPayment';
-    const ADYEN_GENERAL_PAYMENT_METHOD = 'adyen_general_payment_method';
-    const ADYEN_PAYMENT_PAYMENT_METHOD = 'adyen_payment_payment_method';
     const ADYEN_PAYMENT_METHOD_LABEL = 'adyen_type';
     const ADYEN_PAYMENT_STORED_METHOD_ID = 'adyen_stored_method_id';
 
-    const SESSION_ADYEN_PAYMENT = 'adyenPayment';
-    const SESSION_ADYEN_PAYMENT_VALID = 'adyenPaymentValid';
+    const SESSION_ADYEN_PAYMENT_VALID = 'adyenPaymentValid'; // TODO remove
     const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
     const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';
 
