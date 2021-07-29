@@ -26,9 +26,12 @@
     {if $sUserData.additional.payment.type}
         data-adyenType="{$sUserData.additional.payment.type}"
     {/if}
-    {* TODO: bespreken afhankelijk van details   *}
-    {if $sAdyenSetSession}
-        data-adyenSetSession='{$sAdyenSetSession}'
+    {if $sAdyenGoogleConfig}
+        data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
+    {/if}
+    {* TODO: hernoemen naar adyenSetState   *}
+    {if $adyenPaymentState}
+        data-adyenPaymentState='{$adyenPaymentState}'
     {/if}
     {if $sUserData.additional.payment.source == 2}
         data-adyenIsAdyenPayment='true'

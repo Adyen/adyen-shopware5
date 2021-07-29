@@ -88,7 +88,8 @@ class BackendOrderSubscriber implements SubscriberInterface
             $order['adyenNotification'] = null;
             $order['adyenRefundable'] = false;
 
-            if ((int) $order['payment']['source'] !== SourceType::adyen()->getType()) {
+            $source = (int) ($order['payment']['source'] ?? null);
+            if (!SourceType::load($source)->equals(SourceType::adyen())) {
                 continue;
             }
 

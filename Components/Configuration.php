@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 class Configuration
 {
+    const ENV_TEST = 'TEST';
     const ENV_LIVE = 'LIVE';
 
     /**
@@ -159,6 +160,15 @@ class Configuration
             'notification_auth_password_' . $this->getEnvironment($shop, true),
             $shop
         );
+    }
+
+    /**
+     * @param bool $shop
+     * @return string
+     */
+    public function getGoogleMerchantId($shop = false): string
+    {
+        return (string)$this->getConfig('google_merchant_id', $shop);
     }
 
     /**

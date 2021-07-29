@@ -10,7 +10,8 @@
             confirmFormSelector: '#confirm--form',
             mountRedirectSelector: '.is--act-confirm',
             adyenType: '',
-            adyenSetSession: {}, // TODO check: this should still be used
+            adyenGoogleConfig: {},
+            adyenPaymentState: {}, // TODO check: this should still be used
             adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
@@ -20,6 +21,7 @@
                 errorTransactionRefused: 'Your transaction was refused by the Payment Service Provider.',
                 errorTransactionUnknown: 'Your transaction was cancelled due to an unknown reason.',
                 errorTransactionNoSession: 'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
+                errorGooglePayNotAvailable: 'Google Pay is currently not available.',
             },
         },
         paymentMethodSession: 'paymentMethod',
@@ -30,12 +32,14 @@
         init: function () {
             var me = this;
 
-            me.sessionStorage = StorageManager.getStorage('session'); // TODO weg
+            me.sessionStorage = StorageManager.getStorage('session');
 
             me.applyDataAttributes();
-            me.eventListeners(); // TODO ok
-            me.setConfig(); //
+            me.eventListeners();
+            me.checkSetSession();
+            me.setConfig();
             me.setCheckout();
+            me.handleCheckoutButton();
         },
 
         // TODO ok
@@ -43,6 +47,22 @@
             var me = this;
 
             me._on(me.opts.placeOrderSelector, 'click', $.proxy(me.onPlaceOrder, me));
+        },
+
+        checkSetSession: function () {
+            var me = this;
+
+            if (!me.opts.adyenIsAdyenPayment) {
+                me.sessionStorage.removeItem(me.paymentMethodSession);
+                return;
+            }
+
+            if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
+                this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
+                return;
+            }
+
+            me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenPaymentState));
         },
 
         // TODO ok
@@ -55,7 +75,6 @@
 
             me.clearAdyenError();
 
-            // TODO bespreken, mag normaal weg
             if (me.sessionStorage.getItem(me.paymentMethodSession)) {
                 if (!$(me.opts.confirmFormSelector)[0].checkValidity()) {
                     return;
@@ -64,8 +83,8 @@
                 $.loadingIndicator.open();
 
                 var data = {
-                    'paymentMethod': me.getPaymentMethod(), // TODO normaal ophalen via id
-                    'storePaymentMethod': me.getStorePaymentMethod(), // TODO normaal ophalen via id
+                    'paymentMethod': me.getPaymentMethod(),
+                    'storePaymentMethod': me.getStorePaymentMethod(),
                     'browserInfo': me.getBrowserInfo(),
                     'origin': window.location.origin,
                     'sComment': me.getComment()
@@ -192,6 +211,41 @@
             }
         },
 
+        handleCheckoutButton: function () {
+            var me = this;
+
+            if (me.opts.adyenType === 'paywithgoogle') {
+                me.replaceCheckoutButtonForGooglePay();
+            }
+        },
+
+        replaceCheckoutButtonForGooglePay: function () {
+            var me = this;
+
+            var orderButton = $(me.opts.placeOrderSelector);
+            orderButton.parent().append(
+                $('<div />')
+                    .attr('id', 'AdyenGooglePayButton')
+                    .addClass('right')
+            );
+            orderButton.remove();
+
+            me.opts.adyenGoogleConfig.onSubmit = function (state, component) {
+                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
+                me.onPlaceOrder();
+            };
+
+            var googlepay = me.adyenCheckout.create("paywithgoogle", me.opts.adyenGoogleConfig);
+            googlepay
+                .isAvailable()
+                .then(function () {
+                    googlepay.mount("#AdyenGooglePayButton");
+                })
+                .catch(function (e) {
+                    this.addAdyenError(me.opts.adyenSnippets.errorGooglePayNotAvailable);
+                });
+        },
+
         // TODO ok
         addAdyenError: function (message) {
             var me = this;
@@ -214,6 +268,7 @@
         setConfig: function () {
             var me = this;
 
+            var adyenConfigSession = JSON.parse(me.getAdyenConfigSession());
             var adyenConfigTpl = document.querySelector('.adyen-payment-selection.adyen-config').dataset;
 
             var adyenPaymentMethodsResponseConfig = Object.values(me.opts.enrichedPaymentMethods).reduce(
@@ -229,9 +284,9 @@
             );
 
             me.adyenConfiguration = {
-                locale: adyenConfigTpl.shoplocale,
-                environment: adyenConfigTpl.adyenenvironment,
-                clientKey: adyenConfigTpl.adyenclientkey,
+                locale: adyenConfigSession ? adyenConfigSession.locale : adyenConfigTpl.shoplocale,
+                environment: adyenConfigSession ? adyenConfigSession.environment : adyenConfigTpl.adyenenvironment,
+                clientKey: adyenConfigSession ? adyenConfigSession.clientKey : adyenConfigTpl.adyenclientkey,
                 paymentMethodsResponse: Object.assign({}, adyenPaymentMethodsResponseConfig),
                 onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
             };
@@ -249,20 +304,21 @@
             return $('[data-storagekeyname="sComment"]').val();
         },
 
-        // TODO bespreken, mag normaal weg, ophalen via id
+        // TODO ok
         getPaymentMethod: function () {
             var me = this;
 
             return me.sessionStorage.getItem(me.paymentMethodSession);
         },
 
-        // TODO bespreken, mag normaal weg, ophalen via id en type
+        // TODO ok
         getStorePaymentMethod: function () {
             var me = this;
 
             return me.sessionStorage.getItem(me.storePaymentMethodSession);
         },
 
+        // TODO ok
         getAdyenConfigSession: function () {
             var me = this;
 
