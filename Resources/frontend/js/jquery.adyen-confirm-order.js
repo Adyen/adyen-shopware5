@@ -10,7 +10,7 @@
             confirmFormSelector: '#confirm--form',
             mountRedirectSelector: '.is--act-confirm',
             adyenType: '',
-            adyenSetSession: {}, // TODO check
+            adyenSetSession: {}, // TODO check: this should still be used
             adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',

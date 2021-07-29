@@ -55,7 +55,7 @@ class PaymentMethodsEnricherService implements PaymentMethodsEnricherServiceInte
     public function __invoke(array $shopwareMethods): array
     {
         $shopwareMethods = array_filter($shopwareMethods, function ($method) {
-            return (int) $method['source'] !== SourceType::adyenType()->getType();
+            return (int) $method['source'] !== SourceType::adyen()->getType();
         });
 
         $paymentMethodOptions = $this->shopwarePaymentMethodService->getPaymentMethodOptions();
@@ -82,7 +82,7 @@ class PaymentMethodsEnricherService implements PaymentMethodsEnricherServiceInte
             $paymentMethodEnricher
         ) {
             $source = (int)($shopwareMethod['source'] ?? null);
-            if (SourceType::adyenType()->getType() !== $source) {
+            if (SourceType::adyen()->getType() !== $source) {
                 return $shopwareMethod;
             }
 

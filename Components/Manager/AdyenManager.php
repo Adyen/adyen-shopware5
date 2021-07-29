@@ -20,9 +20,8 @@ class AdyenManager
      */
     private $modelManager;
 
-    public function __construct(
-        EntityManagerInterface $modelManager
-    ) {
+    public function __construct(EntityManagerInterface $modelManager)
+    {
         $this->modelManager = $modelManager;
     }
 

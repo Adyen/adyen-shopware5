@@ -115,7 +115,7 @@ class CheckoutSubscriber implements SubscriberInterface
 
         if (!$userData['additional'] ||
             !$userData['additional']['payment'] ||
-            (int) $userData['additional']['payment']['source'] !== SourceType::adyenType()->getType()) {
+            (int) $userData['additional']['payment']['source'] !== SourceType::adyen()->getType()) {
             return;
         }
 
@@ -253,10 +253,8 @@ class CheckoutSubscriber implements SubscriberInterface
     private function shouldRedirectToStep2(Shopware_Controllers_Frontend_Checkout $subject): bool
     {
         $userData = $subject->View()->getAssign('sUserData');
-
-        if (!$userData['additional'] ||
-            !$userData['additional']['payment'] ||
-            (int) $userData['additional']['payment']['source'] !== SourceType::adyenType()->getType()) {
+        $source = (int) $userData['additional']['payment']['source'] ?? null;
+        if (SourceType::load($source)->equals(SourceType::adyen())) {
             return false;
         }
 
@@ -277,13 +275,13 @@ class CheckoutSubscriber implements SubscriberInterface
         //TODO: payment details are also used in
         if (!$paymentMethod->getValue('details') && !$paymentMethod->isStoredPayment()) {
             $subject->View()->assign('sAdyenSetSession', $paymentMethod->serializeMinimalState()); // TODO check
+            // TODO would be so much more logic
+//            $subject->View()->assign('adyenPaymentState', $paymentMethod->serializeMinimalState()); // TODO check
 
             return false;
         }
 
-        //TODO already removed session const
-        // find a fix for return
-        return !$this->session->offsetExists(AdyenPayment::SESSION_ADYEN_PAYMENT_VALID);
+        return true;
     }
 
 

@@ -78,7 +78,7 @@ class OrderEmailSubscriber implements SubscriberInterface
     {
         $variables = $args->get('variables');
 
-        if ((int) $variables['additional']['payment']['source'] === SourceType::adyenType()->getType()
+        if ((int) $variables['additional']['payment']['source'] === SourceType::adyen()->getType()
             && true === Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true)
         ) {
 

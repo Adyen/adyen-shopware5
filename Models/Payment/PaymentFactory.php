@@ -33,7 +33,7 @@ class PaymentFactory implements PaymentFactoryInterface
         $new->setDescription($name);
         $new->setAdditionalDescription('Adyen '.$name);
         $new->setShops(new ArrayCollection([$shop]));
-        $new->setSource(SourceType::adyenType()->getType());
+        $new->setSource(SourceType::adyen()->getType());
         $new->setPluginId(PluginType::adyenType()->getType());
         $new->setCountries(new ArrayCollection(
             $this->countryRepository->findAll()
@@ -55,7 +55,7 @@ class PaymentFactory implements PaymentFactoryInterface
         $new->setDescription($name);
         $new->setAdditionalDescription('Adyen '.$name);
         $new->setShops(new ArrayCollection([$shop]));
-        $new->setSource(SourceType::adyenType()->getType());
+        $new->setSource(SourceType::adyen()->getType());
         $new->setPluginId(PluginType::adyenType()->getType());
         $new->setCountries(new ArrayCollection(
             $this->countryRepository->findAll()
@@ -76,7 +76,7 @@ class PaymentFactory implements PaymentFactoryInterface
         $payment->setDescription($name);
         $payment->setAdditionalDescription('Adyen '.$name);
         $payment->setShops(new ArrayCollection([$shop]));
-        $payment->setSource(SourceType::adyenType()->getType());
+        $payment->setSource(SourceType::adyen()->getType());
         $payment->setPluginId(PluginType::adyenType()->getType());
         $payment->setCountries(new ArrayCollection(
             $this->countryRepository->findAll()
@@ -97,7 +97,7 @@ class PaymentFactory implements PaymentFactoryInterface
         $payment->setDescription($name);
         $payment->setAdditionalDescription('Adyen '.$name);
         $payment->setShops(new ArrayCollection([$shop]));
-        $payment->setSource(SourceType::adyenType()->getType());
+        $payment->setSource(SourceType::adyen()->getType());
         $payment->setPluginId(PluginType::adyenType()->getType());
         $payment->setCountries(new ArrayCollection(
             $this->countryRepository->findAll()

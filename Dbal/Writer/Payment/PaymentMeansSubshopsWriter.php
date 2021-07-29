@@ -29,7 +29,7 @@ final class PaymentMeansSubshopsWriter implements PaymentMeansSubshopsWriterInte
                     WHERE s_core_paymentmeans.source = :adyenSource;',
             [
                 ':subshopID' => $subshopId,
-                ':adyenSource' => SourceType::adyenType()->getType()
+                ':adyenSource' => SourceType::adyen()->getType()
             ]
         );
     }
