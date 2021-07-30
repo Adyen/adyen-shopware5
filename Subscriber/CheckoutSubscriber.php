@@ -4,16 +4,15 @@ namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
+use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder;
 use AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsEnricherServiceInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
-use Enlight_Components_Session_Namespace;
 use Enlight_Event_EventArgs;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\DataConversion;
 use sAdmin;
-use Shopware_Components_Snippet_Manager;
 use Shopware_Controllers_Frontend_Checkout;
 
 /**
@@ -26,17 +25,10 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var Configuration
      */
     protected $configuration;
-
     /**
      * @var PaymentMethodService
      */
     protected $paymentMethodService;
-
-    /**
-     * @var Shopware_Components_Snippet_Manager
-     */
-    private $snippets;
-
     /**
      * @var DataConversion
      */
@@ -45,24 +37,27 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var PaymentMethodsEnricherServiceInterface
      */
     private $paymentMethodsEnricherService;
-
     /**
      * @var sAdmin
      */
     private $admin;
+    /**
+     * @var PaymentMethodOptionsBuilder
+     */
+    private $paymentMethodOptionsBuilder;
 
     public function __construct(
         Configuration $configuration,
         PaymentMethodService $paymentMethodService,
-        Shopware_Components_Snippet_Manager $snippets,
         DataConversion $dataConversion,
-        PaymentMethodsEnricherServiceInterface $paymentMethodsEnricherService
+        PaymentMethodsEnricherServiceInterface $paymentMethodsEnricherService,
+        PaymentMethodOptionsBuilder $paymentMethodOptionsBuilder
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
-        $this->snippets = $snippets;
         $this->dataConversion = $dataConversion;
         $this->paymentMethodsEnricherService = $paymentMethodsEnricherService;
+        $this->paymentMethodOptionsBuilder = $paymentMethodOptionsBuilder;
     }
 
     /**
@@ -170,12 +165,17 @@ class CheckoutSubscriber implements SubscriberInterface
             return false;
         }
 
-        $countryCode = Shopware()->Session()->sOrderVariables['sUserData']['additional']['country']['countryiso'];
-        $currency = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'];
-        $value = Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'];
+        $paymentMethodOptions = $this->paymentMethodOptionsBuilder->__invoke();
+        if ($paymentMethodOptions['value'] == 0) {
+            return false;
+        }
 
         $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
-            $this->paymentMethodService->getPaymentMethods($countryCode, $currency, $value)
+            $this->paymentMethodService->getPaymentMethods(
+                $paymentMethodOptions['countryCode'],
+                $paymentMethodOptions['currency'],
+                $paymentMethodOptions['value']
+            )
         );
 
         $selectedId = $userData['additional']['payment']['id'] ?? null;
