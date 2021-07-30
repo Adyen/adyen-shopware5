@@ -5,8 +5,8 @@
     <services>
         <service id="adyen_payment.enricher.payment_method"
                  class="AdyenPayment\Enricher\Payment\PaymentMethodEnricher">
-            <argument type="service" id="adyen_payment.components.payment_method_service" />
             <argument type="service" id="snippets"/>
+            <argument type="service" id="adyen_payment.components.adyen.payment_method.image_logo_provider"/>
         </service>
     </services>
 </container>

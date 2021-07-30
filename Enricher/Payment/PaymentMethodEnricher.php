@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Enricher\Payment;
 
-use AdyenPayment\Components\Configuration;
+use AdyenPayment\Components\Adyen\PaymentMethod\ImageLogoProviderInterface;
 use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use Shopware_Components_Snippet_Manager;
@@ -12,27 +12,27 @@ use Shopware_Components_Snippet_Manager;
 final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
 {
     /**
-     * @var ShopwarePaymentMethodService
-     */
-    private $paymentMethodService;
-    /**
      * @var Shopware_Components_Snippet_Manager
      */
     private $snippets;
+    /**
+     * @var ImageLogoProviderInterface
+     */
+    private $imageLogoProvider;
 
     public function __construct(
-        ShopwarePaymentMethodService $paymentMethodService,
-        Shopware_Components_Snippet_Manager $snippets
+        Shopware_Components_Snippet_Manager $snippets,
+        ImageLogoProviderInterface $imageLogoProvider
     ) {
-        $this->paymentMethodService = $paymentMethodService;
         $this->snippets = $snippets;
+        $this->imageLogoProvider = $imageLogoProvider;
     }
 
     public function enrichPaymentMethod(array $shopwareMethod, PaymentMethod $paymentMethod): array
     {
         return array_merge($shopwareMethod, [
             'additionaldescription' => $this->enrichDescription($paymentMethod),
-            'image' => $this->paymentMethodService->getAdyenImageByType($paymentMethod->getType()),
+            'image' => $this->imageLogoProvider->getAdyenImageByType($paymentMethod->getType()),
             'isStoredPayment' => $paymentMethod->isStoredPayment(),
             'isAdyenPaymentMethod' => true,
             'adyenType' => $shopwareMethod['attribute']['adyen_type'] ?? '',
