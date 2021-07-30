@@ -62,7 +62,8 @@
             <argument type="service" id="models"/>
             <argument type="service" id="events"/>
         </service>
-        <service id="adyen_payment.components.payment_method_service" class="AdyenPayment\Components\PaymentMethodService">
+        <service id="AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder"
+                 class="AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder">
         </service>
         <service id="adyen_payment.components.builder.notification_builder" class="AdyenPayment\Components\Builder\NotificationBuilder">
             <argument type="service" id="models"/>
@@ -188,7 +189,7 @@
                 id="adyen_payment.components.adyen.payment_method.payment_methods_enricher_service"
                 class="AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsEnricherService">
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
-            <argument type="service" id="adyen_payment.components.payment_method_service"/>
+            <argument type="service" id="AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder"/>
             <argument type="service" id="adyen_payment.enricher.payment_method"/>
             <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentMethodWriter"/>
             <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>

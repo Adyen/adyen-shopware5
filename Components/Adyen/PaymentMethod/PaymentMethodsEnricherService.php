@@ -6,8 +6,8 @@ namespace AdyenPayment\Components\Adyen\PaymentMethod;
 
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
+use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
-use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
@@ -22,9 +22,9 @@ class PaymentMethodsEnricherService implements PaymentMethodsEnricherServiceInte
      */
     protected $paymentMethodService;
     /**
-     * @var ShopwarePaymentMethodService
+     * @var PaymentMethodOptionsBuilder
      */
-    private $shopwarePaymentMethodService;
+    private $paymentMethodOptionsBuilder;
     /**
      * @var PaymentMethodEnricherInterface
      */
@@ -40,13 +40,13 @@ class PaymentMethodsEnricherService implements PaymentMethodsEnricherServiceInte
 
     public function __construct(
         PaymentMethodService $paymentMethodService,
-        ShopwarePaymentMethodService $shopwarePaymentMethodService,
+        PaymentMethodOptionsBuilder $paymentMethodOptionsBuilder,
         PaymentMethodEnricherInterface $paymentMethodEnricher,
         PaymentMethodWriterInterface $paymentMethodWriter,
         ObjectRepository $shopRepository
     ) {
         $this->paymentMethodService = $paymentMethodService;
-        $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
+        $this->paymentMethodOptionsBuilder = $paymentMethodOptionsBuilder;
         $this->paymentMethodEnricher = $paymentMethodEnricher;
         $this->paymentMethodWriter = $paymentMethodWriter;
         $this->shopRepository = $shopRepository;
@@ -59,7 +59,7 @@ class PaymentMethodsEnricherService implements PaymentMethodsEnricherServiceInte
             return !SourceType::load($source)->equals(SourceType::adyen());
         });
 
-        $paymentMethodOptions = $this->shopwarePaymentMethodService->getPaymentMethodOptions();
+        $paymentMethodOptions = $this->paymentMethodOptionsBuilder->__invoke();
         if ($paymentMethodOptions['value'] == 0) {
             return $shopwareMethods;
         }

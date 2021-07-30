@@ -2,13 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Components;
+namespace AdyenPayment\Components\Adyen\Builder;
 
-/**
- * Class PaymentMethodService
- * @package AdyenPayment\Components
- */
-class PaymentMethodService
+class PaymentMethodOptionsBuilder
 {
     /**
      * PaymentMethodService constructor.
@@ -17,7 +13,7 @@ class PaymentMethodService
     {
     }
 
-    public function getPaymentMethodOptions()
+    public function __invoke(): array
     {
         $countryCode = Shopware()->Session()->sOrderVariables['sUserData']['additional']['country']['countryiso'];
         if (!$countryCode) {
