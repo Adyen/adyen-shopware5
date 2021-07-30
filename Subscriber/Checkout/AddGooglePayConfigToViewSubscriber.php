@@ -10,10 +10,6 @@ use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 
-/**
- * Class AddGooglePayConfigToViewSubscriber
- * @package AdyenPayment\Subscriber\Checkout
- */
 class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
 {
     /**
@@ -21,9 +17,7 @@ class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
      */
     protected $configuration;
 
-    public function __construct(
-        Configuration $configuration
-    ) {
+    public function __construct(Configuration $configuration) {
         $this->configuration = $configuration;
     }
 
@@ -56,20 +50,17 @@ class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
             return;
         }
 
-        if ($userData['additional']['payment']['attributes']['core']['adyen_type'] !== 'paywithgoogle') {
+        $adyenType = (string) ($userData['additional']['payment']['attributes']['core']['adyen_type'] ?? '');
+        if ('paywithgoogle' !== $adyenType) {
             return;
         }
 
         $currencyUtil = new Currency();
         $adyenGoogleConfig = [
-            'environment' => 'TEST',
             'environment' => ($this->configuration->getEnvironment() === Configuration::ENV_LIVE ? 'PRODUCTION' : 'TEST'),
             'showPayButton' => true,
             'currencyCode' => $basket['sCurrencyName'],
-            'amount' => $currencyUtil->sanitize($basket['AmountNumeric'], $basket['sCurrencyName']),
-            'configuration' => [
-                'merchantIdentifier' => $this->configuration->getGoogleMerchantId()
-            ]
+            'amount' => $currencyUtil->sanitize($basket['AmountNumeric'], $basket['sCurrencyName'])
         ];
 
         $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));

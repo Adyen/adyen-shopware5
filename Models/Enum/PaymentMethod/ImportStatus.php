@@ -17,7 +17,7 @@ final class ImportStatus
 
     public function __construct(string $status)
     {
-        if (!self::availableStatuses($status)) {
+        if (!self::isValidStatus($status)) {
             throw new \InvalidArgumentException('Invalid import status: "' . $status . '"');
         }
 
@@ -39,12 +39,12 @@ final class ImportStatus
         return new self($status);
     }
 
-    public static function createdStatus()
+    public static function created()
     {
         return new self(self::$CREATED);
     }
 
-    public static function notChangedStatus()
+    public static function notChanged()
     {
         return new self(self::$NOT_CHANGED);
     }
@@ -54,7 +54,7 @@ final class ImportStatus
         return new self(self::$NOT_HANDLED);
     }
 
-    public static function availableStatuses(string $status): bool
+    public static function isValidStatus(string $status): bool
     {
         $availableStatuses = [
             self::$CREATED,

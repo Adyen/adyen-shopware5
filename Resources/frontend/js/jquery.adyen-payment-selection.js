@@ -121,7 +121,6 @@
                 return;
             }
 
-            // wel ADYEN
             if (!me.__canHandlePayment(payment)) {
                 me.setPaymentSession(me.__buildMinimalState(payment));
                 return;

@@ -64,7 +64,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
             $adyenPaymentMethod
         );
 
-        return ImportResult::success($shop, $adyenPaymentMethod, ImportStatus::createdStatus());
+        return ImportResult::success($shop, $adyenPaymentMethod, ImportStatus::created());
     }
 
     private function write(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
