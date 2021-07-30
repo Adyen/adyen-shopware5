@@ -64,7 +64,6 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
 
             yield from $this->import($shop);
         }
-        $this->entityManager->flush();
     }
 
     public function importForShop(Shop $shop): \Generator

@@ -32,7 +32,7 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
     {
         return array_merge($shopwareMethod, [
             'additionaldescription' => $this->enrichDescription($paymentMethod),
-            'image' => $this->imageLogoProvider->getAdyenImageByType($paymentMethod->getType()),
+            'image' => $this->imageLogoProvider->provideByType($paymentMethod->getType()),
             'isStoredPayment' => $paymentMethod->isStoredPayment(),
             'isAdyenPaymentMethod' => true,
             'adyenType' => $shopwareMethod['attribute']['adyen_type'] ?? '',

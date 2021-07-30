@@ -11,7 +11,7 @@
             mountRedirectSelector: '.is--act-confirm',
             adyenType: '',
             adyenGoogleConfig: {},
-            adyenPaymentState: {}, // TODO check: this should still be used
+            adyenPaymentState: {},
             adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
@@ -41,14 +41,11 @@
             me.setCheckout();
             me.handleCheckoutButton();
         },
-
-        // TODO ok
         eventListeners: function () {
             var me = this;
 
             me._on(me.opts.placeOrderSelector, 'click', $.proxy(me.onPlaceOrder, me));
         },
-
         checkSetSession: function () {
             var me = this;
 
@@ -64,8 +61,6 @@
 
             me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenPaymentState));
         },
-
-        // TODO ok
         onPlaceOrder: function (event) {
             var me = this;
 
@@ -105,7 +100,7 @@
                         $.loadingIndicator.close();
                     }
                 });
-            } else { // TODO mag weg door if die wegvalt
+            } else {
                 if (me.opts.adyenIsAdyenPayment) {
                     this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
                     return;
@@ -114,8 +109,6 @@
                 $(me.opts.confirmFormSelector).submit();
             }
         },
-
-        // TODO ok
         handlePaymentData: function (data) {
             var me = this;
 
@@ -134,14 +127,10 @@
                     break;
             }
         },
-
-        // TODO ok
         handlePaymentDataAuthorised: function (data) {
             var me = this;
             $(me.opts.confirmFormSelector).submit();
         },
-
-        // TODO ok
         handlePaymentDataCreateFromAction: function (data) {
             var me = this;
             var payload = {
@@ -178,8 +167,6 @@
                 })
                 .mount('#AdyenModal');
         },
-
-        // TODO ok
         handlePaymentDataRedirectShopper: function (data) {
             var me = this;
             if ('redirect' === data.action.type || 'qrCode' === data.action.type) {
@@ -188,8 +175,6 @@
                     .mount(me.opts.mountRedirectSelector);
             }
         },
-
-        // TODO ok
         handlePaymentDataError: function (data) {
             var me = this;
 
@@ -210,7 +195,6 @@
                     break;
             }
         },
-
         handleCheckoutButton: function () {
             var me = this;
 
@@ -218,7 +202,6 @@
                 me.replaceCheckoutButtonForGooglePay();
             }
         },
-
         replaceCheckoutButtonForGooglePay: function () {
             var me = this;
 
@@ -245,8 +228,6 @@
                     this.addAdyenError(me.opts.adyenSnippets.errorGooglePayNotAvailable);
                 });
         },
-
-        // TODO ok
         addAdyenError: function (message) {
             var me = this;
             $.publish('plugin/AdyenPaymentCheckoutError/addError', message);
@@ -258,13 +239,9 @@
                 .find('.js--loading')
                 .remove();
         },
-
-        // TODO ok
         clearAdyenError: function () {
             $.publish('plugin/AdyenPaymentCheckoutError/cleanErrors');
         },
-
-        // TODO ok
         setConfig: function () {
             var me = this;
 
@@ -291,41 +268,29 @@
                 onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
             };
         },
-
-        // TODO ok
         setCheckout: function () {
             var me = this;
 
             me.adyenCheckout = new AdyenCheckout(me.adyenConfiguration);
         },
-
-        // TODO ok
         getComment: function() {
             return $('[data-storagekeyname="sComment"]').val();
         },
-
-        // TODO ok
         getPaymentMethod: function () {
             var me = this;
 
             return me.sessionStorage.getItem(me.paymentMethodSession);
         },
-
-        // TODO ok
         getStorePaymentMethod: function () {
             var me = this;
 
             return me.sessionStorage.getItem(me.storePaymentMethodSession);
         },
-
-        // TODO ok
         getAdyenConfigSession: function () {
             var me = this;
 
             return me.sessionStorage.getItem('adyenConfig');
         },
-
-        // TODO ok
         getBrowserInfo: function () {
             return {
                 'language': navigator.language,
@@ -337,8 +302,6 @@
                 'javaEnabled': navigator.javaEnabled()
             };
         },
-
-        // TODO ok
         handleOnAdditionalDetails: function (state, component) {
             $.loadingIndicator.close();
         }

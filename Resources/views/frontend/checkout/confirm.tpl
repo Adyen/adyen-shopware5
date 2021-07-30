@@ -29,7 +29,6 @@
     {if $sAdyenGoogleConfig}
         data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
     {/if}
-    {* TODO: hernoemen naar adyenSetState   *}
     {if $adyenPaymentState}
         data-adyenPaymentState='{$adyenPaymentState}'
     {/if}

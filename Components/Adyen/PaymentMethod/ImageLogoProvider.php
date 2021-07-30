@@ -11,16 +11,10 @@ class ImageLogoProvider implements ImageLogoProviderInterface
         'yandex_money' => 'yandex'
     ];
 
-    /**
-     * @param $type
-     * @return string
-     */
-    public function getAdyenImageByType($type): string
+    public function provideByType(string $type): string
     {
         //Some payment method codes don't match the logo filename
-        if (!empty(self::PM_LOGO_FILENAME[$type])) {
-            $type = self::PM_LOGO_FILENAME[$type];
-        }
-        return sprintf('https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/%s.svg', $type);
+        $logoType = self::PM_LOGO_FILENAME[$type] ?? $type;
+        return sprintf('https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/%s.svg', $logoType);
     }
 }

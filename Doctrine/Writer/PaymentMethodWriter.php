@@ -6,6 +6,7 @@ namespace AdyenPayment\Doctrine\Writer;
 
 use AdyenPayment\Dbal\Provider\Payment\PaymentMeanProviderInterface;
 use AdyenPayment\Exceptions\ImportPaymentMethodException;
+use AdyenPayment\Models\Enum\PaymentMethod\ImportStatus;
 use AdyenPayment\Models\Payment\PaymentFactoryInterface;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use AdyenPayment\Models\PaymentMethod\ImportResult;
@@ -63,7 +64,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
             $adyenPaymentMethod
         );
 
-        return ImportResult::success($shop, $adyenPaymentMethod);
+        return ImportResult::success($shop, $adyenPaymentMethod, ImportStatus::createdStatus());
     }
 
     private function write(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment

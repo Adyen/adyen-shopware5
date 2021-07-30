@@ -81,7 +81,6 @@
             me.setCheckout();
             me.handleSelectedMethod();
         },
-        // TODO ok
         eventListeners: function () {
             var me = this;
 
@@ -89,7 +88,6 @@
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
         },
-        // TODO ok
         onPaymentFormSubmit: function (e) {
             var me = this;
             if ($(me.opts.paymentMethodFormSubmitSelector).hasClass('is--disabled')) {
@@ -97,11 +95,9 @@
                 return false;
             }
         },
-        // TODO ok
         isPaymentElement: function (elementId) {
             return $('#' + elementId).parents(this.opts.paymentMethodSelector).length > 0;
         },
-        // TODO ok
         onPaymentChangedBefore: function ($event) {
             var me = this;
             var selectedPaymentElementId = event.target.id;
@@ -114,7 +110,6 @@
             me.selectedPaymentElementId = selectedPaymentElementId;
             me.selectedPaymentId = $(event.target).val();
         },
-        // TODO ok
         onPaymentChangedAfter: function () {
             var me = this;
 
@@ -144,7 +139,6 @@
             $(me.opts.paymentMethodFormSubmitSelector).addClass('is--disabled');
             me.handleComponent(payment);
         },
-        // TODO ok
         setConfig: function () {
             var me = this;
 
@@ -169,18 +163,15 @@
             };
             me.saveAdyenConfigInSession(me.adyenConfiguration);
         },
-        // TODO ok
         getCurrentComponentId: function (selectedPaymentElementId) {
             return 'component-' + selectedPaymentElementId;
         },
-        // TODO ok
         getPaymentMethodById: function (id) {
             var me = this;
             var paymentMethod = me.opts.enrichedPaymentMethods[id] || {};
 
             return paymentMethod;
         },
-        // TODO bespreken, detail is nodig, maar mogelijks met refactor
         /**
          * @param {object} paymentMethod
          * @param {String} detailKey
@@ -196,13 +187,11 @@
 
             return filteredDetails[0] || null;
         },
-        // TODO ok
         setCheckout: function () {
             var me = this;
 
             me.adyenCheckout = new AdyenCheckout(me.adyenConfiguration);
         },
-        // TODO ok
         handleComponent: function (paymentMethod) {
             var me = this;
 
@@ -216,12 +205,10 @@
                 .create(adyenCheckoutData.cardType, adyenCheckoutData.paymentMethodData)
                 .mount('#' + me.getCurrentComponentId(me.selectedPaymentElementId));
         },
-        // TODO ok
         handleComponentPayWithGoogle: function () {
             var me = this;
             $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
         },
-        // TODO ok
         handleOnChange: function (state) {
             var me = this;
 
@@ -240,7 +227,6 @@
                 me.changeInfosButton = null;
             }
         },
-        // TODO ok
         handleSelectedMethod: function () {
             var me = this;
 
@@ -262,7 +248,6 @@
 
             me.enableUpdatePaymentInfoButton();
         },
-        // TODO ok
         isPaymentMethodValid: function (paymentMethodElement) {
             var me = this;
 
@@ -280,7 +265,6 @@
 
             return me.__canHandlePayment(paymentMethod);
         },
-        // TODO ok
         updatePaymentInfo: function () {
             var me = this;
 
@@ -331,7 +315,6 @@
 
             me.sessionStorage.setItem(me.adyenConfigSession, JSON.stringify(data));
         },
-        // TODO ok
         enableUpdatePaymentInfoButton: function () {
             var me = this;
             var paymentMethodContainer = $(me.opts.formSelector)
@@ -354,7 +337,6 @@
                 .find(me.opts.methodBankdataSelector)
                 .append(me.changeInfosButton);
         },
-        // TODO ok
         /**
          * @param {string} paymentType
          * @return {boolean}
@@ -374,7 +356,6 @@
 
             return filteredTypes.length > 0;
         },
-        // TODO ok
         /**
          * @param {object} paymentMethod
          * @return {boolean}
@@ -383,7 +364,6 @@
         __isStoredPaymentMethod: function (paymentMethod) {
             return paymentMethod.isStoredPayment || false;
         },
-        // TODO bespreken: als sessie weggaat, altijd false
         /**
          * @return {boolean}
          * @private
@@ -409,7 +389,6 @@
 
             return 1 === keys.length && 'type' === keys[0]; // Minimal state structure @see __buildMinimalState()
         },
-        // TODO ok
         /**
          * @param {object} paymentMethod
          * @return {boolean}
@@ -418,7 +397,6 @@
         __isAdyenPaymentMethod: function (paymentMethod) {
             return paymentMethod.isAdyenPaymentMethod || false;
         },
-        // TODO bespreken
         /**
          * @param {object} paymentMethod
          * @return {boolean}
@@ -438,7 +416,6 @@
             // not all adyen payment methods have "details", these cannot be handled by webcomponents (e.g. Paypal)
             return "undefined" !== typeof paymentMethod.metadata.details;
         },
-        // TODO ok
         /**
          * @param  {object} paymentMethod
          * @return {boolean}
@@ -448,7 +425,6 @@
             // ignore property "paymentMethod.supportsRecurring"
             return 'scheme' === paymentMethod.adyenType;
         },
-        // TODO ok
         /**
          * Modify AdyenPaymentMethod with additional data for the web-component library
          * @param paymentMethod Adyen response: Payment Method response
