@@ -6,7 +6,6 @@ namespace AdyenPayment\Components\Adyen\PaymentMethod;
 
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
-use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
