@@ -9,18 +9,16 @@ use Shopware\Models\Shop\Shop;
 
 class ImportPaymentMethodException extends \Exception
 {
-    public static function missingId(PaymentMethod $paymentMethod, Shop $shop): self
+    public function missingId(PaymentMethod $paymentMethod, Shop $shop): self
     {
-        return new static(
-            "Could not import "
-            . $paymentMethod->isStoredPayment() ? "stored" : "" .
-            "payment method with id: "
-            . $paymentMethod->getId() .
-            " and type: "
-            . $paymentMethod->getType() .
-            " from adyen for shop: "
-            . $shop->getName() .
-            "."
+        return new self(
+            sprintf(
+                'Could not import %s payment method with id: %s and type: %s from adyen for shop: %s.',
+                $paymentMethod->isStoredPayment() ? "stored" : "",
+                $paymentMethod->getId(),
+                $paymentMethod->getType(),
+                $shop->getName()
+            )
         );
     }
 }
