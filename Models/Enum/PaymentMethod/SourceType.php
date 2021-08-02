@@ -9,9 +9,6 @@ namespace AdyenPayment\Models\Enum\PaymentMethod;
  */
 final class SourceType
 {
-    /**
-     * @see \Shopware\Models\Payment\Payment::$source
-     */
     private static $DEFAULT_PAYMENT = null; // Shopware default payment mean source
     private static $SELF_CREATED = 1; // User created payment mean source
     private static $ADYEN = 1425514; // Adyen specific payment mean, avoid conflict with other plugins
