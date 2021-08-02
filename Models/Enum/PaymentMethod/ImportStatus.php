@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Models\Enum\PaymentMethod;
 
-use Assert\Assertion;
-
 final class ImportStatus
 {
     private static $CREATED = 'CREATED';
@@ -17,7 +15,13 @@ final class ImportStatus
 
     public function __construct(string $status)
     {
-        if (!self::isValidStatus($status)) {
+        $availableStates = [
+            self::$CREATED,
+            self::$NOT_CHANGED,
+            self::$NOT_HANDLED
+        ];
+
+        if (!in_array($status, $availableStates, true)) {
             throw new \InvalidArgumentException('Invalid import status: "' . $status . '"');
         }
 
@@ -52,16 +56,5 @@ final class ImportStatus
     public static function notHandledStatus()
     {
         return new self(self::$NOT_HANDLED);
-    }
-
-    public static function isValidStatus(string $status): bool
-    {
-        $availableStatuses = [
-            self::$CREATED,
-            self::$NOT_CHANGED,
-            self::$NOT_HANDLED
-        ];
-
-        return in_array($status, $availableStatuses, true);
     }
 }
