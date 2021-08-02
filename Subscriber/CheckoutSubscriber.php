@@ -4,7 +4,7 @@ namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
-use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder;
+use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
@@ -42,7 +42,7 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     private $admin;
     /**
-     * @var PaymentMethodOptionsBuilder
+     * @var PaymentMethodOptionsBuilderInterface
      */
     private $paymentMethodOptionsBuilder;
 
@@ -51,7 +51,7 @@ class CheckoutSubscriber implements SubscriberInterface
         PaymentMethodService $paymentMethodService,
         DataConversion $dataConversion,
         EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider,
-        PaymentMethodOptionsBuilder $paymentMethodOptionsBuilder
+        PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;

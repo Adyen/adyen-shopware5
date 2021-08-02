@@ -7,6 +7,7 @@ namespace AdyenPayment\Components\Adyen\PaymentMethod;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder;
+use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
@@ -22,7 +23,7 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
      */
     protected $paymentMethodService;
     /**
-     * @var PaymentMethodOptionsBuilder
+     * @var PaymentMethodOptionsBuilderInterface
      */
     private $paymentMethodOptionsBuilder;
     /**
@@ -40,7 +41,7 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
 
     public function __construct(
         PaymentMethodService $paymentMethodService,
-        PaymentMethodOptionsBuilder $paymentMethodOptionsBuilder,
+        PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder,
         PaymentMethodEnricherInterface $paymentMethodEnricher,
         PaymentMethodWriterInterface $paymentMethodWriter,
         ObjectRepository $shopRepository
