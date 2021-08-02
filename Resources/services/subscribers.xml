@@ -16,7 +16,7 @@
         </service>
         <service id="adyen_payment.subscriber.payment" class="AdyenPayment\Subscriber\PaymentSubscriber">
             <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="adyen_payment.components.adyen.payment_method.payment_methods_enricher_service" />
+            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider" />
         </service>
         <service id="adyen_payment.subscriber.backend_order_subscriber" class="AdyenPayment\Subscriber\BackendOrderSubscriber">
             <tag name="shopware.event_subscriber"/>
@@ -33,7 +33,7 @@
             <argument type="service" id="adyen_payment.components.configuration"/>
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
             <argument type="service" id="adyen_payment.components.data_conversion" />
-            <argument type="service" id="adyen_payment.components.adyen.payment_method.payment_methods_enricher_service"/>
+            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider"/>
             <argument type="service" id="AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder"/>
         </service>
         <service id="adyen_payment.subscriber.checkout.add_google_pay_config_to_view_subscriber" class="AdyenPayment\Subscriber\Checkout\AddGooglePayConfigToViewSubscriber">

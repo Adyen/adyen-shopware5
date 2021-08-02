@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
-use AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsEnricherServiceInterface;
+use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 
@@ -21,19 +21,19 @@ class PaymentSubscriber implements SubscriberInterface
      */
     private $skipReplaceAdyenMethods = false;
     /**
-     * @var PaymentMethodsEnricherServiceInterface
+     * @var EnrichedPaymentMeanProviderInterface
      */
-    private $paymentMethodsEnricherService;
+    private $enrichedPaymentMeanProvider;
 
     /**
      * PaymentSubscriber constructor.
      *
-     * @param PaymentMethodsEnricherServiceInterface $paymentMethodsEnricherService
+     * @param EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider
      */
     public function __construct(
-        PaymentMethodsEnricherServiceInterface $paymentMethodsEnricherService
+        EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider
     ) {
-        $this->paymentMethodsEnricherService = $paymentMethodsEnricherService;
+        $this->enrichedPaymentMeanProvider = $enrichedPaymentMeanProvider;
     }
 
     public static function getSubscribedEvents(): array
@@ -75,6 +75,6 @@ class PaymentSubscriber implements SubscriberInterface
             return $shopwareMethods;
         }
 
-        return $this->paymentMethodsEnricherService->__invoke($shopwareMethods);
+        return $this->enrichedPaymentMeanProvider->__invoke($shopwareMethods);
     }
 }

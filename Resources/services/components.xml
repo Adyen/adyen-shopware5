@@ -186,8 +186,8 @@
             <argument type="service" id="adyen_payment.logger"/>
         </service>
         <service
-                id="adyen_payment.components.adyen.payment_method.payment_methods_enricher_service"
-                class="AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsEnricherService">
+                id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider"
+                class="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider">
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
             <argument type="service" id="AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder"/>
             <argument type="service" id="adyen_payment.enricher.payment_method"/>

@@ -5,7 +5,7 @@ namespace AdyenPayment\Subscriber;
 use Adyen\AdyenException;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder;
-use AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsEnricherServiceInterface;
+use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
@@ -34,9 +34,9 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     private $dataConversion;
     /**
-     * @var PaymentMethodsEnricherServiceInterface
+     * @var EnrichedPaymentMeanProviderInterface
      */
-    private $paymentMethodsEnricherService;
+    private $enrichedPaymentMeanProvider;
     /**
      * @var sAdmin
      */
@@ -50,13 +50,13 @@ class CheckoutSubscriber implements SubscriberInterface
         Configuration $configuration,
         PaymentMethodService $paymentMethodService,
         DataConversion $dataConversion,
-        PaymentMethodsEnricherServiceInterface $paymentMethodsEnricherService,
+        EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider,
         PaymentMethodOptionsBuilder $paymentMethodOptionsBuilder
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
         $this->dataConversion = $dataConversion;
-        $this->paymentMethodsEnricherService = $paymentMethodsEnricherService;
+        $this->enrichedPaymentMeanProvider = $enrichedPaymentMeanProvider;
         $this->paymentMethodOptionsBuilder = $paymentMethodOptionsBuilder;
     }
 
@@ -117,7 +117,7 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         $this->admin = Shopware()->Modules()->Admin();
-        $enrichedPaymentMethods = $this->paymentMethodsEnricherService->__invoke(
+        $enrichedPaymentMethods = $this->enrichedPaymentMeanProvider->__invoke(
             $this->admin->sGetPaymentMeans()
         );
 

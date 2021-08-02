@@ -15,7 +15,7 @@ use AdyenPayment\Models\Payment\PaymentMethodType;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
-class PaymentMethodsEnricherService implements PaymentMethodsEnricherServiceInterface
+class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterface
 {
     /**
      * @var PaymentMethodService
