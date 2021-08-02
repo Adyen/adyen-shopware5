@@ -17,13 +17,11 @@ final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
      */
     private $paymentMeansSubshopsRemover;
 
-    public function __construct(
-        PaymentMeansSubshopsRemoverInterface $paymentMeansSubshopsRemover
-    ) {
+    public function __construct(PaymentMeansSubshopsRemoverInterface $paymentMeansSubshopsRemover) {
         $this->paymentMeansSubshopsRemover = $paymentMeansSubshopsRemover;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'Enlight_Controller_Action_PostDispatch_Backend_Config' => '__invoke',
