@@ -43,17 +43,17 @@ final class ImportStatus
         return new self($status);
     }
 
-    public static function created()
+    public static function created(): self
     {
         return new self(self::$CREATED);
     }
 
-    public static function notChanged()
+    public static function notChanged(): self
     {
         return new self(self::$NOT_CHANGED);
     }
 
-    public static function notHandledStatus()
+    public static function notHandledStatus(): self
     {
         return new self(self::$NOT_HANDLED);
     }
