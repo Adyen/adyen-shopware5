@@ -21,10 +21,6 @@ final class ImportResult
     /** @var ImportStatus */
     private $status;
 
-    private function __construct()
-    {
-    }
-
     public static function success(
         Shop $shop,
         PaymentMethod $paymentMethod,
@@ -83,9 +79,6 @@ final class ImportResult
         return $this->exception;
     }
 
-    /**
-     * @return ImportStatus
-     */
     public function getStatus(): ImportStatus
     {
         return $this->status;
