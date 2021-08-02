@@ -8,7 +8,7 @@ use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use Shopware_Components_Snippet_Manager;
 
-class RegisterPaymentSnippetsSubcriber implements SubscriberInterface
+final class RegisterPaymentSnippetsSubcriber implements SubscriberInterface
 {
     /**
      * @var Shopware_Components_Snippet_Manager
@@ -20,7 +20,7 @@ class RegisterPaymentSnippetsSubcriber implements SubscriberInterface
         $this->snippets = $snippets;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => '__invoke',
