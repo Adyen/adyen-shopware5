@@ -10,21 +10,20 @@ use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 
-class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
+final class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
 {
+    private static $PAY_WITH_GOOGLE = 'paywithgoogle';
+
     /**
      * @var Configuration
      */
-    protected $configuration;
+    private $configuration;
 
     public function __construct(Configuration $configuration) {
         $this->configuration = $configuration;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => '__invoke',
@@ -51,7 +50,7 @@ class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
         }
 
         $adyenType = (string) ($userData['additional']['payment']['attributes']['core']['adyen_type'] ?? '');
-        if ('paywithgoogle' !== $adyenType) {
+        if (self::$PAY_WITH_GOOGLE !== $adyenType) {
             return;
         }
 
