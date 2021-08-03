@@ -56,7 +56,7 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
     {
         $shopwareMethods = array_filter($shopwareMethods, function ($method) {
             $source = (int) ($method['source'] ?? null);
-            return !SourceType::load($source)->equals(SourceType::adyen());
+            return SourceType::load($source)->equals(SourceType::adyen());
         });
 
         $paymentMethodOptions = $this->paymentMethodOptionsBuilder->__invoke();
