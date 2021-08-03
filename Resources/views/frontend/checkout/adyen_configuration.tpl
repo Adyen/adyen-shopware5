@@ -4,6 +4,6 @@
          data-adyenEnvironment='{$sAdyenConfig.environment}'
          data-enrichedPaymentMethods='{$sPayments|@json_encode}'
          {if $mAdyenSnippets}data-adyensnippets="{$mAdyenSnippets}"{/if}
-         class="adyen-payment-selection adyen-config adyen-confirm-order">
+         class="adyen-payment-selection adyen-config">
     </div>
 {/if}
