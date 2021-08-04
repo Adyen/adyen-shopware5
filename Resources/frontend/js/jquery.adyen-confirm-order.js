@@ -11,6 +11,7 @@
             mountRedirectSelector: '.is--act-confirm',
             adyenType: '',
             adyenGoogleConfig: {},
+            adyenSetSession: {},
             adyenPaymentState: {},
             adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
@@ -54,12 +55,15 @@
                 return;
             }
 
+            if (!$.isEmptyObject(me.opts.adyenSetSession)) {
+                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenSetSession));
+                return;
+            }
+
             if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
                 this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
                 return;
             }
-
-            me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenPaymentState));
         },
         onPlaceOrder: function (event) {
             var me = this;

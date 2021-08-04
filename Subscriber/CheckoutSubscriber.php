@@ -161,7 +161,7 @@ class CheckoutSubscriber implements SubscriberInterface
     {
         $userData = $subject->View()->getAssign('sUserData');
         $source = (int) ($userData['additional']['payment']['source'] ?? null);
-        if (!SourceType::load($source)->equals(SourceType::adyen())) {
+        if (SourceType::load($source)->equals(SourceType::adyen())) {
             return false;
         }
 
