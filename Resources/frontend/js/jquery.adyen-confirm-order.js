@@ -11,7 +11,6 @@
             mountRedirectSelector: '.is--act-confirm',
             adyenType: '',
             adyenGoogleConfig: {},
-            adyenSetSession: {},
             adyenPaymentState: {},
             adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
@@ -55,8 +54,8 @@
                 return;
             }
 
-            if (!$.isEmptyObject(me.opts.adyenSetSession)) {
-                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenSetSession));
+            if (!$.isEmptyObject(me.opts.adyenPaymentState)) {
+                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenPaymentState));
                 return;
             }
 
@@ -252,7 +251,7 @@
             var adyenConfigSession = JSON.parse(me.getAdyenConfigSession());
             var adyenConfigTpl = document.querySelector('.adyen-payment-selection.adyen-config').dataset;
 
-            var adyenPaymentMethodsResponseConfig = Object.values(me.opts.enrichedPaymentMethods).reduce(
+            var adyenPaymentMethodsResponseConfig = Object.values(adyenConfigTpl.enrichedpaymentmethods).reduce(
                 function (rawAdyen, enrichedPaymentMethod) {
                     var isAdyenPaymentMethod = enrichedPaymentMethod.isAdyenPaymentMethod || false;
                     if (true === isAdyenPaymentMethod) {
