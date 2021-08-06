@@ -15,13 +15,7 @@ final class ImportStatus
 
     public function __construct(string $status)
     {
-        $availableStates = [
-            self::$CREATED,
-            self::$NOT_CHANGED,
-            self::$NOT_HANDLED
-        ];
-
-        if (!in_array($status, $availableStates, true)) {
+        if (!in_array($status, $this->availableStates(), true)) {
             throw new \InvalidArgumentException('Invalid import status: "' . $status . '"');
         }
 
@@ -56,5 +50,15 @@ final class ImportStatus
     public static function notHandledStatus(): self
     {
         return new self(self::$NOT_HANDLED);
+    }
+
+    private function availableStates(): array
+    {
+        return [
+            self::$CREATED,
+            self::$NOT_CHANGED,
+            self::$NOT_HANDLED
+        ];
+
     }
 }
