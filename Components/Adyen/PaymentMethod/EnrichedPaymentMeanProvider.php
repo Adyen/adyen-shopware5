@@ -55,12 +55,12 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
     public function __invoke(array $shopwareMethods): array
     {
         $shopwareMethods = array_filter($shopwareMethods, function ($method) {
-            $source = (int) ($method['source'] ?? null);
+            $source = (int) ($method['source'] ?? 0);
             return SourceType::load($source)->equals(SourceType::adyen());
         });
 
         $paymentMethodOptions = $this->paymentMethodOptionsBuilder->__invoke();
-        if ($paymentMethodOptions['value'] == 0) {
+        if (0 === $paymentMethodOptions['value']) {
             return $shopwareMethods;
         }
 
@@ -75,10 +75,16 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
         $this->saveStoredPaymentMethods($storedPaymentMethods);
 
+        $shopwareMethods = $this->enrichShopwareMethodWithAdyenDetails($adyenPaymentMethods, $shopwareMethods);
+
+        return $shopwareMethods;
+    }
+
+    private function enrichShopwareMethodWithAdyenDetails(PaymentMethodCollection $adyenPaymentMethods, array $shopwareMethods)
+    {
         $paymentMethodEnricher = $this->paymentMethodEnricher;
 
-        // TODO: refactor to a collection or more clean structure
-        $shopwareMethods = array_filter(array_map(static function (array $shopwareMethod) use (
+        return array_filter(array_map(static function (array $shopwareMethod) use (
             $adyenPaymentMethods,
             $paymentMethodEnricher
         ) {
@@ -99,10 +105,9 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
 
             return $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod, $paymentMethod);
         }, $shopwareMethods));
-
-        return $shopwareMethods;
     }
 
+    // TODO: refactor to appropriate class
     private function saveStoredPaymentMethods(PaymentMethodCollection $storedPaymentMethods)
     {
         // Detached shop cannot be saved with ORM relation mapping
