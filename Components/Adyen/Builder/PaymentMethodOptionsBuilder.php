@@ -13,15 +13,14 @@ final class PaymentMethodOptionsBuilder implements PaymentMethodOptionsBuilderIn
             $countryCode = (string) (Shopware()->Modules()->Admin()->sGetUserData()['additional']['country']['countryiso']);
         }
 
-        $currency = (string) (Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'] ?? '');
-        if (!$currency) {
-            $currency = Shopware()->Shop()->getCurrency()->getCurrency();
-        }
+        $currencyName = Shopware()->Session()->sOrderVariables['sBasket']['sCurrencyName'] ?? '';
+        $currency = $currencyName ?: Shopware()->Shop()->getCurrency()->getCurrency();
 
-        $value = (float) (Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric'] ?? 0.0);
-        if (!$value) {
-            $value = (float) (Shopware()->Modules()->Basket()->sGetAmount()['totalAmount'] ?? 1);
-        }
+        $value = (float) (
+            Shopware()->Session()->sOrderVariables['sBasket']['AmountNumeric']
+            ?? Shopware()->Modules()->Basket()->sGetAmount()['totalAmount']
+            ?? 1.0
+        );
 
         $paymentMethodOptions['countryCode'] = $countryCode;
         $paymentMethodOptions['currency'] = $currency;
