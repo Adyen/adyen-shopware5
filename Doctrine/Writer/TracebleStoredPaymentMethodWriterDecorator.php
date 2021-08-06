@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Models\Payment\Payment;
 use Shopware\Models\Shop\Shop;
 
-class TracebleStoredPaymentMethodWriterDecorator implements StoredPaymentMethodWriterInterface
+final class TracebleStoredPaymentMethodWriterDecorator implements StoredPaymentMethodWriterInterface
 {
     /** @var StoredPaymentMethodWriterInterface */
     private $storedPaymentMethodWriter;
