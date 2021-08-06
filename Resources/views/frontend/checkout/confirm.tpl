@@ -32,7 +32,7 @@
     {if $adyenPaymentState}
         data-adyenPaymentState='{$adyenPaymentState}'
     {/if}
-    {if $sUserData.additional.payment.source == 1425514}
+    {if $sUserData.additional.payment.source == $adyenSourceType}
         data-adyenIsAdyenPayment='true'
     {/if}
 {/block}
