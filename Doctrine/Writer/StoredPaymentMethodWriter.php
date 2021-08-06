@@ -13,7 +13,7 @@ use AdyenPayment\Models\PaymentMethod\ImportResult;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Shop\Shop;
 
-class StoredPaymentMethodWriter implements StoredPaymentMethodWriterInterface
+final class StoredPaymentMethodWriter implements StoredPaymentMethodWriterInterface
 {
     /** @var ModelManager */
     private $entityManager;
