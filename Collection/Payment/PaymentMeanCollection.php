@@ -13,11 +13,11 @@ use IteratorAggregate;
 final class PaymentMeanCollection implements IteratorAggregate, Countable
 {
     /**
-     * @var array<array>|array<PaymentMean>
+     * @var array<PaymentMean>
      */
     private $paymentMeans;
 
-    public function __construct(array ...$paymentMeans)
+    public function __construct(PaymentMean ...$paymentMeans)
     {
         $this->paymentMeans = $paymentMeans;
     }
@@ -33,7 +33,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     }
 
     /**
-     * @return iterable<array>|iterable<PaymentMean>
+     * @return iterable<PaymentMean>
      */
     public function getIterator(): iterable
     {
@@ -69,7 +69,6 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
         return $this->filterBySource(SourceType::adyen());
     }
 
-    // this method converts it back to a Shopware paymentMeans array
     public function toShopwareArray(): array
     {
         return $this->map(

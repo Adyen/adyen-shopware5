@@ -8,22 +8,25 @@ use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 
 final class PaymentMean
 {
+    /** @var int|null */
     private $id;
+    /** @var SourceType */
     private $source;
+    /** @var array */
     private $raw;
 
     public static function createFromShopwareArray(array $paymentMean): self
     {
         $new = new self();
-        $new->id = $paymentMean['id'] ?? null;
-        $new->source = $paymentMean['source'];
+        $new->id = (int) ($paymentMean['id'] ?? null);
+        $new->source = SourceType::load($paymentMean['source']);
         $new->raw = $paymentMean;
 
         return $new;
     }
 
     /**
-     * @return int | null
+     * @return int|null
      */
     public function getId()
     {
@@ -38,6 +41,9 @@ final class PaymentMean
         return $this->source;
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getValue(string $key, $fallback)
     {
         return $this->raw[$key] ?? $fallback;
