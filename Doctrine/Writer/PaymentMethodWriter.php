@@ -55,7 +55,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
             return ImportResult::fromException(
                 $shop,
                 $adyenPaymentMethod,
-                ImportPaymentMethodException::missingId($adyenPaymentMethod, $shop)
+                (new ImportPaymentMethodException)->missingId($adyenPaymentMethod, $shop)
             );
         }
 
@@ -71,7 +71,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
     {
         $swPayment = $this->paymentMeanProvider->provideByAdyenType($adyenPaymentMethod->getType());
 
-        $payment = !is_null($swPayment)
+        $payment = !is_null($swPayment) && ($adyenPaymentMethod->getType() !== 'giftcard')
             ? $this->paymentFactory->updateFromAdyen($swPayment, $adyenPaymentMethod, $shop)
             : $this->paymentFactory->createFromAdyen($adyenPaymentMethod, $shop);
 
