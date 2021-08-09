@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Components\Adyen\PaymentMethod;
 
 use AdyenPayment\AdyenPayment;
+use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
@@ -54,14 +55,12 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
 
     public function __invoke(array $shopwareMethods): array
     {
-        $shopwareMethods = array_filter($shopwareMethods, function ($method) {
-            $source = (int) ($method['source'] ?? 0);
-            return SourceType::load($source)->equals(SourceType::adyen());
-        });
+        $paymentMeans = PaymentMeanCollection::createFromShopwareArray($shopwareMethods);
+        $shopwareMethods = $paymentMeans->filterByAdyenSource();
 
         $paymentMethodOptions = $this->paymentMethodOptionsBuilder->__invoke();
         if (0 === $paymentMethodOptions['value']) {
-            return $shopwareMethods;
+            return $shopwareMethods->toShopwareArray();
         }
 
         $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
@@ -75,36 +74,7 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
         $this->saveStoredPaymentMethods($storedPaymentMethods);
 
-        $shopwareMethods = $this->enrichShopwareMethodWithAdyenDetails($adyenPaymentMethods, $shopwareMethods);
-
-        return $shopwareMethods;
-    }
-
-    private function enrichShopwareMethodWithAdyenDetails(PaymentMethodCollection $adyenPaymentMethods, array $shopwareMethods)
-    {
-        $paymentMethodEnricher = $this->paymentMethodEnricher;
-
-        return array_filter(array_map(static function (array $shopwareMethod) use (
-            $adyenPaymentMethods,
-            $paymentMethodEnricher
-        ) {
-            $source = (int)($shopwareMethod['source'] ?? null);
-            if (!SourceType::load($source)->equals(SourceType::adyen())) {
-                return $shopwareMethod;
-            }
-
-            /** @var Attribute $attribute */
-            $attribute = $shopwareMethod['attribute'];
-            $typeOrId = $attribute->get(AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID)
-                ?: $attribute->get(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL);
-
-            $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($typeOrId);
-            if (!$paymentMethod) {
-                return [];
-            }
-
-            return $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod, $paymentMethod);
-        }, $shopwareMethods));
+        return $shopwareMethods->enrichAdyenPaymentMeans($adyenPaymentMethods);
     }
 
     // TODO: refactor to appropriate class
