@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Components\Adyen\PaymentMethod;
 
-use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
-use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMethodType;
 use Doctrine\Common\Persistence\ObjectRepository;
-use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterface
 {
@@ -56,11 +53,11 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
     public function __invoke(array $shopwareMethods): array
     {
         $paymentMeans = PaymentMeanCollection::createFromShopwareArray($shopwareMethods);
-        $shopwareMethods = $paymentMeans->filterByAdyenSource();
+        $adyenShopwareMethods = $paymentMeans->filterByAdyenSource();
 
         $paymentMethodOptions = $this->paymentMethodOptionsBuilder->__invoke();
         if (0 === $paymentMethodOptions['value']) {
-            return $shopwareMethods->toShopwareArray();
+            return $adyenShopwareMethods->toShopwareArray();
         }
 
         $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
@@ -74,7 +71,7 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
         $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
         $this->saveStoredPaymentMethods($storedPaymentMethods);
 
-        return $shopwareMethods->enrichAdyenPaymentMeans($adyenPaymentMethods);
+        return $adyenShopwareMethods->enrichAdyenPaymentMeans($adyenPaymentMethods, $this->paymentMethodEnricher);
     }
 
     // TODO: refactor to appropriate class

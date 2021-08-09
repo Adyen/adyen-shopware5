@@ -19,7 +19,7 @@ final class PaymentMean
     {
         $new = new self();
         $new->id = (int) ($paymentMean['id'] ?? null);
-        $new->source = SourceType::load($paymentMean['source']);
+        $new->source = SourceType::load((int) $paymentMean['source']);
         $new->raw = $paymentMean;
 
         return $new;

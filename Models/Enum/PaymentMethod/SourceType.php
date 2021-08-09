@@ -39,7 +39,7 @@ final class SourceType
         return $sourceType->getType() === $this->type;
     }
 
-    public static function load($sourceType): self
+    public static function load(int $sourceType): self
     {
         return new self($sourceType);
     }

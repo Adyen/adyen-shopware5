@@ -9,27 +9,18 @@ use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMean;
 use Countable;
-use iterable;
 use IteratorAggregate;
 use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class PaymentMeanCollection implements IteratorAggregate, Countable
 {
     /**
-     * @var PaymentMethodEnricherInterface
-     */
-    private $paymentMethodEnricher;
-    /**
      * @var array<PaymentMean>
      */
     private $paymentMeans;
 
-    public function __construct(
-        PaymentMethodEnricherInterface $paymentMethodEnricher,
-        PaymentMean ...$paymentMeans
-    )
+    public function __construct(PaymentMean ...$paymentMeans)
     {
-        $this->paymentMethodEnricher = $paymentMethodEnricher;
         $this->paymentMeans = $paymentMeans;
     }
 
@@ -44,9 +35,9 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     }
 
     /**
-     * @return iterable<PaymentMean>
+     * @return \Generator<PaymentMean>
      */
-    public function getIterator(): iterable
+    public function getIterator(): \Generator
     {
         yield from $this->paymentMeans;
     }
@@ -89,30 +80,32 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
         );
     }
 
-    public function enrichAdyenPaymentMeans(PaymentMethodCollection $adyenPaymentMethods): array
+    public function enrichAdyenPaymentMeans(
+        PaymentMethodCollection $adyenPaymentMethods,
+        PaymentMethodEnricherInterface $paymentMethodEnricher
+    ): array
     {
-        $paymentMethodEnricher = $this->paymentMethodEnricher;
+        return $this->map(
+            static function (PaymentMean $shopwareMethod) use (
+                $adyenPaymentMethods,
+                $paymentMethodEnricher
+            ) {
+                $source = $shopwareMethod->getSource();
+                if (!SourceType::load($source->getType())->equals(SourceType::adyen())) {
+                    return $shopwareMethod;
+                }
 
-        return $this->map(static function (array $shopwareMethod) use (
-            $adyenPaymentMethods,
-            $paymentMethodEnricher
-        ) {
-            $source = (int)($shopwareMethod['source'] ?? null);
-            if (!SourceType::load($source)->equals(SourceType::adyen())) {
-                return $shopwareMethod;
-            }
+                /** @var Attribute $attribute */
+                $attribute = $shopwareMethod->getRaw()['attribute'];
+                $typeOrId = $attribute->get(AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID)
+                    ?: $attribute->get(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL);
 
-            /** @var Attribute $attribute */
-            $attribute = $shopwareMethod['attribute'];
-            $typeOrId = $attribute->get(AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID)
-                ?: $attribute->get(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL);
+                $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($typeOrId);
+                if (!$paymentMethod) {
+                    return [];
+                }
 
-            $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($typeOrId);
-            if (!$paymentMethod) {
-                return [];
-            }
-
-            return $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod, $paymentMethod);
+                return $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod->getRaw(), $paymentMethod);
         });
     }
 }
