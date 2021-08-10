@@ -39,18 +39,6 @@ class PaymentMethod
         return $this->getPaymentMethodType()->equals(PaymentMethodType::stored());
     }
 
-    public function equalsDefaultPaymentType(string $type): bool
-    {
-        return $this->getPaymentMethodType()->equals(PaymentMethodType::default())
-            && $this->getType() === $type;
-    }
-
-    public function equalsStoredPaymentId(string $id): bool
-    {
-        return $this->getPaymentMethodType()->equals(PaymentMethodType::stored())
-            && $this->getId() === $id;
-    }
-
     public function getId(): string
     {
         return $this->rawData['id'] ?? '';
