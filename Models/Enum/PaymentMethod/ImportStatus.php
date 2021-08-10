@@ -59,6 +59,5 @@ final class ImportStatus
             self::$NOT_CHANGED,
             self::$NOT_HANDLED
         ];
-
     }
 }

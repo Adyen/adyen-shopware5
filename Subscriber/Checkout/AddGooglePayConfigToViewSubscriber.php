@@ -19,7 +19,8 @@ final class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
      */
     private $configuration;
 
-    public function __construct(Configuration $configuration) {
+    public function __construct(Configuration $configuration)
+    {
         $this->configuration = $configuration;
     }
 
@@ -56,7 +57,7 @@ final class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
 
         $currencyUtil = new Currency();
         $adyenGoogleConfig = [
-            'environment' => ($this->configuration->getEnvironment() === Configuration::ENV_LIVE ? 'PRODUCTION' : 'TEST'),
+            'environment' => $this->configuration->getEnvironment() === Configuration::ENV_LIVE ? 'PRODUCTION' : 'TEST',
             'showPayButton' => true,
             'currencyCode' => $basket['sCurrencyName'],
             'amount' => $currencyUtil->sanitize($basket['AmountNumeric'], $basket['sCurrencyName'])

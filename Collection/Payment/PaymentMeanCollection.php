@@ -27,11 +27,13 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     public static function createFromShopwareArray(array $paymentMeans): self
     {
         return new self(
-            ...array_map(function(array $paymentMean) {
-                return PaymentMean::createFromShopwareArray($paymentMean);
-            },
-            $paymentMeans
-        ));
+            ...array_map(
+                function (array $paymentMean) {
+                    return PaymentMean::createFromShopwareArray($paymentMean);
+                },
+                $paymentMeans
+            )
+        );
     }
 
     /**
@@ -83,8 +85,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     public function enrichAdyenPaymentMeans(
         PaymentMethodCollection $adyenPaymentMethods,
         PaymentMethodEnricherInterface $paymentMethodEnricher
-    ): array
-    {
+    ): array {
         return $this->map(
             static function (PaymentMean $shopwareMethod) use (
                 $adyenPaymentMethods,
@@ -106,6 +107,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
                 }
 
                 return $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod->getRaw(), $paymentMethod);
-        });
+            }
+        );
     }
 }

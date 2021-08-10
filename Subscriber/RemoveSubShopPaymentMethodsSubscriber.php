@@ -17,7 +17,8 @@ final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
      */
     private $paymentMeansSubshopsRemover;
 
-    public function __construct(PaymentMeansSubshopsRemoverInterface $paymentMeansSubshopsRemover) {
+    public function __construct(PaymentMeansSubshopsRemoverInterface $paymentMeansSubshopsRemover)
+    {
         $this->paymentMeansSubshopsRemover = $paymentMeansSubshopsRemover;
     }
 
