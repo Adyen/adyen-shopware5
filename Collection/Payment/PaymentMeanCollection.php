@@ -14,9 +14,6 @@ use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class PaymentMeanCollection implements IteratorAggregate, Countable
 {
-    /**
-     * @var array<PaymentMean>
-     */
     private $paymentMeans;
 
     public function __construct(PaymentMean ...$paymentMeans)
@@ -56,7 +53,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
 
     public function filter(callable $filter): self
     {
-        return new self(...array_values(array_filter($this->paymentMeans, $filter)));
+        return new self(...array_filter($this->paymentMeans, $filter));
     }
 
     public function filterBySource(SourceType $source): self
@@ -75,10 +72,13 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
 
     public function toShopwareArray(): array
     {
-        return $this->map(
-            static function (PaymentMean $paymentMean) {
-                return $paymentMean->getRaw();
-            }
+        return array_reduce(
+            $this->paymentMeans,
+            static function (array $payload, PaymentMean $paymentMean) {
+                $payload[$paymentMean->getId()] = $paymentMean->getRaw();
+                return $payload;
+            },
+            []
         );
     }
 
@@ -86,7 +86,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
         PaymentMethodCollection $adyenPaymentMethods,
         PaymentMethodEnricherInterface $paymentMethodEnricher
     ): self {
-        return new self(...$this->map(
+        return new self(...array_filter($this->map(
             static function (PaymentMean $shopwareMethod) use (
                 $adyenPaymentMethods,
                 $paymentMethodEnricher
@@ -102,12 +102,11 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
                     ?: $attribute->get(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL);
 
                 $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($typeOrId);
-                if (!$paymentMethod) {
-                    return [];
-                }
 
-                return $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod->getRaw(), $paymentMethod);
+                return null === $paymentMethod
+                    ? null
+                    : PaymentMean::createFromShopwareArray($paymentMethodEnricher->enrichPaymentMethod($shopwareMethod->getRaw(), $paymentMethod));
             }
-        ));
+        )));
     }
 }

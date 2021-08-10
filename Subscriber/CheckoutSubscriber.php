@@ -3,6 +3,7 @@
 namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
+use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
@@ -118,7 +119,7 @@ class CheckoutSubscriber implements SubscriberInterface
 
         $this->admin = Shopware()->Modules()->Admin();
         $enrichedPaymentMethods = $this->enrichedPaymentMeanProvider->__invoke(
-            $this->admin->sGetPaymentMeans()
+            PaymentMeanCollection::createFromShopwareArray($this->admin->sGetPaymentMeans())
         );
 
         $shop = Shopware()->Shop();
@@ -127,7 +128,7 @@ class CheckoutSubscriber implements SubscriberInterface
             "shopLocale" => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
             "clientKey" => $this->configuration->getClientKey($shop),
             "environment" => $this->configuration->getEnvironment($shop),
-            "enrichedPaymentMethods" => $enrichedPaymentMethods,
+            "enrichedPaymentMethods" => $enrichedPaymentMethods->toShopwareArray(),
         ];
 
         $view = $subject->View();

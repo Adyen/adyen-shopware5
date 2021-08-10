@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
+use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
@@ -39,17 +40,8 @@ class PaymentSubscriber implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'enrichAdyenPaymentMethods',
-            'Shopware_Controllers_Frontend_Checkout::getSelectedPayment::before' => 'beforeGetSelectedPayment',
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'enrichAdyenPaymentMethods'
         ];
-    }
-
-    /**
-     * Skip replacement of payment methods during checkPaymentAvailability validation
-     */
-    public function beforeGetSelectedPayment()
-    {
-        $this->skipReplaceAdyenMethods = true;
     }
 
     /**
@@ -64,17 +56,16 @@ class PaymentSubscriber implements SubscriberInterface
     {
         $shopwareMethods = $args->getReturn();
 
-        if ($this->skipReplaceAdyenMethods
-            || !in_array(
-                Shopware()->Front()->Request()->getActionName(),
-                ['shippingPayment', 'payment']
-            )
+        if (!in_array(
+            Shopware()->Front()->Request()->getActionName(),
+            ['shippingPayment', 'payment']
+        )
         ) {
-            $this->skipReplaceAdyenMethods = false;
-
             return $shopwareMethods;
         }
 
-        return $this->enrichedPaymentMeanProvider->__invoke($shopwareMethods);
+        return $this->enrichedPaymentMeanProvider->__invoke(
+            PaymentMeanCollection::createFromShopwareArray($shopwareMethods)
+        )->toShopwareArray();
     }
 }
