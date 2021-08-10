@@ -18,7 +18,7 @@ final class PaymentMean
     public static function createFromShopwareArray(array $paymentMean): self
     {
         $new = new self();
-        $new->id = (int) ($paymentMean['id'] ?? null);
+        $new->id = (int) ($paymentMean['id'] ?? 0);
         $new->source = SourceType::load((int) $paymentMean['source']);
         $new->raw = $paymentMean;
 

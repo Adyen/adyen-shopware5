@@ -11,7 +11,7 @@ class PaymentMethod
      */
     private $paymentMethodType;
     /**
-     * @var array raw data
+     * @var array
      */
     private $rawData;
 
@@ -21,44 +21,9 @@ class PaymentMethod
         $this->rawData = $rawData;
     }
 
-    public static function fromRawPaymentData(array $data): self
-    {
-        return new self(
-            array_key_exists('id', $data) ? PaymentMethodType::stored() : PaymentMethodType::default(),
-            $data
-        );
-    }
-
     public function getPaymentMethodType(): PaymentMethodType
     {
         return $this->paymentMethodType;
-    }
-
-    public function isStoredPayment(): bool
-    {
-        return $this->getPaymentMethodType()->equals(PaymentMethodType::stored());
-    }
-
-    public function getId(): string
-    {
-        return $this->rawData['id'] ?? '';
-    }
-
-    public function getType(): string
-    {
-        return $this->rawData['type'] ?? '';
-    }
-
-    public function getRawData(): array
-    {
-        return $this->rawData;
-    }
-
-    public function serializeMinimalState(): string
-    {
-        return json_encode([
-            'type' => $this->getType(),
-        ]);
     }
 
     /**
@@ -74,5 +39,40 @@ class PaymentMethod
     public function getStoredPaymentMethodId(): string
     {
         return (string) ($this->rawData['id'] ?? '');
+    }
+
+    public function getId(): string
+    {
+        return (string) ($this->rawData['id'] ?? '');
+    }
+
+    public function getType(): string
+    {
+        return (string) ($this->rawData['type'] ?? '');
+    }
+
+    public function getRawData(): array
+    {
+        return $this->rawData;
+    }
+
+    public static function fromRaw(array $data): self
+    {
+        return new self(
+            array_key_exists('id', $data) ? PaymentMethodType::stored() : PaymentMethodType::default(),
+            $data
+        );
+    }
+
+    public function isStoredPayment(): bool
+    {
+        return $this->getPaymentMethodType()->equals(PaymentMethodType::stored());
+    }
+
+    public function serializeMinimalState(): string
+    {
+        return json_encode([
+            'type' => $this->getType(),
+        ]);
     }
 }

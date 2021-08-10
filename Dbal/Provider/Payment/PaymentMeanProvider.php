@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Dbal\Provider\Payment;
 
+use AdyenPayment\Models\Payment\PaymentMean;
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
 use Shopware\Components\Model\ModelRepository;
 use Shopware\Models\Payment\Payment;
@@ -46,6 +47,9 @@ final class PaymentMeanProvider implements PaymentMeanProviderInterface
         return $this->paymentRepository->findOneBy(['id' => $paymentMeanId]);
     }
 
+    /**
+     * @return PaymentMean|null
+     */
     public function provideByAdyenStoredPaymentMethodId(string $adyenStoredPaymentMethodId)
     {
         if ('' === $adyenStoredPaymentMethodId) {

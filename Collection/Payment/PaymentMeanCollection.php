@@ -54,7 +54,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
         return array_map($callable, $this->paymentMeans);
     }
 
-    public function filter(callable $filter = null): self
+    public function filter(callable $filter): self
     {
         return new self(...array_values(array_filter($this->paymentMeans, $filter)));
     }
@@ -85,8 +85,8 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     public function enrichAdyenPaymentMeans(
         PaymentMethodCollection $adyenPaymentMethods,
         PaymentMethodEnricherInterface $paymentMethodEnricher
-    ): array {
-        return $this->map(
+    ): self {
+        return new self(...$this->map(
             static function (PaymentMean $shopwareMethod) use (
                 $adyenPaymentMethods,
                 $paymentMethodEnricher
@@ -108,6 +108,6 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
 
                 return $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod->getRaw(), $paymentMethod);
             }
-        );
+        ));
     }
 }

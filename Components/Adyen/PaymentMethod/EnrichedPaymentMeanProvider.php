@@ -13,7 +13,7 @@ use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
 use AdyenPayment\Models\Payment\PaymentMethodType;
 use Doctrine\Common\Persistence\ObjectRepository;
 
-class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterface
+final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterface
 {
     /**
      * @var PaymentMethodService
@@ -55,7 +55,7 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
         $paymentMeans = PaymentMeanCollection::createFromShopwareArray($shopwareMethods);
         $adyenShopwareMethods = $paymentMeans->filterByAdyenSource();
 
-        $paymentMethodOptions = $this->paymentMethodOptionsBuilder->__invoke();
+        $paymentMethodOptions = ($this->paymentMethodOptionsBuilder)();
         if (0 === $paymentMethodOptions['value']) {
             return $adyenShopwareMethods->toShopwareArray();
         }
@@ -90,7 +90,7 @@ class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterfac
         }
 
         foreach ($storedPaymentMethods as $storedPaymentMethod) {
-            $this->paymentMethodWriter->__invoke($storedPaymentMethod, $shop);
+            ($this->paymentMethodWriter)($storedPaymentMethod, $shop);
         }
     }
 }

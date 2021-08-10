@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Models\Enum\PaymentMethod;
 
-/**
- * @see \Shopware\Models\Payment\Payment::$source
- */
 final class SourceType
 {
     private static $DEFAULT_PAYMENT = null; // Shopware default payment mean source

@@ -13,14 +13,14 @@ class PaymentMethodMapper implements PaymentMethodMapperInterface
         $paymentMethods = $data['paymentMethods'] ?? [];
         if (count($paymentMethods) > 0) {
             foreach ($paymentMethods as $paymentMethod) {
-                yield PaymentMethod::fromRawPaymentData($paymentMethod);
+                yield PaymentMethod::fromRaw($paymentMethod);
             }
         }
 
         $storedPaymentMethods = $data['storedPaymentMethods'] ?? [];
         if (count($storedPaymentMethods)) {
             foreach ($storedPaymentMethods as $storedPaymentMethod) {
-                yield PaymentMethod::fromRawPaymentData($storedPaymentMethod);
+                yield PaymentMethod::fromRaw($storedPaymentMethod);
             }
         }
     }

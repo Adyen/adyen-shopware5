@@ -63,7 +63,7 @@ class CheckoutSubscriber implements SubscriberInterface
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'checkoutFrontendPostDispatch',
@@ -165,7 +165,7 @@ class CheckoutSubscriber implements SubscriberInterface
             return false;
         }
 
-        $paymentMethodOptions = $this->paymentMethodOptionsBuilder->__invoke();
+        $paymentMethodOptions = ($this->paymentMethodOptionsBuilder)();
         if ($paymentMethodOptions['value'] == 0) {
             return false;
         }

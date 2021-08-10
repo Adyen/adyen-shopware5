@@ -10,7 +10,7 @@ use Enlight_Event_EventArgs;
 
 final class AddAdyenSourceTypeToViewSubscriber implements SubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => '__invoke',

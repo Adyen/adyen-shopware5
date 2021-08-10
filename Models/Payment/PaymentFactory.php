@@ -62,7 +62,7 @@ class PaymentFactory implements PaymentFactoryInterface
         $new->setCountries(new ArrayCollection(
             $this->countryRepository->findAll()
         ));
-        $new->setHide(true);
+        $new->setHide(true); // Hide stored payments methods in Admin / Backend
 
         return $new;
     }
