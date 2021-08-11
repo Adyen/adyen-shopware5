@@ -343,17 +343,10 @@
          */
         __isGiftCardType: function (paymentType) {
             var me = this;
-            var paymentGroups = me.adyenConfiguration.paymentMethodsResponse['groups'] || [];
-            var filteredGiftCardGroup = paymentGroups.filter(function (group) {
-                return me.defaults.giftCardGroupName === group['name'];
-            });
-            var giftCardGroup = filteredGiftCardGroup[0] || [];
-            var giftCardGroupTypes = (giftCardGroup && giftCardGroup['types']) || [];
-            var filteredTypes = giftCardGroupTypes.filter(function (giftCardGroupType) {
-                return giftCardGroupType === paymentType;
-            });
 
-            return filteredTypes.length > 0;
+            var paymentBrand = me.adyenConfiguration.paymentMethodsResponse['brand'] || '';
+
+            return '' !== paymentBrand || 'giftcard' === paymentType;
         },
         /**
          * @param {object} paymentMethod
