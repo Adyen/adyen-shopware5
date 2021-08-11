@@ -118,7 +118,7 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         $this->admin = Shopware()->Modules()->Admin();
-        $enrichedPaymentMethods = $this->enrichedPaymentMeanProvider->__invoke(
+        $enrichedPaymentMethods = ($this->enrichedPaymentMeanProvider)(
             PaymentMeanCollection::createFromShopwareArray($this->admin->sGetPaymentMeans())
         );
 
@@ -185,7 +185,7 @@ class CheckoutSubscriber implements SubscriberInterface
             return true;
         }
 
-        if (!$paymentMethod->getValue('details') && !$paymentMethod->isStoredPayment()) {
+        if (!$paymentMethod->hasDetails() && !$paymentMethod->isStoredPayment()) {
             $subject->View()->assign('adyenPaymentState', $paymentMethod->serializeMinimalState());
 
             return false;

@@ -16,6 +16,8 @@ use Shopware\Models\Shop\Shop;
 
 final class PaymentMethodWriter implements PaymentMethodWriterInterface
 {
+    const GIFTCARD = 'giftcard';
+
     /** @var ModelManager */
     private $entityManager;
     /** @var PaymentMeanProviderInterface */
@@ -71,7 +73,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
     {
         $swPayment = $this->paymentMeanProvider->provideByAdyenType($adyenPaymentMethod->getType());
 
-        $payment = !is_null($swPayment) && ($adyenPaymentMethod->getType() !== 'giftcard')
+        $payment = !is_null($swPayment) && (self::GIFTCARD !== $adyenPaymentMethod->getType())
             ? $this->paymentFactory->updateFromAdyen($swPayment, $adyenPaymentMethod, $shop)
             : $this->paymentFactory->createFromAdyen($adyenPaymentMethod, $shop);
 

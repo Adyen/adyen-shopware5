@@ -105,7 +105,9 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
 
                 return null === $paymentMethod
                     ? null
-                    : PaymentMean::createFromShopwareArray($paymentMethodEnricher->enrichPaymentMethod($shopwareMethod->getRaw(), $paymentMethod));
+                    : PaymentMean::createFromShopwareArray(
+                        $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod->getRaw(), $paymentMethod)
+                    );
             }
         )));
     }

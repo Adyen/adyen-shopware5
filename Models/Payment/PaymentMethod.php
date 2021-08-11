@@ -28,7 +28,7 @@ class PaymentMethod
 
     /**
      * shortcut to get value of raw payment data
-     * @param mixed|null  $fallback
+     * @param mixed|null $fallback
      * @return mixed|null
      */
     public function getValue(string $key, $fallback = null)
@@ -38,17 +38,17 @@ class PaymentMethod
 
     public function getStoredPaymentMethodId(): string
     {
-        return (string) ($this->rawData['id'] ?? '');
+        return (string)($this->rawData['id'] ?? '');
     }
 
     public function getId(): string
     {
-        return (string) ($this->rawData['id'] ?? '');
+        return (string)($this->rawData['id'] ?? '');
     }
 
     public function getType(): string
     {
-        return (string) ($this->rawData['type'] ?? '');
+        return (string)($this->rawData['type'] ?? '');
     }
 
     public function getRawData(): array
@@ -67,6 +67,11 @@ class PaymentMethod
     public function isStoredPayment(): bool
     {
         return $this->getPaymentMethodType()->equals(PaymentMethodType::stored());
+    }
+
+    public function hasDetails(): bool
+    {
+        return array_key_exists('details', $this->rawData) && 0 !== count((array) $this->rawData['details']);
     }
 
     public function serializeMinimalState(): string

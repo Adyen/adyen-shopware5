@@ -199,7 +199,9 @@ class AdyenPayment extends Plugin
             $metaDataCache->deleteAll();
         }
 
-        $this->container->get('models')->generateAttributeModels(['s_user_attributes', 's_core_paymentmeans_attributes']);
+        $this->container->get('models')->generateAttributeModels(
+            ['s_user_attributes', 's_core_paymentmeans_attributes']
+        );
     }
 }
 

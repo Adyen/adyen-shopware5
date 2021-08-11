@@ -57,7 +57,9 @@ final class PaymentMeanProvider implements PaymentMeanProviderInterface
         }
 
         $result = $this->db->executeQuery(
-            'SELECT paymentmeanID FROM s_core_paymentmeans_attributes WHERE adyen_stored_method_id = :adyenStoredPaymentMethodId',
+            'SELECT paymentmeanID 
+                    FROM s_core_paymentmeans_attributes 
+                    WHERE adyen_stored_method_id = :adyenStoredPaymentMethodId',
             [':adyenStoredPaymentMethodId' => $adyenStoredPaymentMethodId]
         );
         $paymentMeanId = (int) $result->fetchColumn();
