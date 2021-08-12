@@ -44,13 +44,11 @@ class Configuration
     /**
      * @param Shop|bool $shop
      */
-    public function getEnvironment($shop = false, $lowercase = false): string
+    public function getEnvironment($shop = false): string
     {
-        $environment = self::ENV_LIVE === $this->getConfig('environment', $shop)
+        return self::ENV_LIVE === strtolower($this->getConfig('environment', $shop))
             ? Environment::LIVE
             : Environment::TEST;
-
-        return  (true === $lowercase) ? strtolower($environment) : $environment;
     }
 
     /**
@@ -107,7 +105,7 @@ class Configuration
     public function getApiKey($shop = false): string
     {
         return (string)$this->getConfig(
-            'api_key_' . $this->getEnvironment($shop, true),
+            'api_key_' . $this->getEnvironment($shop),
             $shop
         );
     }
@@ -123,7 +121,7 @@ class Configuration
 
     public function getClientKey(Shop $shop): string
     {
-        return (string)$this->getConfig('client_key_'.$this->getEnvironment($shop, true), $shop);
+        return (string)$this->getConfig('client_key_'.$this->getEnvironment($shop), $shop);
     }
 
     /**
@@ -133,7 +131,7 @@ class Configuration
     public function getNotificationHmac($shop = false): string
     {
         return (string)$this->getConfig(
-            'notification_hmac_' . $this->getEnvironment($shop, true),
+            'notification_hmac_' . $this->getEnvironment($shop),
             $shop
         );
     }
@@ -145,7 +143,7 @@ class Configuration
     public function getNotificationAuthUsername($shop = false): string
     {
         return (string)$this->getConfig(
-            'notification_auth_username_' . $this->getEnvironment($shop, true),
+            'notification_auth_username_' . $this->getEnvironment($shop),
             $shop
         );
     }
@@ -157,7 +155,7 @@ class Configuration
     public function getNotificationAuthPassword($shop = false): string
     {
         return (string)$this->getConfig(
-            'notification_auth_password_' . $this->getEnvironment($shop, true),
+            'notification_auth_password_' . $this->getEnvironment($shop),
             $shop
         );
     }
