@@ -7,6 +7,7 @@ namespace AdyenPayment\Models\Enum\PaymentMethod;
 final class ImportStatus
 {
     private static $CREATED = 'CREATED';
+    private static $UPDATED = 'UPDATED';
     private static $NOT_CHANGED = 'NOT_CHANGED';
     private static $NOT_HANDLED = 'NOT_HANDLED';
 
@@ -42,6 +43,11 @@ final class ImportStatus
         return new self(self::$CREATED);
     }
 
+    public static function updated(): self
+    {
+        return new self(self::$UPDATED);
+    }
+
     public static function notChanged(): self
     {
         return new self(self::$NOT_CHANGED);
@@ -56,6 +62,7 @@ final class ImportStatus
     {
         return [
             self::$CREATED,
+            self::$UPDATED,
             self::$NOT_CHANGED,
             self::$NOT_HANDLED
         ];

@@ -10,6 +10,7 @@
             <argument type="service" id="AdyenPayment\Components\Adyen\Mapper\PaymentMethodMapper" />
             <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentMethodWriter"/>
             <argument type="service" id="models"/>
+            <argument type="service" id="AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubshopsWriter"/>
         </service>
         <service id="AdyenPayment\Import\TraceablePaymentMethodImporter"
                  decorates="AdyenPayment\Import\PaymentMethodImporter">

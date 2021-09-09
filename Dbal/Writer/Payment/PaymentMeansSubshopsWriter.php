@@ -23,7 +23,7 @@ final class PaymentMeansSubshopsWriter implements PaymentMeansSubshopsWriterInte
     public function registerAdyenPaymentMethodForSubshop(int $subshopId)
     {
         $this->db->executeQuery(
-            'INSERT INTO s_core_paymentmeans_subshops (paymentID, subshopID) 
+            'REPLACE INTO s_core_paymentmeans_subshops (paymentID, subshopID) 
                     SELECT id as paymentID, :subshopID as subshopID
                     FROM s_core_paymentmeans 
                     WHERE s_core_paymentmeans.source = :adyenSource;',

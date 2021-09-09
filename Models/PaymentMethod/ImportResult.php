@@ -35,6 +35,18 @@ final class ImportResult
         return $new;
     }
 
+    public static function successSubshopFallback(
+        Shop $shop,
+        ImportStatus $importStatus
+    ): ImportResult {
+        $new = new self();
+        $new->shop = $shop;
+        $new->success = true;
+        $new->status = $importStatus;
+
+        return $new;
+    }
+
     /**
      * @param PaymentMethod | null $paymentMethod
      */

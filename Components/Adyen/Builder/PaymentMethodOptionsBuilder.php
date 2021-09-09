@@ -8,11 +8,13 @@ final class PaymentMethodOptionsBuilder implements PaymentMethodOptionsBuilderIn
 {
     public function __invoke(): array
     {
-        $countryCode = (string) (Shopware()->Session()
+        $countryCode = (string) (
+            Shopware()->Session()
                 ->sOrderVariables['sUserData']['additional']['country']['countryiso'] ?? ''
         );
         if (!$countryCode) {
-            $countryCode = (string) (Shopware()->Modules()->Admin()
+            $countryCode = (string) (
+                Shopware()->Modules()->Admin()
                 ->sGetUserData()['additional']['country']['countryiso']
             );
         }

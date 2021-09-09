@@ -17,15 +17,15 @@
 {/block}
 
 {block name='frontend_index_body_attributes'}
+    {assign var=adyenType value=$sUserData.additional.payment.attribute->get('adyen_type')}
+
     {$smarty.block.parent}
     data-adyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
     data-adyenAjaxThreeDsUrl="{url module='frontend' controller='adyen' action='ajaxThreeDs'}"
     {if $mAdyenSnippets}
         data-adyenSnippets="{$mAdyenSnippets}"
     {/if}
-    {if $sUserData.additional.payment.type}
-        data-adyenType="{$sUserData.additional.payment.type}"
-    {/if}
+    {if $adyenType}data-adyenType="{$adyenType}"{/if}
     {if $sAdyenGoogleConfig}
         data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
     {/if}

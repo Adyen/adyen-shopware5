@@ -49,7 +49,9 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
             $this->logger->info('Adyen payment method imported', [
                 'shop id' => $importResult->getShop()->getId(),
                 'shop name' => $importResult->getShop()->getName(),
-                'payment method' => $importResult->getPaymentMethod()->getType(),
+                'payment method' => $importResult->getPaymentMethod()
+                    ? $importResult->getPaymentMethod()->getType()
+                    : 'all',
             ]);
 
             return;
@@ -58,7 +60,9 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
         $this->logger->error('Adyen payment method could not be imported', [
             'shop id' => $importResult->getShop()->getId(),
             'shop name' => $importResult->getShop()->getName(),
-            'payment method' => $importResult->getPaymentMethod()->getType(),
+            'payment method' => $importResult->getPaymentMethod()
+                ? $importResult->getPaymentMethod()->getType()
+                : 'n/a',
         ]);
     }
 }

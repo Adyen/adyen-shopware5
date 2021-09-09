@@ -6,7 +6,9 @@ namespace AdyenPayment\Import;
 
 use AdyenPayment\Components\Adyen\Mapper\PaymentMethodMapperInterface;
 use AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsProviderInterface;
+use AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubshopsWriterInterface;
 use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
+use AdyenPayment\Models\Enum\PaymentMethod\ImportStatus;
 use AdyenPayment\Models\PaymentMethod\ImportResult;
 use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -37,6 +39,11 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
     private $paymentMethodWriter;
     /** @var ModelManager */
     private $entityManager;
+    /**
+     * @var PaymentMeansSubshopsWriterInterface
+     */
+    private $paymentMeansSubshopsWriter;
+
 
     public function __construct(
         PaymentMethodsProviderInterface $paymentMethodsProvider,
@@ -44,7 +51,8 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
         UsedFallbackConfigRuleInterface $usedFallbackConfigRule,
         PaymentMethodMapperInterface $paymentMethodMapper,
         PaymentMethodWriterInterface $paymentMethodWriter,
-        ModelManager $entityManager
+        ModelManager $entityManager,
+        PaymentMeansSubshopsWriterInterface $paymentMeansSubshopsWriter
     ) {
         $this->paymentMethodsProvider = $paymentMethodsProvider;
         $this->shopRepository = $shopRepository;
@@ -52,6 +60,7 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
         $this->paymentMethodMapper = $paymentMethodMapper;
         $this->paymentMethodWriter = $paymentMethodWriter;
         $this->entityManager = $entityManager;
+        $this->paymentMeansSubshopsWriter = $paymentMeansSubshopsWriter;
     }
 
     public function importAll(): \Generator
@@ -59,6 +68,9 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
         /** @var Shop $shop */
         foreach ($this->shopRepository->findAll() as $shop) {
             if (true === ($this->usedFallbackConfigRule)($shop->getId())) {
+                $this->paymentMeansSubshopsWriter->registerAdyenPaymentMethodForSubshop($shop->getId());
+                yield ImportResult::successSubshopFallback($shop, ImportStatus::updated());
+
                 continue;
             }
 
