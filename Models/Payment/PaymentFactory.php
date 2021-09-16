@@ -31,7 +31,7 @@ class PaymentFactory implements PaymentFactoryInterface
 
         $new = new Payment();
         $new->setActive(true);
-        $new->setName($name);
+        $new->setName($adyenPaymentMethod->getType() . '_' . $name);
         $new->setDescription($name);
         $new->setAdditionalDescription(self::ADYEN_PREFIX . " " . $name);
         $new->setShops(new ArrayCollection([$shop]));

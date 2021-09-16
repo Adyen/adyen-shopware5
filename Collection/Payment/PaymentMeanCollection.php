@@ -97,7 +97,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
                 }
 
                 /** @var Attribute $attribute */
-                $attribute = $shopwareMethod->getRaw()['attribute'];
+                $attribute = $shopwareMethod->getValue('attribute');
                 $typeOrId = $attribute->get(AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID)
                     ?: $attribute->get(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL);
 

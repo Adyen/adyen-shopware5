@@ -44,7 +44,7 @@ final class PaymentMean
     /**
      * @return mixed|null
      */
-    public function getValue(string $key, $fallback)
+    public function getValue(string $key, $fallback = null)
     {
         return $this->raw[$key] ?? $fallback;
     }

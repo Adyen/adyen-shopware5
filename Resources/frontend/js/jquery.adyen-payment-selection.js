@@ -419,20 +419,20 @@
         },
         /**
          * Modify AdyenPaymentMethod with additional data for the web-component library
-         * @param paymentMethod Adyen response: Payment Method response
+         * @param paymentMethod Shopware PaymentMean enriched with Adyen payment data
          * @return  {{cardType: string, paymentMethodData: object}}
          * @private
          */
         __buildCheckoutComponentData: function (paymentMethod) {
             var defaultData = {
                 cardType: paymentMethod.adyenType,
-                paymentMethodData: paymentMethod
+                paymentMethodData: paymentMethod.metadata
             };
 
             if (this.__isStoredPaymentMethod(paymentMethod || {})) {
                 return $.extend(true, {}, defaultData, {
                     paymentMethodData: {
-                        storedPaymentMethodId: paymentMethod.id
+                        storedPaymentMethodId: paymentMethod.metadata.id
                     }
                 });
             }
