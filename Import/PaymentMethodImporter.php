@@ -91,19 +91,27 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
             $generator = $this->paymentMethodMapper->mapFromAdyen(
                 ($this->paymentMethodsProvider)($shop)
             );
+        } catch(\Exception $exception) {
+            yield ImportResult::fromException(
+                $shop,
+                null,
+                $exception
+            );
+        }
 
-            foreach ($generator as $adyenPaymentMethod) {
+        foreach ($generator as $adyenPaymentMethod) {
+            try {
                 yield $this->paymentMethodWriter->__invoke(
                     $adyenPaymentMethod,
                     $shop
                 );
+            } catch (\Exception $exception) {
+                yield ImportResult::fromException(
+                    $shop,
+                    $adyenPaymentMethod ?? null,
+                    $exception
+                );
             }
-        } catch (\Exception $exception) {
-            yield ImportResult::fromException(
-                $shop,
-                $adyenPaymentMethod ?? null,
-                $exception
-            );
         }
     }
 }
