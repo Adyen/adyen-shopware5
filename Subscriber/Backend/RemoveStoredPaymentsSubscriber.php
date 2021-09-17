@@ -8,21 +8,21 @@ use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Controller_Action;
 use Enlight_Event_EventArgs;
-use Shopware_Controllers_Backend_Payment;
 
 class RemoveStoredPaymentsSubscriber implements SubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
         return [
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_Payment' => '__invoke'
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Payment' => 'providePaymentsWithAdyenHideFunctionality'
         ];
     }
 
-    public function __invoke(Enlight_Event_EventArgs $args)
+    public function providePaymentsWithAdyenHideFunctionality(Enlight_Event_EventArgs $args)
     {
-        /** @var Shopware_Controllers_Backend_Payment $subject */
+        /** @var \Shopware_Controllers_Backend_Payment $subject */
         $subject = $args->getSubject();
+
         if ($subject->Request()->getActionName() !== 'getPayments') {
             return;
         }
@@ -36,15 +36,10 @@ class RemoveStoredPaymentsSubscriber implements SubscriberInterface
 
         $adyenSourceType = SourceType::adyen()->getType();
         foreach ($data as $key => $paymentMethod) {
-            if (false === (bool) $paymentMethod['hide']) {
-                continue;
+            if ((true === $paymentMethod['hide']
+                && $adyenSourceType === $paymentMethod['source'])) {
+                unset($data[$key]);
             }
-
-            if ($adyenSourceType !== (string) $paymentMethod['source']) {
-                continue;
-            }
-
-            unset($data[$key]);
         }
 
         $subject->View()->assign(
