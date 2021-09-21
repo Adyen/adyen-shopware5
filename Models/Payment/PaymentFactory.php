@@ -44,29 +44,6 @@ class PaymentFactory implements PaymentFactoryInterface
         return $new;
     }
 
-    public function createStoredFromAdyen(
-        PaymentMethod $adyenPaymentMethod,
-        Shop $shop
-    ): Payment {
-        $id = $adyenPaymentMethod->getValue('id');
-        $name = $adyenPaymentMethod->getValue('name');
-
-        $new = new Payment();
-        $new->setActive(true);
-        $new->setName($id);
-        $new->setDescription($name);
-        $new->setAdditionalDescription(self::ADYEN_PREFIX . " " . $name);
-        $new->setShops(new ArrayCollection([$shop]));
-        $new->setSource(SourceType::adyen()->getType());
-        $new->setPluginId(PluginType::adyenType()->getType());
-        $new->setCountries(new ArrayCollection(
-            $this->countryRepository->findAll()
-        ));
-        $new->setHide(true); // Hide stored payments methods in Admin / Backend
-
-        return $new;
-    }
-
     public function updateFromAdyen(
         Payment $payment,
         PaymentMethod $adyenPaymentMethod,
@@ -75,27 +52,6 @@ class PaymentFactory implements PaymentFactoryInterface
         $name = $adyenPaymentMethod->getValue('name');
 
         $payment->setName($name);
-        $payment->setDescription($name);
-        $payment->setAdditionalDescription(self::ADYEN_PREFIX . " " . $name);
-        $payment->setShops(new ArrayCollection([$shop]));
-        $payment->setSource(SourceType::adyen()->getType());
-        $payment->setPluginId(PluginType::adyenType()->getType());
-        $payment->setCountries(new ArrayCollection(
-            $this->countryRepository->findAll()
-        ));
-
-        return $payment;
-    }
-
-    public function updateStoredFromAdyen(
-        Payment $payment,
-        PaymentMethod $adyenPaymentMethod,
-        Shop $shop
-    ): Payment {
-        $id = $adyenPaymentMethod->getValue('id');
-        $name = $adyenPaymentMethod->getValue('name');
-
-        $payment->setName($id);
         $payment->setDescription($name);
         $payment->setAdditionalDescription(self::ADYEN_PREFIX . " " . $name);
         $payment->setShops(new ArrayCollection([$shop]));

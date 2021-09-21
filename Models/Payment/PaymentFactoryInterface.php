@@ -10,7 +10,5 @@ use Shopware\Models\Shop\Shop;
 interface PaymentFactoryInterface
 {
     public function createFromAdyen(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment;
-    public function createStoredFromAdyen(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment;
     public function updateFromAdyen(Payment $payment, PaymentMethod $adyenPaymentMethod, Shop $shop): Payment;
-    public function updateStoredFromAdyen(Payment $payment, PaymentMethod $adyenPaymentMethod, Shop $shop): Payment;
 }

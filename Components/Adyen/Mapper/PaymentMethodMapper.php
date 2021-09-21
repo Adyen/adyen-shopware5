@@ -16,12 +16,5 @@ class PaymentMethodMapper implements PaymentMethodMapperInterface
                 yield PaymentMethod::fromRaw($paymentMethod);
             }
         }
-
-        $storedPaymentMethods = $data['storedPaymentMethods'] ?? [];
-        if (count($storedPaymentMethods)) {
-            foreach ($storedPaymentMethods as $storedPaymentMethod) {
-                yield PaymentMethod::fromRaw($storedPaymentMethod);
-            }
-        }
     }
 }

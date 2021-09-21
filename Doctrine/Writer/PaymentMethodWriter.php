@@ -26,31 +26,23 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
     private $paymentFactory;
     /** @var PaymentAttributeWriterInterface */
     private $paymentAttributeWriter;
-    /** @var StoredPaymentMethodWriterInterface */
-    private $storedPaymentMethodWriter;
 
     public function __construct(
         ModelManager $entityManager,
         PaymentMeanProviderInterface $paymentMeanProvider,
         PaymentFactoryInterface $paymentFactory,
-        PaymentAttributeWriterInterface $paymentAttributeWriter,
-        StoredPaymentMethodWriterInterface $storedPaymentMethodWriter
+        PaymentAttributeWriterInterface $paymentAttributeWriter
     ) {
         $this->entityManager = $entityManager;
         $this->paymentMeanProvider = $paymentMeanProvider;
         $this->paymentFactory = $paymentFactory;
         $this->paymentAttributeWriter = $paymentAttributeWriter;
-        $this->storedPaymentMethodWriter = $storedPaymentMethodWriter;
     }
 
     public function __invoke(
         PaymentMethod $adyenPaymentMethod,
         Shop $shop
     ): ImportResult {
-        if ($adyenPaymentMethod->isStoredPayment()) {
-            return $this->storedPaymentMethodWriter->__invoke($adyenPaymentMethod, $shop);
-        }
-
         $payment = $this->write($adyenPaymentMethod, $shop);
 
         if (null === $payment->getId()) {

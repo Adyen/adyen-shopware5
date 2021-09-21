@@ -67,29 +67,6 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
             )
         );
 
-        $storedPaymentMethods = $adyenPaymentMethods->filterByPaymentType(PaymentMethodType::stored());
-        $this->saveStoredPaymentMethods($storedPaymentMethods);
-
         return $adyenShopwareMethods->enrichAdyenPaymentMeans($adyenPaymentMethods, $this->paymentMethodEnricher);
-    }
-
-    // TODO: refactor to appropriate class
-    private function saveStoredPaymentMethods(PaymentMethodCollection $storedPaymentMethods)
-    {
-        // Detached shop cannot be saved with ORM relation mapping
-        // the actual shop entity needs to be fetched.
-        $shopId = Shopware()->Shop() ? Shopware()->Shop()->getId() : 0;
-        if (0 === $shopId) {
-            return;
-        }
-
-        $shop = $this->shopRepository->find($shopId);
-        if (null === $shop) {
-            return;
-        }
-
-        foreach ($storedPaymentMethods as $storedPaymentMethod) {
-            ($this->paymentMethodWriter)($storedPaymentMethod, $shop);
-        }
     }
 }

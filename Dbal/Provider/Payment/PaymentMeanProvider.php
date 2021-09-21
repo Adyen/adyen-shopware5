@@ -46,27 +46,4 @@ final class PaymentMeanProvider implements PaymentMeanProviderInterface
 
         return $this->paymentRepository->findOneBy(['id' => $paymentMeanId]);
     }
-
-    /**
-     * @return PaymentMean|null
-     */
-    public function provideByAdyenStoredPaymentMethodId(string $adyenStoredPaymentMethodId)
-    {
-        if ('' === $adyenStoredPaymentMethodId) {
-            return null;
-        }
-
-        $result = $this->db->executeQuery(
-            'SELECT paymentmeanID 
-                    FROM s_core_paymentmeans_attributes 
-                    WHERE adyen_stored_method_id = :adyenStoredPaymentMethodId',
-            [':adyenStoredPaymentMethodId' => $adyenStoredPaymentMethodId]
-        );
-        $paymentMeanId = (int) $result->fetchColumn();
-        if (0 === $paymentMeanId) {
-            return null;
-        }
-
-        return $this->paymentRepository->findOneBy(['id' => $paymentMeanId]);
-    }
 }

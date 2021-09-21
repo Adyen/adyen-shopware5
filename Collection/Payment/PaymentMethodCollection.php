@@ -37,10 +37,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
         return new self(
             ...array_map(function (array $paymentMethod) {
                 return PaymentMethod::fromRaw($paymentMethod);
-            }, $adyenMethods['paymentMethods'] ?? []),
-            ...array_map(function (array $paymentMethod) {
-                return PaymentMethod::fromRaw($paymentMethod);
-            }, $adyenMethods['storedPaymentMethods'] ?? [])
+            }, $adyenMethods['paymentMethods'] ?? [])
         );
     }
 

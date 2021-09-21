@@ -18,9 +18,6 @@
             <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider" />
             <tag name="shopware.event_subscriber"/>
         </service>
-        <service id="AdyenPayment\Subscriber\Backend\RemoveStoredPaymentsSubscriber">
-            <tag name="shopware.event_subscriber"/>
-        </service>
         <service id="adyen_payment.subscriber.backend_order_subscriber" class="AdyenPayment\Subscriber\BackendOrderSubscriber">
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="models"/>
