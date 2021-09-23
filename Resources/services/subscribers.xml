@@ -43,8 +43,7 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="adyen_payment.components.configuration"/>
         </service>
-        <service id="AdyenPayment\Subscriber\Checkout\RegisterConfirmSnippetsSubscriber"
-                 class="AdyenPayment\Subscriber\Checkout\RegisterConfirmSnippetsSubscriber">
+        <service id="AdyenPayment\Subscriber\Checkout\RegisterConfirmSnippetsSubscriber">
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="snippets"/>
         </service>
