@@ -8,7 +8,7 @@ use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use Shopware_Components_Snippet_Manager;
 
-final class RegisterConfirmSnippetsSubcriber implements SubscriberInterface
+final class RegisterConfirmSnippetsSubscriber implements SubscriberInterface
 {
     /**
      * @var Shopware_Components_Snippet_Manager
