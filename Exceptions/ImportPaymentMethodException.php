@@ -13,7 +13,7 @@ class ImportPaymentMethodException extends \Exception
     {
         return new self(
             sprintf(
-                'Could not import %s payment method with id: %s and type: %s from adyen for shop: %s.',
+                'Could not import %s payment method with ID: %s and type: %s from Adyen for shop: %s.',
                 $paymentMethod->isStoredPayment() ? "stored" : "",
                 $paymentMethod->getId(),
                 $paymentMethod->getType(),
