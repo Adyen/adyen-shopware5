@@ -194,7 +194,7 @@
         </changes>
     </changelog>
     <changelog version="2.0.0">
-        <changes lang="de">
+        <changes lang="en">
             Features
             Upgrade to API v67 and Adyen Web Components Library
             Fixes
@@ -208,7 +208,7 @@
         </changes>
     </changelog>
     <changelog version="3.0.0">
-        <changes lang="de">
+        <changes lang="en">
             Features
             Convert Adyen payment methods to native payment methods
             Fixes
