@@ -4,24 +4,19 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Rule\AdyenApi;
 
-use AdyenPayment\Components\Configuration;
 use Doctrine\Common\Persistence\ObjectRepository;
 
-class UsedMainShopConfigRule
+final class UsedMainShopConfigRule implements MainShopRule
 {
     /**
-     * @var ObjectRepository
+     * @var UsedFallbackConfigRuleInterface
      */
-    private $shopRepository;
-    /**
-     * @var Configuration
-     */
-    private $configuration;
+    private $usedFallbackConfigRule;
 
-    public function __construct(ObjectRepository $shopRepository, Configuration $configuration)
-    {
-        $this->shopRepository = $shopRepository;
-        $this->configuration = $configuration;
+    public function __construct(
+        UsedFallbackConfigRuleInterface $usedFallbackConfigRule
+    ) {
+        $this->usedFallbackConfigRule = $usedFallbackConfigRule;
     }
 
     public function __invoke(int $shopId): bool
@@ -30,18 +25,6 @@ class UsedMainShopConfigRule
             return true;
         }
 
-        $shop = $this->shopRepository->find($shopId);
-        $mainShop = $this->shopRepository->find(1);
-        $mainShopApiKey = $this->configuration->getApiKey($mainShop);
-        $shopApiKey = $this->configuration->getApiKey($shop);
-
-        if ($shopApiKey !== $mainShopApiKey) {
-            return false;
-        }
-
-        $mainShopMerchantAccount = $this->configuration->getMerchantAccount($mainShop);
-        $shopMerchantAccount = $this->configuration->getMerchantAccount($shop);
-
-        return $shopMerchantAccount === $mainShopMerchantAccount;
+        return ($this->usedFallbackConfigRule)($shopId);
     }
 }
