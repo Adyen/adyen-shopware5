@@ -12,21 +12,19 @@ class CookieSubscriber implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'CookieCollector_Collect_Cookies' => 'addAdyenCookie'
+            'CookieCollector_Collect_Cookies' => 'addAdyenCookie',
         ];
     }
 
     public function addAdyenCookie(): CookieCollection
     {
-        $collection = new CookieCollection();
-
-        $collection->add(new CookieStruct(
-            'comfort',
-            '/^adyen/',
-            'Adyen Cookies',
-            CookieGroupStruct::TECHNICAL
-        ));
-
-        return $collection;
+        return new CookieCollection([
+            new CookieStruct(
+                'comfort',
+                '/^adyen/',
+                'Adyen Cookies',
+                CookieGroupStruct::TECHNICAL
+            ),
+        ]);
     }
 }

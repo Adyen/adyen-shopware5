@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
-use AdyenPayment\AdyenPayment;
-use AdyenPayment\Collection\Payment\PaymentMethodCollection;
-use AdyenPayment\Components\Adyen\PaymentMethodService;
-use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
-use AdyenPayment\Serializer\Payment\PaymentMethodSerializer;
+use AdyenPayment\Collection\Payment\PaymentMeanCollection;
+use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 
@@ -21,54 +18,30 @@ use Enlight_Event_EventArgs;
 class PaymentSubscriber implements SubscriberInterface
 {
     /**
-     * @var PaymentMethodService
-     */
-    protected $paymentMethodService;
-    /**
-     * @var ShopwarePaymentMethodService
-     */
-    private $shopwarePaymentMethodService;
-
-    /**
      * @var $skipReplaceAdyenMethods
      */
     private $skipReplaceAdyenMethods = false;
     /**
-     * @var PaymentMethodSerializer
+     * @var EnrichedPaymentMeanProviderInterface
      */
-    private $paymentMethodSerializer;
+    private $enrichedPaymentMeanProvider;
 
     /**
      * PaymentSubscriber constructor.
      *
-     * @param PaymentMethodService         $paymentMethodService
-     * @param ShopwarePaymentMethodService $shopwarePaymentMethodService
-     * @param PaymentMethodSerializer      $paymentMethodConverter
+     * @param EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider
      */
     public function __construct(
-        PaymentMethodService $paymentMethodService,
-        ShopwarePaymentMethodService $shopwarePaymentMethodService,
-        PaymentMethodSerializer $paymentMethodConverter
+        EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider
     ) {
-        $this->paymentMethodService = $paymentMethodService;
-        $this->shopwarePaymentMethodService = $shopwarePaymentMethodService;
-        $this->paymentMethodSerializer = $paymentMethodConverter;
+        $this->enrichedPaymentMeanProvider = $enrichedPaymentMeanProvider;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'replaceAdyenMethods',
-            'Shopware_Controllers_Frontend_Checkout::getSelectedPayment::before' => 'beforeGetSelectedPayment',
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'enrichAdyenPaymentMethods'
         ];
-    }
-
-    /**
-     * Skip replacement of payment methods during checkPaymentAvailability validation
-     */
-    public function beforeGetSelectedPayment()
-    {
-        $this->skipReplaceAdyenMethods = true;
     }
 
     /**
@@ -79,41 +52,20 @@ class PaymentSubscriber implements SubscriberInterface
      * @return array
      * @throws AdyenException
      */
-    public function replaceAdyenMethods(Enlight_Event_EventArgs $args): array
+    public function enrichAdyenPaymentMethods(Enlight_Event_EventArgs $args): array
     {
         $shopwareMethods = $args->getReturn();
 
-        if ($this->skipReplaceAdyenMethods
-            || !in_array(
-                Shopware()->Front()->Request()->getActionName(),
-                ['shippingPayment', 'payment']
-            )
+        if (!in_array(
+            Shopware()->Front()->Request()->getActionName(),
+            ['shippingPayment', 'payment']
+        )
         ) {
-            $this->skipReplaceAdyenMethods = false;
-
             return $shopwareMethods;
         }
 
-        $shopwareMethods = array_filter($shopwareMethods, function ($method) {
-            return $method['name'] !== AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD;
-        });
-
-        $paymentMethodOptions = $this->shopwarePaymentMethodService->getPaymentMethodOptions();
-        if ($paymentMethodOptions['value'] == 0) {
-            return $shopwareMethods;
-        }
-        $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
-            $this->paymentMethodService->getPaymentMethods(
-                $paymentMethodOptions['countryCode'],
-                $paymentMethodOptions['currency'],
-                $paymentMethodOptions['value']
-            )
-        );
-
-        if (!$adyenPaymentMethods->count()) {
-            return $shopwareMethods;
-        }
-
-        return ($this->paymentMethodSerializer)($shopwareMethods, $adyenPaymentMethods);
+        return $this->enrichedPaymentMeanProvider->__invoke(
+            PaymentMeanCollection::createFromShopwareArray($shopwareMethods)
+        )->toShopwareArray();
     }
 }

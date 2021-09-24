@@ -5,7 +5,6 @@
     <services>
         <service id="adyen_payment.components.manager.adyen_manager" class="AdyenPayment\Components\Manager\AdyenManager">
             <argument type="service" id="models"/>
-            <argument type="service" id="session"/>
         </service>
         <service id="adyen_payment.components.notification_manager"
                  class="AdyenPayment\Components\NotificationManager">

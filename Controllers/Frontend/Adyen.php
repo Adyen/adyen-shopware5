@@ -74,6 +74,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                 [
                     'status' => 'success',
                     'content' => $paymentInfo,
+                    'sUniqueID' => $context->getOrder()->getTemporaryId()
                 ]
             ));
         } catch (AdyenException $ex) {
@@ -92,14 +93,10 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         }
     }
 
-    public function resetValidPaymentSessionAction()
-    {
-        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
-        $this->adyenManager->unsetValidPaymentSession();
-    }
-
     /**
      * @throws AdyenException
+     * @deprecated will be removed in 3.0.0 to move closer to a generic implementation,
+     * use paymentDetailsAction() instead
      */
     public function ajaxThreeDsAction()
     {

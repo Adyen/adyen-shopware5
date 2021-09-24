@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>2.0.0</version>
+    <version>3.0.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -194,7 +194,7 @@
         </changes>
     </changelog>
     <changelog version="2.0.0">
-        <changes lang="de">
+        <changes lang="en">
             Features
             Upgrade to API v67 and Adyen Web Components Library
             Fixes
@@ -205,6 +205,24 @@
             Upgrade to API v67 and Adyen Web Components Library
             Fixes
             Inserting payment method selection as user attribute if no user attribute exists
+        </changes>
+    </changelog>
+    <changelog version="3.0.0">
+        <changes lang="en">
+            Features
+            Convert Adyen payment methods to native payment methods
+            Fixes
+            Handle IdentifyShopper, ChallengeShopper, Pending and RedirectShopper with the same createFromAction
+            Fix env constants
+            Add sUniqueID to sync payments
+        </changes>
+        <changes lang="de">
+            Features
+            Convert Adyen payment methods to native payment methods
+            Fixes
+            Handle IdentifyShopper, ChallengeShopper, Pending and RedirectShopper with the same createFromAction
+            Fix env constants
+            Add sUniqueID to sync payments
         </changes>
     </changelog>
 </plugin>

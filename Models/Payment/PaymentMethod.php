@@ -11,7 +11,7 @@ class PaymentMethod
      */
     private $paymentMethodType;
     /**
-     * @var array raw data
+     * @var array
      */
     private $rawData;
 
@@ -21,44 +21,34 @@ class PaymentMethod
         $this->rawData = $rawData;
     }
 
-    public static function fromRawPaymentData(array $data): self
-    {
-        return new self(
-            array_key_exists('id', $data) ? PaymentMethodType::stored() : PaymentMethodType::default(),
-            $data
-        );
-    }
-
     public function getPaymentMethodType(): PaymentMethodType
     {
         return $this->paymentMethodType;
     }
 
-    public function isStoredPayment(): bool
+    /**
+     * shortcut to get value of raw payment data
+     * @param mixed|null $fallback
+     * @return mixed|null
+     */
+    public function getValue(string $key, $fallback = null)
     {
-        return $this->getPaymentMethodType()->equals(PaymentMethodType::stored());
+        return $this->rawData[$key] ?? $fallback;
     }
 
-    public function equalsDefaultPaymentType(string $type): bool
+    public function getStoredPaymentMethodId(): string
     {
-        return $this->getPaymentMethodType()->equals(PaymentMethodType::default())
-            && $this->getType() === $type;
-    }
-
-    public function equalsStoredPaymentId(string $id): bool
-    {
-        return $this->getPaymentMethodType()->equals(PaymentMethodType::stored())
-            && $this->getId() === $id;
+        return (string)($this->rawData['id'] ?? '');
     }
 
     public function getId(): string
     {
-        return $this->rawData['id'] ?? '';
+        return (string)($this->rawData['id'] ?? '');
     }
 
     public function getType(): string
     {
-        return $this->rawData['type'] ?? '';
+        return (string)($this->rawData['type'] ?? '');
     }
 
     public function getRawData(): array
@@ -66,20 +56,28 @@ class PaymentMethod
         return $this->rawData;
     }
 
+    public static function fromRaw(array $data): self
+    {
+        return new self(
+            array_key_exists('id', $data) ? PaymentMethodType::stored() : PaymentMethodType::default(),
+            $data
+        );
+    }
+
+    public function isStoredPayment(): bool
+    {
+        return $this->getPaymentMethodType()->equals(PaymentMethodType::stored());
+    }
+
+    public function hasDetails(): bool
+    {
+        return array_key_exists('details', $this->rawData) && 0 !== count((array) $this->rawData['details']);
+    }
+
     public function serializeMinimalState(): string
     {
         return json_encode([
             'type' => $this->getType(),
         ]);
-    }
-
-    /**
-     * shortcut to get value of raw payment data
-     * @param mixed|null  $fallback
-     * @return mixed|null
-     */
-    public function getValue(string $key, $fallback = null)
-    {
-        return $this->rawData[$key] ?? $fallback;
     }
 }

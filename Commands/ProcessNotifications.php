@@ -46,7 +46,6 @@ class ProcessNotifications extends ShopwareCommand
     protected function configure()
     {
         $this
-            ->setName('adyen:payment:process:notifications')
             ->setDescription('Process notifications in queue')
             ->addOption(
                 'number',

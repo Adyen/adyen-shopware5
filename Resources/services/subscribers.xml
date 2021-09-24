@@ -9,24 +9,14 @@
             <argument type="service" id="template"/>
             <tag name="shopware.event_subscriber"/>
         </service>
-        <service id="adyen_payment.subscriber.account_payment_subscriber" class="AdyenPayment\Subscriber\AccountPaymentSubscriber">
-            <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="adyen_payment.components.payment_method_service"/>
-            <argument type="service" id="session"/>
-        </service>
         <service id="adyen_payment.subscriber.backend_javascript_subscriber" class="AdyenPayment\Subscriber\BackendJavascriptSubscriber">
             <tag name="shopware.event_subscriber"/>
             <argument>%adyen_payment.plugin_dir%</argument>
             <argument type="service" id="models"/>
         </service>
-        <service id="adyen_payment.subscriber.backend_payment_subscriber" class="AdyenPayment\Subscriber\BackendPaymentSubscriber">
-            <tag name="shopware.event_subscriber"/>
-        </service>
         <service id="adyen_payment.subscriber.payment" class="AdyenPayment\Subscriber\PaymentSubscriber">
+            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider" />
             <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
-            <argument type="service" id="adyen_payment.components.payment_method_service"/>
-            <argument type="service" id="adyen_payment.serializer.payment_method"/>
         </service>
         <service id="adyen_payment.subscriber.backend_order_subscriber" class="AdyenPayment\Subscriber\BackendOrderSubscriber">
             <tag name="shopware.event_subscriber"/>
@@ -42,18 +32,24 @@
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="adyen_payment.components.configuration"/>
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
-            <argument type="service" id="adyen_payment.components.payment_method_service"/>
-            <argument type="service" id="session"/>
-            <argument type="service" id="models"/>
-            <argument type="service" id="snippets"/>
-            <argument type="service" id="front" />
-            <argument type="service" id="adyen_payment.components.manager.adyen_manager" />
             <argument type="service" id="adyen_payment.components.data_conversion" />
+            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider"/>
+            <argument type="service" id="AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder"/>
         </service>
-        <service id="adyen_payment.subscriber.frontend_payment_name_subscriber" class="AdyenPayment\Subscriber\FrontendPaymentNameSubscriber">
+        <service id="AdyenPayment\Subscriber\Checkout\AddAdyenSourceTypeToViewSubscriber">
             <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="adyen_payment.components.payment_method_service"/>
-            <argument type="service" id="adyen_payment.logger"/>
+        </service>
+        <service id="adyen_payment.subscriber.checkout.add_google_pay_config_to_view_subscriber" class="AdyenPayment\Subscriber\Checkout\AddGooglePayConfigToViewSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="adyen_payment.components.configuration"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\Checkout\RegisterConfirmSnippetsSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="snippets"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\Checkout\RegisterPaymentSnippetsSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="snippets"/>
         </service>
         <service id="adyen_payment.subscriber.notification.log_incoming_notification" class="AdyenPayment\Subscriber\Notification\LogIncomingNotification">
             <tag name="shopware.event_subscriber"/>
@@ -62,6 +58,19 @@
         <service id="AdyenPayment\Subscriber\Notification\UpdateOrderPsPSubscriber">
             <argument type="service" id="AdyenPayment\Components\Manager\OrderManager"/>
             <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\ImportSubShopPaymentMethodsSubscriber">
+            <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
+            <argument type="service" id="AdyenPayment\Rule\AdyenApi\IsMainShopConfigRule"/>
+            <argument type="service" id="AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubshopsWriter"/>
+            <argument type="service" id="AdyenPayment\Import\PaymentMethodImporter" />
+            <tag name="shopware.event_subscriber"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\RemoveSubShopPaymentMethodsSubscriber">
+            <argument type="service" id="adyen_payment.dbal.remover.payment.payment_means_subshops_remover"/>
+            <tag name="shopware.event_subscriber"/>
+            <tag name="kernel.event_subscriber"/>
         </service>
     </services>
 </container>

@@ -36,11 +36,8 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     {
         return new self(
             ...array_map(function (array $paymentMethod) {
-                return PaymentMethod::fromRawPaymentData($paymentMethod);
-            }, $adyenMethods['paymentMethods']),
-            ...array_map(function (array $paymentMethod) {
-                return PaymentMethod::fromRawPaymentData($paymentMethod);
-            }, $adyenMethods['storedPaymentMethods'])
+                return PaymentMethod::fromRaw($paymentMethod);
+            }, $adyenMethods['paymentMethods'] ?? [])
         );
     }
 
@@ -62,21 +59,21 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     public function fetchByTypeOrId(string $paymentTypeOrId)
     {
         foreach ($this->paymentMethods as $paymentMethod) {
-            if ($paymentMethod->equalsStoredPaymentId($paymentTypeOrId)) {
+            if ($paymentMethod->getId() !== $paymentTypeOrId
+                && $paymentMethod->getType() !== $paymentTypeOrId) {
+                continue;
+            }
+
+            if ($paymentMethod->getPaymentMethodType()->equals(PaymentMethodType::stored())) {
                 return $paymentMethod;
             }
 
-            if ($paymentMethod->equalsDefaultPaymentType($paymentTypeOrId)) {
+            if ($paymentMethod->getPaymentMethodType()->equals(PaymentMethodType::default())) {
                 return $paymentMethod;
             }
         }
 
         return null;
-    }
-
-    public function containsPaymentMethodTypeOrId(string $paymentTypeOrId): bool
-    {
-        return null !== $this->fetchByTypeOrId($paymentTypeOrId);
     }
 
     public function filter(callable $filter = null): self
