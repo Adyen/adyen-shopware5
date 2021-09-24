@@ -17,23 +17,23 @@
 {/block}
 
 {block name='frontend_index_body_attributes'}
+    {assign var=adyenType value=$sUserData.additional.payment.attribute->get('adyen_type')}
+
     {$smarty.block.parent}
     data-adyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
-    data-adyenAjaxIdentifyShopperUrl="{url module='frontend' controller='adyen' action='ajaxIdentifyShopper'}"
-    data-adyenAjaxChallengeShopperUrl="{url module='frontend' controller='adyen' action='ajaxChallengeShopper'}"
+    data-adyenAjaxPaymentDetails="{url module='frontend' controller='adyen' action='paymentDetails'}"
+    data-adyenAjaxThreeDsUrl="{url module='frontend' controller='adyen' action='ajaxThreeDs'}"
     {if $mAdyenSnippets}
         data-adyenSnippets="{$mAdyenSnippets}"
     {/if}
-    {if $sUserData.additional.payment.type}
-        data-adyenType="{$sUserData.additional.payment.type}"
-    {/if}
+    {if $adyenType}data-adyenType="{$adyenType}"{/if}
     {if $sAdyenGoogleConfig}
         data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
     {/if}
-    {if $sAdyenSetSession}
-        data-adyenSetSession='{$sAdyenSetSession}'
+    {if $adyenPaymentState}
+        data-adyenPaymentState='{$adyenPaymentState}'
     {/if}
-    {if $sUserData.additional.payment.name == 'adyen_general_payment_method'}
+    {if $sUserData.additional.payment.source == $adyenSourceType}
         data-adyenIsAdyenPayment='true'
     {/if}
 {/block}

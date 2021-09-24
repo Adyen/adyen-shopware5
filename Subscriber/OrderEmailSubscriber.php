@@ -4,6 +4,7 @@ namespace AdyenPayment\Subscriber;
 
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\OrderMailService;
+use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\PaymentInfo;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityRepository;
@@ -77,7 +78,8 @@ class OrderEmailSubscriber implements SubscriberInterface
     {
         $variables = $args->get('variables');
 
-        if (AdyenPayment::ADYEN_GENERAL_PAYMENT_METHOD === $variables['additional']['payment']['name']
+        $source = (int) ($variables['additional']['payment']['source'] ?? null);
+        if (SourceType::load($source)->equals(SourceType::adyen())
             && true === Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true)
         ) {
 

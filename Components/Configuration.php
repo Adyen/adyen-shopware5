@@ -17,10 +17,8 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 class Configuration
 {
-    const ENV_TEST = 'test';
-    const ENV_LIVE = 'live';
-    const PAYMENT_PREFIX = 'adyen_';
-    const PAYMENT_LENGHT = 6;
+    const ENV_TEST = 'TEST';
+    const ENV_LIVE = 'LIVE';
 
     /**
      * @var CachedConfigReader
@@ -187,14 +185,6 @@ class Configuration
     public function getManualReviewRejectAction($shop = false): string
     {
         return (string)$this->getConfig('manual_review_rejected_action', $shop);
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentMethodPrefix(): string
-    {
-        return (string)self::PAYMENT_PREFIX;
     }
 
     /**
