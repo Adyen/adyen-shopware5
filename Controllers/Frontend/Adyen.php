@@ -74,6 +74,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                 [
                     'status' => 'success',
                     'content' => $paymentInfo,
+                    'sUniqueID' => $context->getOrder()->getTemporaryId()
                 ]
             ));
         } catch (AdyenException $ex) {

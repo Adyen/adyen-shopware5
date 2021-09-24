@@ -95,7 +95,7 @@
                     data: data,
                     success: function (response) {
                         if (response['status'] === 'success') {
-                            me.handlePaymentData(response['content']);
+                            me.handlePaymentData(response['content'], response['sUniqueID']);
                         } else {
                             me.addAdyenError(response['content']);
                         }
@@ -112,12 +112,13 @@
                 $(me.opts.confirmFormSelector).submit();
             }
         },
-        handlePaymentData: function (data) {
+        handlePaymentData: function (data, sUniqueID = null) {
+
             var me = this;
 
             switch (data.resultCode) {
                 case 'Authorised':
-                    me.handlePaymentDataAuthorised(data);
+                    me.handlePaymentDataAuthorised(data, sUniqueID);
                     break;
                 case 'IdentifyShopper':
                 case 'ChallengeShopper':
@@ -130,9 +131,10 @@
                     break;
             }
         },
-        handlePaymentDataAuthorised: function (data) {
+        handlePaymentDataAuthorised: function (data, sUniqueID = null) {
             var me = this;
-            $(me.opts.confirmFormSelector).submit();
+            let input = $("<input>").attr("type", "hidden").attr("name", "sUniqueID").val(sUniqueID);
+            $(me.opts.confirmFormSelector).append(input).submit();
         },
         handlePaymentDataCreateFromAction: function (data) {
             var me = this;
