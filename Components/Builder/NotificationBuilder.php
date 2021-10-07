@@ -23,7 +23,7 @@ class NotificationBuilder
      */
     private $modelManager;
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository|\Shopware\Models\Order\Repository
+     * @var \Doctrine\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository|\Shopware\Models\Order\Repository
      */
     private $orderRepository;
     /**

@@ -8,7 +8,7 @@ use Adyen\AdyenException;
 use Adyen\Service\Checkout;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Validator\ConstraintViolationFactory;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\Validator\ConstraintViolationList;
 
