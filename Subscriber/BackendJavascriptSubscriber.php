@@ -19,7 +19,7 @@ class BackendJavascriptSubscriber implements SubscriberInterface
     private $pluginDirectory;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var \Doctrine\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
      */
     private $notificationRepository;
 

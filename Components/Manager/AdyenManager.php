@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Components\Manager;
 
 use AdyenPayment\Models\PaymentInfo;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Shopware\Models\Order\Order;
 

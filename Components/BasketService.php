@@ -5,7 +5,7 @@ namespace AdyenPayment\Components;
 use AdyenPayment\Basket\Restore\DetailAttributesRestorer;
 use AdyenPayment\Models\Event;
 use DateTime;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
