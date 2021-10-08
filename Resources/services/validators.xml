@@ -25,7 +25,7 @@
             <argument type="service" id="adyen_payment.components.configuration" />
         </service>
 
-        <service id="AdyenPayment\Components\Adyen\ApiConfigValidator">
+        <service id="AdyenPayment\Components\Adyen\ApiConfigValidator" public="true">
             <argument type="service" id="AdyenPayment\Components\Adyen\ApiFactory" />
             <argument type="service" id="adyen_payment.components.configuration" />
             <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>

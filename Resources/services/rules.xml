@@ -7,7 +7,7 @@
         <service id="AdyenPayment\Rule\AdyenApi\UsedMainShopConfigRule">
             <argument type="service" id="AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule"/>
         </service>
-        <service id="AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule">
+        <service id="AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule" public="true">
             <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
             <argument type="service" id="AdyenPayment\Rule\AdyenApi\IsMainShopConfigRule"/>
         </service>
