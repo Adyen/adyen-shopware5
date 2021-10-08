@@ -29,7 +29,7 @@ grumphp:
                 - "\\bdd\\b("
             whitelist_patterns:
                 - /^public/(.*)
-            triggered_by: [php,js]
+            triggered_by: [ php,js ]
             metadata:
                 priority: 300
         file_size:
@@ -72,7 +72,7 @@ grumphp:
             metadata:
                 priority: 50
         phpcs:
-            standard: [PHPCompatibility]
+            standard: [ PHPCompatibility ]
             report: full
-            ignore_patterns: [*/vendor/*','*/node_modules/*]
-            triggered_by: [php]
+            ignore_patterns: [ '*/vendor/*','*/node_modules/*' ]
+            triggered_by: [ php ]

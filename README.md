@@ -10,8 +10,8 @@ We strongly encourage you to join us in contributing to this repository so every
 Read our [**contribution guidelines**](https://github.com/Adyen/.github/blob/master/CONTRIBUTING.md) to find out how.
 
 ## Requirements
-* PHP >=7.0
-* Shopware >=5.6
+* PHP >=7.4
+* Shopware >=5.7
 
 Note: The Adyen payment plugin is not compatible with the cookie manager plugin (<= 5.6.2), it is however compatible with the Shopware default cookie consent manager (>5.6.2).
 
