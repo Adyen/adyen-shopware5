@@ -5,12 +5,12 @@
     <services>
         <!-- Chains -->
         <service id="AdyenPayment\Http\Validator\Notification\AuthorizationValidator"
-                 class="AdyenPayment\Http\Validator\Notification\Chain">
+                 class="AdyenPayment\Http\Validator\Notification\Chain" public="true">
             <argument type="service" id="AdyenPayment\Http\Validator\Notification\AuthenticationValidator"/>
             <argument type="service" id="AdyenPayment\Http\Validator\Notification\HmacValidator"/>
         </service>
         <service id="AdyenPayment\Http\Validator\Notification\LoggingAuthorizationValidatorDecorator"
-                 decorates="AdyenPayment\Http\Validator\Notification\AuthorizationValidator">
+                 decorates="AdyenPayment\Http\Validator\Notification\AuthorizationValidator" public="true">
             <argument type="service"
                       id="AdyenPayment\Http\Validator\Notification\LoggingAuthorizationValidatorDecorator.inner"/>
             <argument type="service" id="adyen_payment.logger.notifications"/>
