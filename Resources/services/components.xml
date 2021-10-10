@@ -2,9 +2,6 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-    <imports>
-        <import resource="./components/basket.xml"/>
-    </imports>
     <services>
         <!-- Components -->
         <service id="adyen_payment.components.data_conversion" class="AdyenPayment\Components\DataConversion"/>
@@ -14,7 +11,7 @@
             <argument type="service" id="models"/>
             <argument type="service" id="events"/>
         </service>
-        <service id="adyen_payment.components.basket_service" class="AdyenPayment\Components\BasketService">
+        <service id="adyen_payment.components.basket_service" class="AdyenPayment\Components\BasketService" public="true">
             <argument type="service" id="events"/>
             <argument type="service" id="models"/>
             <argument type="service" id="db"/>
@@ -25,7 +22,7 @@
             <argument type="service" id="shopware.plugin.cached_config_reader"/>
             <argument type="service" id="dbal_connection"/>
         </service>
-        <service id="adyen_payment.components.order_mail_service" class="AdyenPayment\Components\OrderMailService">
+        <service id="adyen_payment.components.order_mail_service" class="AdyenPayment\Components\OrderMailService" public="true">
             <argument type="service" id="models"/>
             <argument type="service" id="adyen_payment.components.basket_service"/>
         </service>
@@ -37,7 +34,7 @@
             <argument type="service" id="AdyenPayment\Components\Adyen\ApiFactory" />
         </service>
         <service id="adyen_payment.components.adyen.payment.method"
-                 class="AdyenPayment\Components\Adyen\PaymentMethodService">
+                 class="AdyenPayment\Components\Adyen\PaymentMethodService" public="true">
             <argument type="service" id="AdyenPayment\Components\Adyen\ApiClientMap"/>
             <argument type="service" id="adyen_payment.components.configuration"/>
             <argument type="service" id="adyen_payment.logger"/>
@@ -45,7 +42,7 @@
             <argument type="service" id="models"/>
         </service>
         <service id="adyen_payment.components.adyen.refund_service"
-                 class="AdyenPayment\Components\Adyen\RefundService">
+                 class="AdyenPayment\Components\Adyen\RefundService" public="true">
             <argument type="service" id="AdyenPayment\Components\Adyen\ApiClientMap" />
             <argument type="service" id="models"/>
             <argument type="service" id="adyen_payment.components.notification_manager"/>
@@ -68,7 +65,7 @@
         </service>
 
         <!-- Checkout Payment Payload -->
-        <service id="adyen_payment.components.payload.payment_payload_provider" class="AdyenPayment\Components\Payload\Chain">
+        <service id="adyen_payment.components.payload.payment_payload_provider" class="AdyenPayment\Components\Payload\Chain" public="true">
             <argument type="service" id="adyen_payment.components.payload.providers.application_info_provider"/>
             <argument type="service" id="adyen_payment.components.payload.providers.shopper_info_provider"/>
             <argument type="service" id="adyen_payment.components.payload.providers.order_info_provider"/>
@@ -79,7 +76,8 @@
             <argument type="service" id="adyen_payment.components.payload.providers.recurring_payment"/>
         </service>
         <service id="adyen_payment.components.payload.chain" class="AdyenPayment\Components\Payload\Chain"/>
-        <service id="adyen_payment.components.payload.providers.application_info_provider" class="AdyenPayment\Components\Payload\Providers\ApplicationInfoProvider">
+        <service id="adyen_payment.components.payload.providers.application_info_provider"
+                 class="AdyenPayment\Components\Payload\Providers\ApplicationInfoProvider" public="true">
             <argument type="service" id="router" />
             <argument type="service" id="models" />
             <argument type="service" id="adyen_payment.components.configuration" />

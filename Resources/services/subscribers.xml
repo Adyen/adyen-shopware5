@@ -40,8 +40,9 @@
             <tag name="shopware.event_subscriber"/>
         </service>
         <service id="adyen_payment.subscriber.checkout.add_google_pay_config_to_view_subscriber" class="AdyenPayment\Subscriber\Checkout\AddGooglePayConfigToViewSubscriber">
-            <tag name="shopware.event_subscriber"/>
             <argument type="service" id="adyen_payment.components.configuration"/>
+            <argument type="service" id="AdyenPayment\Components\WebComponents\GooglePayConfigProvider"/>
+            <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Checkout\RegisterConfirmSnippetsSubscriber">
             <tag name="shopware.event_subscriber"/>

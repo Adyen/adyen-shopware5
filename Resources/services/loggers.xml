@@ -4,7 +4,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <!-- Loggers -->
-        <service id="adyen_payment.logger.notifications" class="Shopware\Components\Logger">
+        <service id="adyen_payment.logger.notifications" class="Shopware\Components\Logger" public="true">
             <argument>adyen_payment_notifications</argument>
             <call method="pushHandler">
                 <argument type="service" id="monolog.handler.rotating_file.adyen_payment_notifications" />
