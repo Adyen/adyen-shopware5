@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -223,6 +223,16 @@
             Handle IdentifyShopper, ChallengeShopper, Pending and RedirectShopper with the same createFromAction
             Fix env constants
             Add sUniqueID to sync payments
+        </changes>
+    </changelog>
+    <changelog version="3.0.1">
+        <changes lang="en">
+            Fixes
+            Fix GooglePay config provider
+        </changes>
+        <changes lang="de">
+            Fixes
+            Fix GooglePay config provider
         </changes>
     </changelog>
 </plugin>
