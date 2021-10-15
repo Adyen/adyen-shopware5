@@ -20,5 +20,6 @@
         <import resource="services/importers.xml" />
         <import resource="services/factory.xml" />
         <import resource="services/enrichers.xml" />
+        <import resource="services/web-components.xml" />
     </imports>
 </container>
