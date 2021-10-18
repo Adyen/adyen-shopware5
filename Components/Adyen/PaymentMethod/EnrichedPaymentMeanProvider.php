@@ -54,7 +54,7 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
     {
         $paymentMethodOptions = ($this->paymentMethodOptionsBuilder)();
         if (0 === $paymentMethodOptions['value']) {
-            return $paymentMeans;
+            return $paymentMeans->filterExcludeAdyen();
         }
 
         $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
