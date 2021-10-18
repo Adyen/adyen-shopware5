@@ -65,6 +65,15 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
         );
     }
 
+    public function filterExcludeAdyen(): self
+    {
+        return $this->filter(
+            static function (PaymentMean $paymentMean) {
+                return !$paymentMean->getSource()->equals(SourceType::adyen());
+            }
+        );
+    }
+
     public function filterByAdyenSource(): self
     {
         return $this->filterBySource(SourceType::adyen());
