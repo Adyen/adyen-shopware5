@@ -19,7 +19,7 @@
     "require": {
         "php": "^7.4",
         "ext-json": "*",
-        "adyen/php-api-library": "^10.0"
+        "adyen/php-api-library": "^11.0.0"
     },
     "require-dev": {
         "shopware/shopware": "^5.7.3",
