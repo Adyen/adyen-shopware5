@@ -52,11 +52,9 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
 
     public function __invoke(PaymentMeanCollection $paymentMeans): PaymentMeanCollection
     {
-        $adyenShopwareMethods = $paymentMeans->filterByAdyenSource();
-
         $paymentMethodOptions = ($this->paymentMethodOptionsBuilder)();
         if (0 === $paymentMethodOptions['value']) {
-            return $adyenShopwareMethods;
+            return $paymentMeans;
         }
 
         $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
@@ -67,6 +65,6 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
             )
         );
 
-        return $adyenShopwareMethods->enrichAdyenPaymentMeans($adyenPaymentMethods, $this->paymentMethodEnricher);
+        return $paymentMeans->enrichAdyenPaymentMeans($adyenPaymentMethods, $this->paymentMethodEnricher);
     }
 }
