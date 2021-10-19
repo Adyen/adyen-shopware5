@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.0.1</version>
+    <version>3.0.2</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -233,6 +233,18 @@
         <changes lang="de">
             Fixes
             Fix GooglePay config provider
+        </changes>
+    </changelog>
+    <changelog version="3.0.2">
+        <changes lang="en">
+            Fixes
+            Display Shopware payment methods
+            Update composer, lower monolog requirement
+        </changes>
+        <changes lang="de">
+            Fixes
+            Display Shopware payment methods
+            Update composer, lower monolog requirement
         </changes>
     </changelog>
 </plugin>
