@@ -20,7 +20,7 @@
         "php": "^7.0",
         "ext-json": "*",
         "adyen/php-api-library": "^10.0",
-        "monolog/monolog": "^1.25"
+        "monolog/monolog": "1.25.3"
     },
     "require-dev": {
         "shopware/shopware": "^5.6",
