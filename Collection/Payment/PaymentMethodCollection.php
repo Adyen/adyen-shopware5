@@ -85,7 +85,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     {
         return new self(...array_filter(
             $this->paymentMethods,
-            function (PaymentMethod $paymentMethod) use ($paymentMethodType) {
+            static function (PaymentMethod $paymentMethod) use ($paymentMethodType) {
                 return $paymentMethod->getPaymentMethodType()->equals($paymentMethodType);
             }
         ));
