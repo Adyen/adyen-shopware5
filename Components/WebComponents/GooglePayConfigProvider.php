@@ -19,6 +19,19 @@ final class GooglePayConfigProvider implements ConfigProvider
         $this->configuration = $configuration;
     }
 
+    /**
+     * @return array{
+     *      environment: "PRODUCTION"|"TEST",
+     *      countryCode: string,
+     *      amount: array{
+     *          value: int,
+     *          currency: string,
+     *      },
+     *      configuration: array{
+     *          gatewayMerchantId: string
+     *      },
+     * }
+     */
     public function __invoke(ConfigContext $context): array
     {
         return [
