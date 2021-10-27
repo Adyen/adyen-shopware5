@@ -13,27 +13,25 @@ use Shopware\Models\Shop\Shop;
 
 class PaymentFactory implements PaymentFactoryInterface
 {
-    const ADYEN_PREFIX = 'Adyen';
+    private const ADYEN_PREFIX = 'Adyen';
 
-    /** @var ModelRepository */
-    private $countryRepository;
+    private ModelRepository $countryRepository;
 
     public function __construct($countryRepository)
     {
         $this->countryRepository = $countryRepository;
     }
 
-    public function createFromAdyen(
-        PaymentMethod $adyenPaymentMethod,
-        Shop $shop
-    ): Payment {
+    public function createFromAdyen(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
+    {
         $name = $adyenPaymentMethod->getValue('name');
 
         $new = new Payment();
         $new->setActive(true);
-        $new->setName($adyenPaymentMethod->getType() . '_' . $name);
+        // @TODO: sanitize $name, prevent: "adyen_GiftCard Givex"
+        $new->setName($adyenPaymentMethod->getType().'_'.$name);
         $new->setDescription($name);
-        $new->setAdditionalDescription(self::ADYEN_PREFIX . " " . $name);
+        $new->setAdditionalDescription(self::ADYEN_PREFIX." ".$name);
         $new->setShops(new ArrayCollection([$shop]));
         $new->setSource(SourceType::adyen()->getType());
         $new->setPluginId(PluginType::adyenType()->getType());
@@ -44,16 +42,13 @@ class PaymentFactory implements PaymentFactoryInterface
         return $new;
     }
 
-    public function updateFromAdyen(
-        Payment $payment,
-        PaymentMethod $adyenPaymentMethod,
-        Shop $shop
-    ): Payment {
+    public function updateFromAdyen(Payment $payment, PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
+    {
         $name = $adyenPaymentMethod->getValue('name');
 
         $payment->setName($name);
         $payment->setDescription($name);
-        $payment->setAdditionalDescription(self::ADYEN_PREFIX . " " . $name);
+        $payment->setAdditionalDescription(self::ADYEN_PREFIX." ".$name);
         $payment->setShops(new ArrayCollection([$shop]));
         $payment->setSource(SourceType::adyen()->getType());
         $payment->setPluginId(PluginType::adyenType()->getType());
