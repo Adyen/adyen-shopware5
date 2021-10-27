@@ -97,6 +97,8 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
                 null,
                 $exception
             );
+
+            return;
         }
 
         foreach ($generator as $adyenPaymentMethod) {
