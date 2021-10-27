@@ -85,6 +85,9 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
         $this->entityManager->flush();
     }
 
+    /**
+     * @return \Generator<ImportResult>
+     */
     private function import(Shop $shop): \Generator
     {
         try {
