@@ -14,7 +14,10 @@ use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class PaymentMeanCollection implements IteratorAggregate, Countable
 {
-    private $paymentMeans;
+    /**
+     * @var array<PaymentMean>
+     */
+    private array $paymentMeans;
 
     public function __construct(PaymentMean ...$paymentMeans)
     {
@@ -25,9 +28,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     {
         return new self(
             ...array_map(
-                function (array $paymentMean) {
-                    return PaymentMean::createFromShopwareArray($paymentMean);
-                },
+                static fn (array $paymentMean) => PaymentMean::createFromShopwareArray($paymentMean),
                 $paymentMeans
             )
         );
@@ -36,7 +37,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     /**
      * @return \Generator<PaymentMean>
      */
-    public function getIterator(): \Generator
+    public function getIterator(): iterable
     {
         yield from $this->paymentMeans;
     }
