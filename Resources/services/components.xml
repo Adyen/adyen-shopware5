@@ -185,8 +185,6 @@
             <argument type="service" id="adyen_payment.components.adyen.payment.method"/>
             <argument type="service" id="AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder"/>
             <argument type="service" id="adyen_payment.enricher.payment_method"/>
-            <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentMethodWriter"/>
-            <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
         </service>
         <service id="AdyenPayment\Components\Adyen\PaymentMethod\ImageLogoProvider">
         </service>
