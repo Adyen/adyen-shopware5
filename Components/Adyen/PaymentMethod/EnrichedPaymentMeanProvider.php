@@ -19,7 +19,7 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
     public function __construct(
         PaymentMethodService $paymentMethodService,
         PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder,
-        PaymentMethodEnricherInterface $paymentMethodEnricher,
+        PaymentMethodEnricherInterface $paymentMethodEnricher
     ) {
         $this->paymentMethodService = $paymentMethodService;
         $this->paymentMethodOptionsBuilder = $paymentMethodOptionsBuilder;
