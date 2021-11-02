@@ -53,8 +53,7 @@ class BackendOrderSubscriber implements SubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'onBackendOrder',
-            'Shopware_Modules_Order_SendMail_Send' => 'onSendMail'
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'onBackendOrder'
         ];
     }
 
