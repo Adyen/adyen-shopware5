@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.0.2</version>
+    <version>3.1.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -245,6 +245,14 @@
             Fixes
             Display Shopware payment methods
             Update composer, lower monolog requirement
+        </changes>
+    </changelog>
+    <changelog version="3.1.0">
+        <changes lang="en">
+            Compatibility PHP 7.4 Shopware 5.7.x
+        </changes>
+        <changes lang="de">
+            Kompatibilität PHP 7.4 Shopware 5.7.x
         </changes>
     </changelog>
 </plugin>
