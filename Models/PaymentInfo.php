@@ -8,7 +8,9 @@ use Shopware\Models\Order\Order;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="s_plugin_adyen_order_payment_info")
+ * @ORM\Table(name="s_plugin_adyen_order_payment_info", indexes={
+ *     @ORM\Index(name="idx_ordernumber", columns={"ordernumber"})
+ * })
  */
 class PaymentInfo extends ModelEntity
 {
