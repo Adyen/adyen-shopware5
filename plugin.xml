@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.0.0</version>
+    <version>3.1.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -13,7 +13,7 @@
     <description>Official Adyen plugin</description>
     <description lang="de">Offizielles Adyen plugin</description>
 
-    <compatibility minVersion="5.6.0"/>
+    <compatibility minVersion="5.7.0"/>
 
     <changelog version="1.4.1">
         <changes lang="de">1.4.1 release</changes>
@@ -223,6 +223,36 @@
             Handle IdentifyShopper, ChallengeShopper, Pending and RedirectShopper with the same createFromAction
             Fix env constants
             Add sUniqueID to sync payments
+        </changes>
+    </changelog>
+    <changelog version="3.0.1">
+        <changes lang="en">
+            Fixes
+            Fix GooglePay config provider
+        </changes>
+        <changes lang="de">
+            Fixes
+            Fix GooglePay config provider
+        </changes>
+    </changelog>
+    <changelog version="3.0.2">
+        <changes lang="en">
+            Fixes
+            Display Shopware payment methods
+            Update composer, lower monolog requirement
+        </changes>
+        <changes lang="de">
+            Fixes
+            Display Shopware payment methods
+            Update composer, lower monolog requirement
+        </changes>
+    </changelog>
+    <changelog version="3.1.0">
+        <changes lang="en">
+            Compatibility PHP 7.4 Shopware 5.7.x
+        </changes>
+        <changes lang="de">
+            Kompatibilität PHP 7.4 Shopware 5.7.x
         </changes>
     </changelog>
 </plugin>

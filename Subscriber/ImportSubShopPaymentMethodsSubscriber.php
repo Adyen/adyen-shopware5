@@ -7,7 +7,7 @@ namespace AdyenPayment\Subscriber;
 use AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubshopsWriterInterface;
 use AdyenPayment\Import\PaymentMethodImporterInterface;
 use AdyenPayment\Rule\AdyenApi\MainShopConfigRule;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Enlight\Event\SubscriberInterface;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\HttpFoundation\Response;

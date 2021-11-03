@@ -1,0 +1,78 @@
+parameters:
+    grumphp.ignore_patterns:
+        - '*/vendor'
+        - '.gitlab-ci'
+        - 'bin'
+        - 'custom/plugins/'
+        - 'public'
+        - 'src/Command/'
+        - 'tests'
+        - 'var'
+
+grumphp:
+    tasks:
+        # Git
+        git_commit_message:
+            matchers:
+                - /^(ASW-[0-9]*)/
+            case_insensitive: true
+            multiline: false
+            max_subject_width: 80
+        git_blacklist:
+            keywords:
+                - '__debug('
+                - 'console.log('
+                - 'debug_backtrace('
+                - 'die('
+                - 'dump('
+                - 'exit;'
+                - "\\bdd\\b("
+            whitelist_patterns:
+                - /^public/(.*)
+            triggered_by: [ php,js ]
+            metadata:
+                priority: 300
+        file_size:
+            max_size: 5M
+        composer: ~
+
+        # Linters
+        phplint:
+            metadata:
+                priority: 100
+        xmllint:
+            metadata:
+                priority: 100
+        yamllint:
+            parse_custom_tags: true
+            metadata:
+                priority: 100
+
+        # PHP
+        phpcsfixer:
+            config: '.php-cs-fixer.dist.php'
+            metadata:
+                priority: 200
+        phpparser:
+            ignore_patterns: '%grumphp.ignore_patterns%'
+            visitors:
+                no_exit_statements: ~
+                never_use_else: ~
+                forbidden_function_calls:
+                    blacklist: [ echo, print, print_r, phpinfo ]
+            metadata:
+                priority: 200
+        psalm:
+            config: psalm.xml.dist
+            ignore_patterns: '%grumphp.ignore_patterns%'
+            metadata:
+                priority: 200
+        phpunit:
+            always_execute: true
+            metadata:
+                priority: 50
+        phpcs:
+            standard: [ PHPCompatibility ]
+            report: full
+            ignore_patterns: [ '*/vendor/*','*/node_modules/*' ]
+            triggered_by: [ php ]

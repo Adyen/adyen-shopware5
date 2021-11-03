@@ -10,9 +10,9 @@ use AdyenPayment\Models\Payment\PaymentMethodType;
 final class PaymentMethodCollection implements \Countable, \IteratorAggregate
 {
     /**
-     * @var PaymentMethod[]
+     * @var array<PaymentMethod>
      */
-    private $paymentMethods;
+    private array $paymentMethods;
 
     public function __construct(PaymentMethod ...$paymentMethods)
     {
@@ -22,7 +22,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     /**
      * @return \Generator<PaymentMethod>
      */
-    public function getIterator(): \Generator
+    public function getIterator(): iterable
     {
         yield from $this->paymentMethods;
     }
@@ -35,9 +35,10 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     public static function fromAdyenMethods(array $adyenMethods): self
     {
         return new self(
-            ...array_map(function (array $paymentMethod) {
-                return PaymentMethod::fromRaw($paymentMethod);
-            }, $adyenMethods['paymentMethods'] ?? [])
+            ...array_map(
+                static fn(array $paymentMethod) => PaymentMethod::fromRaw($paymentMethod),
+                $adyenMethods['paymentMethods'] ?? []
+            )
         );
     }
 
@@ -48,19 +49,18 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
 
     public function mapToRaw(): array
     {
-        return array_map(function (PaymentMethod $paymentMethod) {
-            return $paymentMethod->getRawData();
-        }, $this->paymentMethods);
+        return array_map(
+            static fn(PaymentMethod $paymentMethod) => $paymentMethod->getRawData(),
+            $this->paymentMethods
+        );
     }
 
-    /**
-     * @return PaymentMethod|null
-     */
-    public function fetchByTypeOrId(string $paymentTypeOrId)
+    public function fetchByTypeOrId(string $paymentTypeOrId): ?PaymentMethod
     {
         foreach ($this->paymentMethods as $paymentMethod) {
             if ($paymentMethod->getId() !== $paymentTypeOrId
-                && $paymentMethod->getType() !== $paymentTypeOrId) {
+                && $paymentMethod->getType() !== $paymentTypeOrId
+            ) {
                 continue;
             }
 
@@ -85,9 +85,8 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     {
         return new self(...array_filter(
             $this->paymentMethods,
-            function (PaymentMethod $paymentMethod) use ($paymentMethodType) {
-                return $paymentMethod->getPaymentMethodType()->equals($paymentMethodType);
-            }
+            static fn(PaymentMethod $paymentMethod) => $paymentMethod->getPaymentMethodType()
+                ->equals($paymentMethodType)
         ));
     }
 }

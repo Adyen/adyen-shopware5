@@ -36,7 +36,7 @@ class Authorisation implements NotificationProcessorInterface
      */
     private $modelManager;
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var \Doctrine\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
      */
     private $paymentInfoRepository;
 

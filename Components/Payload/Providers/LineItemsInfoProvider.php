@@ -96,6 +96,7 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
             $context->getOrder()->getInvoiceShipping(),
             $currencyCode
         );
+        $dispatch = $context->getOrder()->getDispatch();
 
         $shippingLines[] = [
             'quantity' => 1,
@@ -104,8 +105,8 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
                 $context->getOrder()->getInvoiceShippingTaxRate(),
                 $currencyCode
             ),
-            'description' => $context->getOrder()->getDispatch()->getName(),
-            'id' => $context->getOrder()->getDispatch()->getId(),
+            'description' => $dispatch && $dispatch->getId() ? $dispatch->getName(): '',
+            'id' => $dispatch && $dispatch->getId(),
             'taxAmount' => $amountIncludingTax - $amountExcludingTax,
             'amountIncludingTax' => $amountIncludingTax
         ];

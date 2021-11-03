@@ -11,7 +11,7 @@ use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\ImportStatus;
 use AdyenPayment\Models\PaymentMethod\ImportResult;
 use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Shop\Shop;
 
@@ -85,6 +85,9 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
         $this->entityManager->flush();
     }
 
+    /**
+     * @return \Generator<ImportResult>
+     */
     private function import(Shop $shop): \Generator
     {
         try {
@@ -97,6 +100,8 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
                 null,
                 $exception
             );
+
+            return;
         }
 
         foreach ($generator as $adyenPaymentMethod) {

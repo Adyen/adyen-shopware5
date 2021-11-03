@@ -4,21 +4,14 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Dbal\Provider\Payment;
 
-use AdyenPayment\Models\Payment\PaymentMean;
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
 use Shopware\Components\Model\ModelRepository;
 use Shopware\Models\Payment\Payment;
 
 final class PaymentMeanProvider implements PaymentMeanProviderInterface
 {
-    /**
-     * @var Enlight_Components_Db_Adapter_Pdo_Mysql
-     */
-    private $db;
-    /**
-     * @var ModelRepository
-     */
-    private $paymentRepository;
+    private Enlight_Components_Db_Adapter_Pdo_Mysql $db;
+    private ModelRepository $paymentRepository;
 
     public function __construct(Enlight_Components_Db_Adapter_Pdo_Mysql $db, ModelRepository $paymentRepository)
     {
@@ -26,10 +19,7 @@ final class PaymentMeanProvider implements PaymentMeanProviderInterface
         $this->paymentRepository = $paymentRepository;
     }
 
-    /**
-     * @return Payment | null
-     */
-    public function provideByAdyenType(string $adyenType)
+    public function provideByAdyenType(string $adyenType): ?Payment
     {
         if ('' === $adyenType) {
             return null;

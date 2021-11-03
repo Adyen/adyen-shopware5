@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Components;
 
 use AdyenPayment\Models\TextNotification;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityRepository;
 use Shopware\Components\Model\ModelManager;
 
