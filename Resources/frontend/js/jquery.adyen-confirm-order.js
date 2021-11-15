@@ -65,6 +65,8 @@
             }
         },
         onPlaceOrder: function (event) {
+            console.log('on place order');
+            debugger;
             var me = this;
 
             if (typeof event !== 'undefined') {
@@ -73,7 +75,9 @@
 
             me.clearAdyenError();
 
-            if (me.sessionStorage.getItem(me.paymentMethodSession)) {
+                if (me.sessionStorage.getItem(me.paymentMethodSession)) {
+                console.log('if');
+                debugger;
                 if (!$(me.opts.confirmFormSelector)[0].checkValidity()) {
                     return;
                 }
@@ -94,6 +98,9 @@
                     url: me.opts.adyenAjaxDoPaymentUrl,
                     data: data,
                     success: function (response) {
+                        console.log('ajax success');
+                        console.log(response);
+                        debugger;
                         if (response['status'] === 'success') {
                             me.handlePaymentData(response['content'], response['sUniqueID']);
                         } else {
@@ -104,6 +111,8 @@
                     }
                 });
             } else {
+                console.log('else');
+                debugger;
                 if (me.opts.adyenIsAdyenPayment) {
                     this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
                     return;
@@ -162,6 +171,9 @@
                                 'details': state.data.details,
                             },
                             success: function (response) {
+                                console.log('success in create from action');
+                                console.log(response);
+                                debugger;
                                 me.handlePaymentData(response);
                             },
                         });
@@ -172,6 +184,7 @@
                 })
                 .mount('#AdyenModal');
         },
+        // TODO: remove as this method isn't used
         handlePaymentDataRedirectShopper: function (data) {
             var me = this;
             if ('redirect' === data.action.type || 'qrCode' === data.action.type) {
