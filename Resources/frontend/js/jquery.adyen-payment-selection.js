@@ -75,11 +75,18 @@
             var me = this;
             me.sessionStorage = StorageManager.getStorage('session');
 
+            me.setSafariBodyClass();
             me.applyDataAttributes();
             me.eventListeners();
             me.setConfig();
             me.setCheckout();
             me.handleSelectedMethod();
+        },
+        setSafariBodyClass: function (){
+            var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            if (isSafari) {
+                $(document).classList.add('isSafari');
+            }
         },
         eventListeners: function () {
             var me = this;
