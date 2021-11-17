@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber\Checkout;
 
+use AdyenPayment\Models\Payment\PaymentMean;
 use Enlight\Event\SubscriberInterface;
-use Enlight_Event_EventArgs;
 
 final class OverridePreselectedAdyenMethodSubscriber implements SubscriberInterface
 {
@@ -16,53 +16,65 @@ final class OverridePreselectedAdyenMethodSubscriber implements SubscriberInterf
         ];
     }
 
-    public function __invoke(Enlight_Event_EventArgs $args): void
+    public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
-
         if ('confirm' !== $subject->Request()->getActionName()) {
             return;
         }
 
-        $preselectedPayment = Shopware()->Session()->get('sOrderVariables')['sPayment'] ?? false;
-        if (false === $preselectedPayment) {
+        $preselectedPaymentMean = PaymentMean::createFromShopwareArray(
+            Shopware()->Session()->get('sOrderVariables')['sPayment'] ?? []
+        );
+
+        if (!$preselectedPaymentMean->isAdyenType()) {
             return;
         }
 
-        $preselectedPaymentId = (int) ($preselectedPayment['id'] ?? 0);
-        $isAdyenPayment = $preselectedPayment['attribute']['adyen_type'] ?? false;
-        if (0 === $preselectedPaymentId || false === $isAdyenPayment) {
+        if ($preselectedPaymentMean->getId() === $this->provideUserPaymentPresetId($subject)) {
             return;
         }
 
-        $userPaymentPreset = (int) ($subject->View()->getAssign('sUserData')['additional']['user']['paymentpreset'] ?? 0);
-        if (0 === $userPaymentPreset) {
-            $paymentMethodId = Shopware()->Config()->get('defaultPayment');
-            if (0 !== $paymentMethodId) {
-                $this->overridePaymentMethod($subject, $paymentMethodId);
-            }
-            $subject->forward('shippingPayment', 'checkout');
-            
-            return;
-        }
-
-        if ($userPaymentPreset === $preselectedPaymentId) {
-            return;
-        }
-
-        $this->overridePaymentMethod($subject, $preselectedPaymentId);
+        $overridePaymentId = $this->determineOverridePaymentId($subject, $preselectedPaymentMean);
+        $this->overridePaymentMethod($subject, $overridePaymentId);
         $subject->forward('shippingPayment', 'checkout');
     }
 
-    private function overridePaymentMethod($subject, $paymentMethodId)
+    private function provideUserPaymentPresetId(\Enlight_Controller_Action $subject): int
     {
-        $paymentMethod = Shopware()->Modules()->Admin()->sGetPaymentMeanById($paymentMethodId);
-        if ($paymentMethod && Shopware()->Modules()->Admin()->sUpdatePayment($paymentMethodId)) {
-            $userData = $subject->View()->getAssign('sUserData');
-            $userData['additional']['payment'] = $paymentMethod;
-            $subject->View()->assign('sUserData', $userData);
-            $subject->View()->assign('sPayment', $paymentMethod);
-            $subject->View()->clearAssign('adyenPaymentState');
+        return (int) ($subject->View()->getAssign('sUserData')['additional']['user']['paymentpreset'] ?? 0);
+    }
+
+    private function determineOverridePaymentId(
+        \Enlight_Controller_Action $subject,
+        PaymentMean $preselectedPaymentMean
+    ): int {
+        if (0 === $this->provideUserPaymentPresetId($subject)) {
+            return (int) Shopware()->Config()->get('defaultPayment');
         }
+
+        return $preselectedPaymentMean->getId();
+    }
+
+    private function overridePaymentMethod(\Enlight_Controller_Action $subject, int $paymentMethodId): void
+    {
+        $paymentMean = PaymentMean::createFromShopwareArray(
+            Shopware()->Modules()->Admin()->sGetPaymentMeanById($paymentMethodId)
+        );
+
+        if (0 === $paymentMean->getId()) {
+            return;
+        }
+
+        $updated = Shopware()->Modules()->Admin()->sUpdatePayment($paymentMean->getId());
+        if (!$updated) {
+            return;
+        }
+
+        $userData = $subject->View()->getAssign('sUserData');
+        $userData['additional']['payment'] = $paymentMean->getRaw();
+        $subject->View()->assign('sUserData', $userData);
+        $subject->View()->assign('sPayment', $paymentMean->getRaw());
+        $subject->View()->clearAssign('adyenPaymentState');
     }
 }

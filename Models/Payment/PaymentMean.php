@@ -57,4 +57,9 @@ final class PaymentMean
     {
         return $this->raw;
     }
+
+    public function isAdyenType(): bool
+    {
+        return $this->source->equals(SourceType::adyen());
+    }
 }
