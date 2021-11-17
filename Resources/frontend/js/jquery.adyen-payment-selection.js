@@ -88,7 +88,7 @@
                 navigator.userAgent.indexOf('CriOS') === -1 &&
                 navigator.userAgent.indexOf('FxiOS') === -1;
             if (isSafari) {
-                $('body').classList.add('isSafari');
+                $('body').addClass('isSafari');
             }
         },
         eventListeners: function () {
