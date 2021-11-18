@@ -1,56 +1,30 @@
 <?php
 
 use Adyen\AdyenException;
+use AdyenPayment\Components\Adyen\PaymentMethodService;
+use AdyenPayment\Components\BasketService;
+use AdyenPayment\Components\Manager\AdyenManager;
+use AdyenPayment\Components\Manager\OrderManagerInterface;
+use AdyenPayment\Components\OrderMailService;
 use AdyenPayment\Models\Enum\PaymentResultCodes;
+use AdyenPayment\Session\MessageProvider;
 use AdyenPayment\Utils\RequestDataFormatter;
 use Shopware\Components\CSRFWhitelistAware;
 use Shopware\Components\Logger;
 use Shopware\Models\Order\Order;
 use Shopware\Models\Order\Status;
 
-/**
- * Class Redirect
- */
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
-    /**
-     * @var \AdyenPayment\Components\Manager\AdyenManager
-     */
-    private $adyenManager;
-
-    /**
-     * @var \AdyenPayment\Components\Adyen\PaymentMethodService
-     */
-    private $adyenCheckout;
-
-    /**
-     * @var \AdyenPayment\Components\BasketService
-     */
-    private $basketService;
-
-    /**
-     * @var \AdyenPayment\Components\OrderMailService
-     */
-    private $orderMailService;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-    /**
-     * @var \AdyenPayment\Components\Manager\OrderManagerInterface
-     */
-    private $orderManager;
-    /**
-     * @var Shopware_Components_Snippet_Manager|null
-     */
-    private $snippets;
-    /**
-     * @var AdyenPayment\Session\ErrorMessageProvider|null
-     */
-    private $errorMessageProvider;
-
+    private AdyenManager $adyenManager;
+    private PaymentMethodService $adyenCheckout;
+    private BasketService $basketService;
+    private OrderMailService $orderMailService;
+    private Logger $logger;
+    private OrderManagerInterface $orderManager;
+    private Shopware_Components_Snippet_Manager $snippets;
+    private MessageProvider $errorMessageProvider;
 
     /**
      * Whitelist notifyAction
