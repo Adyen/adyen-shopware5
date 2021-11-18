@@ -50,7 +50,6 @@ grumphp:
 
         # PHP
         phpcsfixer:
-            config: '.php-cs-fixer.dist.php'
             metadata:
                 priority: 200
         phpparser:
