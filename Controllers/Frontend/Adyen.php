@@ -57,7 +57,6 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
     public function ajaxDoPaymentAction(): void
     {
-//        dump('ajax do payment');
         $this->Request()->setHeader('Content-Type', 'application/json');
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
@@ -74,14 +73,11 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             );
             $this->handlePaymentData($paymentInfo);
 
-//            dump('success');
-//            dump($paymentInfo);
-//            die();
             $this->Response()->setBody(json_encode(
                 [
                     'status' => 'success',
                     'content' => $paymentInfo,
-                    'sUniqueID' => $context->getOrder()->getTemporaryId()
+                    'sUniqueID' => $context->getOrder()->getTemporaryId(),
                 ]
             ));
         } catch (AdyenException $ex) {
@@ -149,7 +145,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $browserInfo = $this->Request()->getPost('browserInfo');
         $shopperInfo = $this->getShopperInfo();
         $origin = $this->Request()->getPost('origin');
-        $storePaymentMethod = (bool)json_decode($this->Request()->getPost('storePaymentMethod', false), true);
+        $storePaymentMethod = (bool) json_decode($this->Request()->getPost('storePaymentMethod', false), true);
 
         return new PaymentContext(
             $paymentInfo,

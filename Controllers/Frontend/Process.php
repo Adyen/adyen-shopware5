@@ -42,6 +42,14 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
      * @var \AdyenPayment\Components\Manager\OrderManagerInterface
      */
     private $orderManager;
+    /**
+     * @var Shopware_Components_Snippet_Manager|null
+     */
+    private $snippets;
+    /**
+     * @var AdyenPayment\Session\ErrorMessageProvider|null
+     */
+    private $errorMessageProvider;
 
 
     /**
@@ -67,6 +75,8 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         $this->orderMailService = $this->get('adyen_payment.components.order_mail_service');
         $this->logger = $this->get('adyen_payment.logger');
         $this->orderManager = $this->get('AdyenPayment\Components\Manager\OrderManager');
+        $this->snippets = $this->get('snippets');
+        $this->errorMessageProvider = $this->get('AdyenPayment\Session\ErrorMessageProvider');
     }
 
     /**
@@ -104,9 +114,15 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                 case PaymentResultCodes::ERROR:
                 case PaymentResultCodes::REFUSED:
                 default:
+                    $this->errorMessageProvider->add(
+                        $this->snippets->getNamespace('adyen/checkout/error')
+                            ->get('errorTransaction'.$result['resultCode'], $result['refusalReason'] ?? '')
+                    );
+
                     if (!empty($result['merchantReference'])) {
                         $this->basketService->cancelAndRestoreByOrderNumber($result['merchantReference']);
                     }
+
                     $this->redirect([
                         'controller' => 'checkout',
                         'action' => 'confirm',

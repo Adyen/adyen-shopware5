@@ -45,7 +45,8 @@
 
 
 {block name='frontend_checkout_confirm_error_messages'}
-    <div data-adyen-checkout-error="true"></div>
-
+    <div data-adyen-checkout-error="true">
+        {if $sErrorMessages}{include file="frontend/register/error_message.tpl" error_messages=$sErrorMessages}{/if}
+    </div>
     {$smarty.block.parent}
 {/block}
