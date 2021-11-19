@@ -28,7 +28,7 @@ grumphp:
                 - "\\bdd\\b("
             triggered_by: [ php,js ]
             metadata:
-                priority: 300
+                priority: 100
         file_size:
             max_size: 5M
         composer: ~
@@ -45,7 +45,7 @@ grumphp:
         phpcsfixer:
             config: '.php-cs-fixer.dist.php'
             metadata:
-                priority: 200
+                priority: 100
         phpparser:
             ignore_patterns: '%grumphp.ignore_patterns%'
             visitors:
@@ -54,7 +54,7 @@ grumphp:
                 forbidden_function_calls:
                     blacklist: [ echo, print, print_r, phpinfo ]
             metadata:
-                priority: 200
+                priority: 100
         psalm:
             config: psalm.xml.dist
             ignore_patterns: '%grumphp.ignore_patterns%'
