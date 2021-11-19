@@ -7,6 +7,7 @@ namespace AdyenPayment\Components\Adyen;
 use Adyen\AdyenException;
 use Adyen\Service\Modification;
 use AdyenPayment\Components\NotificationManager;
+use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
 use AdyenPayment\Models\Refund;
 use Shopware\Components\Model\ModelManager;
@@ -28,8 +29,9 @@ class RefundService
      * @var NotificationManager
      */
     private $notificationManager;
+
     /**
-     * @var \Doctrine\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository
      */
     private $paymentInfoRepository;
 
@@ -45,8 +47,6 @@ class RefundService
     }
 
     /**
-     * @param int $orderId
-     * @return Refund
      * @throws AdyenException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -59,26 +59,14 @@ class RefundService
             $this->apiClientMap->lookup($order->getShop())
         );
 
-        /** @var PaymentInfo $paymentInfo */
-        $paymentInfo = $this->paymentInfoRepository->findOneBy([
-            'orderId' => $orderId
-        ]);
-
-        if ($paymentInfo && !empty($paymentInfo->getPspReference())) {
-            $notification = $this->notificationManager->getLastNotificationForPspReference(
-                $paymentInfo->getPspReference()
-            );
-        } else {
-            $notification = $this->notificationManager->getLastNotificationForOrderId($orderId);
-        }
-
+        $notification = $this->provideNotification($orderId);
         $request = [
             'originalReference' => $notification->getPspReference(),
             'modificationAmount' => [
                 'value' => $notification->getAmountValue(),
                 'currency' => $notification->getAmountCurrency(),
             ],
-            'merchantAccount' => $notification->getMerchantAccountCode()
+            'merchantAccount' => $notification->getMerchantAccountCode(),
         ];
         $refund = $modification->refund($request);
 
@@ -91,5 +79,16 @@ class RefundService
         $this->modelManager->flush();
 
         return $orderRefund;
+    }
+
+    private function provideNotification(int $orderId): Notification
+    {
+        /** @var PaymentInfo $paymentInfo */
+        $paymentInfo = $this->paymentInfoRepository->findOneBy(['orderId' => $orderId]);
+        if ($paymentInfo && '' !== $paymentInfo->getPspReference()) {
+            return $this->notificationManager->getLastNotificationForPspReference($paymentInfo->getPspReference());
+        }
+
+        return $this->notificationManager->getLastNotificationForOrderId($orderId);
     }
 }

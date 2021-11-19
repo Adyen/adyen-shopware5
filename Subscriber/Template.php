@@ -8,8 +8,7 @@ use Enlight\Event\SubscriberInterface;
 use Enlight_Template_Manager;
 
 /**
- * Class Template
- * @package AdyenPayment\Subscriber
+ * Class Template.
  */
 class Template implements SubscriberInterface
 {
@@ -25,7 +24,6 @@ class Template implements SubscriberInterface
 
     /**
      * @param string $pluginDirectory
-     * @param Enlight_Template_Manager $templateManager
      */
     public function __construct($pluginDirectory, Enlight_Template_Manager $templateManager)
     {
@@ -35,6 +33,10 @@ class Template implements SubscriberInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return string[]
+     *
+     * @psalm-return array{Enlight_Controller_Action_PreDispatch: 'onPreDispatch', Enlight_Controller_Action_PostDispatchSecure_Backend_Order: 'onBackendOrderPostDispatch'}
      */
     public static function getSubscribedEvents()
     {
@@ -44,12 +46,12 @@ class Template implements SubscriberInterface
         ];
     }
 
-    public function onPreDispatch()
+    public function onPreDispatch(): void
     {
-        $this->templateManager->addTemplateDir($this->pluginDirectory . '/Resources/views');
+        $this->templateManager->addTemplateDir($this->pluginDirectory.'/Resources/views');
     }
 
-    public function onBackendOrderPostDispatch(\Enlight_Event_EventArgs $args)
+    public function onBackendOrderPostDispatch(\Enlight_Event_EventArgs $args): void
     {
         /** @var \Shopware_Controllers_Backend_Order $controller */
         $controller = $args->getSubject();
@@ -57,11 +59,11 @@ class Template implements SubscriberInterface
         $view = $controller->View();
         $request = $controller->Request();
 
-        if ($request->getActionName() === 'index') {
+        if ('index' === $request->getActionName()) {
             $view->extendsTemplate('backend/adyen_payment_order/app.js');
         }
 
-        if ($request->getActionName() === 'load') {
+        if ('load' === $request->getActionName()) {
             $view->extendsTemplate('backend/adyen_payment_order/view/detail/window.js');
             $view->extendsTemplate('backend/adyen_payment_order/model/order.js');
         }

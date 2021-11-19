@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
@@ -7,18 +9,17 @@ use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
-use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
-use Enlight\Event\SubscriberInterface;
-use Enlight_Event_EventArgs;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\DataConversion;
+use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use Enlight\Event\SubscriberInterface;
+use Enlight_Event_EventArgs;
 use sAdmin;
 use Shopware_Controllers_Frontend_Checkout;
 
 /**
- * Class CheckoutSubscriber
- * @package AdyenPayment\Subscriber
+ * Class CheckoutSubscriber.
  */
 class CheckoutSubscriber implements SubscriberInterface
 {
@@ -26,22 +27,27 @@ class CheckoutSubscriber implements SubscriberInterface
      * @var Configuration
      */
     protected $configuration;
+
     /**
      * @var PaymentMethodService
      */
     protected $paymentMethodService;
+
     /**
      * @var DataConversion
      */
     private $dataConversion;
+
     /**
      * @var EnrichedPaymentMeanProviderInterface
      */
     private $enrichedPaymentMeanProvider;
+
     /**
      * @var sAdmin
      */
     private $admin;
+
     /**
      * @var PaymentMethodOptionsBuilderInterface
      */
@@ -61,9 +67,6 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->paymentMethodOptionsBuilder = $paymentMethodOptionsBuilder;
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -72,10 +75,9 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param Enlight_Event_EventArgs $args
      * @throws AdyenException
      */
-    public function checkoutFrontendPostDispatch(Enlight_Event_EventArgs $args)
+    public function checkoutFrontendPostDispatch(Enlight_Event_EventArgs $args): void
     {
         $subject = $args->getSubject();
 
@@ -85,10 +87,9 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param Shopware_Controllers_Frontend_Checkout $subject
      * @throws \Exception
      */
-    private function checkBasketAmount(Shopware_Controllers_Frontend_Checkout $subject)
+    private function checkBasketAmount(Shopware_Controllers_Frontend_Checkout $subject): void
     {
         $userData = $subject->View()->getAssign('sUserData');
 
@@ -108,12 +109,11 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param Shopware_Controllers_Frontend_Checkout $subject
      * @throws AdyenException
      */
-    private function addAdyenConfigOnShipping(Shopware_Controllers_Frontend_Checkout $subject)
+    private function addAdyenConfigOnShipping(Shopware_Controllers_Frontend_Checkout $subject): void
     {
-        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'confirm'])) {
+        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'confirm'], true)) {
             return;
         }
 
@@ -125,10 +125,10 @@ class CheckoutSubscriber implements SubscriberInterface
         $shop = Shopware()->Shop();
 
         $adyenConfig = [
-            "shopLocale" => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
-            "clientKey" => $this->configuration->getClientKey($shop),
-            "environment" => $this->configuration->getEnvironment($shop),
-            "enrichedPaymentMethods" => $enrichedPaymentMethods->toShopwareArray(),
+            'shopLocale' => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
+            'clientKey' => $this->configuration->getClientKey($shop),
+            'environment' => $this->configuration->getEnvironment($shop),
+            'enrichedPaymentMethods' => $enrichedPaymentMethods->toShopwareArray(),
         ];
 
         $view = $subject->View();
@@ -136,12 +136,11 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param Shopware_Controllers_Frontend_Checkout $subject
      * @throws AdyenException
      */
-    private function checkFirstCheckoutStep(Shopware_Controllers_Frontend_Checkout $subject)
+    private function checkFirstCheckoutStep(Shopware_Controllers_Frontend_Checkout $subject): void
     {
-        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+        if (!in_array($subject->Request()->getActionName(), ['confirm'], true)) {
             return;
         }
 
@@ -154,8 +153,6 @@ class CheckoutSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param Shopware_Controllers_Frontend_Checkout $subject
-     * @return bool
      * @throws AdyenException
      */
     private function shouldRedirectToStep2(Shopware_Controllers_Frontend_Checkout $subject): bool
@@ -167,7 +164,7 @@ class CheckoutSubscriber implements SubscriberInterface
         }
 
         $paymentMethodOptions = ($this->paymentMethodOptionsBuilder)();
-        if ($paymentMethodOptions['value'] == 0) {
+        if (0 === $paymentMethodOptions['value']) {
             return false;
         }
 
@@ -179,7 +176,7 @@ class CheckoutSubscriber implements SubscriberInterface
             )
         );
 
-        $selectedId = $userData['additional']['payment']['id'] ?? null;
+        $selectedId = $userData['additional']['payment']['id'] ?? '';
         $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($selectedId);
         if (!$paymentMethod) {
             return true;
@@ -194,8 +191,7 @@ class CheckoutSubscriber implements SubscriberInterface
         return true;
     }
 
-
-    private function revertToDefaultPaymentMethod(Shopware_Controllers_Frontend_Checkout $subject)
+    private function revertToDefaultPaymentMethod(Shopware_Controllers_Frontend_Checkout $subject): void
     {
         $defaultPaymentId = Shopware()->Config()->get('defaultPayment');
         $defaultPayment = Shopware()->Modules()->Admin()->sGetPaymentMeanById($defaultPaymentId);

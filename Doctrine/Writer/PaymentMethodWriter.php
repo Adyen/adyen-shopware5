@@ -16,14 +16,17 @@ use Shopware\Models\Shop\Shop;
 
 final class PaymentMethodWriter implements PaymentMethodWriterInterface
 {
-    const GIFTCARD = 'giftcard';
+    public const GIFTCARD = 'giftcard';
 
     /** @var ModelManager */
     private $entityManager;
+
     /** @var PaymentMeanProviderInterface */
     private $paymentMeanProvider;
+
     /** @var PaymentFactoryInterface */
     private $paymentFactory;
+
     /** @var PaymentAttributeWriterInterface */
     private $paymentAttributeWriter;
 
@@ -49,7 +52,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
             return ImportResult::fromException(
                 $shop,
                 $adyenPaymentMethod,
-                (new ImportPaymentMethodException)->missingId($adyenPaymentMethod, $shop)
+                (new ImportPaymentMethodException())->missingId($adyenPaymentMethod, $shop)
             );
         }
 

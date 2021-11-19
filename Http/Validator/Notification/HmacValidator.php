@@ -15,6 +15,7 @@ class HmacValidator implements NotificationValidatorInterface
      * @var HmacSignature
      */
     private $hmacSignatureService;
+
     /**
      * @var Configuration
      */
@@ -29,7 +30,7 @@ class HmacValidator implements NotificationValidatorInterface
     /**
      * @throws InvalidHmacException
      */
-    public function validate(array $notifications)
+    public function validate(array $notifications): void
     {
         foreach ($notifications as $notificationItem) {
             try {
@@ -39,7 +40,7 @@ class HmacValidator implements NotificationValidatorInterface
                     $params
                 );
                 if (!$hmacCheck) {
-                    throw InvalidHmacException::withHmacKey($params["additionalData"]["hmacSignature"] ?? '');
+                    throw InvalidHmacException::withHmacKey($params['additionalData']['hmacSignature'] ?? '');
                 }
             } catch (AdyenException $exception) {
                 throw InvalidHmacException::fromAdyenException($exception);

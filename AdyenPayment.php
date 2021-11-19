@@ -1,17 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 //phpcs:disable PSR1.Files.SideEffects
 
 namespace AdyenPayment;
 
-use Doctrine\Common\Cache\Cache;
-use Doctrine\ORM\Tools\SchemaTool;
-use Exception;
 use AdyenPayment\Components\CompilerPass\NotificationProcessorCompilerPass;
 use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
 use AdyenPayment\Models\Refund;
 use AdyenPayment\Models\TextNotification;
+use Doctrine\ORM\Tools\SchemaTool;
 use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
 use Shopware\Components\Logger;
 use Shopware\Components\Plugin;
@@ -24,39 +24,30 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 /**
- * Class AdyenPayment
- * @package AdyenPayment
+ * Class AdyenPayment.
  */
 class AdyenPayment extends Plugin
 {
-    const NAME = 'AdyenPayment';
-    const ADYEN_PAYMENT_METHOD_LABEL = 'adyen_type';
-    const ADYEN_PAYMENT_STORED_METHOD_ID = 'adyen_stored_method_id';
+    public const NAME = 'AdyenPayment';
+    public const ADYEN_PAYMENT_METHOD_LABEL = 'adyen_type';
+    public const ADYEN_PAYMENT_STORED_METHOD_ID = 'adyen_stored_method_id';
+    public const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
+    public const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';
 
-    const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
-    const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';
-
-    /**
-     * @return bool
-     */
     public static function isPackage(): bool
     {
         return file_exists(static::getPackageVendorAutoload());
     }
 
-    /**
-     * @return string
-     */
     public static function getPackageVendorAutoload(): string
     {
-        return __DIR__ . '/vendor/autoload.php';
+        return __DIR__.'/vendor/autoload.php';
     }
 
     /**
-     * @param ContainerBuilder $container
-     * @throws Exception
+     * @throws \Exception
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new NotificationProcessorCompilerPass());
 
@@ -72,20 +63,19 @@ class AdyenPayment extends Plugin
             new FileLocator()
         );
 
-        $loader->load(__DIR__ . '/Resources/services.xml');
+        $loader->load(__DIR__.'/Resources/services.xml');
 
         $versionCheck = $container->get('adyen_payment.components.shopware_version_check');
 
         if ($versionCheck->isHigherThanShopwareVersion('v5.6.2')) {
-            $loader->load(__DIR__ . '/Resources/services/version/563.xml');
+            $loader->load(__DIR__.'/Resources/services/version/563.xml');
         }
     }
 
     /**
-     * @param InstallContext $context
-     * @throws Exception
+     * @throws \Exception
      */
-    public function install(InstallContext $context)
+    public function install(InstallContext $context): void
     {
         $this->installAttributes();
 
@@ -94,7 +84,7 @@ class AdyenPayment extends Plugin
         $tool->updateSchema($classes, true);
     }
 
-    public function update(UpdateContext $context)
+    public function update(UpdateContext $context): void
     {
         $this->installAttributes();
 
@@ -106,10 +96,9 @@ class AdyenPayment extends Plugin
     }
 
     /**
-     * @param UninstallContext $context
-     * @throws Exception
+     * @throws \Exception
      */
-    public function uninstall(UninstallContext $context)
+    public function uninstall(UninstallContext $context): void
     {
         if (!$context->keepUserData()) {
             $this->uninstallAttributes($context);
@@ -124,20 +113,15 @@ class AdyenPayment extends Plugin
         }
     }
 
-
-    /**
-     * @param DeactivateContext $context
-     */
-    public function deactivate(DeactivateContext $context)
+    public function deactivate(DeactivateContext $context): void
     {
         $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
     }
 
     /**
-     * @param UninstallContext $uninstallContext
-     * @throws Exception
+     * @throws \Exception
      */
-    private function uninstallAttributes(UninstallContext $uninstallContext)
+    private function uninstallAttributes(UninstallContext $uninstallContext): void
     {
         $crudService = $this->container->get('shopware_attribute.crud_service');
         $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_PAYMENT_METHOD_LABEL);
@@ -147,9 +131,9 @@ class AdyenPayment extends Plugin
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
-    private function installAttributes()
+    private function installAttributes(): void
     {
         $crudService = $this->container->get('shopware_attribute.crud_service');
         $crudService->update(
@@ -159,7 +143,7 @@ class AdyenPayment extends Plugin
             [
                 'displayInBackend' => true,
                 'readonly' => true,
-                'label' => 'Adyen payment type'
+                'label' => 'Adyen payment type',
             ]
         );
         $crudService->update(
@@ -169,16 +153,13 @@ class AdyenPayment extends Plugin
             [
                 'displayInBackend' => true,
                 'readonly' => true,
-                'label' => 'Adyen stored payment method id'
+                'label' => 'Adyen stored payment method id',
             ]
         );
 
         $this->rebuildAttributeModels();
     }
 
-    /**
-     * @return array
-     */
     private function getModelMetaData(): array
     {
         $entityManager = $this->container->get('models');
@@ -187,13 +168,13 @@ class AdyenPayment extends Plugin
             $entityManager->getClassMetadata(Notification::class),
             $entityManager->getClassMetadata(PaymentInfo::class),
             $entityManager->getClassMetadata(Refund::class),
-            $entityManager->getClassMetadata(TextNotification::class)
+            $entityManager->getClassMetadata(TextNotification::class),
         ];
     }
 
-    private function rebuildAttributeModels()
+    private function rebuildAttributeModels(): void
     {
-        /** @var Cache $metaDataCache */
+        /** @var \Doctrine\Common\Cache\CacheProvider $metaDataCache */
         $metaDataCache = $this->container->get('models')->getConfiguration()->getMetadataCacheImpl();
         if ($metaDataCache) {
             $metaDataCache->deleteAll();

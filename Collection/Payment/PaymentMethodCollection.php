@@ -22,7 +22,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     /**
      * @return \Generator<PaymentMethod>
      */
-    public function getIterator(): iterable
+    public function getIterator(): \Traversable
     {
         yield from $this->paymentMethods;
     }
@@ -76,7 +76,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
         return null;
     }
 
-    public function filter(callable $filter = null): self
+    public function filter(callable $filter): self
     {
         return new self(...array_filter($this->paymentMethods, $filter));
     }

@@ -13,9 +13,8 @@ final class ConfigContext
     {
     }
 
-    public static function fromCheckoutEvent(\Enlight_Event_EventArgs $args):self
+    public static function fromCheckoutEvent(\Enlight_Controller_ActionEventArgs $args): self
     {
-        /* @var $subject \Enlight_Controller_Action */
         $subject = $args->getSubject();
         $userData = $subject->View()->getAssign('sUserData') ?? [];
         $basket = $subject->View()->getAssign('sBasket') ?? [];

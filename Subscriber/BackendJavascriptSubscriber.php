@@ -1,15 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
+use AdyenPayment\Models\Notification;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use AdyenPayment\Models\Notification;
 use Shopware\Components\Model\ModelManager;
 
 /**
- * Class BackendJavascriptSubscriber
- * @package AdyenPayment\Subscriber
+ * Class BackendJavascriptSubscriber.
  */
 class BackendJavascriptSubscriber implements SubscriberInterface
 {
@@ -19,14 +20,12 @@ class BackendJavascriptSubscriber implements SubscriberInterface
     private $pluginDirectory;
 
     /**
-     * @var \Doctrine\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository
      */
     private $notificationRepository;
 
     /**
      * BackendJavascriptSubscriber constructor.
-     * @param string $pluginDirectory
-     * @param ModelManager $modelManager
      */
     public function __construct(
         string $pluginDirectory,
@@ -37,20 +36,19 @@ class BackendJavascriptSubscriber implements SubscriberInterface
     }
 
     /**
-     * @return array
+     * @return string[]
+     *
+     * @psalm-return array{Enlight_Controller_Action_PostDispatchSecure_Backend_Order: 'onOrderPostDispatch', Enlight_Controller_Action_PostDispatchSecure_Backend_Customer: 'onCustomerPostDispatch'}
      */
     public static function getSubscribedEvents()
     {
         return [
             'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'onOrderPostDispatch',
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_Customer' => 'onCustomerPostDispatch'
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Customer' => 'onCustomerPostDispatch',
         ];
     }
 
-    /**
-     * @param Enlight_Event_EventArgs $args
-     */
-    public function onOrderPostDispatch(\Enlight_Event_EventArgs $args)
+    public function onOrderPostDispatch(Enlight_Event_EventArgs $args): void
     {
         /** @var \Shopware_Controllers_Backend_Customer $controller */
         $controller = $args->getSubject();
@@ -58,18 +56,18 @@ class BackendJavascriptSubscriber implements SubscriberInterface
         $view = $controller->View();
         $request = $controller->Request();
 
-        $view->addTemplateDir($this->pluginDirectory . '/Resources/views');
+        $view->addTemplateDir($this->pluginDirectory.'/Resources/views');
 
-        if ($request->getActionName() === 'index') {
+        if ('index' === $request->getActionName()) {
             $view->extendsTemplate('backend/order/adyen_payment_method/app.js');
         }
 
-        if ($request->getActionName() === 'getList') {
+        if ('getList' === $request->getActionName()) {
             $this->onGetList($args);
         }
     }
 
-    public function onCustomerPostDispatch(\Enlight_Event_EventArgs $args)
+    public function onCustomerPostDispatch(Enlight_Event_EventArgs $args): void
     {
         /** @var \Shopware_Controllers_Backend_Customer $controller */
         $controller = $args->getSubject();
@@ -77,21 +75,18 @@ class BackendJavascriptSubscriber implements SubscriberInterface
         $view = $controller->View();
         $request = $controller->Request();
 
-        $view->addTemplateDir($this->pluginDirectory . '/Resources/views');
+        $view->addTemplateDir($this->pluginDirectory.'/Resources/views');
 
-        if ($request->getActionName() === 'index') {
+        if ('index' === $request->getActionName()) {
             $view->extendsTemplate('backend/customer/adyen_payment_method/app.js');
         }
 
-        if ($request->getActionName() === 'getOrders') {
+        if ('getOrders' === $request->getActionName()) {
             $this->onGetList($args);
         }
     }
 
-    /**
-     * @param Enlight_Event_EventArgs $args
-     */
-    private function onGetList(Enlight_Event_EventArgs $args)
+    private function onGetList(Enlight_Event_EventArgs $args): void
     {
         $assign = $args->getSubject()->View()->getAssign();
 

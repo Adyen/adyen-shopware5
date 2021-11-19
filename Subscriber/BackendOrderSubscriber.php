@@ -1,20 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
+use AdyenPayment\Components\NotificationManager;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
-use Doctrine\Persistence\ObjectRepository;
+use AdyenPayment\Models\PaymentInfo;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use AdyenPayment\Components\NotificationManager;
-use AdyenPayment\Models\PaymentInfo;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Controllers_Backend_Order;
 
 /**
- * Class CheckoutSubscriber
- * @package AdyenPayment\Subscriber
+ * Class CheckoutSubscriber.
  */
 class BackendOrderSubscriber implements SubscriberInterface
 {
@@ -24,7 +25,7 @@ class BackendOrderSubscriber implements SubscriberInterface
     private $modelManager;
 
     /**
-     * @var ObjectRepository|EntityRepository
+     * @var EntityRepository|ObjectRepository
      */
     private $paymentInfoRepository;
 
@@ -35,8 +36,6 @@ class BackendOrderSubscriber implements SubscriberInterface
 
     /**
      * BackendOrderSubscriber constructor.
-     * @param ModelManager $modelManager
-     * @param NotificationManager $notificationManager
      */
     public function __construct(
         ModelManager $modelManager,
@@ -48,24 +47,23 @@ class BackendOrderSubscriber implements SubscriberInterface
     }
 
     /**
-     * @return array
+     * @return string[]
+     *
+     * @psalm-return array{Enlight_Controller_Action_PostDispatchSecure_Backend_Order: 'onBackendOrder'}
      */
     public static function getSubscribedEvents()
     {
         return [
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'onBackendOrder'
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'onBackendOrder',
         ];
     }
 
-    /**
-     * @param Enlight_Event_EventArgs $args
-     */
-    public function onBackendOrder(Enlight_Event_EventArgs $args)
+    public function onBackendOrder(Enlight_Event_EventArgs $args): void
     {
         /** @var Shopware_Controllers_Backend_Order $subject */
         $subject = $args->getSubject();
 
-        if ($subject->Request()->getActionName() !== 'getList') {
+        if ('getList' !== $subject->Request()->getActionName()) {
             return;
         }
 
@@ -77,10 +75,9 @@ class BackendOrderSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param array $data
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    private function addTransactionData(array &$data)
+    private function addTransactionData(array &$data): void
     {
         foreach ($data as &$order) {
             $order['adyenTransaction'] = null;
@@ -103,7 +100,7 @@ class BackendOrderSubscriber implements SubscriberInterface
                 $order['adyenRefundable'] = in_array($lastNotification->getEventCode(), [
                     'AUTHORISATION',
                     'CAPTURE',
-                ]);
+                ], true);
             }
         }
     }

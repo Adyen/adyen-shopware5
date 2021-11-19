@@ -19,7 +19,7 @@ class Chain implements NotificationValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validate(array $notifications)
+    public function validate(array $notifications): void
     {
         foreach ($this->validators as $validator) {
             $validator->validate($notifications);

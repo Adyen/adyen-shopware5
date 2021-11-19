@@ -20,7 +20,7 @@ final class PaymentMeansSubshopsWriter implements PaymentMeansSubshopsWriterInte
         $this->db = $db;
     }
 
-    public function registerAdyenPaymentMethodForSubshop(int $subshopId)
+    public function registerAdyenPaymentMethodForSubshop(int $subshopId): void
     {
         $this->db->executeQuery(
             'REPLACE INTO s_core_paymentmeans_subshops (paymentID, subshopID) 
@@ -29,7 +29,7 @@ final class PaymentMeansSubshopsWriter implements PaymentMeansSubshopsWriterInte
                     WHERE s_core_paymentmeans.source = :adyenSource;',
             [
                 ':subshopID' => $subshopId,
-                ':adyenSource' => SourceType::adyen()->getType()
+                ':adyenSource' => SourceType::adyen()->getType(),
             ]
         );
     }

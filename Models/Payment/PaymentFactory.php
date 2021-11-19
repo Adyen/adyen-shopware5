@@ -14,7 +14,6 @@ use Shopware\Models\Shop\Shop;
 class PaymentFactory implements PaymentFactoryInterface
 {
     private const ADYEN_PREFIX = 'Adyen';
-
     private ModelRepository $countryRepository;
 
     public function __construct($countryRepository)
@@ -31,7 +30,7 @@ class PaymentFactory implements PaymentFactoryInterface
         // @TODO: sanitize $name, prevent: "adyen_GiftCard Givex"
         $new->setName($adyenPaymentMethod->getType().'_'.$name);
         $new->setDescription($name);
-        $new->setAdditionalDescription(self::ADYEN_PREFIX." ".$name);
+        $new->setAdditionalDescription(self::ADYEN_PREFIX.' '.$name);
         $new->setShops(new ArrayCollection([$shop]));
         $new->setSource(SourceType::adyen()->getType());
         $new->setPluginId(PluginType::adyenType()->getType());
@@ -48,7 +47,7 @@ class PaymentFactory implements PaymentFactoryInterface
 
         $payment->setName($name);
         $payment->setDescription($name);
-        $payment->setAdditionalDescription(self::ADYEN_PREFIX." ".$name);
+        $payment->setAdditionalDescription(self::ADYEN_PREFIX.' '.$name);
         $payment->setShops(new ArrayCollection([$shop]));
         $payment->setSource(SourceType::adyen()->getType());
         $payment->setPluginId(PluginType::adyenType()->getType());

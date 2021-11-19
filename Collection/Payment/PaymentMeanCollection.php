@@ -28,7 +28,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     {
         return new self(
             ...array_map(
-                static fn (array $paymentMean) => PaymentMean::createFromShopwareArray($paymentMean),
+                static fn(array $paymentMean) => PaymentMean::createFromShopwareArray($paymentMean),
                 $paymentMeans
             )
         );
@@ -37,7 +37,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     /**
      * @return \Generator<PaymentMean>
      */
-    public function getIterator(): iterable
+    public function getIterator(): \Traversable
     {
         yield from $this->paymentMeans;
     }
@@ -60,7 +60,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     public function filterBySource(SourceType $source): self
     {
         return $this->filter(
-            static function (PaymentMean $paymentMean) use ($source) {
+            static function(PaymentMean $paymentMean) use ($source) {
                 return $source->equals($paymentMean->getSource());
             }
         );
@@ -69,7 +69,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     public function filterExcludeAdyen(): self
     {
         return $this->filter(
-            static function (PaymentMean $paymentMean) {
+            static function(PaymentMean $paymentMean) {
                 return !$paymentMean->getSource()->equals(SourceType::adyen());
             }
         );
@@ -84,8 +84,9 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     {
         return array_reduce(
             $this->paymentMeans,
-            static function (array $payload, PaymentMean $paymentMean) {
+            static function(array $payload, PaymentMean $paymentMean) {
                 $payload[$paymentMean->getId()] = $paymentMean->getRaw();
+
                 return $payload;
             },
             []
@@ -97,7 +98,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
         PaymentMethodEnricherInterface $paymentMethodEnricher
     ): self {
         return new self(...array_filter($this->map(
-            static function (PaymentMean $shopwareMethod) use (
+            static function(PaymentMean $shopwareMethod) use (
                 $adyenPaymentMethods,
                 $paymentMethodEnricher
             ) {

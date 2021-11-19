@@ -24,11 +24,14 @@ final class ImportPaymentMethodsCommand extends ShopwareCommand
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Import Adyen payment methods for all stores');
     }
 
+    /**
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $counter = 0;

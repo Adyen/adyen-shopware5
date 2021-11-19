@@ -13,6 +13,7 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
 {
     /** @var DataPersisterInterface */
     private $dataPersister;
+
     /** @var PaymentAttributeUpdaterInterface */
     private $paymentAttributeUpdater;
 
@@ -27,9 +28,9 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
     public function storeAdyenPaymentMethodType(
         int $paymentMeanId,
         PaymentMethod $adyenPaymentMethod
-    ) {
+    ): void {
         $data = [
-            '_table' => "s_core_paymentmeans_attributes",
+            '_table' => 's_core_paymentmeans_attributes',
             '_foreignKey' => $paymentMeanId,
             AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL => $adyenPaymentMethod->getType(),
             AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID => $adyenPaymentMethod->getStoredPaymentMethodId(),
@@ -37,7 +38,7 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
 
         $attributesColumns = [
             AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL,
-            AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID
+            AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID,
         ];
 
         // update read only "false" to allow model changes
@@ -45,7 +46,7 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
 
         $this->dataPersister->persist(
             $data,
-            "s_core_paymentmeans_attributes",
+            's_core_paymentmeans_attributes',
             $paymentMeanId
         );
 

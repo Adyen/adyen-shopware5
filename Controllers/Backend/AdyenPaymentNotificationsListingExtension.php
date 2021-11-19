@@ -43,7 +43,7 @@ class Shopware_Controllers_Backend_AdyenPaymentNotificationsListingExtension ext
     /**
      * Returns distinct Event Codes in json array
      */
-    public function getEventCodesAction()
+    public function getEventCodesAction(): void
     {
         $eventCodes = $this->getManager()->createQueryBuilder()
             ->select('n.eventCode')
@@ -58,7 +58,7 @@ class Shopware_Controllers_Backend_AdyenPaymentNotificationsListingExtension ext
     /**
      * Returns all NotificationStatusses in json array
      */
-    public function getNotificationStatussesAction()
+    public function getNotificationStatussesAction(): void
     {
         $statusses = array_map(function ($status) {
             return ['status' => $status];

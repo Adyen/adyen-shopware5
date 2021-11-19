@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Components\Payload\Providers;
 
-use AdyenPayment\Components\Adyen\Model\RecurringProcessing;
 use AdyenPayment\Components\Payload\PaymentContext;
 use AdyenPayment\Components\Payload\PaymentPayloadProvider;
 

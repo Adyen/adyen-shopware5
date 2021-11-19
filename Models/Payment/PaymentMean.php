@@ -10,8 +10,10 @@ final class PaymentMean
 {
     /** @var int|null */
     private $id;
+
     /** @var SourceType */
     private $source;
+
     /** @var array */
     private $raw;
 
@@ -42,6 +44,8 @@ final class PaymentMean
     }
 
     /**
+     * @param mixed|null $fallback
+     *
      * @return mixed|null
      */
     public function getValue(string $key, $fallback = null)

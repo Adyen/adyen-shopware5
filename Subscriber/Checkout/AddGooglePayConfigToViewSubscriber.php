@@ -9,12 +9,10 @@ use AdyenPayment\Components\WebComponents\ConfigContext;
 use AdyenPayment\Components\WebComponents\ConfigProvider;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
-use Enlight_Event_EventArgs;
 
 final class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
 {
     private static $PAY_WITH_GOOGLE = 'paywithgoogle';
-
     private Configuration $configuration;
     private ConfigProvider $googlePayConfigProvider;
 
@@ -31,11 +29,11 @@ final class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
         ];
     }
 
-    public function __invoke(Enlight_Event_EventArgs $args)
+    public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
 
-        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+        if ('confirm' !== $subject->Request()->getActionName()) {
             return;
         }
 
@@ -57,7 +55,7 @@ final class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
 
         $googlePayConfig = ($this->googlePayConfigProvider)(ConfigContext::fromCheckoutEvent($args));
         $subject->View()->assign('sAdyenGoogleConfig', htmlentities(
-            json_encode($googlePayConfig, JSON_THROW_ON_ERROR))
+                json_encode($googlePayConfig, JSON_THROW_ON_ERROR))
         );
     }
 }

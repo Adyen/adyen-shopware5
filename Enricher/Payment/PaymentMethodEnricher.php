@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AdyenPayment\Enricher\Payment;
 
 use AdyenPayment\Components\Adyen\PaymentMethod\ImageLogoProviderInterface;
-use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use Shopware_Components_Snippet_Manager;
 
@@ -15,6 +14,7 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
      * @var Shopware_Components_Snippet_Manager
      */
     private $snippets;
+
     /**
      * @var ImageLogoProviderInterface
      */
@@ -36,13 +36,11 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
             'isStoredPayment' => $paymentMethod->isStoredPayment(),
             'isAdyenPaymentMethod' => true,
             'adyenType' => $shopwareMethod['attribute']['adyen_type'] ?? '',
-            'metadata' => $paymentMethod->getRawData()
+            'metadata' => $paymentMethod->getRawData(),
         ]);
     }
 
-
     /**
-     * @param PaymentMethod $adyenMethod
      * @return string
      */
     private function enrichDescription(PaymentMethod $adyenMethod)
@@ -57,7 +55,7 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
 
         return sprintf(
             '%s%s: %s',
-            ($description ? $description . ' ' : ''),
+            ($description ? $description.' ' : ''),
             $this->snippets
                 ->getNamespace('adyen/checkout/payment')
                 ->get('CardNumberEndingOn', 'Card number ending on', true),

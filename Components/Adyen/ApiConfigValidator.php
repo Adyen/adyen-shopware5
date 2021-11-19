@@ -18,10 +18,12 @@ class ApiConfigValidator
      * @var ApiFactory
      */
     private $adyenApiFactory;
+
     /**
      * @var Configuration
      */
     private $configuration;
+
     /**
      * @var ObjectRepository
      */

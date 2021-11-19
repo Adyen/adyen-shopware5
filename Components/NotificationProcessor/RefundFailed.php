@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components\NotificationProcessor;
 
 use AdyenPayment\Components\PaymentStatusUpdate;
@@ -9,21 +11,22 @@ use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
 
 /**
- * Class RefundFailed
- * @package AdyenPayment\Components\NotificationProcessor
+ * Class RefundFailed.
  */
 class RefundFailed implements NotificationProcessorInterface
 {
-    const EVENT_CODE = 'REFUND_FAILED';
+    public const EVENT_CODE = 'REFUND_FAILED';
 
     /**
      * @var LoggerInterface
      */
     private $logger;
+
     /**
      * @var ContainerAwareEventManager
      */
     private $eventManager;
+
     /**
      * @var PaymentStatusUpdate
      */
@@ -31,9 +34,6 @@ class RefundFailed implements NotificationProcessorInterface
 
     /**
      * Authorisation constructor.
-     * @param LoggerInterface $logger
-     * @param ContainerAwareEventManager $eventManager
-     * @param PaymentStatusUpdate $paymentStatusUpdate
      */
     public function __construct(
         LoggerInterface $logger,
@@ -46,26 +46,22 @@ class RefundFailed implements NotificationProcessorInterface
     }
 
     /**
-     * Returns boolean on whether this processor can process the Notification object
-     *
-     * @param Notification $notification
-     * @return boolean
+     * Returns boolean on whether this processor can process the Notification object.
      */
     public function supports(Notification $notification): bool
     {
-        return strtoupper($notification->getEventCode()) === self::EVENT_CODE;
+        return self::EVENT_CODE === mb_strtoupper($notification->getEventCode());
     }
 
     /**
-     * Actual processing of the notification
+     * Actual processing of the notification.
      *
-     * @param Notification $notification
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      * @throws \Enlight_Event_Exception
      */
-    public function process(Notification $notification)
+    public function process(Notification $notification): void
     {
         $order = $notification->getOrder();
 
@@ -73,7 +69,7 @@ class RefundFailed implements NotificationProcessorInterface
             Event::NOTIFICATION_PROCESS_REFUND_FAILED,
             [
                 'order' => $order,
-                'notification' => $notification
+                'notification' => $notification,
             ]
         );
     }

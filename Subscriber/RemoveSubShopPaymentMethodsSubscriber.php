@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
 {
-    const DELETE_VALUES_ACTION = 'deleteValues';
+    public const DELETE_VALUES_ACTION = 'deleteValues';
 
     /**
      * @var PaymentMeansSubshopsRemoverInterface
@@ -29,7 +29,7 @@ final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
         ];
     }
 
-    public function __invoke(\Enlight_Event_EventArgs $args)
+    public function __invoke(\Enlight_Event_EventArgs $args): void
     {
         $request = $args->get('request') ?? false;
         $response = $args->get('response') ?? false;

@@ -12,6 +12,7 @@ final class UsedFallbackConfigRule implements UsedFallbackConfigRuleInterface
      * @var ObjectRepository
      */
     private $shopRepository;
+
     /**
      * @var MainShopConfigRule
      */

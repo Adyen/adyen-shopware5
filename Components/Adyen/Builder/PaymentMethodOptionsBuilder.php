@@ -15,7 +15,7 @@ final class PaymentMethodOptionsBuilder implements PaymentMethodOptionsBuilderIn
         if (!$countryCode) {
             $countryCode = (string) (
                 Shopware()->Modules()->Admin()
-                ->sGetUserData()['additional']['country']['countryiso']
+                    ->sGetUserData()['additional']['country']['countryiso']
             );
         }
 
@@ -28,10 +28,10 @@ final class PaymentMethodOptionsBuilder implements PaymentMethodOptionsBuilderIn
             ?? 1.0
         );
 
-        $paymentMethodOptions['countryCode'] = $countryCode;
-        $paymentMethodOptions['currency'] = $currency;
-        $paymentMethodOptions['value'] = $value;
-
-        return $paymentMethodOptions;
+        return [
+            'countryCode' => $countryCode,
+            'currency' => $currency,
+            'value' => $value,
+        ];
     }
 }

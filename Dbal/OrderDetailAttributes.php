@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Dbal;
 
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
@@ -24,6 +26,7 @@ class OrderDetailAttributes
             ->where('detailID=?', $orderDetailId)
             ->query()
             ->fetchAll();
+
         return $orderDetailAttributesResult[0] ?? [];
     }
 }

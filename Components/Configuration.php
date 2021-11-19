@@ -5,20 +5,19 @@ declare(strict_types=1);
 namespace AdyenPayment\Components;
 
 use Adyen\Environment;
-use Doctrine\DBAL\Connection;
 use AdyenPayment\AdyenPayment;
+use Doctrine\DBAL\Connection;
 use Shopware\Components\Plugin\CachedConfigReader;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
- * Class Configuration
- * @package AdyenPayment\Components
+ * Class Configuration.
  */
 class Configuration
 {
-    const ENV_TEST = 'TEST';
-    const ENV_LIVE = 'LIVE';
+    public const ENV_TEST = 'TEST';
+    public const ENV_LIVE = 'LIVE';
 
     /**
      * @var CachedConfigReader
@@ -30,8 +29,6 @@ class Configuration
 
     /**
      * Configuration constructor.
-     * @param CachedConfigReader $cachedConfigReader
-     * @param Connection $connection
      */
     public function __construct(
         CachedConfigReader $cachedConfigReader,
@@ -42,39 +39,35 @@ class Configuration
     }
 
     /**
-     * @param Shop|bool $shop
+     * @param false|Shop $shop
      */
     public function getEnvironment($shop = false): string
     {
-        return self::ENV_LIVE === strtolower($this->getConfig('environment', $shop))
+        return self::ENV_LIVE === mb_strtoupper($this->getConfig('environment', $shop))
             ? Environment::LIVE
             : Environment::TEST;
     }
 
     /**
      * @param bool $shop
-     * @return bool
      */
     public function isTestModus($shop = false): bool
     {
-        return $this->getEnvironment($shop) === Environment::TEST;
+        return Environment::TEST === $this->getEnvironment($shop);
     }
 
     /**
-     * @param bool|Shop $shop
-     * @return string
+     * @param false|Shop $shop
      */
     public function getMerchantAccount($shop = false): string
     {
-        return (string)$this->getConfig('merchant_account', $shop);
+        return (string) $this->getConfig('merchant_account', $shop);
     }
 
     /**
-     * @param string $key
-     * @param bool|Shop $shop
-     * @return mixed
+     * @param false|Shop $shop
      */
-    public function getConfig($key = null, $shop = false)
+    public function getConfig(?string $key = null, $shop = false)
     {
         if (!$shop) {
             try {
@@ -87,108 +80,97 @@ class Configuration
 
         $config = $this->cachedConfigReader->getByPluginName(AdyenPayment::NAME, $shop);
 
-        if ($key === null) {
+        if (null === $key) {
             return $config;
         }
 
         if (array_key_exists($key, $config)) {
             return $config[$key];
         }
-
-        return null;
     }
 
     /**
-     * @param bool|Shop $shop
-     * @return string
+     * @param false|Shop $shop
      */
     public function getApiKey($shop = false): string
     {
-        return (string)$this->getConfig(
-            'api_key_' . $this->getEnvironment($shop),
+        return (string) $this->getConfig(
+            'api_key_'.$this->getEnvironment($shop),
             $shop
         );
     }
 
     /**
-     * @param bool|Shop $shop
-     * @return string
+     * @param false|Shop $shop
      */
     public function getApiUrlPrefix($shop = false): string
     {
-        return (string)$this->getConfig('api_url_prefix', $shop);
+        return (string) $this->getConfig('api_url_prefix', $shop);
     }
 
     public function getClientKey(Shop $shop): string
     {
-        return (string)$this->getConfig('client_key_'.$this->getEnvironment($shop), $shop);
+        return (string) $this->getConfig('client_key_'.$this->getEnvironment($shop), $shop);
     }
 
     /**
      * @param bool|Shop $shop
-     * @return string
      */
     public function getNotificationHmac($shop = false): string
     {
-        return (string)$this->getConfig(
-            'notification_hmac_' . $this->getEnvironment($shop),
+        return (string) $this->getConfig(
+            'notification_hmac_'.$this->getEnvironment($shop),
             $shop
         );
     }
 
     /**
      * @param bool $shop
-     * @return string
      */
     public function getNotificationAuthUsername($shop = false): string
     {
-        return (string)$this->getConfig(
-            'notification_auth_username_' . $this->getEnvironment($shop),
+        return (string) $this->getConfig(
+            'notification_auth_username_'.$this->getEnvironment($shop),
             $shop
         );
     }
 
     /**
      * @param bool $shop
-     * @return string
      */
     public function getNotificationAuthPassword($shop = false): string
     {
-        return (string)$this->getConfig(
-            'notification_auth_password_' . $this->getEnvironment($shop),
+        return (string) $this->getConfig(
+            'notification_auth_password_'.$this->getEnvironment($shop),
             $shop
         );
     }
 
     /**
      * @param bool $shop
-     * @return string
      */
     public function getGoogleMerchantId($shop = false): string
     {
-        return (string)$this->getConfig('google_merchant_id', $shop);
+        return (string) $this->getConfig('google_merchant_id', $shop);
     }
 
     /**
      * @param bool $shop
-     * @return bool
      */
     public function isPaymentmethodsCacheEnabled($shop = false): bool
     {
-        return (bool)$this->getConfig('paymentmethods_cache', $shop);
+        return (bool) $this->getConfig('paymentmethods_cache', $shop);
     }
 
     /**
      * @param bool $shop
-     * @return string
      */
     public function getManualReviewRejectAction($shop = false): string
     {
-        return (string)$this->getConfig('manual_review_rejected_action', $shop);
+        return (string) $this->getConfig('manual_review_rejected_action', $shop);
     }
 
     /**
-     * @return int
      * @throws \Doctrine\DBAL\DBALException
      */
     public function getCurrentPluginVersion(): int
@@ -197,6 +179,6 @@ class Configuration
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([AdyenPayment::NAME]);
 
-        return (int)$stmt->fetchColumn();
+        return (int) $stmt->fetchColumn();
     }
 }

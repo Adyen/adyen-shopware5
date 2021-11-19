@@ -17,6 +17,9 @@ class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Bac
      */
     private $usedFallbackConfigRule;
 
+    /**
+     * @return void
+     */
     public function preDispatch()
     {
         parent::preDispatch();
@@ -25,6 +28,9 @@ class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Bac
         $this->usedFallbackConfigRule = $this->get('AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule');
     }
 
+    /**
+     * @return void
+     */
     public function runAction()
     {
         $shopId = (int) $this->request->get('shopId', 1);

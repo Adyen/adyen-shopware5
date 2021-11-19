@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Models\Enum;
 
 use ReflectionClass;
 
 /**
- * Class NotificationStatus
- * @package AdyenPayment\Models\Enum
+ * Class NotificationStatus.
  */
 class NotificationStatus
 {
-    const STATUS_RECEIVED = 'received';
-    const STATUS_HANDLED = 'handled';
-    const STATUS_ERROR = 'error';
-    const STATUS_RETRY = 'retry';
-    const STATUS_FATAL = 'fatal';
+    public const STATUS_RECEIVED = 'received';
+    public const STATUS_HANDLED = 'handled';
+    public const STATUS_ERROR = 'error';
+    public const STATUS_RETRY = 'retry';
+    public const STATUS_FATAL = 'fatal';
 
     public static function getStatusses(): array
     {
         $reflection = new ReflectionClass(NotificationStatus::class);
+
         return array_values($reflection->getConstants());
     }
 }

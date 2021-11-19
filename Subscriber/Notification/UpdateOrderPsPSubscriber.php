@@ -28,7 +28,7 @@ class UpdateOrderPsPSubscriber implements SubscriberInterface
         ];
     }
 
-    public function __invoke(Enlight_Event_EventArgs $args)
+    public function __invoke(Enlight_Event_EventArgs $args): void
     {
         /**
          * @var \Shopware\Models\Order\Order      $order

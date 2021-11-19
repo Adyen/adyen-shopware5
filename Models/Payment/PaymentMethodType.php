@@ -16,7 +16,7 @@ final class PaymentMethodType
 
     private function __construct(string $paymentMethodType)
     {
-        if (!in_array($paymentMethodType, $this->availableTypes())) {
+        if (!in_array($paymentMethodType, $this->availableTypes(), true)) {
             throw new \InvalidArgumentException('Invalid Payment method type: "'.$paymentMethodType.'"');
         }
 

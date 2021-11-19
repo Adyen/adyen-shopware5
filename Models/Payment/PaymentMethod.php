@@ -10,6 +10,7 @@ class PaymentMethod
      * @var PaymentMethodType
      */
     private $paymentMethodType;
+
     /**
      * @var array
      */
@@ -27,28 +28,30 @@ class PaymentMethod
     }
 
     /**
-     * shortcut to get value of raw payment data
-     * @param mixed|null $fallback
+     * shortcut to get value of raw payment data.
+     *
      * @return mixed|null
+     *
+     * @psalm-param ''|null $fallback
      */
-    public function getValue(string $key, $fallback = null)
+    public function getValue(string $key, ?string $fallback = null)
     {
         return $this->rawData[$key] ?? $fallback;
     }
 
     public function getStoredPaymentMethodId(): string
     {
-        return (string)($this->rawData['id'] ?? '');
+        return (string) ($this->rawData['id'] ?? '');
     }
 
     public function getId(): string
     {
-        return (string)($this->rawData['id'] ?? '');
+        return (string) ($this->rawData['id'] ?? '');
     }
 
     public function getType(): string
     {
-        return (string)($this->rawData['type'] ?? '');
+        return (string) ($this->rawData['type'] ?? '');
     }
 
     public function getRawData(): array

@@ -2,6 +2,7 @@ parameters:
     grumphp.ignore_patterns:
         - '*/vendor'
         - '.gitlab-ci'
+        - '.github/'
         - 'bin'
         - 'custom/plugins/'
         - 'public'
@@ -15,7 +16,6 @@ grumphp:
         git_commit_message:
             matchers:
                 - /^(ASW-[0-9]*)/
-            case_insensitive: true
             multiline: false
             max_subject_width: 80
         git_blacklist:
@@ -27,8 +27,6 @@ grumphp:
                 - 'dump('
                 - 'exit;'
                 - "\\bdd\\b("
-            whitelist_patterns:
-                - /^public/(.*)
             triggered_by: [ php,js ]
             metadata:
                 priority: 300
@@ -50,6 +48,7 @@ grumphp:
 
         # PHP
         phpcsfixer:
+            config: '.php-cs-fixer.dist.php'
             metadata:
                 priority: 200
         phpparser:
@@ -66,10 +65,10 @@ grumphp:
             ignore_patterns: '%grumphp.ignore_patterns%'
             metadata:
                 priority: 200
-        phpunit:
-            always_execute: true
-            metadata:
-                priority: 50
+#        phpunit:
+#            always_execute: true
+#            metadata:
+#                priority: 50
         phpcs:
             standard: [ PHPCompatibility ]
             report: full

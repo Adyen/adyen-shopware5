@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Models\Enum;
 
 /**
- * Class Channel
- * @package AdyenPayment\Models\Enum
+ * Class Channel.
  */
 class Channel
 {
-    const WEB = 'Web';
+    public const WEB = 'Web';
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AdyenPayment\Subscriber\Checkout;
 
 use Enlight\Event\SubscriberInterface;
-use Enlight_Event_EventArgs;
 use Shopware_Components_Snippet_Manager;
 
 final class RegisterConfirmSnippetsSubscriber implements SubscriberInterface
@@ -27,7 +26,7 @@ final class RegisterConfirmSnippetsSubscriber implements SubscriberInterface
         ];
     }
 
-    public function __invoke(Enlight_Event_EventArgs $args)
+    public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
 

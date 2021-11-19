@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components;
 
 use Shopware\Components\Model\ModelManager;
@@ -10,6 +12,7 @@ class OrderMailService
      * @var ModelManager
      */
     private $modelManager;
+
     /**
      * @var BasketService
      */
@@ -24,10 +27,9 @@ class OrderMailService
     }
 
     /**
-     * Sends the mail after a payment is confirmed
-     * @param string $orderNumber
+     * Sends the mail after a payment is confirmed.
      */
-    public function sendOrderConfirmationMail(string $orderNumber)
+    public function sendOrderConfirmationMail(string $orderNumber): void
     {
         $order = $this->basketService->getOrderByOrderNumber($orderNumber);
         if (!$order) {
@@ -37,7 +39,7 @@ class OrderMailService
         $paymentInfoRepository = $this->modelManager->getRepository(\AdyenPayment\Models\PaymentInfo::class);
         /** @var \AdyenPayment\Models\PaymentInfo $paymentInfo */
         $paymentInfo = $paymentInfoRepository->findOneBy([
-            'orderId' => $order->getId()
+            'orderId' => $order->getId(),
         ]);
 
         if (!$paymentInfo) {

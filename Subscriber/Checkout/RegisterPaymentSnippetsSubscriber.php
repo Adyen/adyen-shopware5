@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AdyenPayment\Subscriber\Checkout;
 
 use Enlight\Event\SubscriberInterface;
-use Enlight_Event_EventArgs;
 use Shopware_Components_Snippet_Manager;
 
 final class RegisterPaymentSnippetsSubscriber implements SubscriberInterface
@@ -27,11 +26,11 @@ final class RegisterPaymentSnippetsSubscriber implements SubscriberInterface
         ];
     }
 
-    public function __invoke(Enlight_Event_EventArgs $args)
+    public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
 
-        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'])) {
+        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'saveShippingPayment'], true)) {
             return;
         }
 

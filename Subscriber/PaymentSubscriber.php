@@ -11,25 +11,15 @@ use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 
 /**
- * Class PaymentSubscriber
- *
- * @package AdyenPayment\Subscriber
+ * Class PaymentSubscriber.
  */
 class PaymentSubscriber implements SubscriberInterface
 {
-    /**
-     * @var $skipReplaceAdyenMethods
-     */
-    private $skipReplaceAdyenMethods = false;
-    /**
-     * @var EnrichedPaymentMeanProviderInterface
-     */
-    private $enrichedPaymentMeanProvider;
+    private bool $skipReplaceAdyenMethods = false;
+    private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
 
     /**
      * PaymentSubscriber constructor.
-     *
-     * @param EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider
      */
     public function __construct(
         EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider
@@ -40,16 +30,13 @@ class PaymentSubscriber implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'enrichAdyenPaymentMethods'
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'enrichAdyenPaymentMethods',
         ];
     }
 
     /**
-     * Replace general Adyen payment method with dynamic loaded payment methods
+     * Replace general Adyen payment method with dynamic loaded payment methods.
      *
-     * @param Enlight_Event_EventArgs $args
-     *
-     * @return array
      * @throws AdyenException
      */
     public function enrichAdyenPaymentMethods(Enlight_Event_EventArgs $args): array
@@ -58,7 +45,7 @@ class PaymentSubscriber implements SubscriberInterface
 
         if (!in_array(
             Shopware()->Front()->Request()->getActionName(),
-            ['shippingPayment', 'payment']
+            ['shippingPayment', 'payment'], true
         )
         ) {
             return $shopwareMethods;

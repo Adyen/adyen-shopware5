@@ -14,20 +14,23 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
 {
-    const SAVE_VALUES_ACTION = 'saveValues';
+    public const SAVE_VALUES_ACTION = 'saveValues';
 
     /**
      * @var ObjectRepository
      */
     private $shopRepository;
+
     /**
      * @var MainShopConfigRule
      */
     private $mainShopConfigRuleChain;
+
     /**
      * @var PaymentMeansSubshopsWriterInterface
      */
     private $paymentMeansSubshopsWriter;
+
     /**
      * @var PaymentMethodImporterInterface
      */
@@ -52,7 +55,7 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
         ];
     }
 
-    public function __invoke(\Enlight_Event_EventArgs $args)
+    public function __invoke(\Enlight_Event_EventArgs $args): void
     {
         $request = $args->get('request') ?? false;
         $response = $args->get('response') ?? false;
@@ -73,8 +76,9 @@ final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
 
         $mainShop = $this->shopRepository->find(1);
 
-        if (($this->mainShopConfigRuleChain)($shop[0], $mainShop)) {
+        if (($this->mainShopConfigRuleChain)($shop, $mainShop)) {
             $this->paymentMeansSubshopsWriter->registerAdyenPaymentMethodForSubshop($shop->getId());
+
             return;
         }
 

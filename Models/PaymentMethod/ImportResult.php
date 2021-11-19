@@ -12,12 +12,16 @@ final class ImportResult
 {
     /** @var Shop */
     private $shop;
-    /** @var null | PaymentMethod */
+
+    /** @var PaymentMethod|null */
     private $paymentMethod;
+
     /** @var bool */
     private $success;
-    /** @var null | \Exception */
-    private $exception = null;
+
+    /** @var \Exception|null */
+    private $exception;
+
     /** @var ImportStatus */
     private $status;
 
@@ -47,12 +51,9 @@ final class ImportResult
         return $new;
     }
 
-    /**
-     * @param PaymentMethod | null $paymentMethod
-     */
     public static function fromException(
         Shop $shop,
-        $paymentMethod,
+        ?PaymentMethod $paymentMethod,
         \Exception $exception
     ): ImportResult {
         $new = new self();
@@ -71,7 +72,7 @@ final class ImportResult
     }
 
     /**
-     * @return null|PaymentMethod
+     * @return PaymentMethod|null
      */
     public function getPaymentMethod()
     {

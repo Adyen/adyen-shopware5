@@ -8,8 +8,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 
 /**
- * Class FifoNotificationLoader
- * @package AdyenPayment\Components
+ * Class FifoNotificationLoader.
  */
 class FifoNotificationLoader
 {
@@ -20,7 +19,6 @@ class FifoNotificationLoader
 
     /**
      * FifoNotificationLoader constructor.
-     * @param NotificationManager $notificationManager
      */
     public function __construct(
         NotificationManager $notificationManager
@@ -28,10 +26,6 @@ class FifoNotificationLoader
         $this->notificationManager = $notificationManager;
     }
 
-    /**
-     * @param int $amount
-     * @return \Generator
-     */
     public function load(int $amount): \Generator
     {
         try {

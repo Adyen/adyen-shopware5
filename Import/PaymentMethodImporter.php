@@ -21,29 +21,34 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
      * @var PaymentMethodsProviderInterface
      */
     private $paymentMethodsProvider;
+
     /**
      * @var ObjectRepository
      */
     private $shopRepository;
+
     /**
      * @var UsedFallbackConfigRuleInterface
      */
     private $usedFallbackConfigRule;
+
     /**
      * @var PaymentMethodMapperInterface
      */
     private $paymentMethodMapper;
+
     /**
      * @var PaymentMethodWriterInterface
      */
     private $paymentMethodWriter;
+
     /** @var ModelManager */
     private $entityManager;
+
     /**
      * @var PaymentMeansSubshopsWriterInterface
      */
     private $paymentMeansSubshopsWriter;
-
 
     public function __construct(
         PaymentMethodsProviderInterface $paymentMethodsProvider,

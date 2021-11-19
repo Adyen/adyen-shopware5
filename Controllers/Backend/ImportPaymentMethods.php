@@ -14,6 +14,9 @@ class Shopware_Controllers_Backend_ImportPaymentMethods extends Shopware_Control
     /** @var LoggerInterface */
     private $logger;
 
+    /**
+     * @return void
+     */
     public function preDispatch()
     {
         parent::preDispatch();
@@ -22,7 +25,7 @@ class Shopware_Controllers_Backend_ImportPaymentMethods extends Shopware_Control
         $this->logger = $this->get('adyen_payment.logger');
     }
 
-    public function importAction()
+    public function importAction(): void
     {
         try {
             $counter = 0;

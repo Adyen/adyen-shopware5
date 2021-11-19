@@ -14,6 +14,7 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
      * @var PaymentMethodImporterInterface
      */
     private $paymentMethodImporter;
+
     /**
      * @var LoggerInterface
      */
@@ -43,7 +44,7 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
         }
     }
 
-    private function log(ImportResult $importResult)
+    private function log(ImportResult $importResult): void
     {
         if ($importResult->isSuccess()) {
             $this->logger->info('Adyen payment method imported', [
@@ -64,7 +65,7 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
                 ? $importResult->getPaymentMethod()->getType()
                 : 'n/a',
             'message' => $importResult->getException()->getMessage(),
-            'exception' => $importResult->getException()
+            'exception' => $importResult->getException(),
         ]);
     }
 }

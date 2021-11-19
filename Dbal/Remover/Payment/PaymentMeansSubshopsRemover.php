@@ -18,13 +18,13 @@ final class PaymentMeansSubshopsRemover implements PaymentMeansSubshopsRemoverIn
         $this->db = $db;
     }
 
-    public function removeBySubShopId(int $subshopId)
+    public function removeBySubShopId(int $subshopId): void
     {
         $this->db->executeQuery(
             'DELETE FROM s_core_paymentmeans_subshops
                     WHERE subshopID = :subshopID;',
             [
-                ':subshopID' => $subshopId
+                ':subshopID' => $subshopId,
             ]
         );
     }

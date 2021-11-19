@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AdyenPayment\Components\Adyen;
 
@@ -13,9 +15,7 @@ use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Customer\Customer;
 
 /**
- * Class PaymentMethodService
- *
- * @package AdyenPayment\Components\Adyen
+ * Class PaymentMethodService.
  */
 class PaymentMethodService
 {
@@ -23,22 +23,27 @@ class PaymentMethodService
      * @var ApiClientMap
      */
     private $apiClientMap;
+
     /**
      * @var Configuration
      */
     private $configuration;
+
     /**
      * @var array
      */
     private $cache;
+
     /**
      * @var LoggerInterface
      */
     private $logger;
+
     /**
      * @var Enlight_Components_Session_Namespace
      */
     private $session;
+
     /**
      * @var ModelManager
      */
@@ -64,8 +69,6 @@ class PaymentMethodService
      * @param int    $value
      * @param null   $locale
      * @param bool   $cache
-     *
-     * @return array
      */
     public function getPaymentMethods(
         $countryCode = null,
@@ -75,7 +78,7 @@ class PaymentMethodService
         $cache = true
     ): array {
         $cache = $cache && $this->configuration->isPaymentmethodsCacheEnabled();
-        $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string)$value ?? '');
+        $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string) ($value ?? ''));
         if ($cache && isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
         }
@@ -118,10 +121,8 @@ class PaymentMethodService
 
     /**
      * @param string ...$keys
-     *
-     * @return string
      */
-    private function getCacheKey(string ...$keys)
+    private function getCacheKey(string ...$keys): string
     {
         return md5(implode(',', $keys));
     }
@@ -146,6 +147,6 @@ class PaymentMethodService
         }
         $customer = $this->modelManager->getRepository(Customer::class)->find($userId);
 
-        return $customer ? (string)$customer->getNumber() : '';
+        return $customer ? (string) $customer->getNumber() : '';
     }
 }

@@ -46,12 +46,19 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
 
     /**
      * Whitelist notifyAction
+     *
+     * @return string[]
+     *
+     * @psalm-return array{0: 'return'}
      */
     public function getWhitelistedCSRFActions()
     {
         return ['return'];
     }
 
+    /**
+     * @return void
+     */
     public function preDispatch()
     {
         $this->adyenManager = $this->get('adyen_payment.components.manager.adyen_manager');
@@ -65,7 +72,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     /**
      * @throws Exception
      */
-    public function returnAction()
+    public function returnAction(): void
     {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
@@ -74,7 +81,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         if ($response) {
             /** @var Order $order */
             $order = $this->getModelManager()->getRepository(Order::class)->findOneBy([
-                'number' => $response['merchantReference'] ?? ''
+                'number' => $response['merchantReference'] ?? '',
             ]);
             $result = $this->validateResponse($response, $order);
             $this->handleReturnResult($result, $order);
@@ -102,7 +109,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                     }
                     $this->redirect([
                         'controller' => 'checkout',
-                        'action' => 'confirm'
+                        'action' => 'confirm',
                     ]);
                     break;
             }
@@ -110,13 +117,11 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     }
 
     /**
-     * @param array $result
-     * @param Order|null $order
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    private function handleReturnResult(array $result, $order)
+    private function handleReturnResult(array $result, ?Order $order): void
     {
         if (!$order) {
             $this->logger->error('No order found for ', [
@@ -158,18 +163,16 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     /**
      * Validates the payload from checkout /payments hpp and returns the api response
      *
-     * @param array $response
-     * @param Order $order
      * @return mixed
      */
-    private function validateResponse($response, $order)
+    private function validateResponse(array $response, ?Order $order)
     {
-        $request['paymentData'] = $this->adyenManager->fetchOrderPaymentData($order);
-        $request['details'] = RequestDataFormatter::forPaymentDetails($response);
-
         try {
             $checkout = $this->adyenCheckout->getCheckout();
-            $response = $checkout->paymentsDetails($request);
+            $response = $checkout->paymentsDetails([
+                'paymentData' => $this->adyenManager->fetchOrderPaymentData($order),
+                'details' => RequestDataFormatter::forPaymentDetails($response),
+            ]);
         } catch (AdyenException $e) {
             $response['error'] = $e->getMessage();
         }
