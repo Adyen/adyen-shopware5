@@ -1,28 +1,55 @@
 image: docphpro/php:7.4
 
-pipelines:
-    default:
-        - step:
+definitions:
+    steps:
+        - step: &setup
             name: Continues Integration Setup
             caches:
-                - composer
+              - composer
+            artifacts:
+              - vendor/**
             script:
-                - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
-                - composer install --prefer-dist
-                - php ./vendor/bin/grumphp run --testsuite=default
-        - step:
-            name: Validate Styles
+              - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
+              - composer install --prefer-dist
+        - step: &composer
+            name: Validate Composer
             script:
-                - php ./vendor/bin/grumphp run --testsuite=style
-        - step:
-            name: Unit Testing
+              - php ./vendor/bin/grumphp run --testsuite=default
+        - step: &style
+            name: Code style
             script:
-                - php ./vendor/bin/grumphp run --testsuite=unit
-        - step:
+              - php ./vendor/bin/grumphp run --testsuite=style
+        - step: &compatibility
+            name: Code style
+            script:
+              - php ./vendor/bin/grumphp run --testsuite=compatibility
+        - step: &analysis
             name: Static Analysis
             script:
                 - php ./vendor/bin/grumphp run --testsuite=analysis
-        - step:
-            name: PHP Compatibility
+        - step: &unit
+            name: Unit Testing
             script:
-                - php ./vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 7.4- --extensions=php --ignore=*/vendor/*,*/tests/*
+                - php ./vendor/bin/grumphp run --testsuite=unit
+        - step: &integration
+            name: Integration Testing
+            script:
+                - php ./vendor/bin/grumphp run --testsuite=integration
+
+pipelines:
+    default:
+        - step: *setup
+        - parallel:
+            - step: *composer
+            - step: *style
+            - step: *compatibility
+            - step: *analysis
+        - step: *unit
+        - step: *integration
+
+    "{master,release/*}":
+        - step: *setup
+        - parallel:
+            - step: *composer
+            - step: *compatibility
+        - step: *unit
