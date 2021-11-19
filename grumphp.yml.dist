@@ -65,12 +65,23 @@ grumphp:
             ignore_patterns: '%grumphp.ignore_patterns%'
             metadata:
                 priority: 200
-#        phpunit:
+        phpunit:
 #            always_execute: true
-#            metadata:
-#                priority: 50
+            metadata:
+                priority: 50
         phpcs:
-            standard: [ PHPCompatibility ]
-            report: full
+            standard: [ 'PHPCompatibility' ]
             ignore_patterns: [ '*/vendor/*','*/node_modules/*' ]
             triggered_by: [ php ]
+
+    testsuites:
+        default:
+            tasks: ['composer']
+        style:
+            tasks: ['phpcsfixer', 'phplint', 'xmllint', 'yamllint']
+        compatibility:
+            tasks: ['phpcs', 'phpcs', 'phplint', 'xmllint', 'yamllint']
+        analysis:
+            tasks: ['phpparser', 'psalm']
+        unit:
+            tasks: ['phpunit']

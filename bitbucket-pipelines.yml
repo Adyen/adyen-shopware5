@@ -1,0 +1,28 @@
+image: php:7.4-cli
+
+pipelines:
+    default:
+        - step:
+            name: Continues Integration Setup
+            caches:
+                - composer
+            script:
+                - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
+                - composer install --prefer-dist
+                - php ./vendor/bin/grumphp run --testsuite=default
+        - step:
+            name: Validate Styles
+            script:
+                - php ./vendor/bin/grumphp run --testsuite=style
+        - step:
+            name: Unit Testing
+            script:
+                - php ./vendor/bin/grumphp run --testsuite=unit
+        - step:
+            name: Static Analysis
+            script:
+                - php ./vendor/bin/grumphp run --testsuite=analysis
+        - step:
+            name: PHP Compatibility
+            script:
+                - php ./vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 7.4- --extensions=php --ignore=*/vendor/*,*/tests/*
