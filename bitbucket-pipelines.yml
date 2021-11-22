@@ -10,6 +10,7 @@ definitions:
               - vendor/**
             script:
               - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
+              - composer --version
               - composer install --prefer-dist
         - step: &composer
             name: Validate Composer
