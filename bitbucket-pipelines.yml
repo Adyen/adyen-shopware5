@@ -12,7 +12,7 @@ definitions:
               - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
               - php -r "readfile('https://getcomposer.org/installer');" | php
               - composer --version
-              - composer install --prefer-dist
+              - php composer.phar install --prefer-dist
         - step: &composer
             name: Validate Composer
             script:
