@@ -13,7 +13,8 @@
         </ignoreFiles>
     </projectFiles>
     <extraFiles>
-        <directory name="./*"/>
+        <directory name="./*" />
+        <directory name="./vendor/shopware/shopware/engine/*" />
         <ignoreFiles>
             <directory name="vendor"/>
         </ignoreFiles>

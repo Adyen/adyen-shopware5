@@ -1,4 +1,4 @@
-image: docphpro/php:7.4
+image: docphpro/php:7.4-dev
 
 definitions:
     steps:
@@ -6,52 +6,21 @@ definitions:
             name: Continues Integration Setup
             caches:
               - composer
-            artifacts:
-              - vendor/**
             script:
               - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
-              - php -r "readfile('https://getcomposer.org/installer');" | php
-              - composer --version
-              - php composer.phar install --prefer-dist
-        - step: &composer
-            name: Validate Composer
-            script:
-              - php ./vendor/bin/grumphp run --testsuite=default
-        - step: &style
-            name: Code style
-            script:
-              - php ./vendor/bin/grumphp run --testsuite=style
-        - step: &compatibility
-            name: Code style
-            script:
-              - php ./vendor/bin/grumphp run --testsuite=compatibility
-        - step: &analysis
-            name: Static Analysis
-            script:
-                - php ./vendor/bin/grumphp run --testsuite=analysis
-        - step: &unit
-            name: Unit Testing
-            script:
-                - php ./vendor/bin/grumphp run --testsuite=unit
-        - step: &integration
-            name: Integration Testing
-            script:
-                - php ./vendor/bin/grumphp run --testsuite=integration
 
 pipelines:
     default:
         - step: *setup
-        - parallel:
-            - step: *composer
-            - step: *style
-            - step: *compatibility
-            - step: *analysis
-        - step: *unit
-        - step: *integration
+        - step:
+              name: Quality Assurance
+              script:
+                  - php ./vendor/bin/grumphp run
 
-    "{master,release/*}":
-        - step: *setup
-        - parallel:
-            - step: *composer
-            - step: *compatibility
-        - step: *unit
+    branches:
+        master:
+            - step: *setup
+            - step:
+                  name: Compatibility
+                  script:
+                      - php ./vendor/bin/grumphp run --testsuite=master

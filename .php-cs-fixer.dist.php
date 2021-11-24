@@ -73,7 +73,7 @@ return (new PhpCsFixer\Config())
         'phpdoc_add_missing_param_annotation' => true,
         'phpdoc_order' => true,
         'phpdoc_types_order' => ['null_adjustment' => 'always_last'],
-        'php_unit_method_casing' => false,
+        'php_unit_method_casing' => ['case' =>'snake_case'],
         'pow_to_exponentiation' => true,
         'psr_autoloading' => true,
         'random_api_migration' => false,

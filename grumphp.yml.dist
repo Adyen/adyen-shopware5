@@ -27,25 +27,15 @@ grumphp:
                 - 'exit;'
                 - "\\bdd\\b("
             triggered_by: [ php,js ]
-            metadata:
-                priority: 100
         file_size:
             max_size: 5M
         composer: ~
-        phplint:
-            metadata:
-                priority: 100
-        xmllint:
-            metadata:
-                priority: 100
+        phplint: ~
+        xmllint: ~
         yamllint:
             parse_custom_tags: true
-            metadata:
-                priority: 100
         phpcsfixer:
             config: '.php-cs-fixer.dist.php'
-            metadata:
-                priority: 100
         phpparser:
             ignore_patterns: '%grumphp.ignore_patterns%'
             visitors:
@@ -53,32 +43,17 @@ grumphp:
                 never_use_else: ~
                 forbidden_function_calls:
                     blacklist: [ echo, print, print_r, phpinfo ]
-            metadata:
-                priority: 100
         psalm:
             config: psalm.xml.dist
             ignore_patterns: '%grumphp.ignore_patterns%'
-            metadata:
-                priority: 50
         phpunit:
 #            always_execute: true
-            metadata:
-                priority: 50
         php_compatibility:
             scripts:
                 - ["-c", "php ./vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 7.4- --extensions=php --ignore=*/vendor/*,*/tests/*"]
             metadata:
                 task: shell
-                priority: 50
 
     testsuites:
-        default:
-            tasks: ['composer']
-        style:
-            tasks: ['phpcsfixer', 'phplint', 'xmllint', 'yamllint']
-        compatibility:
-            tasks: ['php_compatibility']
-        analysis:
-            tasks: ['phpparser', 'psalm']
-        unit:
-            tasks: ['phpunit']
+        master:
+            tasks: ['composer', 'php_compatibility']
