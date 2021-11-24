@@ -9,6 +9,8 @@ definitions:
             script:
               - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
               - composer install --prefer-dist
+            artifacts:
+              - vendor/**
 
 pipelines:
     default:
