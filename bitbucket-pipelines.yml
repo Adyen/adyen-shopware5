@@ -1,29 +1,23 @@
 image: docphpro/php:7.4-dev
 
-definitions:
-    steps:
-        - step: &setup
-            name: Continues Integration Setup
-            caches:
-              - composer
-            script:
-              - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
-              - composer install --prefer-dist
-            artifacts:
-              - vendor/**
-
 pipelines:
     default:
-        - step: *setup
         - step:
               name: Quality Assurance
+              caches:
+                  - composer
               script:
+                  - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
+                  - composer install --prefer-dist
                   - php ./vendor/bin/grumphp run
 
     branches:
         master:
-            - step: *setup
             - step:
-                  name: Compatibility
+                  name: Code Compatibility
+                  caches:
+                      - composer
                   script:
+                      - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
+                      - composer install --prefer-dist
                       - php ./vendor/bin/grumphp run --testsuite=master
