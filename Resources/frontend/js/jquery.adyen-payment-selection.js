@@ -90,11 +90,18 @@
             me.setCheckout();
             me.handleSelectedMethod();
         },
+        eventListeners: function () {
+            var me = this;
+
+            $(document).on('submit', me.opts.formSelector, $.proxy(me.onPaymentFormSubmit, me));
+            $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
+            $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
+        },
         enableVisibility: function () {
-            this.enableApplePay();
+            this.handleApplePayVisibility();
             $(this.opts.shippingPaymentContentSelector).removeClass('adyen-hidden--all');
         },
-        enableApplePay: function () {
+        handleApplePayVisibility: function () {
             var me = this;
             var applePayAvailable = window.ApplePaySession || false;
             if (applePayAvailable) {
@@ -109,13 +116,6 @@
             }
 
             $('#payment_mean'+applePayMethod.id).parents(this.opts.paymentMethodSelector).addClass('adyen-hidden--all');
-        },
-        eventListeners: function () {
-            var me = this;
-
-            $(document).on('submit', me.opts.formSelector, $.proxy(me.onPaymentFormSubmit, me));
-            $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
-            $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
         },
         onPaymentFormSubmit: function (e) {
             var me = this;
@@ -141,6 +141,7 @@
         },
         onPaymentChangedAfter: function () {
             var me = this;
+            me.enableVisibility();
 
             // Return & clear when no adyen payment
             var payment = me.getPaymentMethodById(me.selectedPaymentId);
