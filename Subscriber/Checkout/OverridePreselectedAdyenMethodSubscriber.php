@@ -18,6 +18,8 @@ final class OverridePreselectedAdyenMethodSubscriber implements SubscriberInterf
 
     public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
+        return;
+
         $subject = $args->getSubject();
         if ('confirm' !== $subject->Request()->getActionName()) {
             return;
