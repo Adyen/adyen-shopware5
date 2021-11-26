@@ -17,6 +17,7 @@
 {/block}
 
 {block name='frontend_index_body_attributes'}
+    {if $mAdyenSnippets}data-adyensnippets="{$mAdyenSnippets}"{/if}
     {assign var=adyenType value=$sUserData.additional.payment.attribute->get('adyen_type')}
 
     {$smarty.block.parent}

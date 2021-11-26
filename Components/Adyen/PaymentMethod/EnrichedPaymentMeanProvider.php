@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AdyenPayment\Components\Adyen\PaymentMethod;
 
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
-use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
@@ -33,12 +32,10 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
             return $paymentMeans->filterExcludeAdyen();
         }
 
-        $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
-            $this->paymentMethodService->getPaymentMethods(
-                $paymentMethodOptions['countryCode'],
-                $paymentMethodOptions['currency'],
-                $paymentMethodOptions['value']
-            )
+        $adyenPaymentMethods = $this->paymentMethodService->getPaymentMethods(
+            $paymentMethodOptions['countryCode'],
+            $paymentMethodOptions['currency'],
+            $paymentMethodOptions['value']
         );
 
         return $paymentMeans->enrichAdyenPaymentMeans($adyenPaymentMethods, $this->paymentMethodEnricher);

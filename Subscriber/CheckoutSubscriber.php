@@ -6,19 +6,16 @@ namespace AdyenPayment\Subscriber;
 
 use Adyen\AdyenException;
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
-use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\DataConversion;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Models\Payment\PaymentMean;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Serializer\PaymentMeanCollectionSerializer;
-use Enlight\Event\SubscriberInterface;
-use Enlight_Event_EventArgs;
 use Shopware_Controllers_Frontend_Checkout;
 
 class CheckoutSubscriber implements SubscriberInterface
@@ -121,7 +118,7 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     private function checkFirstCheckoutStep(Shopware_Controllers_Frontend_Checkout $subject): void
     {
-        if (!in_array($subject->Request()->getActionName(), ['confirm'], true)) {
+        if ($subject->Request()->getActionName() !== 'confirm') {
             return;
         }
 
@@ -139,37 +136,34 @@ class CheckoutSubscriber implements SubscriberInterface
     private function shouldRedirectToStep2(Shopware_Controllers_Frontend_Checkout $subject): bool
     {
         $userData = $subject->View()->getAssign('sUserData');
-        $source = (int) ($userData['additional']['payment']['source'] ?? null);
-        if (SourceType::load($source)->equals(SourceType::adyen())) {
+        $swPaymentMean = PaymentMean::createFromShopwareArray($userData['additional']['payment'] ?? []);
+        if (!$swPaymentMean->isAdyenType()) {
             return false;
         }
 
         $paymentMethodOptions = ($this->paymentMethodOptionsBuilder)();
-        if (0 === $paymentMethodOptions['value']) {
+        if (0 === (int) $paymentMethodOptions['value']) {
             return false;
         }
 
-        $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
-            $this->paymentMethodService->getPaymentMethods(
-                $paymentMethodOptions['countryCode'],
-                $paymentMethodOptions['currency'],
-                $paymentMethodOptions['value']
-            )
+        $adyenPaymentMethods = $this->paymentMethodService->getPaymentMethods(
+            $paymentMethodOptions['countryCode'],
+            $paymentMethodOptions['currency'],
+            $paymentMethodOptions['value']
         );
 
-        $selectedId = $userData['additional']['payment']['id'] ?? '';
-        $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($selectedId);
-        if (!$paymentMethod) {
+        $adyenPaymentMethod = $adyenPaymentMethods->fetchByPaymentMean($swPaymentMean);
+        if (!$adyenPaymentMethod) {
             return true;
         }
 
-        if (!$paymentMethod->hasDetails() && !$paymentMethod->isStoredPayment()) {
-            $subject->View()->assign('adyenPaymentState', $paymentMethod->serializeMinimalState());
+        if (!$adyenPaymentMethod->hasDetails() && !$adyenPaymentMethod->isStoredPayment()) {
+            $subject->View()->assign('adyenPaymentState', $adyenPaymentMethod->serializeMinimalState());
 
             return false;
         }
 
-        return true;
+        return false;
     }
 
     private function revertToDefaultPaymentMethod(Shopware_Controllers_Frontend_Checkout $subject): void

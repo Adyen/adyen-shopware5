@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Models\Payment;
 
+use AdyenPayment\AdyenPayment;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class PaymentMean
 {
@@ -41,6 +43,29 @@ final class PaymentMean
     public function getSource()
     {
         return $this->source;
+    }
+
+    public function getAttribute(): Attribute
+    {
+        return $this->raw['attribute'] ?? new Attribute();
+    }
+
+    public function getAdyenType(): string
+    {
+        if ($this->getAttribute()->exists(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL)) {
+            return (string) $this->getAttribute()->get(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL);
+        }
+
+        return '';
+    }
+
+    public function getAdyenStoredMethodId(): string
+    {
+        if ($this->getAttribute()->exists(AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID)) {
+            return (string) $this->getAttribute()->get(AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID);
+        }
+
+        return '';
     }
 
     /**

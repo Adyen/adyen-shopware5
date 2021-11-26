@@ -7,6 +7,7 @@ namespace AdyenPayment\Components\Adyen;
 use Adyen\AdyenException;
 use Adyen\Service\Checkout;
 use Adyen\Util\Currency;
+use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Models\Enum\Channel;
 use Enlight_Components_Session_Namespace;
@@ -76,7 +77,7 @@ class PaymentMethodService
         $value = null,
         $locale = null,
         $cache = true
-    ): array {
+    ): PaymentMethodCollection {
         $cache = $cache && $this->configuration->isPaymentmethodsCacheEnabled();
         $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string) ($value ?? ''));
         if ($cache && isset($this->cache[$cacheKey])) {
@@ -99,7 +100,9 @@ class PaymentMethodService
         ];
 
         try {
-            $paymentMethods = $checkout->paymentMethods($requestParams);
+            $paymentMethods = PaymentMethodCollection::fromAdyenMethods(
+                $checkout->paymentMethods($requestParams)
+            );
         } catch (AdyenException $e) {
             $this->logger->critical('Adyen Exception', [
                 'message' => $e->getMessage(),
@@ -109,7 +112,7 @@ class PaymentMethodService
                 'status' => $e->getStatus(),
             ]);
 
-            return [];
+            return new PaymentMethodCollection();
         }
 
         if ($cache) {

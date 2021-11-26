@@ -50,12 +50,12 @@
             <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Checkout\RegisterConfirmSnippetsSubscriber">
-            <tag name="shopware.event_subscriber"/>
             <argument type="service" id="snippets"/>
+            <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Checkout\RegisterPaymentSnippetsSubscriber">
-            <tag name="shopware.event_subscriber"/>
             <argument type="service" id="snippets"/>
+            <tag name="shopware.event_subscriber"/>
         </service>
         <service id="adyen_payment.subscriber.notification.log_incoming_notification" class="AdyenPayment\Subscriber\Notification\LogIncomingNotification">
             <tag name="shopware.event_subscriber"/>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Collection\Payment;
 
+use AdyenPayment\Models\Payment\PaymentMean;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use AdyenPayment\Models\Payment\PaymentMethodType;
 
@@ -55,25 +56,36 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
         );
     }
 
+    /**
+     * $paymentTypeOrId is the Adyen "type" or Adyen "stored payment id"
+     * NOT the Shopware id
+     */
     public function fetchByTypeOrId(string $paymentTypeOrId): ?PaymentMethod
     {
         foreach ($this->paymentMethods as $paymentMethod) {
-            if ($paymentMethod->getId() !== $paymentTypeOrId
-                && $paymentMethod->getType() !== $paymentTypeOrId
-            ) {
-                continue;
-            }
-
-            if ($paymentMethod->getPaymentMethodType()->equals(PaymentMethodType::stored())) {
+            if ($paymentMethod->getStoredPaymentMethodId() === $paymentTypeOrId) {
                 return $paymentMethod;
             }
 
-            if ($paymentMethod->getPaymentMethodType()->equals(PaymentMethodType::default())) {
+            if ($paymentMethod->getType() === $paymentTypeOrId) {
                 return $paymentMethod;
             }
         }
 
         return null;
+    }
+
+    public function fetchByPaymentMean(PaymentMean $paymentMean): ?PaymentMethod
+    {
+        if ('' === $paymentMean->getAdyenStoredMethodId() && '' === $paymentMean->getAdyenType()) {
+            return null;
+        }
+
+        if ($paymentMean->getAdyenStoredMethodId()) {
+            return $this->fetchByTypeOrId($paymentMean->getAdyenStoredMethodId());
+        }
+
+        return $this->fetchByTypeOrId($paymentMean->getAdyenType());
     }
 
     public function filter(callable $filter): self
