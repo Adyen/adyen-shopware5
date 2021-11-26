@@ -102,8 +102,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
                 $adyenPaymentMethods,
                 $paymentMethodEnricher
             ) {
-                $source = $shopwareMethod->getSource();
-                if (!SourceType::load($source->getType())->equals(SourceType::adyen())) {
+                if (!$shopwareMethod->getSource()->equals(SourceType::adyen())) {
                     return $shopwareMethod;
                 }
 
@@ -113,12 +112,13 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
                     ?: $attribute->get(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL);
 
                 $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($typeOrId);
+                if (null === $paymentMethod) {
+                    return null;
+                }
 
-                return null === $paymentMethod
-                    ? null
-                    : PaymentMean::createFromShopwareArray(
-                        $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod->getRaw(), $paymentMethod)
-                    );
+                return PaymentMean::createFromShopwareArray(
+                    $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod->getRaw(), $paymentMethod)
+                );
             }
         )));
     }

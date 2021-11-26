@@ -8,7 +8,7 @@ use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMean;
 use PHPUnit\Framework\TestCase;
 
-class PaymentMeanTest extends TestCase
+final class PaymentMeanTest extends TestCase
 {
     private PaymentMean $paymentMean;
 

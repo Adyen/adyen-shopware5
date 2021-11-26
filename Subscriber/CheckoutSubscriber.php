@@ -15,56 +15,35 @@ use AdyenPayment\Components\DataConversion;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use sAdmin;
+use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Serializer\PaymentMeanCollectionSerializer;
+use Enlight\Event\SubscriberInterface;
+use Enlight_Event_EventArgs;
 use Shopware_Controllers_Frontend_Checkout;
 
-/**
- * Class CheckoutSubscriber.
- */
 class CheckoutSubscriber implements SubscriberInterface
 {
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
-
-    /**
-     * @var PaymentMethodService
-     */
-    protected $paymentMethodService;
-
-    /**
-     * @var DataConversion
-     */
-    private $dataConversion;
-
-    /**
-     * @var EnrichedPaymentMeanProviderInterface
-     */
-    private $enrichedPaymentMeanProvider;
-
-    /**
-     * @var sAdmin
-     */
-    private $admin;
-
-    /**
-     * @var PaymentMethodOptionsBuilderInterface
-     */
-    private $paymentMethodOptionsBuilder;
+    protected Configuration $configuration;
+    protected PaymentMethodService $paymentMethodService;
+    private DataConversion $dataConversion;
+    private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
+    private PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder;
+    private PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer;
 
     public function __construct(
         Configuration $configuration,
         PaymentMethodService $paymentMethodService,
         DataConversion $dataConversion,
         EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider,
-        PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder
+        PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder,
+        PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
         $this->dataConversion = $dataConversion;
         $this->enrichedPaymentMeanProvider = $enrichedPaymentMeanProvider;
         $this->paymentMethodOptionsBuilder = $paymentMethodOptionsBuilder;
+        $this->paymentMeanCollectionSerializer = $paymentMeanCollectionSerializer;
     }
 
     public static function getSubscribedEvents(): array
@@ -117,9 +96,9 @@ class CheckoutSubscriber implements SubscriberInterface
             return;
         }
 
-        $this->admin = Shopware()->Modules()->Admin();
+        $admin = Shopware()->Modules()->Admin();
         $enrichedPaymentMethods = ($this->enrichedPaymentMeanProvider)(
-            PaymentMeanCollection::createFromShopwareArray($this->admin->sGetPaymentMeans())
+            PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
         );
 
         $shop = Shopware()->Shop();
@@ -128,7 +107,9 @@ class CheckoutSubscriber implements SubscriberInterface
             'shopLocale' => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
             'clientKey' => $this->configuration->getClientKey($shop),
             'environment' => $this->configuration->getEnvironment($shop),
-            'enrichedPaymentMethods' => $enrichedPaymentMethods->toShopwareArray(),
+            'enrichedPaymentMethods' => json_encode(
+                ($this->paymentMeanCollectionSerializer)($enrichedPaymentMethods),
+                JSON_THROW_ON_ERROR),
         ];
 
         $view = $subject->View();

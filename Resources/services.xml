@@ -23,5 +23,6 @@
         <import resource="services/basket.xml" />
         <import resource="services/web-components.xml" />
         <import resource="services/session.xml" />
+        <import resource="services/serializers.xml" />
     </imports>
 </container>
