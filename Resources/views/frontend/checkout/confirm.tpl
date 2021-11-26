@@ -18,8 +18,7 @@
 
 {block name='frontend_index_body_attributes'}
     {if $mAdyenSnippets}data-adyensnippets="{$mAdyenSnippets}"{/if}
-    {assign var=adyenType value=$sUserData.additional.payment.attribute->get('adyen_type')}
-
+    {$adyenType=$sUserData.additional.payment.attribute['adyen_type']|default:''}
     {$smarty.block.parent}
     data-adyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
     data-adyenAjaxPaymentDetails="{url module='frontend' controller='adyen' action='paymentDetails'}"
