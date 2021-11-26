@@ -1,6 +1,5 @@
 ;(function ($) {
     'use strict';
-
     $.plugin('adyen-payment-selection', {
         /**
          * Plugin default options.
@@ -21,6 +20,12 @@
              * @type {string}
              */
             shopLocale: 'en-US',
+            /**
+             * Selector for the shipping payment content.
+             *
+             * @type {String}
+             */
+            shippingPaymentContentSelector: '#shipping_payment_wrapper',
             /**
              * Selector for the payment form.
              *
@@ -54,6 +59,10 @@
              */
             giftCardGroupName: 'Gift Card',
             /**
+             * @type {string} Adyen payment method type for ApplePay
+             */
+            applePayType: 'applepay',
+            /**
              * @type {string} Snippets associated with the payment page
              */
             adyenSnippets: {
@@ -70,22 +79,36 @@
         storePaymentMethodSession: 'storePaymentMethod',
         adyenConfigSession: 'adyenConfig',
 
-
         init: function () {
             var me = this;
             me.sessionStorage = StorageManager.getStorage('session');
 
-            me.setSafariBodyClass();
             me.applyDataAttributes();
+            me.enableVisibility();
             me.eventListeners();
             me.setConfig();
             me.setCheckout();
             me.handleSelectedMethod();
         },
-        setSafariBodyClass: function (){
-            if (window.ApplePaySession) {
-                $('body').addClass('is-safari');
+        enableVisibility: function () {
+            this.enableApplePay();
+            $(this.opts.shippingPaymentContentSelector).removeClass('adyen-hidden--all');
+        },
+        enableApplePay: function () {
+            var me = this;
+            var applePayAvailable = window.ApplePaySession || false;
+            if (applePayAvailable) {
+                return;
             }
+
+            var applePayMethod = me.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
+                return enrichedPaymentMethod.adyenType === me.opts.applePayType;
+            })[0] || {};
+            if (!applePayMethod) {
+                return;
+            }
+
+            $('#payment_mean'+applePayMethod.id).parents(this.opts.paymentMethodSelector).addClass('adyen-hidden--all');
         },
         eventListeners: function () {
             var me = this;
@@ -147,7 +170,7 @@
         setConfig: function () {
             var me = this;
 
-            var adyenPaymentMethodsResponseConfig = Object.values(me.opts.enrichedPaymentMethods).reduce(
+            var adyenPaymentMethodsResponse = Object.values(me.opts.enrichedPaymentMethods).reduce(
                 function (rawAdyen, enrichedPaymentMethod) {
                     var isAdyenPaymentMethod = enrichedPaymentMethod.isAdyenPaymentMethod || false;
                     if (true === isAdyenPaymentMethod) {
@@ -163,7 +186,7 @@
                 locale: me.opts.shopLocale,
                 environment: me.opts.adyenEnvironment,
                 clientKey: me.opts.adyenClientKey,
-                paymentMethodsResponse: Object.assign({}, adyenPaymentMethodsResponseConfig),
+                paymentMethodsResponse: {'paymentMethods':adyenPaymentMethodsResponse},
                 onChange: $.proxy(me.handleOnChange, me)
             };
             me.saveAdyenConfigInSession(me.adyenConfiguration);
@@ -173,9 +196,10 @@
         },
         getPaymentMethodById: function (id) {
             var me = this;
-            var paymentMethod = me.opts.enrichedPaymentMethods[id] || {};
 
-            return paymentMethod;
+            return this.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
+                return enrichedPaymentMethod.id === id;
+            })[0] || {};
         },
         /**
          * @param {object} paymentMethod

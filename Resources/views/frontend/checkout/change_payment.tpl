@@ -2,7 +2,6 @@
 
 {block name='frontend_checkout_payment_content'}
     {include file="frontend/checkout/adyen_libaries.tpl"}
-
     {* Filter on storedPayments and default payment methods (SW 5 needs internally array<int, array> for $sPayments) *}
     {assign var="paymentMethods" value=[]}
     {assign var="storedPaymentMethods" value=[]}
@@ -24,7 +23,7 @@
                 </h4>
             {/if}
             {assign var=sPayments value=$storedPaymentMethods}
-            {include file="frontend/checkout/adyen_payment_list.tpl"}
+            {$smarty.block.parent}
         {/if}
     {/block}
 
@@ -36,10 +35,9 @@
                 </h4>
             {/if}
             {assign var=sPayments value=$paymentMethods}
-            {include file="frontend/checkout/adyen_payment_list.tpl"}
+            {$smarty.block.parent}
         {/if}
     {/block}
-
 {/block}
 
 {block name='frontend_checkout_payment_fieldset_input_label'}
