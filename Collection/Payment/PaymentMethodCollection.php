@@ -58,7 +58,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
 
     /**
      * $paymentTypeOrId is the Adyen "type" or Adyen "stored payment id"
-     * NOT the Shopware id
+     * NOT the Shopware id.
      */
     public function fetchByTypeOrId(string $paymentTypeOrId): ?PaymentMethod
     {

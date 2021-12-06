@@ -113,7 +113,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
 
                 $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($typeOrId);
                 if (null === $paymentMethod) {
-                    return null;
+                    return;
                 }
 
                 return PaymentMean::createFromShopwareArray(

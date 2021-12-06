@@ -45,6 +45,7 @@ grumphp:
                     blacklist: [ echo, print, print_r, phpinfo ]
         psalm:
             config: psalm.xml.dist
+            no_cache: true
             ignore_patterns: '%grumphp.ignore_patterns%'
         phpunit:
 #            always_execute: true

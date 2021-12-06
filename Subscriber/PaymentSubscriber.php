@@ -38,7 +38,7 @@ final class PaymentSubscriber implements SubscriberInterface
     public function enrichAdyenPaymentMethods(Enlight_Event_EventArgs $args): array
     {
         $shopwareMethods = $args->getReturn();
-        if (!in_array(Shopware()->Front()->Request()->getActionName(), ['shippingPayment', 'payment'])) {
+        if (!in_array(Shopware()->Front()->Request()->getActionName(), ['shippingPayment', 'payment'], true)) {
             return $shopwareMethods;
         }
 

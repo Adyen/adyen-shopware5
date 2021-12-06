@@ -13,9 +13,9 @@ use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\DataConversion;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMean;
+use AdyenPayment\Serializer\PaymentMeanCollectionSerializer;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use AdyenPayment\Serializer\PaymentMeanCollectionSerializer;
 use Shopware_Controllers_Frontend_Checkout;
 
 class CheckoutSubscriber implements SubscriberInterface
@@ -118,7 +118,7 @@ class CheckoutSubscriber implements SubscriberInterface
      */
     private function checkFirstCheckoutStep(Shopware_Controllers_Frontend_Checkout $subject): void
     {
-        if ($subject->Request()->getActionName() !== 'confirm') {
+        if ('confirm' !== $subject->Request()->getActionName()) {
             return;
         }
 

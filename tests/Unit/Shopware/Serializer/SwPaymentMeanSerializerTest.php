@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Tests\Unit\Shopware\Serializer;
 
 use AdyenPayment\Models\Payment\PaymentMean;
@@ -56,7 +58,7 @@ final class SwPaymentMeanSerializerTest extends TestCase
                 'name' => '&lt;some-tag&gt; a name&lt;/some-tag&gt; "quoted"',
                 'description' => 'description and&lt;a&gt;a link&lt;/a&gt;',
                 'additionaldescription' => 'additional &lt;div&gt;a div&lt;/div&gt;',
-            ]
+            ],
         ], $result);
     }
 }

@@ -23,13 +23,13 @@
         }
     },
     "require": {
-        "php": "^7.4",
+        "php": "^7.4|^8.0",
         "ext-json": "*",
         "adyen/php-api-library": "^10.0",
         "monolog/monolog": "2.1.1"
     },
     "require-dev": {
-        "shopware/shopware": "^5.7.3",
+        "shopware/shopware": "^5.7.6",
         "phpcompatibility/php-compatibility": "^9.3",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
         "friendsofphp/php-cs-fixer": "^3.1",

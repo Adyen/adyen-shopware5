@@ -2,21 +2,26 @@
 <psalm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://getpsalm.org/schema/config"
        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
        errorLevel="3"
-       resolveFromConfigFile="true"
        useDocblockTypes="false"
 >
     <projectFiles>
         <file name="AdyenPayment.php"/>
         <directory name="./*"/>
         <ignoreFiles>
+            <directory name=".git"/>
+            <directory name=".github"/>
             <directory name="vendor"/>
+            <directory name="tests"/>
         </ignoreFiles>
     </projectFiles>
     <extraFiles>
-        <directory name="./*" />
-        <directory name="./vendor/shopware/shopware/engine/*" />
+        <directory name="./*"/>
+        <directory name="./vendor/shopware/shopware/engine/*"/>
         <ignoreFiles>
+            <directory name=".git"/>
+            <directory name=".github"/>
             <directory name="vendor"/>
+            <directory name="tests"/>
         </ignoreFiles>
     </extraFiles>
 </psalm>
