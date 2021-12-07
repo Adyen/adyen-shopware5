@@ -6,6 +6,7 @@ namespace AdyenPayment\Models\Payment;
 
 use AdyenPayment\Models\Enum\PaymentMethod\PluginType;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Utils\Sanitize;
 use Doctrine\Common\Collections\ArrayCollection;
 use Shopware\Components\Model\ModelRepository;
 use Shopware\Models\Payment\Payment;
@@ -25,7 +26,7 @@ final class PaymentFactory implements PaymentFactoryInterface
     {
         $new = new Payment();
         $new->setActive(true);
-        $new->setName($this->provideName($paymentMethod));
+        $new->setName($this->provideUniqueName($paymentMethod));
         $new->setDescription($paymentMethod->getValue('name', ''));
         $new->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
         $new->setShops(new ArrayCollection([$shop]));
@@ -40,10 +41,10 @@ final class PaymentFactory implements PaymentFactoryInterface
 
     public function updateFromAdyen(Payment $payment, PaymentMethod $paymentMethod, Shop $shop): Payment
     {
-        $payment->setName($this->provideName($paymentMethod));
+        $payment->setName($this->provideUniqueName($paymentMethod));
         $payment->setDescription($paymentMethod->getValue('name', ''));
         $payment->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
-        $payment->setShops(new ArrayCollection([$shop])); // seems on update it overwrites the exisiting one
+        $payment->setShops(new ArrayCollection([$shop])); // @todo seems on update it overwrites the exisiting one
         $payment->setSource(SourceType::adyen()->getType());
         $payment->setPluginId(PluginType::adyenType()->getType());
         $payment->setCountries(new ArrayCollection(
@@ -56,15 +57,12 @@ final class PaymentFactory implements PaymentFactoryInterface
     /**
      * unique name.
      */
-    private function provideName(PaymentMethod $paymentMethod): string
+    private function provideUniqueName(PaymentMethod $paymentMethod): string
     {
-        // @TODO: sanitize $name, prevent: "adyen_GiftCard Givex"
-        // gift card will cause always an issue
-        //           $payment = null !== $swPayment && (self::GIFTCARD !== $adyenPaymentMethod->getType())
-        //            ? ' do update'
-        //            : 'do create';
-
-        return $paymentMethod->getType().'_'.$paymentMethod->getValue('name', '');
+        return sprintf('%s_%s',
+            $paymentMethod->getType(),
+            Sanitize::removeNonWord($paymentMethod->getValue('name', ''))
+        );
     }
 
     private function provideAdditionalDescription(PaymentMethod $paymentMethod): string
