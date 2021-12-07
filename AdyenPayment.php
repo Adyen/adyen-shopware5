@@ -20,7 +20,9 @@ use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\Context\UpdateContext;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 /**
@@ -50,7 +52,6 @@ class AdyenPayment extends Plugin
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new NotificationProcessorCompilerPass());
-
         parent::build($container);
 
         //set default logger level for 5.4
@@ -58,15 +59,23 @@ class AdyenPayment extends Plugin
             $container->setParameter('kernel.default_error_level', Logger::ERROR);
         }
 
-        $loader = new XmlFileLoader(
-            $container,
-            new FileLocator()
-        );
+        $this->loadServices($container);
+    }
 
-        $loader->load(__DIR__.'/Resources/services.xml');
+    private function loadServices(ContainerBuilder $container): void
+    {
+        $loader = new GlobFileLoader($container, $fileLocator = new FileLocator());
+        $loader->setResolver(new LoaderResolver([
+            new XmlFileLoader($container, $fileLocator),
+        ]));
+
+        $serviceMainFile = __DIR__.'/Resources/services.xml';
+        if (is_file($serviceMainFile)) {
+            $loader->load($serviceMainFile);
+        }
+        $loader->load(__DIR__.'/Resources/services/*.xml');
 
         $versionCheck = $container->get('adyen_payment.components.shopware_version_check');
-
         if ($versionCheck->isHigherThanShopwareVersion('v5.6.2')) {
             $loader->load(__DIR__.'/Resources/services/version/563.xml');
         }
