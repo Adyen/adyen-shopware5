@@ -44,7 +44,7 @@ final class PaymentFactory implements PaymentFactoryInterface
         $payment->setName($this->provideUniqueName($paymentMethod));
         $payment->setDescription($paymentMethod->getValue('name', ''));
         $payment->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
-        $payment->setShops(new ArrayCollection([$shop])); // @todo seems on update it overwrites the exisiting one
+        $payment->setShops(new ArrayCollection([$shop])); // @todo seems on update it overwrites the existing one
         $payment->setSource(SourceType::adyen()->getType());
         $payment->setPluginId(PluginType::adyenType()->getType());
         $payment->setCountries(new ArrayCollection(

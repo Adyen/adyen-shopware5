@@ -6,6 +6,7 @@ namespace AdyenPayment\Dbal\Updater;
 
 use Shopware\Bundle\AttributeBundle\Service\CrudServiceInterface;
 use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
+use Shopware\Bundle\AttributeBundle\Service\TypeMappingInterface;
 use Shopware\Components\Model\ModelManager;
 
 class PaymentAttributeUpdater implements PaymentAttributeUpdaterInterface
@@ -30,12 +31,8 @@ class PaymentAttributeUpdater implements PaymentAttributeUpdaterInterface
             $this->crudService->update(
                 's_core_paymentmeans_attributes',
                 $column,
-                TypeMapping::TYPE_STRING,
-                [
-                    'displayInBackend' => true,
-                    'readonly' => $readOnly,
-                    'label' => 'Adyen payment type', // WTF
-                ]
+                TypeMappingInterface::TYPE_STRING,
+                ['readonly' => $readOnly]
             );
         }
 
@@ -45,7 +42,7 @@ class PaymentAttributeUpdater implements PaymentAttributeUpdaterInterface
     private function rebuildPaymentAttributeModel(): void
     {
         /** @var \Doctrine\Common\Cache\CacheProvider $metaDataCache */
-        $metaDataCache = $this->entityManager->getConfiguration()->getMetadataCacheImpl();
+        $metaDataCache = $this->entityManager->getConfiguration()->getMetadataCache();
         if ($metaDataCache) {
             $metaDataCache->deleteAll();
         }
