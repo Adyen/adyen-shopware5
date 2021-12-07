@@ -11,45 +11,35 @@ use Shopware\Bundle\AttributeBundle\Service\DataPersisterInterface;
 
 final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
 {
-    /** @var DataPersisterInterface */
-    private $dataPersister;
-
-    /** @var PaymentAttributeUpdaterInterface */
-    private $paymentAttributeUpdater;
+    private DataPersisterInterface $dataPersister;
+    private PaymentAttributeUpdaterInterface $attributeUpdater;
 
     public function __construct(
         DataPersisterInterface $dataPersister,
-        PaymentAttributeUpdaterInterface $paymentAttributeUpdater
+        PaymentAttributeUpdaterInterface $attributeUpdater
     ) {
         $this->dataPersister = $dataPersister;
-        $this->paymentAttributeUpdater = $paymentAttributeUpdater;
+        $this->attributeUpdater = $attributeUpdater;
     }
 
-    public function storeAdyenPaymentMethodType(
-        int $paymentMeanId,
-        PaymentMethod $adyenPaymentMethod
-    ): void {
-        $data = [
-            '_table' => 's_core_paymentmeans_attributes',
-            '_foreignKey' => $paymentMeanId,
-            AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL => $adyenPaymentMethod->getType(),
-            AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID => $adyenPaymentMethod->getStoredPaymentMethodId(),
-        ];
-
+    public function storeAdyenPaymentMethodType(int $paymentMeanId, PaymentMethod $adyenPaymentMethod): void
+    {
         $attributesColumns = [
             AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL,
             AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID,
         ];
 
         // update read only "false" to allow model changes
-        $this->paymentAttributeUpdater->updateReadonlyOnAdyenPaymentAttributes($attributesColumns, false);
-
+        $this->attributeUpdater->updateReadonlyOnAdyenPaymentAttributes($attributesColumns, false);
         $this->dataPersister->persist(
-            $data,
+            [
+                '_table' => 's_core_paymentmeans_attributes',
+                '_foreignKey' => $paymentMeanId,
+                AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL => $adyenPaymentMethod->getType(),
+                AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID => $adyenPaymentMethod->getStoredPaymentMethodId(),
+            ],
             's_core_paymentmeans_attributes',
-            $paymentMeanId
-        );
-
-        $this->paymentAttributeUpdater->updateReadonlyOnAdyenPaymentAttributes($attributesColumns, true);
+            $paymentMeanId);
+        $this->attributeUpdater->updateReadonlyOnAdyenPaymentAttributes($attributesColumns, true);
     }
 }

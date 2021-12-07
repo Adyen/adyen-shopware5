@@ -10,20 +10,11 @@ use Shopware\Models\Shop\Shop;
 
 final class TraceablePaymentMethodImporter implements PaymentMethodImporterInterface
 {
-    /**
-     * @var PaymentMethodImporterInterface
-     */
-    private $paymentMethodImporter;
+    private PaymentMethodImporterInterface $paymentMethodImporter;
+    private LoggerInterface $logger;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(
-        PaymentMethodImporterInterface $paymentMethodImporter,
-        LoggerInterface $logger
-    ) {
+    public function __construct(PaymentMethodImporterInterface $paymentMethodImporter, LoggerInterface $logger)
+    {
         $this->paymentMethodImporter = $paymentMethodImporter;
         $this->logger = $logger;
     }
@@ -32,6 +23,7 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
     {
         foreach ($this->paymentMethodImporter->importAll() as $importResult) {
             $this->log($importResult);
+
             yield $importResult;
         }
     }
@@ -40,6 +32,7 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
     {
         foreach ($this->paymentMethodImporter->importForShop($shop) as $importResult) {
             $this->log($importResult);
+
             yield $importResult;
         }
     }
@@ -52,6 +45,7 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
                 'shop name' => $importResult->getShop()->getName(),
                 'payment method' => $importResult->getPaymentMethod()
                     ? $importResult->getPaymentMethod()->getType()
+                    .' '.$importResult->getPaymentMethod()->getValue('name', '')
                     : 'all',
             ]);
 
@@ -61,8 +55,11 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
         $this->logger->error('Adyen payment method could not be imported', [
             'shop id' => $importResult->getShop()->getId(),
             'shop name' => $importResult->getShop()->getName(),
-            'payment method' => $importResult->getPaymentMethod()
-                ? $importResult->getPaymentMethod()->getType()
+            'payment type' => $importResult->getPaymentMethod()
+                ? $importResult->getPaymentMethod()->getValue('type', 'n/a')
+                : 'n/a',
+            'payment name' => $importResult->getPaymentMethod()
+                ? $importResult->getPaymentMethod()->getValue('name', 'n/a')
                 : 'n/a',
             'message' => $importResult->getException()->getMessage(),
             'exception' => $importResult->getException(),

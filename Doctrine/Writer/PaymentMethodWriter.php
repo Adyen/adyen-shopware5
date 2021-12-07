@@ -5,76 +5,81 @@ declare(strict_types=1);
 namespace AdyenPayment\Doctrine\Writer;
 
 use AdyenPayment\Dbal\Provider\Payment\PaymentMeanProviderInterface;
-use AdyenPayment\Exceptions\ImportPaymentMethodException;
+use AdyenPayment\Exceptions\PaymentExistsException;
+use AdyenPayment\Exceptions\PaymentNotImportedException;
 use AdyenPayment\Models\Enum\PaymentMethod\ImportStatus;
 use AdyenPayment\Models\Payment\PaymentFactoryInterface;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use AdyenPayment\Models\PaymentMethod\ImportResult;
+use AdyenPayment\Shopware\Repository\PaymentRepositoryInterface;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Payment\Payment;
 use Shopware\Models\Shop\Shop;
 
 final class PaymentMethodWriter implements PaymentMethodWriterInterface
 {
-    public const GIFTCARD = 'giftcard';
-
-    /** @var ModelManager */
-    private $entityManager;
-
-    /** @var PaymentMeanProviderInterface */
-    private $paymentMeanProvider;
-
-    /** @var PaymentFactoryInterface */
-    private $paymentFactory;
-
-    /** @var PaymentAttributeWriterInterface */
-    private $paymentAttributeWriter;
+    private ModelManager $entityManager;
+    private PaymentMeanProviderInterface $paymentMeanProvider;
+    private PaymentFactoryInterface $paymentFactory;
+    private PaymentAttributeWriterInterface $paymentAttributeWriter;
+    private PaymentRepositoryInterface $paymentRepository;
 
     public function __construct(
         ModelManager $entityManager,
         PaymentMeanProviderInterface $paymentMeanProvider,
         PaymentFactoryInterface $paymentFactory,
-        PaymentAttributeWriterInterface $paymentAttributeWriter
+        PaymentAttributeWriterInterface $paymentAttributeWriter,
+        PaymentRepositoryInterface $paymentRepository
     ) {
         $this->entityManager = $entityManager;
         $this->paymentMeanProvider = $paymentMeanProvider;
         $this->paymentFactory = $paymentFactory;
         $this->paymentAttributeWriter = $paymentAttributeWriter;
+        $this->paymentRepository = $paymentRepository;
     }
 
-    public function __invoke(
-        PaymentMethod $adyenPaymentMethod,
-        Shop $shop
-    ): ImportResult {
-        $payment = $this->write($adyenPaymentMethod, $shop);
+    public function __invoke(PaymentMethod $adyenPaymentMethod, Shop $shop): ImportResult
+    {
+        $payment = $this->providePaymentModel($adyenPaymentMethod, $shop);
+        if ($this->paymentExists($payment)) {
+            return ImportResult::fromException(
+                $shop,
+                $adyenPaymentMethod,
+                PaymentExistsException::withName($payment->getName())
+            );
+        }
 
+        $this->entityManager->persist($payment);
+        $this->entityManager->flush($payment);
         if (null === $payment->getId()) {
             return ImportResult::fromException(
                 $shop,
                 $adyenPaymentMethod,
-                (new ImportPaymentMethodException())->missingId($adyenPaymentMethod, $shop)
+                PaymentNotImportedException::forPayment($adyenPaymentMethod, $payment, $shop)
             );
         }
 
-        $this->paymentAttributeWriter->storeAdyenPaymentMethodType(
-            $payment->getId(),
-            $adyenPaymentMethod
-        );
+        $this->paymentAttributeWriter->storeAdyenPaymentMethodType($payment->getId(), $adyenPaymentMethod);
 
         return ImportResult::success($shop, $adyenPaymentMethod, ImportStatus::created());
     }
 
-    private function write(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
+    private function paymentExists(Payment $payment): bool
+    {
+        if (null === $payment->getId()) {
+            return $this->paymentRepository->existsByName($payment->getName());
+        }
+
+        return $this->paymentRepository->existsDuplicate($payment);
+    }
+
+    private function providePaymentModel(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
     {
         $swPayment = $this->paymentMeanProvider->provideByAdyenType($adyenPaymentMethod->getType());
+        if (!$swPayment) {
+            return $this->paymentFactory->createFromAdyen($adyenPaymentMethod, $shop);
+        }
 
-        $payment = !is_null($swPayment) && (self::GIFTCARD !== $adyenPaymentMethod->getType())
-            ? $this->paymentFactory->updateFromAdyen($swPayment, $adyenPaymentMethod, $shop)
-            : $this->paymentFactory->createFromAdyen($adyenPaymentMethod, $shop);
-
-        $this->entityManager->persist($payment);
-        $this->entityManager->flush();
-
-        return $payment;
+        return $this->paymentFactory->updateFromAdyen($swPayment, $adyenPaymentMethod, $shop);
     }
 }

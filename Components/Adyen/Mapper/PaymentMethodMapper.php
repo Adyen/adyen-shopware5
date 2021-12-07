@@ -6,7 +6,7 @@ namespace AdyenPayment\Components\Adyen\Mapper;
 
 use AdyenPayment\Models\Payment\PaymentMethod;
 
-class PaymentMethodMapper implements PaymentMethodMapperInterface
+final class PaymentMethodMapper implements PaymentMethodMapperInterface
 {
     public function mapFromAdyen(array $data): \Generator
     {

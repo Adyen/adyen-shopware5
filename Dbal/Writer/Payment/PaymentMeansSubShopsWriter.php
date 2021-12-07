@@ -7,28 +7,24 @@ namespace AdyenPayment\Dbal\Writer\Payment;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
 
-final class PaymentMeansSubshopsWriter implements PaymentMeansSubshopsWriterInterface
+final class PaymentMeansSubShopsWriter implements PaymentMeansSubShopsWriterInterface
 {
-    /**
-     * @var Enlight_Components_Db_Adapter_Pdo_Mysql
-     */
-    private $db;
+    private Enlight_Components_Db_Adapter_Pdo_Mysql $db;
 
-    public function __construct(
-        Enlight_Components_Db_Adapter_Pdo_Mysql $db
-    ) {
+    public function __construct(Enlight_Components_Db_Adapter_Pdo_Mysql $db)
+    {
         $this->db = $db;
     }
 
-    public function registerAdyenPaymentMethodForSubshop(int $subshopId): void
+    public function registerAdyenPaymentMethodForSubShop(int $subShopId): void
     {
         $this->db->executeQuery(
             'REPLACE INTO s_core_paymentmeans_subshops (paymentID, subshopID) 
-                    SELECT id as paymentID, :subshopID as subshopID
+                    SELECT id as paymentID, :subShopId as subshopID
                     FROM s_core_paymentmeans 
                     WHERE s_core_paymentmeans.source = :adyenSource;',
             [
-                ':subshopID' => $subshopId,
+                ':subShopId' => $subShopId,
                 ':adyenSource' => SourceType::adyen()->getType(),
             ]
         );

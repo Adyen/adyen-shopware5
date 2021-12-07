@@ -8,5 +8,5 @@ use AdyenPayment\Models\Payment\PaymentMethod;
 
 interface PaymentAttributeWriterInterface
 {
-    public function storeAdyenPaymentMethodType(int $paymentMeanId, PaymentMethod $adyenPaymentMethod);
+    public function storeAdyenPaymentMethodType(int $paymentMeanId, PaymentMethod $adyenPaymentMethod): void;
 }

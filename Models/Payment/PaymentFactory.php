@@ -11,7 +11,7 @@ use Shopware\Components\Model\ModelRepository;
 use Shopware\Models\Payment\Payment;
 use Shopware\Models\Shop\Shop;
 
-class PaymentFactory implements PaymentFactoryInterface
+final class PaymentFactory implements PaymentFactoryInterface
 {
     private const ADYEN_PREFIX = 'Adyen';
     private ModelRepository $countryRepository;
@@ -21,16 +21,13 @@ class PaymentFactory implements PaymentFactoryInterface
         $this->countryRepository = $countryRepository;
     }
 
-    public function createFromAdyen(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
+    public function createFromAdyen(PaymentMethod $paymentMethod, Shop $shop): Payment
     {
-        $name = $adyenPaymentMethod->getValue('name');
-
         $new = new Payment();
         $new->setActive(true);
-        // @TODO: sanitize $name, prevent: "adyen_GiftCard Givex"
-        $new->setName($adyenPaymentMethod->getType().'_'.$name);
-        $new->setDescription($name);
-        $new->setAdditionalDescription(self::ADYEN_PREFIX.' '.$name);
+        $new->setName($this->provideName($paymentMethod));
+        $new->setDescription($paymentMethod->getValue('name', ''));
+        $new->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
         $new->setShops(new ArrayCollection([$shop]));
         $new->setSource(SourceType::adyen()->getType());
         $new->setPluginId(PluginType::adyenType()->getType());
@@ -41,14 +38,12 @@ class PaymentFactory implements PaymentFactoryInterface
         return $new;
     }
 
-    public function updateFromAdyen(Payment $payment, PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
+    public function updateFromAdyen(Payment $payment, PaymentMethod $paymentMethod, Shop $shop): Payment
     {
-        $name = $adyenPaymentMethod->getValue('name');
-
-        $payment->setName($name);
-        $payment->setDescription($name);
-        $payment->setAdditionalDescription(self::ADYEN_PREFIX.' '.$name);
-        $payment->setShops(new ArrayCollection([$shop]));
+        $payment->setName($this->provideName($paymentMethod));
+        $payment->setDescription($paymentMethod->getValue('name', ''));
+        $payment->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
+        $payment->setShops(new ArrayCollection([$shop])); // seems on update it overwrites the exisiting one
         $payment->setSource(SourceType::adyen()->getType());
         $payment->setPluginId(PluginType::adyenType()->getType());
         $payment->setCountries(new ArrayCollection(
@@ -56,5 +51,24 @@ class PaymentFactory implements PaymentFactoryInterface
         ));
 
         return $payment;
+    }
+
+    /**
+     * unique name.
+     */
+    private function provideName(PaymentMethod $paymentMethod): string
+    {
+        // @TODO: sanitize $name, prevent: "adyen_GiftCard Givex"
+        // gift card will cause always an issue
+        //           $payment = null !== $swPayment && (self::GIFTCARD !== $adyenPaymentMethod->getType())
+        //            ? ' do update'
+        //            : 'do create';
+
+        return $paymentMethod->getType().'_'.$paymentMethod->getValue('name', '');
+    }
+
+    private function provideAdditionalDescription(PaymentMethod $paymentMethod): string
+    {
+        return self::ADYEN_PREFIX.' '.$paymentMethod->getValue('name', '').' ('.$paymentMethod->getType().')';
     }
 }

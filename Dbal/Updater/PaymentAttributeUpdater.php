@@ -34,7 +34,7 @@ class PaymentAttributeUpdater implements PaymentAttributeUpdaterInterface
                 [
                     'displayInBackend' => true,
                     'readonly' => $readOnly,
-                    'label' => 'Adyen payment type',
+                    'label' => 'Adyen payment type', // WTF
                 ]
             );
         }

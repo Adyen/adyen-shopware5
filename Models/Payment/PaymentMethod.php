@@ -6,15 +6,12 @@ namespace AdyenPayment\Models\Payment;
 
 class PaymentMethod
 {
-    /**
-     * @var PaymentMethodType
-     */
-    private $paymentMethodType;
+    private PaymentMethodType $paymentMethodType;
 
     /**
-     * @var array
+     * @var array<string,mixed>
      */
-    private $rawData;
+    private array $rawData;
 
     private function __construct(PaymentMethodType $type, array $rawData)
     {
