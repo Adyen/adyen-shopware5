@@ -1,14 +1,10 @@
 parameters:
     grumphp.ignore_patterns:
         - '*/vendor'
+        - '.idea'
         - '.gitlab-ci'
         - '.github/'
-        - 'bin'
-        - 'custom/plugins/'
-        - 'public'
-        - 'src/Command/'
         - 'tests'
-        - 'var'
 
 grumphp:
     tasks:
@@ -48,7 +44,7 @@ grumphp:
             no_cache: true
             ignore_patterns: '%grumphp.ignore_patterns%'
         phpunit:
-#            always_execute: true
+            always_execute: true
         php_compatibility:
             scripts:
                 - ["-c", "php ./vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 7.4- --extensions=php --ignore=*/vendor/*,*/tests/*"]
