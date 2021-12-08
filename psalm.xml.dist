@@ -16,7 +16,4 @@
             <directory name="tests"/>
         </ignoreFiles>
     </projectFiles>
-    <extraFiles>
-        <directory name="tools/vendor/shopware/shopware/engine/*"/>
-    </extraFiles>
 </psalm>
