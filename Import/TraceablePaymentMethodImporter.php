@@ -61,7 +61,7 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
             'payment name' => $importResult->getPaymentMethod()
                 ? $importResult->getPaymentMethod()->getValue('name', 'n/a')
                 : 'n/a',
-            'message' => $importResult->getException()->getMessage(),
+            'message' => $importResult->getException() ? $importResult->getException()->getMessage() : 'n/a',
             'exception' => $importResult->getException(),
         ]);
     }
