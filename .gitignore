@@ -12,3 +12,5 @@ composer.lock
 psalm.xml
 grumphp.yml
 .*.cache
+tools/vendor
+!tools/composer.lock

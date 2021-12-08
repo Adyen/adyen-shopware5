@@ -29,7 +29,6 @@
         "monolog/monolog": "2.1.1"
     },
     "require-dev": {
-        "shopware/shopware": "^5.7.6",
         "phpcompatibility/php-compatibility": "^9.3",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
         "friendsofphp/php-cs-fixer": "^3.1",
@@ -37,7 +36,8 @@
         "phpro/grumphp-shim": "^1.5",
         "php-parallel-lint/php-parallel-lint": "^1.3",
         "vimeo/psalm": "^4.12",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "phpspec/prophecy-phpunit": "^2.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

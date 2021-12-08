@@ -9,6 +9,7 @@ pipelines:
               script:
                   - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
                   - composer install --prefer-dist
+                  - composer install --prefer-dist -d ./tools/
                   - php ./vendor/bin/grumphp run
 
     branches:
@@ -20,4 +21,4 @@ pipelines:
                   script:
                       - echo "memory_limit=-1" >> /usr/local/etc/php/php.ini
                       - composer install --prefer-dist
-                      - php ./vendor/bin/grumphp run --testsuite=master
+                      - php ./vendor/bin/grumphp run --testsuite="code-compatibility"

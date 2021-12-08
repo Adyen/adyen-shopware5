@@ -1,0 +1,10 @@
+{
+    "name": "local/shopware5",
+    "description": "Local Shopware 5",
+    "license": "MIT",
+    "require-dev": {
+        "shopware/shopware": "^5.7.6"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
