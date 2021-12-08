@@ -25,10 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
-/**
- * Class AdyenPayment.
- */
-class AdyenPayment extends Plugin
+final class AdyenPayment extends Plugin
 {
     public const NAME = 'AdyenPayment';
     public const ADYEN_PAYMENT_METHOD_LABEL = 'adyen_type';
@@ -65,9 +62,7 @@ class AdyenPayment extends Plugin
     private function loadServices(ContainerBuilder $container): void
     {
         $loader = new GlobFileLoader($container, $fileLocator = new FileLocator());
-        $loader->setResolver(new LoaderResolver([
-            new XmlFileLoader($container, $fileLocator),
-        ]));
+        $loader->setResolver(new LoaderResolver([new XmlFileLoader($container, $fileLocator)]));
 
         $serviceMainFile = __DIR__.'/Resources/services.xml';
         if (is_file($serviceMainFile)) {
@@ -76,7 +71,7 @@ class AdyenPayment extends Plugin
         $loader->load(__DIR__.'/Resources/services/*.xml');
 
         $versionCheck = $container->get('adyen_payment.components.shopware_version_check');
-        if ($versionCheck->isHigherThanShopwareVersion('v5.6.2')) {
+        if ($versionCheck && $versionCheck->isHigherThanShopwareVersion('v5.6.2')) {
             $loader->load(__DIR__.'/Resources/services/version/563.xml');
         }
     }
@@ -183,10 +178,9 @@ class AdyenPayment extends Plugin
 
     private function rebuildAttributeModels(): void
     {
-        /** @var \Doctrine\Common\Cache\CacheProvider $metaDataCache */
         $metaDataCache = $this->container->get('models')->getConfiguration()->getMetadataCache();
         if ($metaDataCache) {
-            $metaDataCache->deleteAll();
+            $metaDataCache->clear();
         }
 
         $this->container->get('models')->generateAttributeModels(

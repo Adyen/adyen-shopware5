@@ -22,7 +22,7 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
         $this->attributeUpdater = $attributeUpdater;
     }
 
-    // @todo name is incorrect, implementation does more
+    /** @todo name is incorrect, implementation does more */
     public function storeAdyenPaymentMethodType(int $paymentMeanId, PaymentMethod $adyenPaymentMethod): void
     {
         $attributesColumns = [

@@ -8,7 +8,7 @@ use Shopware\Bundle\AttributeBundle\Service\CrudServiceInterface;
 use Shopware\Bundle\AttributeBundle\Service\TypeMappingInterface;
 use Shopware\Components\Model\ModelManager;
 
-class PaymentAttributeUpdater implements PaymentAttributeUpdaterInterface
+final class PaymentAttributeUpdater implements PaymentAttributeUpdaterInterface
 {
     private CrudServiceInterface $crudService;
     private ModelManager $entityManager;
@@ -35,10 +35,9 @@ class PaymentAttributeUpdater implements PaymentAttributeUpdaterInterface
 
     private function rebuildPaymentAttributeModel(): void
     {
-        /** @var \Doctrine\Common\Cache\CacheProvider $metaDataCache */
         $metaDataCache = $this->entityManager->getConfiguration()->getMetadataCache();
         if ($metaDataCache) {
-            $metaDataCache->deleteAll();
+            $metaDataCache->clear();
         }
 
         $this->entityManager->generateAttributeModels(['s_core_paymentmeans_attributes']);

@@ -45,7 +45,7 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
         foreach ($this->shopRepository->findAll() as $shop) {
             if (($this->usedFallbackConfigRule)($shop->getId())) {
                 $this->paymentMeansSubShopsWriter->registerAdyenPaymentMethodForSubShop($shop->getId());
-                yield ImportResult::successSubshopFallback($shop, ImportStatus::updated());
+                yield ImportResult::successSubShopFallback($shop, ImportStatus::updated());
 
                 continue;
             }

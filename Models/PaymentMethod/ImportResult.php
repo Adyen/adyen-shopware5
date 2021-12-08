@@ -10,52 +10,38 @@ use Shopware\Models\Shop\Shop;
 
 final class ImportResult
 {
-    /** @var Shop */
-    private $shop;
+    private Shop $shop;
+    private ?PaymentMethod $paymentMethod;
+    private bool $success;
+    private ?\Exception $exception;
+    private ImportStatus $status;
 
-    /** @var PaymentMethod|null */
-    private $paymentMethod;
-
-    /** @var bool */
-    private $success;
-
-    /** @var \Exception|null */
-    private $exception;
-
-    /** @var ImportStatus */
-    private $status;
-
-    public static function success(
-        Shop $shop,
-        PaymentMethod $paymentMethod,
-        ImportStatus $importStatus
-    ): ImportResult {
+    public static function success(Shop $shop, PaymentMethod $paymentMethod, ImportStatus $importStatus): self
+    {
         $new = new self();
         $new->shop = $shop;
         $new->paymentMethod = $paymentMethod;
         $new->success = true;
+        $new->exception = null;
         $new->status = $importStatus;
 
         return $new;
     }
 
-    public static function successSubshopFallback(
-        Shop $shop,
-        ImportStatus $importStatus
-    ): ImportResult {
+    public static function successSubShopFallback(Shop $shop, ImportStatus $importStatus): self
+    {
         $new = new self();
         $new->shop = $shop;
+        $new->paymentMethod = null;
         $new->success = true;
+        $new->exception = null;
         $new->status = $importStatus;
 
         return $new;
     }
 
-    public static function fromException(
-        Shop $shop,
-        ?PaymentMethod $paymentMethod,
-        \Exception $exception
-    ): ImportResult {
+    public static function fromException(Shop $shop, ?PaymentMethod $paymentMethod, \Exception $exception): self
+    {
         $new = new self();
         $new->shop = $shop;
         $new->paymentMethod = $paymentMethod;
@@ -71,10 +57,7 @@ final class ImportResult
         return $this->shop;
     }
 
-    /**
-     * @return PaymentMethod|null
-     */
-    public function getPaymentMethod()
+    public function getPaymentMethod(): ?PaymentMethod
     {
         return $this->paymentMethod;
     }
@@ -84,10 +67,7 @@ final class ImportResult
         return $this->success;
     }
 
-    /**
-     * @return \Exception|null
-     */
-    public function getException(): \Exception
+    public function getException(): ?\Exception
     {
         return $this->exception;
     }
