@@ -4,7 +4,8 @@ parameters:
         - '.idea'
         - '.gitlab-ci'
         - '.github/'
-        - 'tests'
+        - 'tests/'
+        - 'tools/'
 
 grumphp:
     tasks:
@@ -22,12 +23,14 @@ grumphp:
                 - 'dump('
                 - 'exit;'
                 - "\\bdd\\b("
-            triggered_by: [ php,js ]
+            triggered_by: [php,js,tpl]
         file_size:
             max_size: 5M
         composer: ~
-        phplint: ~
-        xmllint: ~
+        phplint:
+            triggered_by: ['yaml', 'yml', 'yaml.dist', 'yml.dist']
+        xmllint:
+            triggered_by: ['xml', 'xml.dist']
         yamllint:
             parse_custom_tags: true
         phpcsfixer:
