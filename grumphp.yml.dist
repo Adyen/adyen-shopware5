@@ -8,6 +8,9 @@ parameters:
         - 'tools/'
 
 grumphp:
+    environment:
+        paths:
+            - 'tools/vendor/bin'
     tasks:
         git_commit_message:
             matchers:
@@ -49,7 +52,7 @@ grumphp:
             always_execute: true
         php_compatibility:
             scripts:
-                - ["-c", "php ./vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 7.4- --extensions=php --ignore=*/vendor/*,*/tests/*"]
+                - ["-c", "php ./tools/vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 7.4- --extensions=php --ignore=*/vendor/*,*/tests/*"]
             metadata:
                 task: shell
 

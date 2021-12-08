@@ -1,4 +1,6 @@
 <?php
+require_once 'tests/bootstrap.php';
+
 return (new PhpCsFixer\Config())
     ->setFinder(
         PhpCsFixer\Finder::create()
