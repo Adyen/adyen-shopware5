@@ -40,9 +40,5 @@
         "phpspec/prophecy-phpunit": "^2.0"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "scripts": {
-        "format": "vendor/bin/php-cs-fixer fix",
-        "test-php-compatibility" : "vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 7.0- --extensions=php --ignore=*/vendor/*"
-    }
+    "prefer-stable": true
 }
