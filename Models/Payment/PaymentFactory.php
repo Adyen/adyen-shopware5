@@ -6,7 +6,6 @@ namespace AdyenPayment\Models\Payment;
 
 use AdyenPayment\Models\Enum\PaymentMethod\PluginType;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
-use AdyenPayment\Utils\Sanitize;
 use Doctrine\Common\Collections\ArrayCollection;
 use Shopware\Components\Model\ModelRepository;
 use Shopware\Models\Payment\Payment;
@@ -26,7 +25,7 @@ final class PaymentFactory implements PaymentFactoryInterface
     {
         $new = new Payment();
         $new->setActive(true);
-        $new->setName($this->provideUniqueName($paymentMethod));
+        $new->setName($paymentMethod->uniqueIdentifier());
         $new->setDescription($paymentMethod->getValue('name', ''));
         $new->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
         $new->setShops(new ArrayCollection([$shop]));
@@ -41,7 +40,7 @@ final class PaymentFactory implements PaymentFactoryInterface
 
     public function updateFromAdyen(Payment $payment, PaymentMethod $paymentMethod, Shop $shop): Payment
     {
-        $payment->setName($this->provideUniqueName($paymentMethod));
+        $payment->setName($paymentMethod->uniqueIdentifier());
         $payment->setDescription($paymentMethod->getValue('name', ''));
         $payment->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
         $payment->setShops(new ArrayCollection([$shop])); // @todo seems on update it overwrites the existing one
@@ -52,17 +51,6 @@ final class PaymentFactory implements PaymentFactoryInterface
         ));
 
         return $payment;
-    }
-
-    /**
-     * unique name.
-     */
-    private function provideUniqueName(PaymentMethod $paymentMethod): string
-    {
-        return sprintf('%s_%s',
-            $paymentMethod->getType(),
-            Sanitize::removeNonWord($paymentMethod->getValue('name', ''))
-        );
     }
 
     private function provideAdditionalDescription(PaymentMethod $paymentMethod): string

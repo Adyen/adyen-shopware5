@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Models\Payment;
 
+use AdyenPayment\Utils\Sanitize;
+
 class PaymentMethod
 {
     private PaymentMethodType $paymentMethodType;
@@ -22,6 +24,14 @@ class PaymentMethod
     public function getPaymentMethodType(): PaymentMethodType
     {
         return $this->paymentMethodType;
+    }
+
+    public function uniqueIdentifier(): string
+    {
+        return mb_strtolower(sprintf('%s_%s',
+            $this->getType(),
+            Sanitize::removeNonWord($this->getValue('name', ''))
+        ));
     }
 
     /**

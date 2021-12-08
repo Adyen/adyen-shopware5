@@ -22,8 +22,7 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
         $this->attributeUpdater = $attributeUpdater;
     }
 
-    /** @todo name is incorrect, implementation does more */
-    public function storeAdyenPaymentMethodType(int $paymentMeanId, PaymentMethod $adyenPaymentMethod): void
+    public function __invoke(int $paymentMeanId, PaymentMethod $adyenPaymentMethod): void
     {
         $attributesColumns = [
             AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL,
@@ -36,8 +35,7 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
             [
                 '_table' => 's_core_paymentmeans_attributes',
                 '_foreignKey' => $paymentMeanId,
-                AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL => $adyenPaymentMethod->getType(),
-                // @todo fix to be more unique
+                AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL => $adyenPaymentMethod->uniqueIdentifier(),
                 AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID => $adyenPaymentMethod->getStoredPaymentMethodId(),
             ],
             's_core_paymentmeans_attributes',

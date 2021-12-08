@@ -8,6 +8,6 @@ final class Sanitize
 {
     public static function removeNonWord(string $raw, string $replace = '_'): string
     {
-        return preg_replace('/\W/', $replace, $raw);
+        return trim(preg_replace('/\W/', $replace, $raw), $replace);
     }
 }

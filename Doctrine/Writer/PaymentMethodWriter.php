@@ -59,7 +59,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
             );
         }
 
-        $this->paymentAttributeWriter->storeAdyenPaymentMethodType($payment->getId(), $adyenPaymentMethod);
+        ($this->paymentAttributeWriter)($payment->getId(), $adyenPaymentMethod);
 
         return ImportResult::success($shop, $adyenPaymentMethod, ImportStatus::created());
     }
