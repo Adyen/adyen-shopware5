@@ -5,14 +5,20 @@
     <services>
         <service id="AdyenPayment\Doctrine\Writer\PaymentMethodWriter">
             <argument type="service" id="models"/>
-            <argument type="service" id="adyen_payment.dbal.payment_attributes"/>
-            <argument type="service" id="AdyenPayment\Models\Payment\PaymentFactory" />
+            <argument type="service" id="AdyenPayment\Models\Payment\PaymentFactory"/>
             <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentAttributeWriter"/>
-            <argument type="service" id="AdyenPayment\Shopware\Repository\PaymentRepository" />
+            <argument type="service" id="AdyenPayment\Shopware\Repository\PaymentRepository"/>
         </service>
         <service id="AdyenPayment\Doctrine\Writer\PaymentAttributeWriter">
             <argument type="service" id="shopware_attribute.data_persister"/>
-            <argument type="service" id="AdyenPayment\Dbal\Updater\PaymentAttributeUpdater"/>
+            <argument type="service" id="AdyenPayment\Shopware\Crud\AttributeWriter"/>
+        </service>
+        <service id="AdyenPayment\Doctrine\Writer\TraceableLegacyPaymentMethodWriterDecorator"
+                 decorates="AdyenPayment\Doctrine\Writer\PaymentMethodWriter">
+            <argument type="service" id="AdyenPayment\Doctrine\Writer\TraceableLegacyPaymentMethodWriterDecorator.inner"/>
+            <argument type="service" id="AdyenPayment\Shopware\Repository\PaymentRepository"/>
+            <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentAttributeWriter" />
+            <argument type="service" id="adyen_payment.logger" />
         </service>
     </services>
 </container>

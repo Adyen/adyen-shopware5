@@ -6,6 +6,11 @@
         <service id="AdyenPayment\Shopware\Repository\PaymentRepository">
             <argument type="service" id="models"/>
         </service>
+
+        <service id="AdyenPayment\Shopware\Crud\AttributeWriter">
+            <argument type="service" id="shopware_attribute.crud_service"/>
+            <argument type="service" id="models"/>
+        </service>
     </services>
 </container>
 

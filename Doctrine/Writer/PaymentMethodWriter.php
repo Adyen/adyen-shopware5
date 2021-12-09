@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Doctrine\Writer;
 
-use AdyenPayment\Dbal\Provider\Payment\PaymentMeanProviderInterface;
 use AdyenPayment\Exceptions\PaymentExistsException;
 use AdyenPayment\Exceptions\PaymentNotImportedException;
 use AdyenPayment\Models\Enum\PaymentMethod\ImportStatus;
@@ -19,20 +18,17 @@ use Shopware\Models\Shop\Shop;
 final class PaymentMethodWriter implements PaymentMethodWriterInterface
 {
     private ModelManager $entityManager;
-    private PaymentMeanProviderInterface $paymentMeanProvider;
     private PaymentFactoryInterface $paymentFactory;
     private PaymentAttributeWriterInterface $paymentAttributeWriter;
     private PaymentRepositoryInterface $paymentRepository;
 
     public function __construct(
         ModelManager $entityManager,
-        PaymentMeanProviderInterface $paymentMeanProvider,
         PaymentFactoryInterface $paymentFactory,
         PaymentAttributeWriterInterface $paymentAttributeWriter,
         PaymentRepositoryInterface $paymentRepository
     ) {
         $this->entityManager = $entityManager;
-        $this->paymentMeanProvider = $paymentMeanProvider;
         $this->paymentFactory = $paymentFactory;
         $this->paymentAttributeWriter = $paymentAttributeWriter;
         $this->paymentRepository = $paymentRepository;
@@ -75,7 +71,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
 
     private function providePaymentModel(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
     {
-        $swPayment = $this->paymentMeanProvider->provideByAdyenType($adyenPaymentMethod->getType());
+        $swPayment = $this->paymentRepository->findByUniqueIdentifier($adyenPaymentMethod->uniqueIdentifier());
         if (!$swPayment) {
             return $this->paymentFactory->createFromAdyen($adyenPaymentMethod, $shop);
         }

@@ -11,4 +11,6 @@ interface PaymentRepositoryInterface
     public function existsByName(string $name): bool;
 
     public function existsDuplicate(Payment $newPayment): bool;
+
+    public function findByUniqueIdentifier(string $adyenUniqueIdentifier): ?Payment;
 }
