@@ -2,43 +2,28 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Subscriber;
+namespace AdyenPayment\Subscriber\Backend;
 
-use AdyenPayment\Models\Notification;
+use Doctrine\ORM\EntityRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use Shopware\Components\Model\ModelManager;
 
-/**
- * Class BackendJavascriptSubscriber.
- */
-class BackendJavascriptSubscriber implements SubscriberInterface
+final class BackendJavascriptSubscriber implements SubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $pluginDirectory;
+    private string $pluginDirectory;
+    private EntityRepository $notificationRepository;
 
-    /**
-     * @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository
-     */
-    private $notificationRepository;
-
-    /**
-     * BackendJavascriptSubscriber constructor.
-     */
-    public function __construct(
-        string $pluginDirectory,
-        ModelManager $modelManager
-    ) {
+    public function __construct(string $pluginDirectory, EntityRepository $notificationRepository)
+    {
         $this->pluginDirectory = $pluginDirectory;
-        $this->notificationRepository = $modelManager->getRepository(Notification::class);
+        $this->notificationRepository = $notificationRepository;
     }
 
     /**
      * @return string[]
      *
-     * @psalm-return array{Enlight_Controller_Action_PostDispatchSecure_Backend_Order: 'onOrderPostDispatch', Enlight_Controller_Action_PostDispatchSecure_Backend_Customer: 'onCustomerPostDispatch'}
+     * @psalm-return array{Enlight_Controller_Action_PostDispatchSecure_Backend_Order: 'onOrderPostDispatch',
+     *               Enlight_Controller_Action_PostDispatchSecure_Backend_Customer: 'onCustomerPostDispatch'}
      */
     public static function getSubscribedEvents()
     {

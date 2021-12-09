@@ -2,24 +2,20 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Subscriber;
+namespace AdyenPayment\Subscriber\Backend;
 
-use AdyenPayment\Dbal\Remover\Payment\PaymentMeansSubshopsRemoverInterface;
+use AdyenPayment\Dbal\Remover\PaymentMeanSubShopRemoverInterface;
 use Enlight\Event\SubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
+final class RemoveSubShopPaymentMethodSubscriber implements SubscriberInterface
 {
     public const DELETE_VALUES_ACTION = 'deleteValues';
+    private PaymentMeanSubShopRemoverInterface $paymentMeanSubShopRemover;
 
-    /**
-     * @var PaymentMeansSubshopsRemoverInterface
-     */
-    private $paymentMeansSubshopsRemover;
-
-    public function __construct(PaymentMeansSubshopsRemoverInterface $paymentMeansSubshopsRemover)
+    public function __construct(PaymentMeanSubShopRemoverInterface $paymentMeanSubShopRemover)
     {
-        $this->paymentMeansSubshopsRemover = $paymentMeansSubshopsRemover;
+        $this->paymentMeanSubShopRemover = $paymentMeanSubShopRemover;
     }
 
     public static function getSubscribedEvents(): array
@@ -38,16 +34,11 @@ final class RemoveSubShopPaymentMethodsSubscriber implements SubscriberInterface
             return;
         }
 
-        if (!$this->isSubShopDeleted(
-            $request->getParam('id'),
-            $response,
-            $request->getActionName()
-        )
-        ) {
+        if (!$this->isSubShopDeleted($request->getParam('id'), $response, $request->getActionName())) {
             return;
         }
 
-        $this->paymentMeansSubshopsRemover->removeBySubShopId($request->getParam('id'));
+        $this->paymentMeanSubShopRemover->removeBySubShopId($request->getParam('id'));
     }
 
     private function isSubShopDeleted($id, $response, string $action): bool

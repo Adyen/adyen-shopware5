@@ -2,47 +2,23 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Subscriber;
+namespace AdyenPayment\Subscriber\Backend;
 
 use AdyenPayment\Components\NotificationManager;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
-use AdyenPayment\Models\PaymentInfo;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\Persistence\ObjectRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use Shopware\Components\Model\ModelManager;
 use Shopware_Controllers_Backend_Order;
 
-/**
- * Class CheckoutSubscriber.
- */
 class BackendOrderSubscriber implements SubscriberInterface
 {
-    /**
-     * @var ModelManager
-     */
-    private $modelManager;
+    private EntityRepository $paymentInfoRepository;
+    private NotificationManager $notificationManager;
 
-    /**
-     * @var EntityRepository|ObjectRepository
-     */
-    private $paymentInfoRepository;
-
-    /**
-     * @var NotificationManager
-     */
-    private $notificationManager;
-
-    /**
-     * BackendOrderSubscriber constructor.
-     */
-    public function __construct(
-        ModelManager $modelManager,
-        NotificationManager $notificationManager
-    ) {
-        $this->modelManager = $modelManager;
-        $this->paymentInfoRepository = $this->modelManager->getRepository(PaymentInfo::class);
+    public function __construct(EntityRepository $paymentInfoRepository, NotificationManager $notificationManager)
+    {
+        $this->paymentInfoRepository = $paymentInfoRepository;
         $this->notificationManager = $notificationManager;
     }
 
@@ -51,14 +27,14 @@ class BackendOrderSubscriber implements SubscriberInterface
      *
      * @psalm-return array{Enlight_Controller_Action_PostDispatchSecure_Backend_Order: 'onBackendOrder'}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'onBackendOrder',
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => '__invoke',
         ];
     }
 
-    public function onBackendOrder(Enlight_Event_EventArgs $args): void
+    public function __invoke(Enlight_Event_EventArgs $args): void
     {
         /** @var Shopware_Controllers_Backend_Order $subject */
         $subject = $args->getSubject();

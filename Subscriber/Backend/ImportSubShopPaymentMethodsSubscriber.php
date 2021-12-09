@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Subscriber;
+namespace AdyenPayment\Subscriber\Backend;
 
 use AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubShopsWriterInterface;
 use AdyenPayment\Import\PaymentMethodImporterInterface;

@@ -10,7 +10,7 @@ use AdyenPayment\Serializer\PaymentMeanCollectionSerializer;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 
-final class PaymentSubscriber implements SubscriberInterface
+final class EnrichPaymentSubscriber implements SubscriberInterface
 {
     private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
     private PaymentMeanCollectionSerializer $serializer;
@@ -26,7 +26,7 @@ final class PaymentSubscriber implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'enrichAdyenPaymentMethods',
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => '__invoke',
         ];
     }
 
@@ -35,7 +35,7 @@ final class PaymentSubscriber implements SubscriberInterface
      *
      * @return array<int, array<string, mixed>>
      */
-    public function enrichAdyenPaymentMethods(Enlight_Event_EventArgs $args): array
+    public function __invoke(Enlight_Event_EventArgs $args): array
     {
         $shopwareMethods = $args->getReturn();
         if (!in_array(Shopware()->Front()->Request()->getActionName(), ['shippingPayment', 'payment'], true)) {
