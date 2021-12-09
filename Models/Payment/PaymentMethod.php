@@ -6,7 +6,7 @@ namespace AdyenPayment\Models\Payment;
 
 use AdyenPayment\Utils\Sanitize;
 
-class PaymentMethod
+final class PaymentMethod
 {
     private PaymentMethodType $paymentMethodType;
 
