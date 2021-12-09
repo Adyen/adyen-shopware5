@@ -11,7 +11,7 @@ use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use Shopware_Controllers_Backend_Order;
 
-class BackendOrderSubscriber implements SubscriberInterface
+final class BackendOrderSubscriber implements SubscriberInterface
 {
     private EntityRepository $paymentInfoRepository;
     private NotificationManager $notificationManager;
