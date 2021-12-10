@@ -50,8 +50,8 @@ final class PaymentMean
 
     public function getAdyenCode(): string
     {
-        if ($this->getAttribute()->exists(AdyenPayment::ADYEN_CODE)) {
-            return (string) $this->getAttribute()->get(AdyenPayment::ADYEN_CODE);
+        if ($this->getAttribute()->exists(AdyenPayment::ADYEN_UNIQUE_IDENTIFIER)) {
+            return (string) $this->getAttribute()->get(AdyenPayment::ADYEN_UNIQUE_IDENTIFIER);
         }
 
         return '';

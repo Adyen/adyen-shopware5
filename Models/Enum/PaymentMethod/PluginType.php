@@ -6,7 +6,7 @@ namespace AdyenPayment\Models\Enum\PaymentMethod;
 
 final class PluginType
 {
-    private static $ADYEN = 2;
+    private static $ADYEN = 2; // For F* Sake
     private int $type;
 
     public function __construct($pluginType)
