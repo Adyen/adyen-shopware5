@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Models\Payment;
 
-use AdyenPayment\Models\Enum\PaymentMethod\PluginType;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Shopware\Plugin\TraceablePluginIdProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Shopware\Components\Model\ModelRepository;
 use Shopware\Models\Payment\Payment;
@@ -15,10 +15,12 @@ final class PaymentFactory implements PaymentFactoryInterface
 {
     private const ADYEN_PREFIX = 'Adyen';
     private ModelRepository $countryRepository;
+    private TraceablePluginIdProvider $pluginIdProvider;
 
-    public function __construct($countryRepository)
+    public function __construct(ModelRepository $countryRepository, TraceablePluginIdProvider $pluginIdProvider)
     {
         $this->countryRepository = $countryRepository;
+        $this->pluginIdProvider = $pluginIdProvider;
     }
 
     public function createFromAdyen(PaymentMethod $paymentMethod, Shop $shop): Payment
@@ -30,7 +32,7 @@ final class PaymentFactory implements PaymentFactoryInterface
         $new->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
         $new->setShops(new ArrayCollection([$shop]));
         $new->setSource(SourceType::adyen()->getType());
-        $new->setPluginId(PluginType::adyenType()->getType());
+        $new->setPluginId($this->pluginIdProvider->provideId());
         $new->setCountries(new ArrayCollection(
             $this->countryRepository->findAll()
         ));
@@ -45,7 +47,7 @@ final class PaymentFactory implements PaymentFactoryInterface
         $payment->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
         $payment->setShops(new ArrayCollection([$shop]));
         $payment->setSource(SourceType::adyen()->getType());
-        $payment->setPluginId(PluginType::adyenType()->getType());
+        $payment->setPluginId($this->pluginIdProvider->provideId());
         $payment->setCountries(new ArrayCollection(
             $this->countryRepository->findAll()
         ));
