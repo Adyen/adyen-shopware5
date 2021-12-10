@@ -13,6 +13,7 @@ final class PaymentMean
     private int $id;
     private SourceType $source;
     private array $raw;
+    private bool $enriched;
 
     public static function createFromShopwareArray(array $paymentMean): self
     {
@@ -20,6 +21,7 @@ final class PaymentMean
         $new->id = (int) ($paymentMean['id'] ?? 0);
         $new->source = SourceType::load((int) $paymentMean['source']);
         $new->raw = $paymentMean;
+        $new->enriched = (bool) ($paymentMean['enriched'] ?? false);
 
         return $new;
     }
@@ -37,6 +39,11 @@ final class PaymentMean
     public function getAttribute(): Attribute
     {
         return $this->raw['attribute'] ?? new Attribute();
+    }
+
+    public function isEnriched(): bool
+    {
+        return $this->enriched;
     }
 
     public function getAdyenUniqueIdentifier(): string
@@ -72,7 +79,7 @@ final class PaymentMean
         return $this->raw;
     }
 
-    public function isAdyenType(): bool
+    public function isAdyenSourceType(): bool
     {
         return $this->source->equals(SourceType::adyen());
     }

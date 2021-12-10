@@ -7,6 +7,7 @@ namespace AdyenPayment\Subscriber;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\OrderMailService;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Models\Payment\PaymentMean;
 use AdyenPayment\Models\PaymentInfo;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ObjectRepository;
@@ -90,9 +91,8 @@ class OrderEmailSubscriber implements SubscriberInterface
     public function shouldStopEmailSending(Enlight_Event_EventArgs $args)
     {
         $variables = $args->get('variables');
-
-        $source = (int) ($variables['additional']['payment']['source'] ?? null);
-        if (SourceType::load($source)->equals(SourceType::adyen())
+        $paymentMean = PaymentMean::createFromShopwareArray($variables['additional']['payment'] ?? []);
+        if ($paymentMean->getSource()->equals(SourceType::adyen())
             && true === Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true)
         ) {
             /** @var PaymentInfo $paymentInfo */

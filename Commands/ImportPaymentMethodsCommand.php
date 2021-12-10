@@ -35,7 +35,7 @@ final class ImportPaymentMethodsCommand extends ShopwareCommand
 
             if (!$result->isSuccess()) {
                 $io->warning(sprintf('Could not import payment method %s for store %s, message: %s.',
-                    $result->getPaymentMethod() ? $result->getPaymentMethod()->getType() : 'n/a',
+                    $result->getPaymentMethod() ? $result->getPaymentMethod()->adyenType()->type() : 'n/a',
                     $result->getShop()->getName(),
                     $result->getException() ? $result->getException()->getMessage() : 'n/a'
                 ));
@@ -45,7 +45,7 @@ final class ImportPaymentMethodsCommand extends ShopwareCommand
 
             ++$success;
             $io->text(sprintf('Imported payment method %s for store %s',
-                $result->getPaymentMethod() ? $result->getPaymentMethod()->getType() : 'n/a',
+                $result->getPaymentMethod() ? $result->getPaymentMethod()->adyenType()->type() : 'n/a',
                 $result->getShop()->getName()
             ));
         }

@@ -56,12 +56,12 @@ final class CheckoutSubscriber implements SubscriberInterface
         $this->addAdyenConfigOnShipping($subject);
     }
 
-    private function checkBasketAmount(\Shopware_Controllers_Frontend_Checkout $subject): void
+    private function checkBasketAmount(\Enlight_Controller_Action $subject): void
     {
         $userData = $subject->View()->getAssign('sUserData');
 
-        $source = (int) ($userData['additional']['payment']['source'] ?? null);
-        if (!SourceType::load($source)->equals(SourceType::adyen())) {
+        $paymentMean = PaymentMean::createFromShopwareArray($userData['additional']['payment'] ?? []);
+        if (!$paymentMean->getSource()->equals(SourceType::adyen())) {
             return;
         }
 
@@ -75,7 +75,7 @@ final class CheckoutSubscriber implements SubscriberInterface
         }
     }
 
-    private function addAdyenConfigOnShipping(\Shopware_Controllers_Frontend_Checkout $subject): void
+    private function addAdyenConfigOnShipping(\Enlight_Controller_Action $subject): void
     {
         if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'confirm'], true)) {
             return;
@@ -101,7 +101,7 @@ final class CheckoutSubscriber implements SubscriberInterface
         $view->assign('sAdyenConfig', $adyenConfig);
     }
 
-    private function checkFirstCheckoutStep(\Shopware_Controllers_Frontend_Checkout $subject): void
+    private function checkFirstCheckoutStep(\Enlight_Controller_Action $subject): void
     {
         if ('confirm' !== $subject->Request()->getActionName()) {
             return;
@@ -115,11 +115,11 @@ final class CheckoutSubscriber implements SubscriberInterface
         }
     }
 
-    private function shouldRedirectToStep2(\Shopware_Controllers_Frontend_Checkout $subject): bool
+    private function shouldRedirectToStep2(\Enlight_Controller_Action $subject): bool
     {
         $userData = $subject->View()->getAssign('sUserData');
         $swPaymentMean = PaymentMean::createFromShopwareArray($userData['additional']['payment'] ?? []);
-        if (!$swPaymentMean->isAdyenType()) {
+        if (!$swPaymentMean->isAdyenSourceType()) {
             return false;
         }
 
@@ -148,7 +148,7 @@ final class CheckoutSubscriber implements SubscriberInterface
         return false;
     }
 
-    private function revertToDefaultPaymentMethod(\Shopware_Controllers_Frontend_Checkout $subject): void
+    private function revertToDefaultPaymentMethod(\Enlight_Controller_Action $subject): void
     {
         $defaultPaymentId = Shopware()->Config()->get('defaultPayment');
         $defaultPayment = Shopware()->Modules()->Admin()->sGetPaymentMeanById($defaultPaymentId);

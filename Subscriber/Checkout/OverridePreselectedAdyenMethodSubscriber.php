@@ -29,7 +29,7 @@ final class OverridePreselectedAdyenMethodSubscriber implements SubscriberInterf
             Shopware()->Session()->get('sOrderVariables')['sPayment'] ?? []
         );
 
-        if (!$preselectedPaymentMean->isAdyenType()) {
+        if (!$preselectedPaymentMean->isAdyenSourceType()) {
             return;
         }
 

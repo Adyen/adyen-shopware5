@@ -21,7 +21,8 @@ final class EnrichUserAdditionalPaymentSubscriber implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => '__invoke',
+            // run before AddGooglePayConfigToViewSubscriber
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => ['__invoke', 99999],
         ];
     }
 

@@ -8,30 +8,54 @@ use AdyenPayment\Utils\Sanitize;
 
 final class PaymentMethod
 {
-    private PaymentMethodType $paymentMethodType;
+    private PaymentGroup $group;
+    private PaymentType $type;
 
     /**
      * @var array<string,mixed>
      */
     private array $rawData;
 
-    private function __construct(PaymentMethodType $type, array $rawData)
+    private function __construct()
     {
-        $this->paymentMethodType = $type;
-        $this->rawData = $rawData;
     }
 
-    public function getPaymentMethodType(): PaymentMethodType
+    public static function fromRaw(array $data): self
     {
-        return $this->paymentMethodType;
+        $new = new self();
+        $new->group = array_key_exists('id', $data) ? PaymentGroup::stored() : PaymentGroup::default();
+        $new->type = PaymentType::load((string) ($data['type'] ?? ''));
+        $new->rawData = $data;
+
+        return $new;
     }
 
     public function uniqueIdentifier(): string
     {
         return mb_strtolower(sprintf('%s_%s',
-            $this->getType(),
-            Sanitize::removeNonWord($this->getValue('name', ''))
+            $this->adyenType()->type(),
+            Sanitize::removeNonWord($this->name())
         ));
+    }
+
+    public function adyenType(): PaymentType
+    {
+        return $this->type;
+    }
+
+    public function group(): PaymentGroup
+    {
+        return $this->group;
+    }
+
+    public function rawData(): array
+    {
+        return $this->rawData;
+    }
+
+    public function name(): string
+    {
+        return (string) ($this->rawData['name'] ?? '');
     }
 
     /**
@@ -51,32 +75,9 @@ final class PaymentMethod
         return (string) ($this->rawData['id'] ?? '');
     }
 
-    public function getId(): string
-    {
-        return (string) ($this->rawData['id'] ?? '');
-    }
-
-    public function getType(): string
-    {
-        return (string) ($this->rawData['type'] ?? '');
-    }
-
-    public function getRawData(): array
-    {
-        return $this->rawData;
-    }
-
-    public static function fromRaw(array $data): self
-    {
-        return new self(
-            array_key_exists('id', $data) ? PaymentMethodType::stored() : PaymentMethodType::default(),
-            $data
-        );
-    }
-
     public function isStoredPayment(): bool
     {
-        return $this->getPaymentMethodType()->equals(PaymentMethodType::stored());
+        return $this->group()->equals(PaymentGroup::stored());
     }
 
     public function hasDetails(): bool
@@ -87,7 +88,7 @@ final class PaymentMethod
     public function serializeMinimalState(): string
     {
         return json_encode([
-            'type' => $this->getType(),
+            'type' => $this->adyenType()->type(),
         ]);
     }
 }

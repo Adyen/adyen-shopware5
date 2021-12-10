@@ -26,7 +26,7 @@ final class PaymentFactory implements PaymentFactoryInterface
         $new = new Payment();
         $new->setActive(true);
         $new->setName($paymentMethod->uniqueIdentifier());
-        $new->setDescription($paymentMethod->getValue('name', ''));
+        $new->setDescription($paymentMethod->name());
         $new->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
         $new->setShops(new ArrayCollection([$shop]));
         $new->setSource(SourceType::adyen()->getType());
@@ -41,9 +41,9 @@ final class PaymentFactory implements PaymentFactoryInterface
     public function updateFromAdyen(Payment $payment, PaymentMethod $paymentMethod, Shop $shop): Payment
     {
         $payment->setName($paymentMethod->uniqueIdentifier());
-        $payment->setDescription($paymentMethod->getValue('name', ''));
+        $payment->setDescription($paymentMethod->name());
         $payment->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
-        $payment->setShops(new ArrayCollection([$shop])); // @todo seems on update it overwrites the existing one
+        $payment->setShops(new ArrayCollection([$shop]));
         $payment->setSource(SourceType::adyen()->getType());
         $payment->setPluginId(PluginType::adyenType()->getType());
         $payment->setCountries(new ArrayCollection(
@@ -55,6 +55,6 @@ final class PaymentFactory implements PaymentFactoryInterface
 
     private function provideAdditionalDescription(PaymentMethod $paymentMethod): string
     {
-        return self::ADYEN_PREFIX.' '.$paymentMethod->getValue('name', '').' ('.$paymentMethod->getType().')';
+        return self::ADYEN_PREFIX.' '.$paymentMethod->name().' ('.$paymentMethod->adyenType()->type().')';
     }
 }

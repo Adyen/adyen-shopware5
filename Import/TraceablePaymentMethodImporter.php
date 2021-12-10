@@ -44,8 +44,8 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
                 'shop id' => $importResult->getShop()->getId(),
                 'shop name' => $importResult->getShop()->getName(),
                 'payment method' => $importResult->getPaymentMethod()
-                    ? $importResult->getPaymentMethod()->getType()
-                    .' '.$importResult->getPaymentMethod()->getValue('name', '')
+                    ? $importResult->getPaymentMethod()->adyenType()->type()
+                    .' '.$importResult->getPaymentMethod()->name()
                     : 'all',
             ]);
 
@@ -56,10 +56,10 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
             'shop id' => $importResult->getShop()->getId(),
             'shop name' => $importResult->getShop()->getName(),
             'payment type' => $importResult->getPaymentMethod()
-                ? $importResult->getPaymentMethod()->getValue('type', 'n/a')
+                ? $importResult->getPaymentMethod()->adyenType()->type()
                 : 'n/a',
             'payment name' => $importResult->getPaymentMethod()
-                ? $importResult->getPaymentMethod()->getValue('name', 'n/a')
+                ? $importResult->getPaymentMethod()->name()
                 : 'n/a',
             'message' => $importResult->getException() ? $importResult->getException()->getMessage() : 'n/a',
             'exception' => $importResult->getException(),

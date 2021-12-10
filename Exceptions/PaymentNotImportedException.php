@@ -21,8 +21,8 @@ final class PaymentNotImportedException extends \RuntimeException
             'Could not import payment method id: %s, name: "%s", type: "%s"%s for shop: "%s" ("%s").',
             $swPayment->getId(),
             $swPayment->getName(),
-            $adyenPaymentMethod->getType(),
-            $adyenPaymentMethod->isStoredPayment() ? ', stored payment id: "'.$adyenPaymentMethod->getId().'"' : '',
+            $adyenPaymentMethod->adyenType()->type(),
+            $adyenPaymentMethod->isStoredPayment() ? ', stored payment id: "'.$adyenPaymentMethod->getStoredPaymentMethodId().'"' : '',
             $shop->getId(),
             $shop->getName()
         ));

@@ -37,12 +37,12 @@ final class TraceableLegacyPaymentMethodWriterDecorator implements PaymentMethod
 
     public function __invoke(PaymentMethod $adyenPaymentMethod, Shop $shop): ImportResult
     {
-        if ($adyenPaymentMethod->getType() === $adyenPaymentMethod->uniqueIdentifier()) {
+        if ($adyenPaymentMethod->adyenType()->type() === $adyenPaymentMethod->uniqueIdentifier()) {
             return ($this->paymentMethodWriter)($adyenPaymentMethod, $shop);
         }
 
         // legacy code had adyen 'type' stored as identifier
-        $paymentMean = $this->paymentRepository->findByUniqueIdentifier($adyenPaymentMethod->getType());
+        $paymentMean = $this->paymentRepository->findByUniqueIdentifier($adyenPaymentMethod->adyenType()->type());
         if (!$paymentMean) {
             return ($this->paymentMethodWriter)($adyenPaymentMethod, $shop);
         }
@@ -56,7 +56,7 @@ final class TraceableLegacyPaymentMethodWriterDecorator implements PaymentMethod
     private function log(Payment $paymentMean, PaymentMethod $adyenPaymentMethod): void
     {
         $this->logger->notice(sprintf('Updating legacy payment mean adyen "%s" to "%s"',
-            $adyenPaymentMethod->getType(),
+            $adyenPaymentMethod->adyenType()->type(),
             $adyenPaymentMethod->uniqueIdentifier(),
         ), [
             'shopware payment mean' => [
@@ -65,8 +65,8 @@ final class TraceableLegacyPaymentMethodWriterDecorator implements PaymentMethod
                 'additional description' => $paymentMean->getAdditionalDescription(),
             ],
             'adyen payment method' => [
-                'name' => $adyenPaymentMethod->getValue('name', 'n/a'),
-                'type' => $adyenPaymentMethod->getType(),
+                'name' => $adyenPaymentMethod->name(),
+                'type' => $adyenPaymentMethod->adyenType()->type(),
                 'unique identifier' => $adyenPaymentMethod->uniqueIdentifier(),
             ],
         ]);

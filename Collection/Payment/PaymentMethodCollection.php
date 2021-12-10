@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Collection\Payment;
 
+use AdyenPayment\Models\Payment\PaymentGroup;
 use AdyenPayment\Models\Payment\PaymentMean;
 use AdyenPayment\Models\Payment\PaymentMethod;
-use AdyenPayment\Models\Payment\PaymentMethodType;
 
 final class PaymentMethodCollection implements \Countable, \IteratorAggregate
 {
@@ -51,7 +51,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     public function mapToRaw(): array
     {
         return array_map(
-            static fn(PaymentMethod $paymentMethod) => $paymentMethod->getRawData(),
+            static fn(PaymentMethod $paymentMethod) => $paymentMethod->rawData(),
             $this->paymentMethods
         );
     }
@@ -93,12 +93,11 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
         return new self(...array_filter($this->paymentMethods, $filter));
     }
 
-    public function filterByPaymentType(PaymentMethodType $paymentMethodType): self
+    public function filterByPaymentType(PaymentGroup $group): self
     {
         return new self(...array_filter(
             $this->paymentMethods,
-            static fn(PaymentMethod $paymentMethod) => $paymentMethod->getPaymentMethodType()
-                ->equals($paymentMethodType)
+            static fn(PaymentMethod $paymentMethod) => $paymentMethod->group()->equals($group)
         ));
     }
 }
