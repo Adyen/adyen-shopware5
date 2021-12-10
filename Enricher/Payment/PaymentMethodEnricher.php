@@ -10,15 +10,8 @@ use Shopware_Components_Snippet_Manager;
 
 final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
 {
-    /**
-     * @var Shopware_Components_Snippet_Manager
-     */
-    private $snippets;
-
-    /**
-     * @var ImageLogoProviderInterface
-     */
-    private $imageLogoProvider;
+    private Shopware_Components_Snippet_Manager $snippets;
+    private ImageLogoProviderInterface $imageLogoProvider;
 
     public function __construct(
         Shopware_Components_Snippet_Manager $snippets,
@@ -28,22 +21,19 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
         $this->imageLogoProvider = $imageLogoProvider;
     }
 
-    public function enrichPaymentMethod(array $shopwareMethod, PaymentMethod $paymentMethod): array
+    public function __invoke(array $shopwareMethod, PaymentMethod $paymentMethod): array
     {
         return array_merge($shopwareMethod, [
             'additionaldescription' => $this->enrichDescription($paymentMethod),
             'image' => $this->imageLogoProvider->provideByType($paymentMethod->getType()),
             'isStoredPayment' => $paymentMethod->isStoredPayment(),
             'isAdyenPaymentMethod' => true,
-            'adyenType' => $shopwareMethod['attribute']['adyen_type'] ?? '',
+            'adyenType' => $paymentMethod->getType(),
             'metadata' => $paymentMethod->getRawData(),
         ]);
     }
 
-    /**
-     * @return string
-     */
-    private function enrichDescription(PaymentMethod $adyenMethod)
+    private function enrichDescription(PaymentMethod $adyenMethod): string
     {
         $description = $this->snippets
             ->getNamespace('adyen/method/description')

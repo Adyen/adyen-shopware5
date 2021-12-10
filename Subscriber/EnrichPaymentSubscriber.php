@@ -31,8 +31,6 @@ final class EnrichPaymentSubscriber implements SubscriberInterface
     }
 
     /**
-     * Replace general Adyen payment method with dynamic loaded payment methods.
-     *
      * @return array<int, array<string, mixed>>
      */
     public function __invoke(Enlight_Event_EventArgs $args): array

@@ -10,14 +10,9 @@ use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class PaymentMean
 {
-    /** @var int|null */
-    private $id;
-
-    /** @var SourceType */
-    private $source;
-
-    /** @var array */
-    private $raw;
+    private int $id;
+    private SourceType $source;
+    private array $raw;
 
     public static function createFromShopwareArray(array $paymentMean): self
     {
@@ -29,18 +24,12 @@ final class PaymentMean
         return $new;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return SourceType
-     */
-    public function getSource()
+    public function getSource(): SourceType
     {
         return $this->source;
     }
@@ -50,10 +39,10 @@ final class PaymentMean
         return $this->raw['attribute'] ?? new Attribute();
     }
 
-    public function getAdyenType(): string
+    public function getAdyenUniqueIdentifier(): string
     {
-        if ($this->getAttribute()->exists(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL)) {
-            return (string) $this->getAttribute()->get(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL);
+        if ($this->getAttribute()->exists(AdyenPayment::ADYEN_UNIQUE_IDENTIFIER)) {
+            return (string) $this->getAttribute()->get(AdyenPayment::ADYEN_UNIQUE_IDENTIFIER);
         }
 
         return '';
@@ -61,8 +50,8 @@ final class PaymentMean
 
     public function getAdyenStoredMethodId(): string
     {
-        if ($this->getAttribute()->exists(AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID)) {
-            return (string) $this->getAttribute()->get(AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID);
+        if ($this->getAttribute()->exists(AdyenPayment::ADYEN_STORED_METHOD_ID)) {
+            return (string) $this->getAttribute()->get(AdyenPayment::ADYEN_STORED_METHOD_ID);
         }
 
         return '';

@@ -9,12 +9,9 @@ use AdyenPayment\Models\Event;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 
-class UpdateOrderPsPSubscriber implements SubscriberInterface
+final class UpdateOrderPsPSubscriber implements SubscriberInterface
 {
-    /**
-     * @var OrderManagerInterface
-     */
-    private $orderManager;
+    private OrderManagerInterface $orderManager;
 
     public function __construct(OrderManagerInterface $orderManager)
     {

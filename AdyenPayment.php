@@ -28,8 +28,8 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 final class AdyenPayment extends Plugin
 {
     public const NAME = 'AdyenPayment';
-    public const ADYEN_PAYMENT_METHOD_LABEL = 'adyen_type';
-    public const ADYEN_PAYMENT_STORED_METHOD_ID = 'adyen_stored_method_id';
+    public const ADYEN_UNIQUE_IDENTIFIER = 'adyen_type';
+    public const ADYEN_STORED_METHOD_ID = 'adyen_stored_method_id';
     public const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
     public const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';
 
@@ -128,8 +128,8 @@ final class AdyenPayment extends Plugin
     private function uninstallAttributes(UninstallContext $uninstallContext): void
     {
         $crudService = $this->container->get('shopware_attribute.crud_service');
-        $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_PAYMENT_METHOD_LABEL);
-        $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_PAYMENT_STORED_METHOD_ID);
+        $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_UNIQUE_IDENTIFIER);
+        $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_STORED_METHOD_ID);
 
         $this->rebuildAttributeModels();
     }
@@ -142,7 +142,7 @@ final class AdyenPayment extends Plugin
         $crudService = $this->container->get('shopware_attribute.crud_service');
         $crudService->update(
             's_core_paymentmeans_attributes',
-            self::ADYEN_PAYMENT_METHOD_LABEL,
+            self::ADYEN_UNIQUE_IDENTIFIER,
             TypeMapping::TYPE_STRING,
             [
                 'displayInBackend' => true,
@@ -152,7 +152,7 @@ final class AdyenPayment extends Plugin
         );
         $crudService->update(
             's_core_paymentmeans_attributes',
-            self::ADYEN_PAYMENT_STORED_METHOD_ID,
+            self::ADYEN_STORED_METHOD_ID,
             TypeMapping::TYPE_STRING,
             [
                 'displayInBackend' => true,

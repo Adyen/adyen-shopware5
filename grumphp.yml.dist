@@ -59,3 +59,5 @@ grumphp:
     testsuites:
         code-compatibility:
             tasks: ['composer', 'php_compatibility']
+        slim:
+            tasks: ['file_size', 'composer', 'phplint', 'xmllint', 'yamllint', 'phpcsfixer', 'phpparser', 'php_compatibility']

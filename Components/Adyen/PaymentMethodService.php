@@ -15,40 +15,14 @@ use Psr\Log\LoggerInterface;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Customer\Customer;
 
-/**
- * Class PaymentMethodService.
- */
-class PaymentMethodService
+final class PaymentMethodService
 {
-    /**
-     * @var ApiClientMap
-     */
-    private $apiClientMap;
-
-    /**
-     * @var Configuration
-     */
-    private $configuration;
-
-    /**
-     * @var array
-     */
-    private $cache;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var Enlight_Components_Session_Namespace
-     */
-    private $session;
-
-    /**
-     * @var ModelManager
-     */
-    private $modelManager;
+    private ApiClientMap $apiClientMap;
+    private Configuration $configuration;
+    private array $cache;
+    private LoggerInterface $logger;
+    private Enlight_Components_Session_Namespace $session;
+    private ModelManager $modelManager;
 
     public function __construct(
         ApiClientMap $apiClientMap,
@@ -65,18 +39,14 @@ class PaymentMethodService
     }
 
     /**
-     * @param string $countryCode
-     * @param string $currency
-     * @param int    $value
-     * @param null   $locale
-     * @param bool   $cache
+     * @throws AdyenException
      */
     public function getPaymentMethods(
-        $countryCode = null,
-        $currency = null,
-        $value = null,
-        $locale = null,
-        $cache = true
+        ?string $countryCode = null,
+        ?string $currency = null,
+        ?float $value = null,
+        ?string $locale = null,
+        bool $cache = true
     ): PaymentMethodCollection {
         $cache = $cache && $this->configuration->isPaymentmethodsCacheEnabled();
         $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string) ($value ?? ''));
@@ -122,9 +92,6 @@ class PaymentMethodService
         return $paymentMethods;
     }
 
-    /**
-     * @param string ...$keys
-     */
     private function getCacheKey(string ...$keys): string
     {
         return md5(implode(',', $keys));

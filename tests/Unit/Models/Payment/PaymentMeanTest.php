@@ -84,14 +84,14 @@ final class PaymentMeanTest extends TestCase
     /** @test */
     public function it_can_retrieve_attribute_adyen_type(): void
     {
-        $this->assertEquals('adyen-type', $this->paymentMean->getAdyenType());
+        $this->assertEquals('adyen-type', $this->paymentMean->getAdyenUniqueIdentifier());
     }
 
     /** @test */
     public function it_can_retrieve_default_attribute_adyen_type(): void
     {
         $paymentMean = PaymentMean::createFromShopwareArray(['source' => null]);
-        $this->assertEquals('', $paymentMean->getAdyenType());
+        $this->assertEquals('', $paymentMean->getAdyenUniqueIdentifier());
     }
 
     /** @test */

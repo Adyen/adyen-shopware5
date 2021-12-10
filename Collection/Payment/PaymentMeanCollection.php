@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Collection\Payment;
 
-use AdyenPayment\AdyenPayment;
-use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMean;
 use Countable;
 use IteratorAggregate;
-use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class PaymentMeanCollection implements IteratorAggregate, Countable
 {
@@ -49,7 +46,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
 
     public function map(callable $callable): array
     {
-        return array_map($callable, $this->paymentMeans);
+        return array_filter(array_map($callable, $this->paymentMeans));
     }
 
     public function filter(callable $filter): self
@@ -91,35 +88,5 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
             },
             []
         );
-    }
-
-    public function enrichAdyenPaymentMeans(
-        PaymentMethodCollection $adyenPaymentMethods,
-        PaymentMethodEnricherInterface $paymentMethodEnricher
-    ): self {
-        return new self(...array_filter($this->map(
-            static function(PaymentMean $shopwareMethod) use (
-                $adyenPaymentMethods,
-                $paymentMethodEnricher
-            ) {
-                if (!$shopwareMethod->getSource()->equals(SourceType::adyen())) {
-                    return $shopwareMethod;
-                }
-
-                /** @var Attribute $attribute */
-                $attribute = $shopwareMethod->getValue('attribute');
-                $typeOrId = $attribute->get(AdyenPayment::ADYEN_PAYMENT_STORED_METHOD_ID)
-                    ?: $attribute->get(AdyenPayment::ADYEN_PAYMENT_METHOD_LABEL);
-
-                $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($typeOrId);
-                if (null === $paymentMethod) {
-                    return;
-                }
-
-                return PaymentMean::createFromShopwareArray(
-                    $paymentMethodEnricher->enrichPaymentMethod($shopwareMethod->getRaw(), $paymentMethod)
-                );
-            }
-        )));
     }
 }

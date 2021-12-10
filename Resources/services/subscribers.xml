@@ -3,10 +3,8 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <!-- Subscribers -->
-        <service id="adyen_payment.subscriber.template" class="AdyenPayment\Subscriber\Template">
-            <argument>%adyen_payment.plugin_dir%</argument>
-            <argument type="service" id="template"/>
+        <!-- Backend Subscribers -->
+        <service id="AdyenPayment\Subscriber\Backend\ExtendViewTemplateSubscriber">
             <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Backend\BackendJavascriptSubscriber">
@@ -14,14 +12,34 @@
             <argument type="expression">service('models').getRepository('AdyenPayment\\Models\\Notification')</argument>
             <tag name="shopware.event_subscriber"/>
         </service>
-        <service id="adyen_payment.subscriber.payment" class="AdyenPayment\Subscriber\EnrichPaymentSubscriber">
-            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider" />
-            <argument type="service" id="AdyenPayment\Shopware\Serializer\SwPaymentMeanCollectionSerializer" />
-            <tag name="shopware.event_subscriber"/>
-        </service>
         <service id="AdyenPayment\Subscriber\Backend\BackendOrderSubscriber">
             <argument type="expression">service('models').getRepository('AdyenPayment\\Models\\PaymentInfo')</argument>
             <argument type="service" id="adyen_payment.components.notification_manager"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\Backend\ImportSubShopPaymentMethodsSubscriber">
+            <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
+            <argument type="service" id="AdyenPayment\Rule\AdyenApi\IsMainShopConfigRule"/>
+            <argument type="service" id="AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubShopsWriter"/>
+            <argument type="service" id="AdyenPayment\Import\PaymentMethodImporter" />
+            <tag name="shopware.event_subscriber"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\Backend\RemoveSubShopPaymentMethodSubscriber">
+            <argument type="service" id="AdyenPayment\Dbal\Remover\PaymentMeanSubShopRemover" />
+            <tag name="shopware.event_subscriber"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <!-- Frontend Subscribers -->
+        <service id="AdyenPayment\Subscriber\AddPluginTemplatesSubscriber">
+            <argument>%adyen_payment.plugin_dir%</argument>
+            <argument type="service" id="template"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="adyen_payment.subscriber.payment" class="AdyenPayment\Subscriber\EnrichPaymentSubscriber">
+            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider" />
+            <argument type="service" id="AdyenPayment\Shopware\Serializer\SwPaymentMeanCollectionSerializer" />
             <tag name="shopware.event_subscriber"/>
         </service>
         <service id="adyen_payment.subscriber.order_email_subscriber" class="AdyenPayment\Subscriber\OrderEmailSubscriber">
@@ -57,29 +75,20 @@
             <argument type="service" id="snippets"/>
             <tag name="shopware.event_subscriber"/>
         </service>
-        <service id="adyen_payment.subscriber.notification.log_incoming_notification" class="AdyenPayment\Subscriber\Notification\LogIncomingNotification">
-            <tag name="shopware.event_subscriber"/>
+        <service id="AdyenPayment\Subscriber\Notification\LogIncomingNotificationSubscriber">
             <argument type="service" id="adyen_payment.logger.notifications"/>
+            <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Notification\UpdateOrderPsPSubscriber">
             <argument type="service" id="AdyenPayment\Components\Manager\OrderManager"/>
             <tag name="shopware.event_subscriber"/>
         </service>
-        <service id="AdyenPayment\Subscriber\Backend\ImportSubShopPaymentMethodsSubscriber">
-            <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
-            <argument type="service" id="AdyenPayment\Rule\AdyenApi\IsMainShopConfigRule"/>
-            <argument type="service" id="AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubShopsWriter"/>
-            <argument type="service" id="AdyenPayment\Import\PaymentMethodImporter" />
-            <tag name="shopware.event_subscriber"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Backend\RemoveSubShopPaymentMethodSubscriber">
-            <argument type="service" id="AdyenPayment\Dbal\Remover\PaymentMeanSubShopRemover" />
-            <tag name="shopware.event_subscriber"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
         <service id="AdyenPayment\Subscriber\Checkout\AddErrorMessageToViewSubscriber">
             <argument type="service" id="AdyenPayment\Session\ErrorMessageProvider"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\Checkout\EnrichUserAdditionalPaymentSubscriber">
+            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider" />
             <tag name="shopware.event_subscriber"/>
         </service>
     </services>

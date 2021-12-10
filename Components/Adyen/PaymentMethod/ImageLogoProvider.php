@@ -6,7 +6,7 @@ namespace AdyenPayment\Components\Adyen\PaymentMethod;
 
 final class ImageLogoProvider implements ImageLogoProviderInterface
 {
-    public const PM_LOGO_FILENAME = [
+    private const PM_LOGO_FILENAME = [
         'scheme' => 'card',
         'yandex_money' => 'yandex',
     ];
