@@ -10,4 +10,9 @@ final class Sanitize
     {
         return trim(preg_replace('/\W/', $replace, $raw), $replace);
     }
+
+    public static function escape(string $raw): string
+    {
+        return htmlspecialchars($raw, ENT_NOQUOTES);
+    }
 }

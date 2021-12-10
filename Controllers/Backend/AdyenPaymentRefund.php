@@ -8,7 +8,7 @@ class Shopware_Controllers_Backend_AdyenPaymentRefund extends Shopware_Controlle
     public function refundAction(): void
     {
         $orderId = $this->Request()->getParam('orderId');
-        $notificationManager = $this->get('adyen_payment.components.adyen.refund_service');
+        $notificationManager = $this->get('AdyenPayment\Components\Adyen\RefundService');
         $refund = $notificationManager->doRefund($orderId);
 
         $this->View()->assign('refundReference', $refund->getPspReference());

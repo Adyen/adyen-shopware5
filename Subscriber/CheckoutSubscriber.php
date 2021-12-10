@@ -108,10 +108,7 @@ final class CheckoutSubscriber implements SubscriberInterface
         }
 
         if ($this->shouldRedirectToStep2($subject)) {
-            $subject->forward(
-                'shippingPayment',
-                'checkout'
-            );
+            $subject->forward('shippingPayment', 'checkout');
         }
     }
 
@@ -139,6 +136,7 @@ final class CheckoutSubscriber implements SubscriberInterface
             return true;
         }
 
+        // @TODO Adyen Checkout API 68 'details' are removed
         if (!$adyenPaymentMethod->hasDetails() && !$adyenPaymentMethod->isStoredPayment()) {
             $subject->View()->assign('adyenPaymentState', $adyenPaymentMethod->serializeMinimalState());
 

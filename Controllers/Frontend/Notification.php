@@ -39,7 +39,7 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
     {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
         $this->events = $this->get('events');
-        $this->incomingNotificationsManager = $this->get('adyen_payment.components.incoming_notification_manager');
+        $this->incomingNotificationsManager = $this->get('AdyenPayment\Components\IncomingNotificationManager');
         $this->logger = $this->get('adyen_payment.logger.notifications');
         $this->authorizationValidator = $this->get('AdyenPayment\Http\Validator\Notification\AuthorizationValidator');
     }

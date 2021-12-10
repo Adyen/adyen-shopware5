@@ -43,10 +43,10 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
      */
     public function preDispatch()
     {
-        $this->adyenManager = $this->get('adyen_payment.components.manager.adyen_manager');
-        $this->adyenCheckout = $this->get('adyen_payment.components.adyen.payment.method');
-        $this->basketService = $this->get('adyen_payment.components.basket_service');
-        $this->orderMailService = $this->get('adyen_payment.components.order_mail_service');
+        $this->adyenManager = $this->get('AdyenPayment\Components\Manager\AdyenManager');
+        $this->adyenCheckout = $this->get('AdyenPayment\Components\Adyen\PaymentMethodService');
+        $this->basketService = $this->get('AdyenPayment\Components\BasketService');
+        $this->orderMailService = $this->get('AdyenPayment\Components\OrderMailService');
         $this->logger = $this->get('adyen_payment.logger');
         $this->orderManager = $this->get('AdyenPayment\Components\Manager\OrderManager');
         $this->snippets = $this->get('snippets');

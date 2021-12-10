@@ -80,6 +80,9 @@ final class PaymentMethod
         return $this->group()->equals(PaymentGroup::stored());
     }
 
+    /**
+     * @TODO Adyen Checkout API 68 'details' are removed
+     */
     public function hasDetails(): bool
     {
         return array_key_exists('details', $this->rawData) && 0 !== count((array) $this->rawData['details']);
@@ -87,8 +90,8 @@ final class PaymentMethod
 
     public function serializeMinimalState(): string
     {
-        return json_encode([
+        return Sanitize::escape(json_encode([
             'type' => $this->adyenType()->type(),
-        ]);
+        ]));
     }
 }

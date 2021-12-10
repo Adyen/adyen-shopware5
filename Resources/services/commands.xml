@@ -4,9 +4,9 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <!-- Console commands -->
-        <service class="AdyenPayment\Commands\ProcessNotifications" id="adyen_payment.commands.process_notifications">
-            <argument type="service" id="adyen_payment.components.fifo_notification_loader"/>
-            <argument type="service" id="adyen_payment.components.notification_processor"/>
+        <service id="AdyenPayment\Commands\ProcessNotifications">
+            <argument type="service" id="AdyenPayment\Components\FifoNotificationLoader"/>
+            <argument type="service" id="AdyenPayment\Components\NotificationProcessor"/>
             <tag name="console.command" command="adyen:payment:process:notifications" />
         </service>
 

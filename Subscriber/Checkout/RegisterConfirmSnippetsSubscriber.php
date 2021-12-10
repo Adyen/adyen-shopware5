@@ -62,6 +62,11 @@ final class RegisterConfirmSnippetsSubscriber implements SubscriberInterface
             'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
             true
         );
+        $snippets['errorGooglePayNotAvailable'] = $errorSnippets->get(
+            'errorGooglePayNotAvailable',
+            'Google Pay is currently not available.',
+            true
+        );
 
         $subject->View()->assign('mAdyenSnippets', htmlentities(json_encode($snippets)));
     }

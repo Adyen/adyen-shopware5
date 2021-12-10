@@ -225,7 +225,11 @@
         handleComponent: function (paymentMethod) {
             var me = this;
 
+            if (me.opts.applePayType === paymentMethod.adyenType) {
+                me.setPaymentSession(me.__buildMinimalState(paymentMethod));
+            }
             if ('paywithgoogle' === paymentMethod.adyenType) {
+                me.setPaymentSession(me.__buildMinimalState(paymentMethod));
                 me.handleComponentPayWithGoogle();
                 return;
             }

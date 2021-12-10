@@ -16,7 +16,7 @@
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
             adyenSnippets: {
                 errorTransactionCancelled: 'Your transaction was cancelled by the Payment Service Provider.',
-                errorTransactionProcessing: 'An error occured while processing your payment.',
+                errorTransactionProcessing: 'An error occurred while processing your payment.',
                 errorTransactionRefused: 'Your transaction was refused by the Payment Service Provider.',
                 errorTransactionUnknown: 'Your transaction was cancelled due to an unknown reason.',
                 errorTransactionNoSession: 'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
@@ -201,6 +201,12 @@
         },
         replaceCheckoutButtonForGooglePay: function () {
             var me = this;
+
+            if (0 === Object.keys(me.opts.adyenGoogleConfig).length) {
+                this.addAdyenError(me.opts.adyenSnippets.errorGooglePayNotAvailable);
+                console.error('Adyen: Missing google configuration');
+                return;
+            }
 
             var orderButton = $(me.opts.placeOrderSelector);
             orderButton.parent().append(

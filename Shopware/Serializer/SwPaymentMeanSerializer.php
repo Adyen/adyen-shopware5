@@ -6,6 +6,7 @@ namespace AdyenPayment\Shopware\Serializer;
 
 use AdyenPayment\Models\Payment\PaymentMean;
 use AdyenPayment\Serializer\PaymentMeanSerializer;
+use AdyenPayment\Utils\Sanitize;
 
 final class SwPaymentMeanSerializer implements PaymentMeanSerializer
 {
@@ -13,15 +14,10 @@ final class SwPaymentMeanSerializer implements PaymentMeanSerializer
     {
         return [
             $paymentMean->getId() => array_replace($paymentMean->getRaw(), [
-                'name' => $this->escape($paymentMean->getValue('name')),
-                'description' => $this->escape($paymentMean->getValue('description')),
-                'additionaldescription' => $this->escape($paymentMean->getValue('additionaldescription')),
+                'name' => Sanitize::escape($paymentMean->getValue('name')),
+                'description' => Sanitize::escape($paymentMean->getValue('description')),
+                'additionaldescription' => Sanitize::escape($paymentMean->getValue('additionaldescription')),
             ]),
         ];
-    }
-
-    private function escape(string $value): string
-    {
-        return htmlspecialchars($value, ENT_NOQUOTES);
     }
 }

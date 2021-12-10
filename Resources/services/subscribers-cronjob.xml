@@ -4,12 +4,12 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <!-- Cronjob Subscribers -->
-        <service id="adyen_payment.subscriber.cronjob.process_notifications" class="AdyenPayment\Subscriber\Cronjob\ProcessNotifications">
+        <service id="AdyenPayment\Subscriber\Cronjob\ProcessNotifications">
             <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="adyen_payment.components.fifo_notification_loader"/>
-            <argument type="service" id="adyen_payment.components.fifo_text_notification_loader"/>
-            <argument type="service" id="adyen_payment.components.notification_processor"/>
-            <argument type="service" id="adyen_payment.components.incoming_notification_manager"/>
+            <argument type="service" id="AdyenPayment\Components\FifoNotificationLoader"/>
+            <argument type="service" id="AdyenPayment\Components\FifoTextNotificationLoader"/>
+            <argument type="service" id="AdyenPayment\Components\NotificationProcessor"/>
+            <argument type="service" id="AdyenPayment\Components\IncomingNotificationManager"/>
             <argument type="service" id="adyen_payment.logger.notifications" />
         </service>
         <service id="AdyenPayment\Subscriber\Cronjob\ImportPaymentMethodSubscriber">

@@ -14,6 +14,7 @@ final class PaymentMean
     private SourceType $source;
     private array $raw;
     private bool $enriched;
+    private ?PaymentType $adyenType;
 
     public static function createFromShopwareArray(array $paymentMean): self
     {
@@ -22,6 +23,7 @@ final class PaymentMean
         $new->source = SourceType::load((int) $paymentMean['source']);
         $new->raw = $paymentMean;
         $new->enriched = (bool) ($paymentMean['enriched'] ?? false);
+        $new->adyenType = true === $new->enriched ? PaymentType::load((string) $paymentMean['adyenType']) : null;
 
         return $new;
     }
@@ -62,6 +64,11 @@ final class PaymentMean
         }
 
         return '';
+    }
+
+    public function adyenType(): ?PaymentType
+    {
+        return $this->adyenType;
     }
 
     /**
