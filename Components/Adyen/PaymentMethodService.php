@@ -17,6 +17,8 @@ use Shopware\Models\Customer\Customer;
 
 final class PaymentMethodService
 {
+    /** @todo cleanup the public const (unify the services) */
+    public const IMPORT_LOCALE = 'en_GB';
     private ApiClientMap $apiClientMap;
     private Configuration $configuration;
     private array $cache;
@@ -54,6 +56,8 @@ final class PaymentMethodService
             return $this->cache[$cacheKey];
         }
 
+        $locale = $locale ?: Shopware()->Shop()->getLocale()->getLocale();
+
         $checkout = $this->getCheckout();
         $adyenCurrency = new Currency();
 
@@ -65,7 +69,7 @@ final class PaymentMethodService
                 'value' => $adyenCurrency->sanitize($value, $currency),
             ],
             'channel' => Channel::WEB,
-            'shopperLocale' => $locale ?? Shopware()->Shop()->getLocale()->getLocale(),
+            'shopperLocale' => $locale,
             'shopperReference' => $this->provideCustomerNumber(),
         ];
 
@@ -73,6 +77,15 @@ final class PaymentMethodService
             $paymentMethods = PaymentMethodCollection::fromAdyenMethods(
                 $checkout->paymentMethods($requestParams)
             );
+
+            // get payment methods import locale (important for code)
+            $paymentMethods = self::IMPORT_LOCALE === $locale
+                ? $paymentMethods->withImportLocale($paymentMethods)
+                : $paymentMethods->withImportLocale(
+                    PaymentMethodCollection::fromAdyenMethods($checkout->paymentMethods(
+                        array_replace($requestParams, ['shopperLocale' => self::IMPORT_LOCALE])
+                    ))
+                );
         } catch (AdyenException $e) {
             $this->logger->critical('Adyen Exception', [
                 'message' => $e->getMessage(),

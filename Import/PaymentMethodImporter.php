@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Import;
 
-use AdyenPayment\Components\Adyen\Mapper\PaymentMethodMapperInterface;
 use AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsProviderInterface;
 use AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubShopsWriterInterface;
 use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
@@ -19,7 +18,6 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
     private PaymentMethodsProviderInterface $paymentMethodsProvider;
     private ObjectRepository $shopRepository;
     private UsedFallbackConfigRuleInterface $usedFallbackConfigRule;
-    private PaymentMethodMapperInterface $paymentMethodMapper;
     private PaymentMethodWriterInterface $paymentMethodWriter;
     private PaymentMeansSubShopsWriterInterface $paymentMeansSubShopsWriter;
 
@@ -27,14 +25,12 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
         PaymentMethodsProviderInterface $paymentMethodsProvider,
         ObjectRepository $shopRepository,
         UsedFallbackConfigRuleInterface $usedFallbackConfigRule,
-        PaymentMethodMapperInterface $paymentMethodMapper,
         PaymentMethodWriterInterface $paymentMethodWriter,
         PaymentMeansSubShopsWriterInterface $paymentMeansSubShopsWriter
     ) {
         $this->paymentMethodsProvider = $paymentMethodsProvider;
         $this->shopRepository = $shopRepository;
         $this->usedFallbackConfigRule = $usedFallbackConfigRule;
-        $this->paymentMethodMapper = $paymentMethodMapper;
         $this->paymentMethodWriter = $paymentMethodWriter;
         $this->paymentMeansSubShopsWriter = $paymentMeansSubShopsWriter;
     }
@@ -64,7 +60,7 @@ final class PaymentMethodImporter implements PaymentMethodImporterInterface
      */
     private function import(Shop $shop): \Generator
     {
-        $paymentMethods = $this->paymentMethodMapper->mapFromAdyen(($this->paymentMethodsProvider)($shop));
+        $paymentMethods = ($this->paymentMethodsProvider)($shop);
         foreach ($paymentMethods as $adyenPaymentMethod) {
             try {
                 yield $this->paymentMethodWriter->__invoke($adyenPaymentMethod, $shop);

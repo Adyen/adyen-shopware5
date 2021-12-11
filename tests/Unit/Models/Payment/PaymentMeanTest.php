@@ -6,6 +6,7 @@ namespace AdyenPayment\Tests\Unit\Models\Payment;
 
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMean;
+use AdyenPayment\Models\Payment\PaymentType;
 use PHPUnit\Framework\TestCase;
 use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
@@ -22,6 +23,8 @@ final class PaymentMeanTest extends TestCase
                 'adyen_type' => 'adyen-type',
                 'adyen_stored_method_id' => 'stored payment method id',
             ]),
+            'enriched' => true,
+            'adyenType' => 'adyen-type',
         ]);
     }
 
@@ -50,14 +53,28 @@ final class PaymentMeanTest extends TestCase
                 'adyen_type' => 'adyen-type',
                 'adyen_stored_method_id' => 'stored payment method id',
             ]),
+            'enriched' => true,
+            'adyenType' => 'adyen-type',
         ], $this->paymentMean->getRaw());
+    }
+
+    /** @test */
+    public function it_knows_when_enriched(): void
+    {
+        $this->assertTrue($this->paymentMean->isEnriched());
+    }
+
+    /** @test */
+    public function it_contains_adyen_type(): void
+    {
+        $this->assertTrue($this->paymentMean->adyenType()->equals(PaymentType::load('adyen-type')));
     }
 
     /** @test */
     public function it_can_retrieve_a_value(): void
     {
         $this->assertIsString($this->paymentMean->getValue('id'));
-        $this->assertSame('15', $this->paymentMean->getValue('id'));
+        $this->assertEquals('15', $this->paymentMean->getValue('id'));
     }
 
     /** @test */
@@ -84,14 +101,14 @@ final class PaymentMeanTest extends TestCase
     /** @test */
     public function it_can_retrieve_attribute_adyen_type(): void
     {
-        $this->assertEquals('adyen-type', $this->paymentMean->getAdyenUniqueIdentifier());
+        $this->assertEquals('adyen-type', $this->paymentMean->getAdyenCode());
     }
 
     /** @test */
     public function it_can_retrieve_default_attribute_adyen_type(): void
     {
         $paymentMean = PaymentMean::createFromShopwareArray(['source' => null]);
-        $this->assertEquals('', $paymentMean->getAdyenUniqueIdentifier());
+        $this->assertEquals('', $paymentMean->getAdyenCode());
     }
 
     /** @test */

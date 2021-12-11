@@ -8,6 +8,10 @@ use AdyenPayment\Utils\Sanitize;
 
 final class PaymentMethod
 {
+    /**
+     * en_GB locale used for identifying unique payment methods.
+     */
+    private string $code;
     private PaymentGroup $group;
     private PaymentType $type;
 
@@ -23,6 +27,7 @@ final class PaymentMethod
     public static function fromRaw(array $data): self
     {
         $new = new self();
+        $new->code = '';
         $new->group = array_key_exists('id', $data) ? PaymentGroup::stored() : PaymentGroup::default();
         $new->type = PaymentType::load((string) ($data['type'] ?? ''));
         $new->rawData = $data;
@@ -30,12 +35,20 @@ final class PaymentMethod
         return $new;
     }
 
-    public function uniqueIdentifier(): string
+    public function withCode(string $code): self
     {
-        return mb_strtolower(sprintf('%s_%s',
-            $this->adyenType()->type(),
-            Sanitize::removeNonWord($this->name())
+        $new = clone $this;
+        $new->code = mb_strtolower(sprintf('%s_%s',
+            $this->type->type(),
+            Sanitize::removeNonWord($code)
         ));
+
+        return $new;
+    }
+
+    public function code(): string
+    {
+        return $this->code;
     }
 
     public function adyenType(): PaymentType

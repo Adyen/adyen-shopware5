@@ -71,7 +71,7 @@ final class PaymentMethodWriter implements PaymentMethodWriterInterface
 
     private function providePaymentModel(PaymentMethod $adyenPaymentMethod, Shop $shop): Payment
     {
-        $swPayment = $this->paymentRepository->findByUniqueIdentifier($adyenPaymentMethod->uniqueIdentifier());
+        $swPayment = $this->paymentRepository->findByCode($adyenPaymentMethod->code());
         if (!$swPayment) {
             return $this->paymentFactory->createFromAdyen($adyenPaymentMethod, $shop);
         }

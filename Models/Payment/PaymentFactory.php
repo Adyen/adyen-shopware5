@@ -27,7 +27,7 @@ final class PaymentFactory implements PaymentFactoryInterface
     {
         $new = new Payment();
         $new->setActive(true);
-        $new->setName($paymentMethod->uniqueIdentifier());
+        $new->setName($paymentMethod->code());
         $new->setDescription($paymentMethod->name());
         $new->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
         $new->setShops(new ArrayCollection([$shop]));
@@ -42,7 +42,7 @@ final class PaymentFactory implements PaymentFactoryInterface
 
     public function updateFromAdyen(Payment $payment, PaymentMethod $paymentMethod, Shop $shop): Payment
     {
-        $payment->setName($paymentMethod->uniqueIdentifier());
+        $payment->setName($paymentMethod->code());
         $payment->setDescription($paymentMethod->name());
         $payment->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));
         $payment->setShops(new ArrayCollection([$shop]));

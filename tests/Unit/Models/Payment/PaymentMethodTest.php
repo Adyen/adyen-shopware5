@@ -23,9 +23,12 @@ final class PaymentMethodTest extends TestCase
     }
 
     /** @test */
-    public function it_contains_an_unique_identifier(): void
+    public function it_can_be_constructed_with_code(): void
     {
-        $this->assertEquals('bcmc_bancontact', $this->paymentMethod->uniqueIdentifier());
+        $paymentMethod = $this->paymentMethod->withCode('adyen-code');
+
+        $this->assertNotSame($this->paymentMethod, $paymentMethod);
+        $this->assertEquals('bcmc_adyen_code', $paymentMethod->code());
     }
 
     /** @test */

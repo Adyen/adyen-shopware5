@@ -39,14 +39,14 @@ final class PaymentRepository implements PaymentRepositoryInterface
         return false;
     }
 
-    public function findByUniqueIdentifier(string $adyenUniqueIdentifier): ?Payment
+    public function findByCode(string $code): ?Payment
     {
         $query = $this->paymentRepository()
             ->createQueryBuilder('payment')
             ->innerJoin('payment.attribute', 'attribute')
-            ->where('attribute.adyenType = :adyenUniqueIdentifier')
+            ->where('attribute.adyenType = :adyenCode')
             ->setMaxResults(1)
-            ->setParameter(':adyenUniqueIdentifier', $adyenUniqueIdentifier);
+            ->setParameter(':adyenCode', $code);
 
         return $query->getQuery()->execute()[0] ?? null;
     }

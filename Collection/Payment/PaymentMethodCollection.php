@@ -43,6 +43,25 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
         );
     }
 
+    public function withImportLocale(PaymentMethodCollection $importLocalePaymentMethods): self
+    {
+        $importPaymentMethods = iterator_to_array($importLocalePaymentMethods);
+
+        return new self(...array_map(
+            static function(int $index, PaymentMethod $paymentMethod) use ($importPaymentMethods): PaymentMethod {
+                /** @var PaymentMethod $importMethod */
+                $importLocaleMethod = $importPaymentMethods[$index] ?? null;
+                if (!$importLocaleMethod) {
+                    return $paymentMethod;
+                }
+
+                return $paymentMethod->withCode($importLocaleMethod->name());
+            },
+            array_keys($this->paymentMethods),
+            array_values($this->paymentMethods)
+        ));
+    }
+
     public function map(callable $callback): array
     {
         return array_map($callback, $this->paymentMethods);
@@ -67,7 +86,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
                 return $paymentMethod;
             }
 
-            if ($paymentMethod->uniqueIdentifier() === $identifierOrStoredId) {
+            if ($paymentMethod->code() === $identifierOrStoredId) {
                 return $paymentMethod;
             }
         }
@@ -77,7 +96,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
 
     public function fetchByPaymentMean(PaymentMean $paymentMean): ?PaymentMethod
     {
-        if ('' === $paymentMean->getAdyenStoredMethodId() && '' === $paymentMean->getAdyenUniqueIdentifier()) {
+        if ('' === $paymentMean->getAdyenStoredMethodId() && '' === $paymentMean->getAdyenCode()) {
             return null;
         }
 
@@ -85,7 +104,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
             return $this->fetchByIdentifierOrStoredId($paymentMean->getAdyenStoredMethodId());
         }
 
-        return $this->fetchByIdentifierOrStoredId($paymentMean->getAdyenUniqueIdentifier());
+        return $this->fetchByIdentifierOrStoredId($paymentMean->getAdyenCode());
     }
 
     public function filter(callable $filter): self

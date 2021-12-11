@@ -24,7 +24,7 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
     public function __invoke(int $paymentMeanId, PaymentMethod $adyenPaymentMethod): void
     {
         $attributesColumns = [
-            AdyenPayment::ADYEN_UNIQUE_IDENTIFIER => TypeMappingInterface::TYPE_STRING,
+            AdyenPayment::ADYEN_CODE => TypeMappingInterface::TYPE_STRING,
             AdyenPayment::ADYEN_STORED_METHOD_ID => TypeMappingInterface::TYPE_STRING,
         ];
 
@@ -36,7 +36,7 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
                 [
                     '_table' => $table,
                     '_foreignKey' => $paymentMeanId,
-                    AdyenPayment::ADYEN_UNIQUE_IDENTIFIER => $adyenPaymentMethod->uniqueIdentifier(),
+                    AdyenPayment::ADYEN_CODE => $adyenPaymentMethod->code(),
                     AdyenPayment::ADYEN_STORED_METHOD_ID => $adyenPaymentMethod->getStoredPaymentMethodId(),
                 ],
                 's_core_paymentmeans_attributes',
