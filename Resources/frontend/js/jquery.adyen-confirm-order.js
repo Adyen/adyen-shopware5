@@ -53,14 +53,18 @@
                 return;
             }
 
+            if (!me.cookiesAllowed()) {
+                this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
+                return;
+            }
+
             if (!$.isEmptyObject(me.opts.adyenPaymentState)) {
                 me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenPaymentState));
                 return;
             }
 
             if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
-                this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
-                return;
+                window.location.href = '/checkout/shippingPayment/sTarget/checkout';
             }
         },
         onPlaceOrder: function (event) {
@@ -307,6 +311,9 @@
         },
         handleOnAdditionalDetails: function (state, component) {
             $.loadingIndicator.close();
+        },
+        cookiesAllowed: function () {
+            return -1 !== document.cookie.indexOf('{"name":"allowCookie","active":true}');
         }
     });
 })(jQuery);

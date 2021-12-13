@@ -59,9 +59,6 @@
         <service id="AdyenPayment\Subscriber\Checkout\AddAdyenSourceTypeToViewSubscriber">
             <tag name="shopware.event_subscriber"/>
         </service>
-        <service id="AdyenPayment\Subscriber\Checkout\OverridePreselectedAdyenMethodSubscriber">
-            <tag name="shopware.event_subscriber"/>
-        </service>
         <service id="AdyenPayment\Subscriber\Checkout\AddGooglePayConfigToViewSubscriber">
             <argument type="service" id="AdyenPayment\Components\WebComponents\GooglePayConfigProvider"/>
             <tag name="shopware.event_subscriber"/>
