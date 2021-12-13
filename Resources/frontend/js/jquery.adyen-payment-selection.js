@@ -156,7 +156,7 @@
                 return;
             }
 
-            if (me.__hasActivePaymentMethod()) {
+            if (!this.__isGiftCardType(payment) && me.__hasActivePaymentMethod()) {
                 me.enableUpdatePaymentInfoButton();
                 return;
             }
@@ -372,16 +372,16 @@
                 .append(me.changeInfosButton);
         },
         /**
-         * @param {string} paymentType
+         * @param {object} paymentMethod
          * @return {boolean}
          * @private
          */
-        __isGiftCardType: function (paymentType) {
+        __isGiftCardType: function (paymentMethod) {
             var me = this;
 
             var paymentBrand = me.adyenConfiguration.paymentMethodsResponse['brand'] || '';
 
-            return '' !== paymentBrand || 'giftcard' === paymentType;
+            return '' !== paymentBrand || 'giftcard' === paymentMethod.metadata.type;
         },
         /**
          * @param {object} paymentMethod
@@ -441,7 +441,23 @@
             }
 
             // not all adyen payment methods have "details", these cannot be handled by webcomponents (e.g. Paypal)
+            return this.__hasMetadataDetails(paymentMethod) || this.__hasMetadataBrand(paymentMethod);
+        },
+        /**
+         * @param  {object} paymentMethod
+         * @return {boolean}
+         * @private
+         */
+        __hasMetadataDetails: function(paymentMethod) {
             return "undefined" !== typeof paymentMethod.metadata.details;
+        },
+        /**
+         * @param  {object} paymentMethod
+         * @return {boolean}
+         * @private
+         */
+        __hasMetadataBrand: function(paymentMethod) {
+            return "undefined" !== typeof paymentMethod.metadata.brand;
         },
         /**
          * @param  {object} paymentMethod
@@ -474,7 +490,7 @@
                 });
             }
 
-            if (this.__isGiftCardType(paymentMethod.adyenType)) {
+            if (this.__isGiftCardType(paymentMethod)) {
                 var pinRequiredDetail = this.__retrievePaymentMethodDetailByKey(
                     paymentMethod,
                     'encryptedSecurityCode'
@@ -484,7 +500,8 @@
                     cardType: 'giftcard',
                     paymentMethodData: {
                         type: paymentMethod.adyenType,
-                        pinRequired: false === pinRequiredDetail.optional || false
+                        brand: paymentMethod.metadata.brand,
+                        pinRequired: null !== pinRequiredDetail && false === pinRequiredDetail.optional || false
                     }
                 });
             }
@@ -503,17 +520,6 @@
          * @private
          */
         __buildMinimalState: function (payment) {
-            if (this.__isGiftCardType(payment.adyenType)) {
-                return {
-                    data: {
-                        paymentMethod: {
-                            type: payment.adyenType,
-                            brand: payment.metadata.brand
-                        }
-                    }
-                };
-            }
-
             return {
                 data: {
                     paymentMethod: {
