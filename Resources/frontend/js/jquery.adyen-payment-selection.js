@@ -141,11 +141,12 @@
         },
         onPaymentChangedAfter: function () {
             var me = this;
+
             me.enableVisibility();
 
-            // Return & clear when no adyen payment
             var payment = me.getPaymentMethodById(me.selectedPaymentId);
 
+            // Return & clear when no adyen payment
             if (!me.__isAdyenPaymentMethod(payment)) {
                 me.clearPaymentSession();
                 return;
@@ -156,7 +157,7 @@
                 return;
             }
 
-            if (!this.__isGiftCardType(payment) && me.__hasActivePaymentMethod()) {
+            if (me.__hasActivePaymentMethod()) {
                 me.enableUpdatePaymentInfoButton();
                 return;
             }
@@ -327,6 +328,11 @@
             me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
             me.sessionStorage.setItem(me.storePaymentMethodSession, state.data.storePaymentMethod || false);
         },
+        getPaymentSession: function () {
+            var me = this;
+
+            return JSON.parse(me.sessionStorage.getItem(me.paymentMethodSession) || "{}");
+        },
         clearPaymentSession: function () {
             var me = this;
             me.sessionStorage.removeItem(me.paymentMethodSession);
@@ -376,12 +382,10 @@
          * @return {boolean}
          * @private
          */
-        __isGiftCardType: function (paymentMethod) {
+        __isGiftCard: function (paymentMethod) {
             var me = this;
 
-            var paymentBrand = me.adyenConfiguration.paymentMethodsResponse['brand'] || '';
-
-            return '' !== paymentBrand || 'giftcard' === paymentMethod.metadata.type;
+            return 'giftcard' === paymentMethod.metadata.type;
         },
         /**
          * @param {object} paymentMethod
@@ -411,7 +415,7 @@
             if (!this.__hasActivePaymentMethod()) {
                 return false;
             }
-            var storedPaymentMethod = this.sessionStorage.getItem(this.paymentMethodSession);
+            var storedPaymentMethod = this.getPaymentSession();
             var keys = Object.keys(storedPaymentMethod);
 
             return 1 === keys.length && 'type' === keys[0]; // Minimal state structure @see __buildMinimalState()
@@ -441,23 +445,7 @@
             }
 
             // not all adyen payment methods have "details", these cannot be handled by webcomponents (e.g. Paypal)
-            return this.__hasMetadataDetails(paymentMethod) || this.__hasMetadataBrand(paymentMethod);
-        },
-        /**
-         * @param  {object} paymentMethod
-         * @return {boolean}
-         * @private
-         */
-        __hasMetadataDetails: function(paymentMethod) {
-            return "undefined" !== typeof paymentMethod.metadata.details;
-        },
-        /**
-         * @param  {object} paymentMethod
-         * @return {boolean}
-         * @private
-         */
-        __hasMetadataBrand: function(paymentMethod) {
-            return "undefined" !== typeof paymentMethod.metadata.brand;
+            return "undefined" !== typeof paymentMethod.metadata.details || "undefined" !== typeof paymentMethod.metadata.brand;
         },
         /**
          * @param  {object} paymentMethod
@@ -490,18 +478,18 @@
                 });
             }
 
-            if (this.__isGiftCardType(paymentMethod)) {
+            if (this.__isGiftCard(paymentMethod)) {
                 var pinRequiredDetail = this.__retrievePaymentMethodDetailByKey(
                     paymentMethod,
                     'encryptedSecurityCode'
-                );
+                ) || false;
 
                 return $.extend(true, {}, defaultData, {
                     cardType: 'giftcard',
                     paymentMethodData: {
                         type: paymentMethod.adyenType,
                         brand: paymentMethod.metadata.brand,
-                        pinRequired: null !== pinRequiredDetail && false === pinRequiredDetail.optional || false
+                        pinRequired: pinRequiredDetail && (false !== pinRequiredDetail.optional || false)
                     }
                 });
             }
