@@ -22,6 +22,7 @@
     {$smarty.block.parent}
     data-adyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
     data-adyenAjaxPaymentDetails="{url module='frontend' controller='adyen' action='paymentDetails'}"
+    data-checkoutShippingPaymentUrl="{url controller='checkout' action='shippingPayment' sTarget='checkout'}"
     data-adyenAjaxThreeDsUrl="{url module='frontend' controller='adyen' action='ajaxThreeDs'}"
     {if $mAdyenSnippets}
         data-adyenSnippets="{$mAdyenSnippets}"

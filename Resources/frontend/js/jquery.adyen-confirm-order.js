@@ -14,6 +14,7 @@
             adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
+            checkoutShippingPaymentUrl: '',
             adyenSnippets: {
                 errorTransactionCancelled: 'Your transaction was cancelled by the Payment Service Provider.',
                 errorTransactionProcessing: 'An error occurred while processing your payment.',
@@ -64,7 +65,7 @@
             }
 
             if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
-                window.location.href = '/checkout/shippingPayment/sTarget/checkout';
+                window.location.href = me.opts.checkoutShippingPaymentUrl;
             }
         },
         onPlaceOrder: function (event) {
