@@ -503,6 +503,17 @@
          * @private
          */
         __buildMinimalState: function (payment) {
+            if (this.__isGiftCardType(payment.adyenType)) {
+                return {
+                    data: {
+                        paymentMethod: {
+                            type: payment.adyenType,
+                            brand: payment.metadata.brand
+                        }
+                    }
+                };
+            }
+
             return {
                 data: {
                     paymentMethod: {
