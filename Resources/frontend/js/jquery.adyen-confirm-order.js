@@ -14,7 +14,7 @@
             adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
-            checkoutShippingPaymentUrl: '',
+            checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
             adyenSnippets: {
                 errorTransactionCancelled: 'Your transaction was cancelled by the Payment Service Provider.',
                 errorTransactionProcessing: 'An error occurred while processing your payment.',
