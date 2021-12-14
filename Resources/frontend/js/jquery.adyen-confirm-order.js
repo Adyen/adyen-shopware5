@@ -314,7 +314,12 @@
             $.loadingIndicator.close();
         },
         cookiesAllowed: function () {
-            return -1 !== document.cookie.indexOf('{"name":"allowCookie","active":true}');
+            let value = `; ${window.document.cookie}`;
+            let parts = value.split(`; cookiePreferences=`);
+            let cookieContent = (parts.length === 2) ? parts.pop().split(';').shift() : '{}';
+            let parsedPreferences = JSON.parse(cookieContent);
+
+            return parsedPreferences?.groups?.technical?.cookies?.allowCookie?.active;
         }
     });
 })(jQuery);
