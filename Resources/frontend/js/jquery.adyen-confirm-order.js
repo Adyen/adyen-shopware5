@@ -137,7 +137,7 @@
         },
         handlePaymentDataAuthorised: function (data, sUniqueID = null) {
             var me = this;
-            let input = $("<input>").attr("type", "hidden").attr("name", "sUniqueID").val(sUniqueID);
+            var input = $("<input>").attr("type", "hidden").attr("name", "sUniqueID").val(sUniqueID);
             $(me.opts.confirmFormSelector).append(input).submit();
         },
         handlePaymentDataCreateFromAction: function (data) {
@@ -314,12 +314,19 @@
             $.loadingIndicator.close();
         },
         cookiesAllowed: function () {
-            let value = `; ${window.document.cookie}`;
-            let parts = value.split(`; cookiePreferences=`);
-            let cookieContent = (parts.length === 2) ? parts.pop().split(';').shift() : '{}';
-            let parsedPreferences = JSON.parse(cookieContent);
+            var value = `; ${window.document.cookie}`;
+            var parts = value.split(`; cookiePreferences=`);
+            var cookieContent = (parts.length === 2) ? parts.pop().split(';').shift() : '{}';
+            var parsedPreferences = JSON.parse(cookieContent);
 
-            return parsedPreferences?.groups?.technical?.cookies?.allowCookie?.active;
+            var cookieAllowed = parsedPreferences &&
+                parsedPreferences.groups &&
+                parsedPreferences.groups.technical &&
+                parsedPreferences.groups.technical.cookies &&
+                parsedPreferences.groups.technical.cookies.allowCookie &&
+                parsedPreferences.groups.technical.cookies.allowCookie.active;
+
+            return (cookieAllowed == null) ? false : cookieAllowed;
         }
     });
 })(jQuery);
