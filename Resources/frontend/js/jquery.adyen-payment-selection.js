@@ -129,6 +129,9 @@
         },
         onPaymentChangedBefore: function ($event) {
             var me = this;
+
+            debugger;
+
             var selectedPaymentElementId = event.target.id;
 
             // only update when switching payment-methods (not on shipping methods)
@@ -138,6 +141,22 @@
 
             me.selectedPaymentElementId = selectedPaymentElementId;
             me.selectedPaymentId = $(event.target).val();
+
+            var storedPaymentMethodSession = this.getPaymentSession();
+            var storedPaymentMethod = me.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod){
+                return enrichedPaymentMethod.id === me.selectedPaymentId;
+            })[0] || {};
+
+            // fresh start: no browser storage -> normal way
+            if (storedPaymentMethodSession === "{}") {
+                return;
+            }
+
+            // change payment selection: check browser storage, if diff from selected -> clear
+            // 19 givex              !=               17 generic selectedPaymentId
+            if (storedPaymentMethod.id !== me.selectedPaymentId || storedPaymentMethod.adyenType === 'giftcard') {
+                me.clearPaymentSession();
+            }
         },
         onPaymentChangedAfter: function () {
             var me = this;
