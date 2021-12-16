@@ -71,26 +71,6 @@ final class PaymentMethod
         return (string) ($this->rawData['name'] ?? '');
     }
 
-    public function adyenType(): PaymentType
-    {
-        return $this->type;
-    }
-
-    public function group(): PaymentGroup
-    {
-        return $this->group;
-    }
-
-    public function rawData(): array
-    {
-        return $this->rawData;
-    }
-
-    public function name(): string
-    {
-        return (string) ($this->rawData['name'] ?? '');
-    }
-
     /**
      * shortcut to get value of raw payment data.
      *
