@@ -314,7 +314,7 @@
             $.loadingIndicator.close();
         },
         cookiesAllowed: function () {
-            var cookie = `; ${window.document.cookie}`;
+            var cookie = window.document.cookie;
             var cookiePreferences = JSON.parse(
                 (cookie.split('; ').filter(row => 0 === row.indexOf('cookiePreferences='))[0] || '') // find would be better than filter, but IE does not support find
                     .split('cookiePreferences=')[1] || '{}'
