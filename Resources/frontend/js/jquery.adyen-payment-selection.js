@@ -130,8 +130,7 @@
         onPaymentChangedBefore: function ($event) {
             var me = this;
 
-            debugger;
-
+            var previousSelectedPaymentElementId = me.selectedPaymentElementId;
             var selectedPaymentElementId = event.target.id;
 
             // only update when switching payment-methods (not on shipping methods)
@@ -142,19 +141,12 @@
             me.selectedPaymentElementId = selectedPaymentElementId;
             me.selectedPaymentId = $(event.target).val();
 
-            var storedPaymentMethodSession = this.getPaymentSession();
-            var storedPaymentMethod = me.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod){
-                return enrichedPaymentMethod.id === me.selectedPaymentId;
-            })[0] || {};
-
-            // fresh start: no browser storage -> normal way
-            if (storedPaymentMethodSession === "{}") {
+            var paymentMethodSession = this.getPaymentSession();
+            if (0 === Object.keys(paymentMethodSession).length) {
                 return;
             }
 
-            // change payment selection: check browser storage, if diff from selected -> clear
-            // 19 givex              !=               17 generic selectedPaymentId
-            if (storedPaymentMethod.id !== me.selectedPaymentId || storedPaymentMethod.adyenType === 'giftcard') {
+            if (previousSelectedPaymentElementId !== me.selectedPaymentElementId) {
                 me.clearPaymentSession();
             }
         },
@@ -384,7 +376,8 @@
             }
 
             // minimal state has no info that needs updating
-            if (me.__hasActiveMinimalPaymentMethodState()) {
+            var payment = me.getPaymentMethodById(me.selectedPaymentId);
+            if (me.__hasActiveMinimalPaymentMethodState() && !this.__isGiftCard(payment)) {
                 return;
             }
 
@@ -463,8 +456,13 @@
                 return true;
             }
 
+            if ("undefined" !== typeof paymentMethod.metadata.brand) {
+                var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
+                return true;
+            }
+
             // not all adyen payment methods have "details", these cannot be handled by webcomponents (e.g. Paypal)
-            return "undefined" !== typeof paymentMethod.metadata.details || "undefined" !== typeof paymentMethod.metadata.brand;
+            return "undefined" !== typeof paymentMethod.metadata.details;
         },
         /**
          * @param  {object} paymentMethod
