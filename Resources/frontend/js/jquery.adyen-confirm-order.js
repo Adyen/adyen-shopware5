@@ -314,19 +314,16 @@
             $.loadingIndicator.close();
         },
         cookiesAllowed: function () {
-            var value = `; ${window.document.cookie}`;
-            var parts = value.split(`; cookiePreferences=`);
-            var cookieContent = (parts.length === 2) ? parts.pop().split(';').shift() : '{}';
-            var parsedPreferences = JSON.parse(cookieContent);
+            var cookie = `; ${window.document.cookie}`;
+            var cookiePreferences = JSON.parse(
+                (cookie.split('; ').filter(row => 0 === row.indexOf('cookiePreferences='))[0] || '') // find would be better than filter, but IE does not support find
+                    .split('cookiePreferences=')[1] || '{}'
+            );
 
-            var cookieAllowed = parsedPreferences &&
-                parsedPreferences.groups &&
-                parsedPreferences.groups.technical &&
-                parsedPreferences.groups.technical.cookies &&
-                parsedPreferences.groups.technical.cookies.allowCookie &&
-                parsedPreferences.groups.technical.cookies.allowCookie.active;
+            var defaultPreferences = {groups:{technical:{cookies:{allowCookie:{active:false}}}}}; // sensible default with defined keys
+            var preferences = $.extend({}, defaultPreferences, cookiePreferences); // IE compatible merging of objects
 
-            return (cookieAllowed == null) ? false : cookieAllowed;
+            return preferences.groups.technical.cookies.allowCookie.active; // all keys will always be present
         }
     });
 })(jQuery);
