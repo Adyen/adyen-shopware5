@@ -377,7 +377,7 @@
 
             // minimal state has no info that needs updating
             var payment = me.getPaymentMethodById(me.selectedPaymentId);
-            if (me.__hasActiveMinimalPaymentMethodState() && !this.__isGiftCard(payment)) {
+            if (me.__hasActiveMinimalPaymentMethodState()) {
                 return;
             }
 
@@ -456,13 +456,9 @@
                 return true;
             }
 
-            if ("undefined" !== typeof paymentMethod.metadata.brand) {
-                var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
-                return true;
-            }
-
             // not all adyen payment methods have "details", these cannot be handled by webcomponents (e.g. Paypal)
-            return "undefined" !== typeof paymentMethod.metadata.details;
+            return "undefined" !== typeof paymentMethod.metadata.details
+                || "undefined" !== typeof paymentMethod.metadata.brand;
         },
         /**
          * @param  {object} paymentMethod

@@ -59,7 +59,9 @@
                 return;
             }
 
-            if (!$.isEmptyObject(me.opts.adyenPaymentState)) {
+            var parsedPaymentMethodSession = JSON.parse(me.getPaymentMethod() || '{}');
+            if (!$.isEmptyObject(me.opts.adyenPaymentState)
+                && 0 === Object.keys(parsedPaymentMethodSession).length) {
                 me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenPaymentState));
                 return;
             }
