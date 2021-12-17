@@ -316,14 +316,14 @@
         cookiesAllowed: function () {
             var cookie = window.document.cookie;
             var cookiePreferences = JSON.parse(
-                (cookie.split('; ').filter(row => 0 === row.indexOf('cookiePreferences='))[0] || '') // find would be better than filter, but IE does not support find
+                (cookie.split('; ').filter(row => 0 === row.indexOf('cookiePreferences='))[0] || '')
                     .split('cookiePreferences=')[1] || '{}'
             );
 
-            var defaultPreferences = {groups:{technical:{cookies:{allowCookie:{active:false}}}}}; // sensible default with defined keys
-            var preferences = $.extend({}, defaultPreferences, cookiePreferences); // IE compatible merging of objects
+            var defaultPreferences = {groups:{technical:{cookies:{allowCookie:{active:false}}}}};
+            var preferences = $.extend({}, defaultPreferences, cookiePreferences);
 
-            return preferences.groups.technical.cookies.allowCookie.active; // all keys will always be present
+            return preferences.groups.technical.cookies.allowCookie.active;
         }
     });
 })(jQuery);
