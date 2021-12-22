@@ -37,7 +37,7 @@ final class HideStoredPaymentUmbrellaSubscriber implements SubscriberInterface
 
         $assign = $args->getSubject()->View()->getAssign();
         $data = $assign['data'] ?? null;
-        if (null === $data) {
+        if (!is_array($data)) {
             return;
         }
 
