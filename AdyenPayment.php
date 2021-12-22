@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace AdyenPayment;
 
 use AdyenPayment\Components\CompilerPass\NotificationProcessorCompilerPass;
+use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
 use AdyenPayment\Models\Refund;
@@ -14,11 +15,13 @@ use AdyenPayment\Models\TextNotification;
 use Doctrine\ORM\Tools\SchemaTool;
 use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
 use Shopware\Components\Logger;
+use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\Context\UpdateContext;
+use Shopware\Models\Payment\Payment;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,6 +33,7 @@ final class AdyenPayment extends Plugin
     public const NAME = 'AdyenPayment';
     public const ADYEN_CODE = 'adyen_type';
     public const ADYEN_STORED_METHOD_ID = 'adyen_stored_method_id';
+    public const ADYEN_STORED_PAYMENT_UMBRELLA_CODE = 'adyen_stored_payment_umbrella';
     public const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
     public const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';
 
@@ -82,6 +86,7 @@ final class AdyenPayment extends Plugin
     public function install(InstallContext $context): void
     {
         $this->installAttributes();
+        $this->installStoredPaymentUmbrella($context);
 
         $tool = new SchemaTool($this->container->get('models'));
         $classes = $this->getModelMetaData();
@@ -91,6 +96,7 @@ final class AdyenPayment extends Plugin
     public function update(UpdateContext $context): void
     {
         $this->installAttributes();
+        $this->installStoredPaymentUmbrella($context);
 
         $tool = new SchemaTool($this->container->get('models'));
         $classes = $this->getModelMetaData();
@@ -186,6 +192,30 @@ final class AdyenPayment extends Plugin
         $this->container->get('models')->generateAttributeModels(
             ['s_user_attributes', 's_core_paymentmeans_attributes']
         );
+    }
+
+    private function installStoredPaymentUmbrella(InstallContext $context): void
+    {
+        $database = $this->container->get('db');
+        /** @var ModelManager $modelsManager */
+        $modelsManager = $this->container->get(ModelManager::class);
+
+        $payment = new Payment();
+        $payment->setActive(true);
+        $payment->setName(self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE);
+        $payment->setSource(SourceType::adyen()->getType());
+        $payment->setHide(true);
+        $payment->setPluginId($context->getPlugin()->getId());
+        $payment->setDescription('Stored Payment');
+        $payment->setAdditionalDescription('Adyen Stored Payment');
+
+        $sql = 'SELECT `id` FROM `s_core_paymentmeans` WHERE `name` = "'.self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE.'"';
+        $paymentId = $database->fetchRow($sql)['id'] ?? null;
+
+        if (null === $paymentId) {
+            $modelsManager->persist($payment);
+            $modelsManager->flush($payment);
+        }
     }
 }
 
