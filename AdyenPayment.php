@@ -209,8 +209,10 @@ final class AdyenPayment extends Plugin
         $payment->setDescription('Stored Payment');
         $payment->setAdditionalDescription('Adyen Stored Payment');
 
-        $sql = 'SELECT `id` FROM `s_core_paymentmeans` WHERE `name` = "'.self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE.'"';
-        $paymentId = $database->fetchRow($sql)['id'] ?? null;
+        $paymentId = $database->fetchRow(
+            'SELECT `id` FROM `s_core_paymentmeans` WHERE `name` = :name',
+            [':name' => self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE]
+            )['id'] ?? null;
 
         if (null === $paymentId) {
             $modelsManager->persist($payment);
