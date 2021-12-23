@@ -2,23 +2,5 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-    <imports>
-        <!-- register services files explicitly -->
-        <import resource="services/adyen.xml" />
-        <import resource="services/commands.xml" />
-        <import resource="services/components.xml" />
-        <import resource="services/dbal.xml" />
-        <import resource="services/loggers.xml" />
-        <import resource="services/managers.xml" />
-        <import resource="services/subscribers.xml" />
-        <import resource="services/subscribers-cronjob.xml" />
-        <import resource="services/validators.xml" />
-        <import resource="services/rules.xml" />
-        <import resource="services/providers.xml" />
-        <import resource="services/mapper.xml" />
-        <import resource="services/doctrine.xml"/>
-        <import resource="services/importers.xml" />
-        <import resource="services/factory.xml" />
-        <import resource="services/enrichers.xml" />
-    </imports>
+    <!-- Default services file, services are loaded in Adyen Plugin -->
 </container>

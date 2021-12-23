@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace AdyenPayment\Components;
 
 use AdyenPayment\Models\TextNotification;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Shopware\Components\Model\ModelManager;
 
 /**
- * Class NotificationManager
- * @package AdyenPayment\Components
+ * Class NotificationManager.
  */
 class TextNotificationManager
 {
@@ -21,14 +20,12 @@ class TextNotificationManager
     private $modelManager;
 
     /**
-     * @var ObjectRepository|EntityRepository
+     * @var EntityRepository|ObjectRepository
      */
     private $textNotificationRepository;
 
-
     /**
      * NotificationManager constructor.
-     * @param ModelManager $modelManager
      */
     public function __construct(
         ModelManager $modelManager
@@ -37,9 +34,6 @@ class TextNotificationManager
         $this->textNotificationRepository = $modelManager->getRepository(TextNotification::class);
     }
 
-    /**
-     * @return array
-     */
     public function getTextNextNotificationsToHandle(): array
     {
         $builder = $this->textNotificationRepository->createQueryBuilder('n');

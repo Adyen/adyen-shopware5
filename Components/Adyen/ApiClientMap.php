@@ -13,6 +13,7 @@ class ApiClientMap
      * @var array<int|string, Client>
      */
     private $memoisedClients = [];
+
     /**
      * @var ApiFactory
      */

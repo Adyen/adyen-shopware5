@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components;
 
 use AdyenPayment\Components\Builder\NotificationBuilder;
 use AdyenPayment\Exceptions\InvalidParameterException;
 use AdyenPayment\Exceptions\OrderNotFoundException;
-use AdyenPayment\Models\Feedback\NotificationItemFeedback;
 use AdyenPayment\Models\Feedback\TextNotificationItemFeedback;
 use AdyenPayment\Models\TextNotification;
 use Doctrine\ORM\ORMException;
@@ -13,8 +14,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Components\Model\ModelManager;
 
 /**
- * Class IncomingNotificationManager
- * @package AdyenPayment\Components
+ * Class IncomingNotificationManager.
  */
 class IncomingNotificationManager
 {
@@ -35,9 +35,6 @@ class IncomingNotificationManager
 
     /**
      * IncomingNotificationManager constructor.
-     * @param LoggerInterface $logger
-     * @param NotificationBuilder $notificationBuilder
-     * @param ModelManager $entityManager
      */
     public function __construct(
         LoggerInterface $logger,
@@ -51,10 +48,11 @@ class IncomingNotificationManager
 
     /**
      * @param TextNotification[] $textNotifications
+     *
      * @throws ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function convertNotifications(array $textNotifications)
+    public function convertNotifications(array $textNotifications): void
     {
         foreach ($textNotifications as $textNotificationItem) {
             try {
@@ -66,11 +64,11 @@ class IncomingNotificationManager
                 }
             } catch (InvalidParameterException $exception) {
                 $this->logger->warning(
-                    $exception->getMessage() . " " . $textNotificationItem->getTextNotification()
+                    $exception->getMessage().' '.$textNotificationItem->getTextNotification()
                 );
             } catch (OrderNotFoundException $exception) {
                 $this->logger->warning(
-                    $exception->getMessage() . " " . $textNotificationItem->getTextNotification()
+                    $exception->getMessage().' '.$textNotificationItem->getTextNotification()
                 );
             }
             $this->entityManager->remove($textNotificationItem);
@@ -79,8 +77,6 @@ class IncomingNotificationManager
     }
 
     /**
-     * @param array $textNotificationItems
-     * @return \Generator
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -92,8 +88,9 @@ class IncomingNotificationManager
                     if ($this->skipNotification($textNotificationItem['NotificationRequestItem'])) {
                         $this->logger->info(
                             'Skipped notification',
-                            ['eventCode' => $notificationRequest['eventCode'] ?? '']
+                            ['eventCode' => $textNotificationItem['eventCode'] ?? '']
                         );
+
                         continue;
                     }
 
@@ -114,7 +111,7 @@ class IncomingNotificationManager
     private function skipNotification(array $notificationRequest): bool
     {
         if (!empty($notificationRequest['eventCode']) &&
-            strpos($notificationRequest['eventCode'], 'REPORT_') !== false) {
+            false !== mb_strpos($notificationRequest['eventCode'], 'REPORT_')) {
             return true;
         }
 

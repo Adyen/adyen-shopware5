@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Collection\Payment;
 
+use AdyenPayment\Models\Payment\PaymentGroup;
+use AdyenPayment\Models\Payment\PaymentMean;
 use AdyenPayment\Models\Payment\PaymentMethod;
-use AdyenPayment\Models\Payment\PaymentMethodType;
 
 final class PaymentMethodCollection implements \Countable, \IteratorAggregate
 {
     /**
-     * @var PaymentMethod[]
+     * @var array<PaymentMethod>
      */
-    private $paymentMethods;
+    private array $paymentMethods;
 
     public function __construct(PaymentMethod ...$paymentMethods)
     {
@@ -22,7 +23,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     /**
      * @return \Generator<PaymentMethod>
      */
-    public function getIterator(): \Generator
+    public function getIterator(): \Traversable
     {
         yield from $this->paymentMethods;
     }
@@ -35,10 +36,30 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     public static function fromAdyenMethods(array $adyenMethods): self
     {
         return new self(
-            ...array_map(function (array $paymentMethod) {
-                return PaymentMethod::fromRaw($paymentMethod);
-            }, $adyenMethods['paymentMethods'] ?? [])
+            ...array_map(
+                static fn(array $paymentMethod) => PaymentMethod::fromRaw($paymentMethod),
+                $adyenMethods['paymentMethods'] ?? []
+            )
         );
+    }
+
+    public function withImportLocale(PaymentMethodCollection $importLocalePaymentMethods): self
+    {
+        $importPaymentMethods = iterator_to_array($importLocalePaymentMethods);
+
+        return new self(...array_map(
+            static function(int $index, PaymentMethod $paymentMethod) use ($importPaymentMethods): PaymentMethod {
+                /** @var PaymentMethod $importMethod */
+                $importLocaleMethod = $importPaymentMethods[$index] ?? null;
+                if (!$importLocaleMethod) {
+                    return $paymentMethod;
+                }
+
+                return $paymentMethod->withCode($importLocaleMethod->name());
+            },
+            array_keys($this->paymentMethods),
+            array_values($this->paymentMethods)
+        ));
     }
 
     public function map(callable $callback): array
@@ -48,27 +69,24 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
 
     public function mapToRaw(): array
     {
-        return array_map(function (PaymentMethod $paymentMethod) {
-            return $paymentMethod->getRawData();
-        }, $this->paymentMethods);
+        return array_map(
+            static fn(PaymentMethod $paymentMethod) => $paymentMethod->rawData(),
+            $this->paymentMethods
+        );
     }
 
     /**
-     * @return PaymentMethod|null
+     * $identifierOrStoredId is the Adyen "unique identifier" or Adyen "stored payment id"
+     * NOT the Shopware id.
      */
-    public function fetchByTypeOrId(string $paymentTypeOrId)
+    public function fetchByIdentifierOrStoredId(string $identifierOrStoredId): ?PaymentMethod
     {
         foreach ($this->paymentMethods as $paymentMethod) {
-            if ($paymentMethod->getId() !== $paymentTypeOrId
-                && $paymentMethod->getType() !== $paymentTypeOrId) {
-                continue;
-            }
-
-            if ($paymentMethod->getPaymentMethodType()->equals(PaymentMethodType::stored())) {
+            if ($paymentMethod->getStoredPaymentMethodId() === $identifierOrStoredId) {
                 return $paymentMethod;
             }
 
-            if ($paymentMethod->getPaymentMethodType()->equals(PaymentMethodType::default())) {
+            if ($paymentMethod->code() === $identifierOrStoredId) {
                 return $paymentMethod;
             }
         }
@@ -76,18 +94,29 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
         return null;
     }
 
-    public function filter(callable $filter = null): self
+    public function fetchByPaymentMean(PaymentMean $paymentMean): ?PaymentMethod
+    {
+        if ('' === $paymentMean->getAdyenStoredMethodId() && '' === $paymentMean->getAdyenCode()) {
+            return null;
+        }
+
+        if ($paymentMean->getAdyenStoredMethodId()) {
+            return $this->fetchByIdentifierOrStoredId($paymentMean->getAdyenStoredMethodId());
+        }
+
+        return $this->fetchByIdentifierOrStoredId($paymentMean->getAdyenCode());
+    }
+
+    public function filter(callable $filter): self
     {
         return new self(...array_filter($this->paymentMethods, $filter));
     }
 
-    public function filterByPaymentType(PaymentMethodType $paymentMethodType): self
+    public function filterByPaymentType(PaymentGroup $group): self
     {
         return new self(...array_filter(
             $this->paymentMethods,
-            function (PaymentMethod $paymentMethod) use ($paymentMethodType) {
-                return $paymentMethod->getPaymentMethodType()->equals($paymentMethodType);
-            }
+            static fn(PaymentMethod $paymentMethod) => $paymentMethod->group()->equals($group)
         ));
     }
 }

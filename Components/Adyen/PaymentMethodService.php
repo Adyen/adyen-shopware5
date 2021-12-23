@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AdyenPayment\Components\Adyen;
 
 use Adyen\AdyenException;
 use Adyen\Service\Checkout;
 use Adyen\Util\Currency;
+use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Models\Enum\Channel;
 use Enlight_Components_Session_Namespace;
@@ -12,37 +15,16 @@ use Psr\Log\LoggerInterface;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Customer\Customer;
 
-/**
- * Class PaymentMethodService
- *
- * @package AdyenPayment\Components\Adyen
- */
-class PaymentMethodService
+final class PaymentMethodService
 {
-    /**
-     * @var ApiClientMap
-     */
-    private $apiClientMap;
-    /**
-     * @var Configuration
-     */
-    private $configuration;
-    /**
-     * @var array
-     */
-    private $cache;
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-    /**
-     * @var Enlight_Components_Session_Namespace
-     */
-    private $session;
-    /**
-     * @var ModelManager
-     */
-    private $modelManager;
+    /** @todo cleanup the public const (unify the services) */
+    public const IMPORT_LOCALE = 'en_GB';
+    private ApiClientMap $apiClientMap;
+    private Configuration $configuration;
+    private array $cache;
+    private LoggerInterface $logger;
+    private Enlight_Components_Session_Namespace $session;
+    private ModelManager $modelManager;
 
     public function __construct(
         ApiClientMap $apiClientMap,
@@ -59,26 +41,22 @@ class PaymentMethodService
     }
 
     /**
-     * @param string $countryCode
-     * @param string $currency
-     * @param int    $value
-     * @param null   $locale
-     * @param bool   $cache
-     *
-     * @return array
+     * @throws AdyenException
      */
     public function getPaymentMethods(
-        $countryCode = null,
-        $currency = null,
-        $value = null,
-        $locale = null,
-        $cache = true
-    ): array {
+        ?string $countryCode = null,
+        ?string $currency = null,
+        ?float $value = null,
+        ?string $locale = null,
+        bool $cache = true
+    ): PaymentMethodCollection {
         $cache = $cache && $this->configuration->isPaymentmethodsCacheEnabled();
-        $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string)$value ?? '');
+        $cacheKey = $this->getCacheKey($countryCode ?? '', $currency ?? '', (string) ($value ?? ''));
         if ($cache && isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
         }
+
+        $locale = $locale ?: Shopware()->Shop()->getLocale()->getLocale();
 
         $checkout = $this->getCheckout();
         $adyenCurrency = new Currency();
@@ -91,12 +69,23 @@ class PaymentMethodService
                 'value' => $adyenCurrency->sanitize($value, $currency),
             ],
             'channel' => Channel::WEB,
-            'shopperLocale' => $locale ?? Shopware()->Shop()->getLocale()->getLocale(),
+            'shopperLocale' => $locale,
             'shopperReference' => $this->provideCustomerNumber(),
         ];
 
         try {
-            $paymentMethods = $checkout->paymentMethods($requestParams);
+            $paymentMethods = PaymentMethodCollection::fromAdyenMethods(
+                $checkout->paymentMethods($requestParams)
+            );
+
+            // get payment methods import locale (important for code)
+            $paymentMethods = self::IMPORT_LOCALE === $locale
+                ? $paymentMethods->withImportLocale($paymentMethods)
+                : $paymentMethods->withImportLocale(
+                    PaymentMethodCollection::fromAdyenMethods($checkout->paymentMethods(
+                        array_replace($requestParams, ['shopperLocale' => self::IMPORT_LOCALE])
+                    ))
+                );
         } catch (AdyenException $e) {
             $this->logger->critical('Adyen Exception', [
                 'message' => $e->getMessage(),
@@ -106,7 +95,7 @@ class PaymentMethodService
                 'status' => $e->getStatus(),
             ]);
 
-            return [];
+            return new PaymentMethodCollection();
         }
 
         if ($cache) {
@@ -116,12 +105,7 @@ class PaymentMethodService
         return $paymentMethods;
     }
 
-    /**
-     * @param string ...$keys
-     *
-     * @return string
-     */
-    private function getCacheKey(string ...$keys)
+    private function getCacheKey(string ...$keys): string
     {
         return md5(implode(',', $keys));
     }
@@ -146,6 +130,6 @@ class PaymentMethodService
         }
         $customer = $this->modelManager->getRepository(Customer::class)->find($userId);
 
-        return $customer ? (string)$customer->getNumber() : '';
+        return $customer ? (string) $customer->getNumber() : '';
     }
 }

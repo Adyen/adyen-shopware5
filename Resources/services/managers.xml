@@ -3,25 +3,22 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="adyen_payment.components.manager.adyen_manager" class="AdyenPayment\Components\Manager\AdyenManager">
+        <service id="AdyenPayment\Components\Manager\AdyenManager" public="true">
             <argument type="service" id="models"/>
         </service>
-        <service id="adyen_payment.components.notification_manager"
-                 class="AdyenPayment\Components\NotificationManager">
+        <service id="AdyenPayment\Components\NotificationManager">
             <argument type="service" id="models"/>
         </service>
-        <service id="AdyenPayment\Components\Manager\OrderManager">
+        <service id="AdyenPayment\Components\Manager\OrderManager" public="true">
             <argument type="service" id="models"/>
         </service>
         <service id="AdyenPayment\Components\Manager\OrderManagerInterface" alias="AdyenPayment\Components\Manager\OrderManager" />
-        <service id="adyen_payment.components.text_notification_manager"
-                 class="AdyenPayment\Components\TextNotificationManager">
+        <service id="AdyenPayment\Components\TextNotificationManager">
             <argument type="service" id="models"/>
         </service>
-        <service id="adyen_payment.components.incoming_notification_manager"
-                 class="AdyenPayment\Components\IncomingNotificationManager">
+        <service id="AdyenPayment\Components\IncomingNotificationManager" public="true">
             <argument type="service" id="adyen_payment.logger.notifications"/>
-            <argument type="service" id="adyen_payment.components.builder.notification_builder"/>
+            <argument type="service" id="AdyenPayment\Components\Builder\NotificationBuilder"/>
             <argument type="service" id="models"/>
         </service>
     </services>

@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber\Checkout;
 
-use Adyen\Util\Currency;
-use AdyenPayment\Components\Configuration;
+use AdyenPayment\Components\WebComponents\ConfigContext;
+use AdyenPayment\Components\WebComponents\ConfigProvider;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Models\Payment\PaymentMean;
+use AdyenPayment\Models\Payment\PaymentType;
+use AdyenPayment\Utils\Sanitize;
 use Enlight\Event\SubscriberInterface;
-use Enlight_Event_EventArgs;
 
+/**
+ * Depends on EnrichUserAdditionalPaymentSubscriber.
+ */
 final class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
 {
-    private static $PAY_WITH_GOOGLE = 'paywithgoogle';
+    private ConfigProvider $googlePayConfigProvider;
 
-    /**
-     * @var Configuration
-     */
-    private $configuration;
-
-    public function __construct(Configuration $configuration)
+    public function __construct(ConfigProvider $googlePayConfigProvider)
     {
-        $this->configuration = $configuration;
+        $this->googlePayConfigProvider = $googlePayConfigProvider;
     }
 
     public static function getSubscribedEvents(): array
@@ -31,17 +31,16 @@ final class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
         ];
     }
 
-    public function __invoke(Enlight_Event_EventArgs $args)
+    public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
-
-        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+        if ('confirm' !== $subject->Request()->getActionName()) {
             return;
         }
 
         $userData = $subject->View()->getAssign('sUserData');
-        $source = (int) ($userData['additional']['payment']['source'] ?? null);
-        if (!SourceType::load($source)->equals(SourceType::adyen())) {
+        $paymentMean = PaymentMean::createFromShopwareArray($userData['additional']['payment'] ?? []);
+        if (!$paymentMean->getSource()->equals(SourceType::adyen())) {
             return;
         }
 
@@ -50,19 +49,13 @@ final class AddGooglePayConfigToViewSubscriber implements SubscriberInterface
             return;
         }
 
-        $adyenType = (string) ($userData['additional']['payment']['attributes']['core']['adyen_type'] ?? '');
-        if (self::$PAY_WITH_GOOGLE !== $adyenType) {
+        if (!$paymentMean->adyenType() || !$paymentMean->adyenType()->equals(PaymentType::googlePay())) {
             return;
         }
 
-        $currencyUtil = new Currency();
-        $adyenGoogleConfig = [
-            'environment' => $this->configuration->getEnvironment() === Configuration::ENV_LIVE ? 'PRODUCTION' : 'TEST',
-            'showPayButton' => true,
-            'currencyCode' => $basket['sCurrencyName'],
-            'amount' => $currencyUtil->sanitize($basket['AmountNumeric'], $basket['sCurrencyName'])
-        ];
-
-        $subject->View()->assign('sAdyenGoogleConfig', htmlentities(json_encode($adyenGoogleConfig)));
+        $googlePayConfig = ($this->googlePayConfigProvider)(ConfigContext::fromCheckoutEvent($args));
+        $subject->View()->assign('sAdyenGoogleConfig',
+            Sanitize::escape(json_encode($googlePayConfig, JSON_THROW_ON_ERROR))
+        );
     }
 }

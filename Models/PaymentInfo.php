@@ -8,7 +8,9 @@ use Shopware\Models\Order\Order;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="s_plugin_adyen_order_payment_info")
+ * @ORM\Table(name="s_plugin_adyen_order_payment_info", indexes={
+ *     @ORM\Index(name="idx_ordernumber", columns={"ordernumber"})
+ * })
  */
 class PaymentInfo extends ModelEntity
 {
@@ -94,9 +96,9 @@ class PaymentInfo extends ModelEntity
     /**
      * @param int $id
      *
-     * @return $this
+     * @return static
      */
-    public function setId(int $id)
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -114,9 +116,9 @@ class PaymentInfo extends ModelEntity
     /**
      * @param int $orderId
      *
-     * @return $this
+     * @return static
      */
-    public function setOrderId(int $orderId)
+    public function setOrderId(int $orderId): self
     {
         $this->orderId = $orderId;
 
@@ -135,9 +137,9 @@ class PaymentInfo extends ModelEntity
     /**
      * @param Order|null $order
      *
-     * @return $this
+     * @return static
      */
-    public function setOrder(Order $order = null)
+    public function setOrder(Order $order = null): self
     {
         $this->order = $order;
 
@@ -157,9 +159,9 @@ class PaymentInfo extends ModelEntity
     /**
      * @param string $pspReference
      *
-     * @return $this
+     * @return static
      */
-    public function setPspReference(string $pspReference)
+    public function setPspReference(string $pspReference): self
     {
         $this->pspReference = $pspReference;
 
@@ -177,9 +179,9 @@ class PaymentInfo extends ModelEntity
     /**
      * @param \DateTime $createdAt
      *
-     * @return $this
+     * @return static
      */
-    public function setCreatedAt(\DateTime $createdAt)
+    public function setCreatedAt(\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
@@ -197,9 +199,9 @@ class PaymentInfo extends ModelEntity
     /**
      * @param \DateTime $updatedAt
      *
-     * @return $this
+     * @return static
      */
-    public function setUpdatedAt(\DateTime $updatedAt)
+    public function setUpdatedAt(\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -217,9 +219,9 @@ class PaymentInfo extends ModelEntity
     /**
      * @param string $resultCode
      *
-     * @return $this
+     * @return static
      */
-    public function setResultCode(string $resultCode)
+    public function setResultCode(string $resultCode): self
     {
         $this->resultCode = $resultCode;
 
@@ -237,9 +239,9 @@ class PaymentInfo extends ModelEntity
     /**
      * @param string|null $ordermailVariables
      *
-     * @return $this
+     * @return static
      */
-    public function setOrdermailVariables($ordermailVariables)
+    public function setOrdermailVariables($ordermailVariables): self
     {
         $this->ordermailVariables = $ordermailVariables;
 
@@ -257,9 +259,9 @@ class PaymentInfo extends ModelEntity
     /**
      * @param string|null $ordernumber
      *
-     * @return $this
+     * @return static
      */
-    public function setOrderNumber($ordernumber)
+    public function setOrderNumber($ordernumber): self
     {
         $this->ordernumber = $ordernumber;
 

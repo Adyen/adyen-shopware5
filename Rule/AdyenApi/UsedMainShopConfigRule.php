@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Rule\AdyenApi;
 
-use Doctrine\Common\Persistence\ObjectRepository;
-
 final class UsedMainShopConfigRule implements MainShopRule
 {
     /**

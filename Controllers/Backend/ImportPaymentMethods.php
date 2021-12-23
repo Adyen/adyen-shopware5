@@ -9,11 +9,12 @@ use Symfony\Component\HttpFoundation\Response;
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps, Generic.Files.LineLength.TooLong
 class Shopware_Controllers_Backend_ImportPaymentMethods extends Shopware_Controllers_Backend_ExtJs
 {
-    /** @var PaymentMethodImporterInterface */
-    private $paymentMethodImporter;
-    /** @var LoggerInterface */
-    private $logger;
+    private PaymentMethodImporterInterface $paymentMethodImporter;
+    private LoggerInterface $logger;
 
+    /**
+     * @return void
+     */
     public function preDispatch()
     {
         parent::preDispatch();
@@ -22,30 +23,30 @@ class Shopware_Controllers_Backend_ImportPaymentMethods extends Shopware_Control
         $this->logger = $this->get('adyen_payment.logger');
     }
 
-    public function importAction()
+    public function importAction(): void
     {
         try {
-            $counter = 0;
-
-            $counter = count(iterator_to_array(
-                $this->paymentMethodImporter->importAll()
-            ));
+            $total = $success = 0;
+            foreach ($this->paymentMethodImporter->importAll() as $result) {
+                ++$total;
+                if ($result->isSuccess()) {
+                    ++$success;
+                }
+            }
 
             $this->response->setHttpResponseCode(Response::HTTP_OK);
-            $this->View()->assign('responseText', sprintf(
-                'Imported successfully %s payment method(s)',
-                $counter
+            $this->View()->assign('responseText', sprintf('Imported %s of %s payment method(s).%s',
+                $success,
+                $total,
+                $total !== $success ? ' Details can be found in adyen log.' : ''
             ));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error($e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            $this->View()->assign(
-                'responseText',
-                sprintf(
-                    'Import of payment methods failed. Please check the logs for more details.'
-                )
+            $this->View()->assign('responseText',
+                sprintf('Import of payment methods failed. Please check the logs for more details.')
             );
         }
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
@@ -7,7 +9,7 @@ use Shopware\Bundle\CookieBundle\CookieCollection;
 use Shopware\Bundle\CookieBundle\Structs\CookieGroupStruct;
 use Shopware\Bundle\CookieBundle\Structs\CookieStruct;
 
-class CookieSubscriber implements SubscriberInterface
+final class CookieSubscriber implements SubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components\NotificationProcessor;
 
 use AdyenPayment\Components\PaymentStatusUpdate;
@@ -12,39 +14,39 @@ use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Status;
 
 /**
- * Class Authorisation
- * @package AdyenPayment\Components\NotificationProcessor
+ * Class Authorisation.
  */
 class Authorisation implements NotificationProcessorInterface
 {
-    const EVENT_CODE = 'AUTHORISATION';
+    public const EVENT_CODE = 'AUTHORISATION';
 
     /**
      * @var LoggerInterface
      */
     private $logger;
+
     /**
      * @var ContainerAwareEventManager
      */
     private $eventManager;
+
     /**
      * @var PaymentStatusUpdate
      */
     private $paymentStatusUpdate;
+
     /**
      * @var ModelManager
      */
     private $modelManager;
+
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository
      */
     private $paymentInfoRepository;
 
     /**
      * Authorisation constructor.
-     * @param LoggerInterface $logger
-     * @param ContainerAwareEventManager $eventManager
-     * @param PaymentStatusUpdate $paymentStatusUpdate
      */
     public function __construct(
         LoggerInterface $logger,
@@ -60,46 +62,46 @@ class Authorisation implements NotificationProcessorInterface
     }
 
     /**
-     * Returns boolean on whether this processor can process the Notification object
-     *
-     * @param Notification $notification
-     * @return boolean
+     * Returns boolean on whether this processor can process the Notification object.
      */
     public function supports(Notification $notification): bool
     {
-        return strtoupper($notification->getEventCode()) === self::EVENT_CODE;
+        return self::EVENT_CODE === mb_strtoupper($notification->getEventCode());
     }
 
     /**
-     * Actual processing of the notification
+     * Actual processing of the notification.
      *
-     * @param Notification $notification
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      * @throws \Enlight_Event_Exception
      */
-    public function process(Notification $notification)
+    public function process(Notification $notification): void
     {
         $order = $notification->getOrder();
+        if (!$order) {
+            return;
+        }
+
         $this->eventManager->notify(
             Event::NOTIFICATION_PROCESS_AUTHORISATION,
             [
                 'order' => $order,
-                'notification' => $notification
+                'notification' => $notification,
             ]
         );
 
-        $status = $notification->isSuccess() ?
-            Status::PAYMENT_STATE_COMPLETELY_PAID :
-            Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED;
+        $status = $notification->isSuccess()
+            ? Status::PAYMENT_STATE_COMPLETELY_PAID
+            : Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED;
 
         $this->paymentStatusUpdate->updatePaymentStatus($order, $status);
 
         if ($notification->isSuccess()) {
             /** @var PaymentInfo $paymentInfo */
             $paymentInfo = $this->paymentInfoRepository->findOneBy([
-                'orderId' => $order->getId()
+                'orderId' => $order->getId(),
             ]);
 
             $paymentInfo->setPspReference($notification->getPspReference());

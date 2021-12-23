@@ -18,8 +18,7 @@ use Shopware\Components\Model\ModelManager;
 use Traversable;
 
 /**
- * Class NotificationProcessor
- * @package AdyenPayment\Components
+ * Class NotificationProcessor.
  */
 class NotificationProcessor
 {
@@ -27,14 +26,17 @@ class NotificationProcessor
      * @var NotificationProcessorInterface[]
      */
     private $processors;
+
     /**
      * @var LoggerInterface
      */
     private $logger;
+
     /**
      * @var ModelManager
      */
     private $modelManager;
+
     /**
      * @var ContainerAwareEventManager
      */
@@ -42,9 +44,7 @@ class NotificationProcessor
 
     /**
      * NotificationProcessor constructor.
-     * @param LoggerInterface $logger
-     * @param ModelManager $modelManager
-     * @param ContainerAwareEventManager $eventManager
+     *
      * @throws \Enlight_Event_Exception
      */
     public function __construct(
@@ -58,12 +58,12 @@ class NotificationProcessor
     }
 
     /**
-     * @param Traversable $notifications
-     * @return \Generator<NotificationProcessorFeedback>
      * @throws \Doctrine\ORM\ORMException
      * @throws \Enlight_Event_Exception
+     *
+     * @psalm-return \Generator<NotificationProcessorFeedback>
      */
-    public function processMany(Traversable $notifications)
+    public function processMany(Traversable $notifications): \Generator
     {
         foreach ($notifications as $notification) {
             try {
@@ -74,7 +74,7 @@ class NotificationProcessor
                     [
                         'eventCode' => $notification->getEventCode(),
                         'pspReference' => $notification->getPspReference(),
-                        'status' => $notification->getStatus()
+                        'status' => $notification->getStatus(),
                     ]
                 );
 
@@ -82,10 +82,10 @@ class NotificationProcessor
             } catch (OrderNotFoundException $exception) {
                 $this->logger->error('No order found for notification', [
                     'eventCode' => $notification->getEventCode(),
-                    'status ' => $notification->getStatus()
+                    'status ' => $notification->getStatus(),
                 ]);
                 $this->eventManager->notify(Event::NOTIFICATION_NO_ORDER_FOUND, [
-                    'notification' => $notification
+                    'notification' => $notification,
                 ]);
 
                 yield new NotificationProcessorFeedback(false, $exception->getMessage(), $notification);
@@ -96,26 +96,29 @@ class NotificationProcessor
     }
 
     /**
-     * @param Notification $notification
      * @throws NoNotificationProcessorFoundException
      * @throws OrderNotFoundException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Enlight_Event_Exception
+     *
+     * @psalm-return \Generator<NotificationProcessorFeedback>
      */
-    private function process(Notification $notification)
+    private function process(Notification $notification): \Generator
     {
         $processors = $this->findProcessors($notification);
 
         if (empty($processors)) {
             $notification->setStatus(NotificationStatus::STATUS_FATAL);
             $this->modelManager->persist($notification);
-            throw new NoNotificationProcessorFoundException((string)$notification->getId());
+
+            throw new NoNotificationProcessorFoundException((string) $notification->getId());
         }
 
         if (!$notification->getOrder()) {
             $notification->setStatus(NotificationStatus::STATUS_FATAL);
             $this->modelManager->persist($notification);
-            throw new OrderNotFoundException((string)$notification->getOrderId());
+
+            throw new OrderNotFoundException((string) $notification->getOrderId());
         }
 
         $status = NotificationStatus::STATUS_HANDLED;
@@ -126,11 +129,11 @@ class NotificationProcessor
                 $status = NotificationStatus::STATUS_ERROR;
                 $this->logger->notice('NotificationException', [
                     'message' => $exception->getMessage(),
-                    'notificationId' => $exception->getNotification()->getId()
+                    'notificationId' => $exception->getNotification()->getId(),
                 ]);
                 yield new NotificationProcessorFeedback(
                     false,
-                    "NotificationException: " . $exception->getMessage(),
+                    'NotificationException: '.$exception->getMessage(),
                     $notification
                 );
             } catch (\Exception $exception) {
@@ -139,13 +142,13 @@ class NotificationProcessor
                     'exception' => [
                         'message' => $exception->getMessage(),
                         'file' => $exception->getFile(),
-                        'line' => $exception->getLine()
+                        'line' => $exception->getLine(),
                     ],
-                    'notificationId' => $notification->getId()
+                    'notificationId' => $notification->getId(),
                 ]);
                 yield new NotificationProcessorFeedback(
                     false,
-                    "General Exception: " . $exception->getMessage(),
+                    'General Exception: '.$exception->getMessage(),
                     $notification
                 );
             }
@@ -154,24 +157,20 @@ class NotificationProcessor
         $notification->setStatus($status);
         $this->modelManager->persist($notification);
 
-        yield new NotificationProcessorFeedback(true, "Processed " . $notification->getId(), $notification);
+        yield new NotificationProcessorFeedback(true, 'Processed '.$notification->getId(), $notification);
     }
 
-    /**
-     * @param NotificationProcessorInterface $processor
-     */
-    public function addProcessor(NotificationProcessorInterface $processor)
+    public function addProcessor(NotificationProcessorInterface $processor): void
     {
         $this->processors[] = $processor;
     }
 
     /**
-     * Finds all processors that support this type of Notification
+     * Finds all processors that support this type of Notification.
      *
      * @param $notification
-     * @return array
      */
-    private function findProcessors($notification): array
+    private function findProcessors(Notification $notification): array
     {
         $processors = [];
         foreach ($this->processors as $processor) {
@@ -179,6 +178,7 @@ class NotificationProcessor
                 $processors[] = $processor;
             }
         }
+
         return $processors;
     }
 }

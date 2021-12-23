@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components\NotificationProcessor;
 
 use AdyenPayment\Components\PaymentStatusUpdate;
@@ -10,21 +12,22 @@ use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Models\Order\Status;
 
 /**
- * Class Chargeback
- * @package AdyenPayment\Components\NotificationProcessor
+ * Class Chargeback.
  */
 class Chargeback implements NotificationProcessorInterface
 {
-    const EVENT_CODE = 'CHARGEBACK';
+    public const EVENT_CODE = 'CHARGEBACK';
 
     /**
      * @var LoggerInterface
      */
     private $logger;
+
     /**
      * @var ContainerAwareEventManager
      */
     private $eventManager;
+
     /**
      * @var PaymentStatusUpdate
      */
@@ -32,9 +35,6 @@ class Chargeback implements NotificationProcessorInterface
 
     /**
      * Authorisation constructor.
-     * @param LoggerInterface $logger
-     * @param ContainerAwareEventManager $eventManager
-     * @param PaymentStatusUpdate $paymentStatusUpdate
      */
     public function __construct(
         LoggerInterface $logger,
@@ -47,33 +47,30 @@ class Chargeback implements NotificationProcessorInterface
     }
 
     /**
-     * Returns boolean on whether this processor can process the Notification object
-     *
-     * @param Notification $notification
-     * @return boolean
+     * Returns boolean on whether this processor can process the Notification object.
      */
     public function supports(Notification $notification): bool
     {
-        return strtoupper($notification->getEventCode()) === self::EVENT_CODE;
+        return self::EVENT_CODE === mb_strtoupper($notification->getEventCode());
     }
 
     /**
-     * Actual processing of the notification
+     * Actual processing of the notification.
      *
-     * @param Notification $notification
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      * @throws \Enlight_Event_Exception
      */
-    public function process(Notification $notification)
+    public function process(Notification $notification): void
     {
         $order = $notification->getOrder();
         if (!$order) {
             $this->logger->error('No order found', [
                 'eventCode' => $notification->getEventCode(),
-                'status ' => $notification->getStatus()
+                'status ' => $notification->getStatus(),
             ]);
+
             return;
         }
 
@@ -81,7 +78,7 @@ class Chargeback implements NotificationProcessorInterface
             Event::NOTIFICATION_PROCESS_CHARGEBACK,
             [
                 'order' => $order,
-                'notification' => $notification
+                'notification' => $notification,
             ]
         );
 

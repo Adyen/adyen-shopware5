@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Rule\AdyenApi;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 
 final class UsedFallbackConfigRule implements UsedFallbackConfigRuleInterface
 {
@@ -12,6 +12,7 @@ final class UsedFallbackConfigRule implements UsedFallbackConfigRuleInterface
      * @var ObjectRepository
      */
     private $shopRepository;
+
     /**
      * @var MainShopConfigRule
      */

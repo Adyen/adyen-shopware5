@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Components;
 
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
-
 /**
- * Class FifoNotificationLoader
- * @package AdyenPayment\Components
+ * Class FifoNotificationLoader.
  */
 class FifoTextNotificationLoader
 {
@@ -20,7 +16,6 @@ class FifoTextNotificationLoader
 
     /**
      * FifoTextNotificationLoader constructor.
-     * @param TextNotificationManager $textNotificationManager
      */
     public function __construct(
         TextNotificationManager $textNotificationManager

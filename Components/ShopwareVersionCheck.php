@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AdyenPayment\Components;
 
@@ -9,21 +11,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ShopwareVersionCheck
 {
-    const SHOPWARE = '___VERSION___';
+    public const SHOPWARE = '___VERSION___';
 
     /**
      * @var ContainerInterface
      */
     private $container;
+
     /**
      * @var LoggerInterface
      */
     private $logger;
 
-    /**
-     * @param ContainerInterface $container
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         ContainerInterface $container,
         LoggerInterface $logger
@@ -40,21 +39,21 @@ class ShopwareVersionCheck
 
         $version = $this->container->get('shopware.release')->getVersion();
 
-        if ($version === self::SHOPWARE) {
+        if (self::SHOPWARE === $version) {
             try {
-                list($composerVersion, $sha) = explode('@', Versions::getVersion('shopware/shopware'));
+                [$composerVersion, $sha] = explode('@', Versions::getVersion('shopware/shopware'));
                 $version = $composerVersion;
             } catch (OutOfBoundsException $ex) {
                 $this->logger->error('OutOfBoundsException', [
                     'message' => $ex->getMessage(),
                     'file' => $ex->getFile(),
-                    'line' => $ex->getLine()
+                    'line' => $ex->getLine(),
                 ]);
             }
         }
 
-        if ($version[0] !== 'v') {
-            $version = 'v' . $version;
+        if ('v' !== $version[0]) {
+            $version = 'v'.$version;
         }
 
         return version_compare($shopwareVersion, $version, '<');

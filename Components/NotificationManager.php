@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Components;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use AdyenPayment\Models\Enum\NotificationStatus;
+use AdyenPayment\Models\Notification;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use AdyenPayment\Models\Enum\NotificationStatus;
-use AdyenPayment\Models\Notification;
+use Doctrine\Persistence\ObjectRepository;
 use Shopware\Components\Model\ModelManager;
 
 /**
- * Class NotificationManager
- * @package AdyenPayment\Components
+ * Class NotificationManager.
  */
 class NotificationManager
 {
@@ -24,14 +23,12 @@ class NotificationManager
     private $modelManager;
 
     /**
-     * @var ObjectRepository|EntityRepository
+     * @var EntityRepository|ObjectRepository
      */
     private $notificationRepository;
 
-
     /**
      * NotificationManager constructor.
-     * @param ModelManager $modelManager
      */
     public function __construct(
         ModelManager $modelManager
@@ -41,28 +38,27 @@ class NotificationManager
     }
 
     /**
-     * @return mixed
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
     public function getNextNotificationToHandle()
     {
         $builder = $this->notificationRepository->createQueryBuilder('n');
-        $builder->where("n.status = :statusReceived OR n.status = :statusRetry")
+        $builder->where('n.status = :statusReceived OR n.status = :statusRetry')
             ->andWhere('(n.scheduledProcessingTime <= :processingTime OR n.scheduledProcessingTime IS NULL)')
             ->orderBy('n.updatedAt', 'ASC')
             ->setParameter('statusReceived', NotificationStatus::STATUS_RECEIVED)
             ->setParameter('statusRetry', NotificationStatus::STATUS_RETRY)
-            ->setParameter('processingTime', new \DateTime())
+            ->setParameter('processingTime', new \DateTimeImmutable())
             ->setMaxResults(1);
 
         return $builder->getQuery()->getSingleResult();
     }
 
     /**
-     * @param int $orderId
-     * @return mixed|null
      * @throws NonUniqueResultException
+     *
+     * @return mixed|null
      */
     public function getLastNotificationForOrderId(int $orderId)
     {
@@ -74,16 +70,17 @@ class NotificationManager
                 ->setParameter('orderId', $orderId)
                 ->getQuery()
                 ->getSingleResult();
+
             return $lastNotification;
         } catch (NoResultException $ex) {
-            return null;
+            return;
         }
     }
 
     /**
-     * @param string $pspReference
-     * @return mixed|null
      * @throws NonUniqueResultException
+     *
+     * @return mixed|null
      */
     public function getLastNotificationForPspReference(string $pspReference)
     {
@@ -95,9 +92,10 @@ class NotificationManager
                 ->setParameter('pspReference', $pspReference)
                 ->getQuery()
                 ->getSingleResult();
+
             return $lastNotification;
         } catch (NoResultException $ex) {
-            return null;
+            return;
         }
     }
 }

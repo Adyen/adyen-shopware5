@@ -17,7 +17,7 @@ final class ImportStatus
     public function __construct(string $status)
     {
         if (!in_array($status, $this->availableStates(), true)) {
-            throw new \InvalidArgumentException('Invalid import status: "' . $status . '"');
+            throw new \InvalidArgumentException('Invalid import status: "'.$status.'"');
         }
 
         $this->status = $status;
@@ -64,7 +64,7 @@ final class ImportStatus
             self::$CREATED,
             self::$UPDATED,
             self::$NOT_CHANGED,
-            self::$NOT_HANDLED
+            self::$NOT_HANDLED,
         ];
     }
 }

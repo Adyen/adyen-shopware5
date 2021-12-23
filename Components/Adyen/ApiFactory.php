@@ -12,9 +12,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Models\Shop\Shop;
 
 /**
- * Class ApiFactory
- *
- * @package AdyenPayment\Components\Adyen
+ * Class ApiFactory.
  */
 class ApiFactory
 {
@@ -49,7 +47,7 @@ class ApiFactory
         );
     }
 
-    private function createClient(string $merchantAccount, string $apiKey, string $environment, $prefix = null): Client
+    private function createClient(string $merchantAccount, string $apiKey, string $environment, ?string $prefix = null): Client
     {
         $urlPrefix = Environment::LIVE === $environment ? $prefix : null;
 

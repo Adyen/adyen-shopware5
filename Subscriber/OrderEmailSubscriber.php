@@ -1,13 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\OrderMailService;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Models\Payment\PaymentMean;
 use AdyenPayment\Models\PaymentInfo;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use Shopware\Components\Model\ModelManager;
@@ -22,13 +25,15 @@ class OrderEmailSubscriber implements SubscriberInterface
     private $modelManager;
 
     /**
-     * @var ObjectRepository|EntityRepository
+     * @var EntityRepository|ObjectRepository
      */
     private $paymentInfoRepository;
+
     /**
-     * @var ObjectRepository|EntityRepository
+     * @var EntityRepository|ObjectRepository
      */
     private $orderRepository;
+
     /**
      * @var OrderMailService
      */
@@ -44,12 +49,17 @@ class OrderEmailSubscriber implements SubscriberInterface
         $this->orderMailService = $orderMailService;
     }
 
+    /**
+     * @return string[]
+     *
+     * @psalm-return array{Shopware_Modules_Order_SendMail_Send: 'shouldStopEmailSending', Shopware_Modules_Order_SaveOrder_ProcessDetails: 'setPaymentInfoOrderNumber', Enlight_Controller_Action_PostDispatch_Frontend_Checkout: 'onCheckoutDispatch'}
+     */
     public static function getSubscribedEvents()
     {
         return [
             'Shopware_Modules_Order_SendMail_Send' => 'shouldStopEmailSending',
             'Shopware_Modules_Order_SaveOrder_ProcessDetails' => 'setPaymentInfoOrderNumber',
-            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'onCheckoutDispatch'
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'onCheckoutDispatch',
         ];
     }
 
@@ -62,7 +72,7 @@ class OrderEmailSubscriber implements SubscriberInterface
             $orderNumber = $this->getOrderNumber($orderId);
             /** @var PaymentInfo $paymentInfo */
             $paymentInfo = $this->paymentInfoRepository->findOneBy([
-                'id' => $paymentInfoId
+                'id' => $paymentInfoId,
             ]);
 
             if ($paymentInfo) {
@@ -71,21 +81,23 @@ class OrderEmailSubscriber implements SubscriberInterface
                 $this->modelManager->flush($paymentInfo);
             }
         }
+
         return $args->getReturn();
     }
 
+    /**
+     * @return false|null
+     */
     public function shouldStopEmailSending(Enlight_Event_EventArgs $args)
     {
         $variables = $args->get('variables');
-
-        $source = (int) ($variables['additional']['payment']['source'] ?? null);
-        if (SourceType::load($source)->equals(SourceType::adyen())
+        $paymentMean = PaymentMean::createFromShopwareArray($variables['additional']['payment'] ?? []);
+        if ($paymentMean->getSource()->equals(SourceType::adyen())
             && true === Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true)
         ) {
-
             /** @var PaymentInfo $paymentInfo */
             $paymentInfo = $this->paymentInfoRepository->findOneBy([
-                'ordernumber' => $variables['ordernumber']
+                'ordernumber' => $variables['ordernumber'],
             ]);
 
             if ($paymentInfo && empty($paymentInfo->getOrdermailVariables())) {
@@ -97,16 +109,14 @@ class OrderEmailSubscriber implements SubscriberInterface
 
             return false;
         }
-
-        return null;
     }
 
-    public function onCheckoutDispatch(Enlight_Event_EventArgs $args)
+    public function onCheckoutDispatch(Enlight_Event_EventArgs $args): void
     {
         /** @var Shopware_Controllers_Frontend_Checkout $subject */
         $subject = $args->getSubject();
 
-        if ($subject->Request()->getActionName() !== 'finish') {
+        if ('finish' !== $subject->Request()->getActionName()) {
             return;
         }
 
@@ -122,7 +132,7 @@ class OrderEmailSubscriber implements SubscriberInterface
     private function getOrderNumber($orderId)
     {
         return $this->orderRepository->findOneBy([
-            'id' => $orderId
+            'id' => $orderId,
         ])->getNumber();
     }
 }

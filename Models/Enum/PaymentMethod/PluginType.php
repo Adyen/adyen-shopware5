@@ -4,28 +4,21 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Models\Enum\PaymentMethod;
 
-use http\Exception\InvalidArgumentException;
-
 final class PluginType
 {
-    private static $ADYEN = 2;
-
-    /** @var int */
-    private $type;
+    private static $ADYEN = 2; // For F* Sake
+    private int $type;
 
     public function __construct($pluginType)
     {
         if (!self::isTypeAllowed($pluginType)) {
-            throw new InvalidArgumentException('Invalid plugin type: "' . $pluginType . '"');
+            throw new \InvalidArgumentException('Invalid plugin type: "'.$pluginType.'"');
         }
 
         $this->type = $pluginType;
     }
 
-    /**
-     * @return int
-     */
-    public function getType()
+    public function getType(): int
     {
         return $this->type;
     }

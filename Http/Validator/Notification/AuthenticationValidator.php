@@ -22,7 +22,7 @@ class AuthenticationValidator implements NotificationValidatorInterface
     /**
      * @throws InvalidAuthenticationException
      */
-    public function validate(array $notifications)
+    public function validate(array $notifications): void
     {
         $authUsername = $_SERVER['PHP_AUTH_USER'] ?? $_SERVER['HTTP_PHP_AUTH_USER'] ?? '';
         $authPassword = $_SERVER['PHP_AUTH_PW'] ?? $_SERVER['HTTP_PHP_AUTH_PW'] ?? '';

@@ -5,20 +5,13 @@ declare(strict_types=1);
 namespace AdyenPayment\Enricher\Payment;
 
 use AdyenPayment\Components\Adyen\PaymentMethod\ImageLogoProviderInterface;
-use AdyenPayment\Components\PaymentMethodService as ShopwarePaymentMethodService;
 use AdyenPayment\Models\Payment\PaymentMethod;
 use Shopware_Components_Snippet_Manager;
 
 final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
 {
-    /**
-     * @var Shopware_Components_Snippet_Manager
-     */
-    private $snippets;
-    /**
-     * @var ImageLogoProviderInterface
-     */
-    private $imageLogoProvider;
+    private Shopware_Components_Snippet_Manager $snippets;
+    private ImageLogoProviderInterface $imageLogoProvider;
 
     public function __construct(
         Shopware_Components_Snippet_Manager $snippets,
@@ -28,28 +21,24 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
         $this->imageLogoProvider = $imageLogoProvider;
     }
 
-    public function enrichPaymentMethod(array $shopwareMethod, PaymentMethod $paymentMethod): array
+    public function __invoke(array $shopwareMethod, PaymentMethod $paymentMethod): array
     {
         return array_merge($shopwareMethod, [
+            'enriched' => true,
             'additionaldescription' => $this->enrichDescription($paymentMethod),
-            'image' => $this->imageLogoProvider->provideByType($paymentMethod->getType()),
+            'image' => $this->imageLogoProvider->provideByType($paymentMethod->adyenType()->type()),
             'isStoredPayment' => $paymentMethod->isStoredPayment(),
             'isAdyenPaymentMethod' => true,
-            'adyenType' => $shopwareMethod['attribute']['adyen_type'] ?? '',
-            'metadata' => $paymentMethod->getRawData()
+            'adyenType' => $paymentMethod->adyenType()->type(),
+            'metadata' => $paymentMethod->rawData(),
         ]);
     }
 
-
-    /**
-     * @param PaymentMethod $adyenMethod
-     * @return string
-     */
-    private function enrichDescription(PaymentMethod $adyenMethod)
+    private function enrichDescription(PaymentMethod $adyenMethod): string
     {
         $description = $this->snippets
             ->getNamespace('adyen/method/description')
-            ->get($adyenMethod->getType()) ?? '';
+            ->get($adyenMethod->adyenType()->type()) ?? '';
 
         if (!$adyenMethod->isStoredPayment()) {
             return $description;
@@ -57,7 +46,7 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
 
         return sprintf(
             '%s%s: %s',
-            ($description ? $description . ' ' : ''),
+            ($description ? $description.' ' : ''),
             $this->snippets
                 ->getNamespace('adyen/checkout/payment')
                 ->get('CardNumberEndingOn', 'Card number ending on', true),

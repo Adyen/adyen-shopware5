@@ -13,8 +13,7 @@ use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
 
 /**
- * Class NotificationBuilder
- * @package AdyenPayment\Components\Builder
+ * Class NotificationBuilder.
  */
 class NotificationBuilder
 {
@@ -22,10 +21,12 @@ class NotificationBuilder
      * @var ModelManager
      */
     private $modelManager;
+
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository|\Shopware\Models\Order\Repository
+     * @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository|\Shopware\Models\Order\Repository
      */
     private $orderRepository;
+
     /**
      * @var Currency
      */
@@ -33,7 +34,6 @@ class NotificationBuilder
 
     /**
      * NotificationBuilder constructor.
-     * @param ModelManager $modelManager
      */
     public function __construct(
         ModelManager $modelManager
@@ -44,14 +44,14 @@ class NotificationBuilder
     }
 
     /**
-     * Builds Notification object from Adyen webhook params
+     * Builds Notification object from Adyen webhook params.
      *
      * @param $params
-     * @return Notification|void
+     *
      * @throws OrderNotFoundException
      * @throws InvalidParameterException
      */
-    public function fromParams($params)
+    public function fromParams($params): Notification
     {
         $notification = new Notification();
 
@@ -78,17 +78,19 @@ class NotificationBuilder
 
         if (isset($params['paymentMethod'])) {
             $notification->setPaymentMethod($params['paymentMethod']);
-        } elseif (isset($params['additionalData']['paymentMethodVariant'])) {
+        }
+
+        if (!isset($params['paymentMethod']) && isset($params['additionalData']['paymentMethodVariant'])) {
             $notification->setPaymentMethod($params['additionalData']['paymentMethodVariant']);
         }
 
         if (isset($params['success'])) {
-            $notification->setSuccess($params['success'] == 'true');
+            $notification->setSuccess('true' === $params['success']);
         }
         if (isset($params['merchantAccountCode'])) {
             $notification->setMerchantAccountCode($params['merchantAccountCode']);
         }
-        if (isset($params['amount']['value']) && isset($params['amount']['currency'])) {
+        if (isset($params['amount']['value'], $params['amount']['currency'])) {
             $notification->setAmountValue($params['amount']['value']);
             $notification->setAmountCurrency($params['amount']['currency']);
         }
@@ -96,7 +98,7 @@ class NotificationBuilder
             $notification->setErrorDetails($params['reason']);
         }
 
-        if (isset($params['eventCode']) && isset($params['success'])) {
+        if (isset($params['eventCode'], $params['success'])) {
             $notification->setScheduledProcessingTime($this->getProcessingTime($notification));
         }
 
@@ -105,9 +107,6 @@ class NotificationBuilder
 
     /**
      * Set delay in processing time for certain notifications.
-     *
-     * @param Notification $notification
-     * @return \DateTime
      */
     private function getProcessingTime(Notification $notification): \DateTime
     {
@@ -117,9 +116,11 @@ class NotificationBuilder
                 if (!$notification->isSuccess()) {
                     $processingTime = $processingTime->add(new \DateInterval('PT30M'));
                 }
+
                 break;
             case 'OFFER_CLOSED':
                 $processingTime = $processingTime->add(new \DateInterval('PT30M'));
+
                 break;
             default:
                 break;

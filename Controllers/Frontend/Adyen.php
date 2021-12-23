@@ -43,16 +43,19 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private $paymentPayloadProvider;
 
+    /**
+     * @return void
+     */
     public function preDispatch()
     {
-        $this->adyenManager = $this->get('adyen_payment.components.manager.adyen_manager');
-        $this->adyenCheckout = $this->get('adyen_payment.components.adyen.payment.method');
-        $this->basketService = $this->get('adyen_payment.components.basket_service');
+        $this->adyenManager = $this->get('AdyenPayment\Components\Manager\AdyenManager');
+        $this->adyenCheckout = $this->get('AdyenPayment\Components\Adyen\PaymentMethodService');
+        $this->basketService = $this->get('AdyenPayment\Components\BasketService');
         $this->logger = $this->get('adyen_payment.logger');
-        $this->paymentPayloadProvider = $this->get('adyen_payment.components.payload.payment_payload_provider');
+        $this->paymentPayloadProvider = $this->get('AdyenPayment\Components\Payload\PaymentPayloadProvider');
     }
 
-    public function ajaxDoPaymentAction()
+    public function ajaxDoPaymentAction(): void
     {
         $this->Request()->setHeader('Content-Type', 'application/json');
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
@@ -74,7 +77,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                 [
                     'status' => 'success',
                     'content' => $paymentInfo,
-                    'sUniqueID' => $context->getOrder()->getTemporaryId()
+                    'sUniqueID' => $context->getOrder()->getTemporaryId(),
                 ]
             ));
         } catch (AdyenException $ex) {
@@ -95,17 +98,18 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
     /**
      * @throws AdyenException
+     *
      * @deprecated will be removed in 3.0.0 to move closer to a generic implementation,
      * use paymentDetailsAction() instead
      */
-    public function ajaxThreeDsAction()
+    public function ajaxThreeDsAction(): void
     {
         $threeDSResult = (string) ($this->Request()->getPost()['details']['threeDSResult'] ?? '');
         if ('' === $threeDSResult) {
             $this->logger->error('3DS missing data', [
-                'action' => $postData['action'] ?? [],
+                'action' => $this->Request()->getPost()['action'] ?? '',
                 'threeDSResult' => substr($threeDSResult, -5),
-                'paymentData' => substr($postData['paymentData'] ?? '', -5),
+                'paymentData' => substr( $this->Request()->getPost()['paymentData'] ?? '', -5),
             ]);
         }
 
@@ -115,7 +119,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     /**
      * @throws AdyenException
      */
-    public function paymentDetailsAction()
+    public function paymentDetailsAction(): void
     {
         $this->Request()->setHeader('Content-Type', 'application/json');
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
@@ -133,7 +137,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    private function createPaymentContext()
+    private function createPaymentContext(): PaymentContext
     {
         $paymentInfo = json_decode($this->Request()->getPost('paymentMethod') ?? '{}', true);
         $transaction = $this->prepareTransaction();
@@ -141,7 +145,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $browserInfo = $this->Request()->getPost('browserInfo');
         $shopperInfo = $this->getShopperInfo();
         $origin = $this->Request()->getPost('origin');
-        $storePaymentMethod = (bool)json_decode($this->Request()->getPost('storePaymentMethod', false), true);
+        $storePaymentMethod = (bool) json_decode($this->Request()->getPost('storePaymentMethod', false), true);
 
         return new PaymentContext(
             $paymentInfo,
@@ -160,7 +164,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    private function prepareTransaction()
+    private function prepareTransaction(): PaymentInfo
     {
         $transaction = new PaymentInfo();
         $transaction->setOrderId(-1);
@@ -179,13 +183,13 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    private function prepareOrder($transaction)
+    private function prepareOrder(PaymentInfo $transaction): Order
     {
         $signature = $this->persistBasket();
 
         Shopware()->Session()->offsetSet(
             AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS,
-            (bool)(0 < $transaction->getId())
+            0 < $transaction->getId()
         );
 
         Shopware()->Session()->offsetSet(
@@ -221,8 +225,10 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
     /**
      * @return array
+     *
+     * @psalm-return array{shopperIP: mixed}
      */
-    private function getShopperInfo()
+    private function getShopperInfo(): array
     {
         return [
             'shopperIP' => $this->request->getClientIp(),
@@ -239,7 +245,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    private function handlePaymentData($paymentInfo)
+    private function handlePaymentData($paymentInfo): void
     {
         if (!in_array(
             $paymentInfo['resultCode'],
@@ -259,7 +265,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    private function handlePaymentDataError($paymentInfo)
+    private function handlePaymentDataError($paymentInfo): void
     {
         if ($paymentInfo['merchantReference']) {
             $this->basketService->cancelAndRestoreByOrderNumber($paymentInfo['merchantReference']);

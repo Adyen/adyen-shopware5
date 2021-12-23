@@ -30,8 +30,6 @@ class PaymentStatusUpdate
 
     /**
      * PaymentStatusUpdate constructor.
-     * @param ModelManager $modelManager
-     * @param ContainerAwareEventManager $eventManager
      */
     public function __construct(
         ModelManager $modelManager,
@@ -42,13 +40,11 @@ class PaymentStatusUpdate
     }
 
     /**
-     * @param Order $order
-     * @param int $statusId
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    public function updateOrderStatus(Order $order, int $statusId)
+    public function updateOrderStatus(Order $order, int $statusId): void
     {
         $orderStatus = $this->modelManager->find(Status::class, $statusId);
 
@@ -56,7 +52,7 @@ class PaymentStatusUpdate
             $this->logger->debug('Update order status', [
                 'number' => $order->getNumber(),
                 'oldStatus' => $order->getOrderStatus()->getName(),
-                'newStatus' => $orderStatus->getName()
+                'newStatus' => $orderStatus->getName(),
             ]);
         }
 
@@ -64,7 +60,7 @@ class PaymentStatusUpdate
             Event::ORDER_STATUS_CHANGED,
             [
                 'order' => $order,
-                'newStatus' => $orderStatus
+                'newStatus' => $orderStatus,
             ]
         );
 
@@ -74,13 +70,11 @@ class PaymentStatusUpdate
     }
 
     /**
-     * @param Order $order
-     * @param int $statusId
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    public function updatePaymentStatus(Order $order, int $statusId)
+    public function updatePaymentStatus(Order $order, int $statusId): void
     {
         $paymentStatus = $this->modelManager->find(Status::class, $statusId);
 
@@ -88,7 +82,7 @@ class PaymentStatusUpdate
             $this->logger->debug('Update order payment status', [
                 'number' => $order->getNumber(),
                 'oldStatus' => $order->getPaymentStatus()->getName(),
-                'newStatus' => $paymentStatus->getName()
+                'newStatus' => $paymentStatus->getName(),
             ]);
         }
 
@@ -96,7 +90,7 @@ class PaymentStatusUpdate
             Event::ORDER_PAYMENT_STATUS_CHANGED,
             [
                 'order' => $order,
-                'newStatus' => $paymentStatus
+                'newStatus' => $paymentStatus,
             ]
         );
 
@@ -106,12 +100,12 @@ class PaymentStatusUpdate
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @return $this
+     * @return static
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): self
     {
         $this->logger = $logger;
+
         return $this;
     }
 }

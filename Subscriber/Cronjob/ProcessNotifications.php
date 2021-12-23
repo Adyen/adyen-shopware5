@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Subscriber\Cronjob;
 
 use AdyenPayment\Components\FifoNotificationLoader;
@@ -13,12 +15,11 @@ use Psr\Log\LoggerInterface;
 use Shopware_Components_Cron_CronJob;
 
 /**
- * Class ProcessNotifications
- * @package AdyenPayment\Subscriber\Cronjob
+ * Class ProcessNotifications.
  */
 class ProcessNotifications implements SubscriberInterface
 {
-    const NUMBER_OF_NOTIFICATIONS_TO_HANDLE = 20;
+    public const NUMBER_OF_NOTIFICATIONS_TO_HANDLE = 20;
 
     /**
      * @var FifoNotificationLoader
@@ -47,11 +48,6 @@ class ProcessNotifications implements SubscriberInterface
 
     /**
      * ProcessNotifications constructor.
-     * @param FifoNotificationLoader $fifoNotificationLoader
-     * @param FifoTextNotificationLoader $fifoTextNotificationLoader
-     * @param NotificationProcessor $notificationProcessor
-     * @param IncomingNotificationManager $incomingNotificationManager
-     * @param LoggerInterface $logger
      */
     public function __construct(
         FifoNotificationLoader $fifoNotificationLoader,
@@ -67,6 +63,11 @@ class ProcessNotifications implements SubscriberInterface
         $this->logger = $logger;
     }
 
+    /**
+     * @return string[]
+     *
+     * @psalm-return array<string, 'runCronjob'>
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -75,11 +76,10 @@ class ProcessNotifications implements SubscriberInterface
     }
 
     /**
-     * @param Shopware_Components_Cron_CronJob $job
      * @throws \Doctrine\ORM\ORMException
      * @throws \Enlight_Event_Exception
      */
-    public function runCronjob(Shopware_Components_Cron_CronJob $job)
+    public function runCronjob(Shopware_Components_Cron_CronJob $job): void
     {
         $textNotifications = $this->fifoTextNotificationLoader->get();
         $this->incomingNotificationManager->convertNotifications($textNotifications);
@@ -92,7 +92,7 @@ class ProcessNotifications implements SubscriberInterface
         /** @var NotificationProcessorFeedback $item */
         foreach ($feedback as $item) {
             if (!$item->isSuccess()) {
-                $this->logger->alert($item->getNotification()->getId() . ": " . $item->getMessage());
+                $this->logger->alert($item->getNotification()->getId().': '.$item->getMessage());
             }
         }
     }

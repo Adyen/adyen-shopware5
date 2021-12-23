@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Models\Feedback;
 
 /**
- * Class TextNotificationItemFeedback
- * @package AdyenPayment\Models\Feedback
+ * Class TextNotificationItemFeedback.
  */
 class TextNotificationItemFeedback
 {
@@ -20,8 +21,6 @@ class TextNotificationItemFeedback
 
     /**
      * TextNotificationItemFeedback constructor.
-     * @param string $message
-     * @param array $textNotificationItem
      */
     public function __construct(
         string $message,
@@ -31,39 +30,27 @@ class TextNotificationItemFeedback
         $this->textNotificationItem = $textNotificationItem;
     }
 
-    /**
-     * @return string
-     */
     public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * @param string $message
-     * @return TextNotificationItemFeedback
-     */
     public function setMessage(string $message): TextNotificationItemFeedback
     {
         $this->message = $message;
+
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getTextNotificationItem(): array
     {
         return $this->textNotificationItem;
     }
 
-    /**
-     * @param array $textNotificationItem
-     * @return TextNotificationItemFeedback
-     */
     public function setTextNotificationItem(array $textNotificationItem): TextNotificationItemFeedback
     {
         $this->textNotificationItem = $textNotificationItem;
+
         return $this;
     }
 }
