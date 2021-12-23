@@ -108,7 +108,7 @@
                 return;
             }
 
-            var applePayMethod = me.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
+            var applePayMethod = Object.values(me.opts.enrichedPaymentMethods).filter(function(enrichedPaymentMethod) {
                 return enrichedPaymentMethod.adyenType === me.opts.applePayType;
             })[0] || {};
             if (!applePayMethod) {
@@ -210,7 +210,7 @@
         getPaymentMethodById: function (id) {
             var me = this;
 
-            return this.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
+            return Object.values(me.opts.enrichedPaymentMethods).filter(function(enrichedPaymentMethod) {
                 return enrichedPaymentMethod.id === id;
             })[0] || {};
         },
