@@ -99,7 +99,7 @@ final class HideStoredPaymentUmbrellaSubscriberTest extends TestCase
     public function it_does_nothing_on_wrong_data(): void
     {
         $view = $this->prophesize(\Enlight_View_Default::class);
-        $view->getAssign()->willReturn([]); // $assign['data'] undefined
+        $view->getAssign()->willReturn([]);
         $subject = $this->prophesize(\Enlight_Controller_Action::class);
         $subject->View()->willReturn($view->reveal());
 

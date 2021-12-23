@@ -7,6 +7,9 @@
     {assign var="paymentMethods" value=[]}
     {assign var="storedPaymentMethods" value=[]}
     {foreach $sPayments as $paymentMethod}
+        {if 'hide'|array_key_exists:$paymentMethod && '1' === $paymentMethod.hide}
+            {continue}
+        {/if}
         {if 'isStoredPayment'|array_key_exists:$paymentMethod && true === $paymentMethod.isStoredPayment}
             {$storedPaymentMethods[] = $paymentMethod}
         {else}

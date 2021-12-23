@@ -35,13 +35,12 @@ final class HideStoredPaymentUmbrellaSubscriber implements SubscriberInterface
             return;
         }
 
-        $assign = $args->getSubject()->View()->getAssign();
-        $data = $assign['data'] ?? null;
-        if (!is_array($data)) {
+        $data = $args->getSubject()->View()->getAssign()['data'] ?? [];
+        if (0 === count($data)) {
             return;
         }
 
-        $filtered = array_values(array_filter($assign['data'], static function($paymentMethod) {
+        $filtered = array_values(array_filter($data, static function($paymentMethod) {
             return AdyenPayment::ADYEN_STORED_PAYMENT_UMBRELLA_CODE !== $paymentMethod['name'];
         }));
 
