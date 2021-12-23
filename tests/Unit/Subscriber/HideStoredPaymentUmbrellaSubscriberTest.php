@@ -45,7 +45,10 @@ final class HideStoredPaymentUmbrellaSubscriberTest extends TestCase
     public function it_subscribe_to_the_proper_events(): void
     {
         self::assertEquals(
-            ['Enlight_Controller_Action_PostDispatch_Backend_Payment' => '__invoke'],
+            [
+                'Enlight_Controller_Action_PostDispatch_Backend_Payment' => '__invoke',
+                'Enlight_Controller_Action_PostDispatch_Backend_Shipping' => '__invoke',
+            ],
             HideStoredPaymentUmbrellaSubscriber::getSubscribedEvents()
         );
     }
