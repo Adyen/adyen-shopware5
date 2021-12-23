@@ -42,6 +42,15 @@ final class HideStoredPaymentUmbrellaSubscriberTest extends TestCase
     }
 
     /** @test */
+    public function it_subscribe_to_the_proper_events(): void
+    {
+        self::assertEquals(
+            ['Enlight_Controller_Action_PostDispatch_Backend_Payment' => '__invoke'],
+            HideStoredPaymentUmbrellaSubscriber::getSubscribedEvents()
+        );
+    }
+
+    /** @test */
     public function it_does_nothing_on_missing_request(): void
     {
         $this->args->get('request')->willReturn(false);

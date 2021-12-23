@@ -206,8 +206,8 @@ final class AdyenPayment extends Plugin
         $payment->setSource(SourceType::adyen()->getType());
         $payment->setHide(true);
         $payment->setPluginId($context->getPlugin()->getId());
-        $payment->setDescription('Stored Payment');
-        $payment->setAdditionalDescription('Adyen Stored Payment');
+        $payment->setDescription(self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE);
+        $payment->setAdditionalDescription(self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE);
 
         $paymentId = $database->fetchRow(
             'SELECT `id` FROM `s_core_paymentmeans` WHERE `name` = :name',
