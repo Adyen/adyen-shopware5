@@ -31,7 +31,7 @@ grumphp:
             max_size: 5M
         composer: ~
         phplint:
-            triggered_by: ['yaml', 'yml', 'yaml.dist', 'yml.dist']
+            triggered_by: ['php']
         xmllint:
             triggered_by: ['xml', 'xml.dist']
         yamllint:
