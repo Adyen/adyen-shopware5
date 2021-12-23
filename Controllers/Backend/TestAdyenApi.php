@@ -1,6 +1,7 @@
 <?php
 
 use AdyenPayment\Components\Adyen\ApiConfigValidator;
+use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule;
 use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -8,24 +9,18 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Backend_ExtJs
 {
-    /**
-     * @var ApiConfigValidator
-     */
-    private $apiConfigValidator;
-    /**
-     * @var UsedFallbackConfigRuleInterface
-     */
-    private $usedFallbackConfigRule;
+    private ApiConfigValidator $apiConfigValidator;
+    private UsedFallbackConfigRuleInterface $usedFallbackConfigRule;
 
-    public function preDispatch()
+    public function preDispatch(): void
     {
         parent::preDispatch();
 
-        $this->apiConfigValidator = $this->get('AdyenPayment\Components\Adyen\ApiConfigValidator');
-        $this->usedFallbackConfigRule = $this->get('AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule');
+        $this->apiConfigValidator = $this->get(ApiConfigValidator::class);
+        $this->usedFallbackConfigRule = $this->get(UsedFallbackConfigRule::class);
     }
 
-    public function runAction()
+    public function runAction(): void
     {
         $shopId = (int) $this->request->get('shopId', 1);
         $violations = $this->apiConfigValidator->validate($shopId);

@@ -6,7 +6,6 @@ namespace AdyenPayment\Subscriber\Checkout;
 
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
-use Enlight_Event_EventArgs;
 
 final class AddAdyenSourceTypeToViewSubscriber implements SubscriberInterface
 {
@@ -17,7 +16,7 @@ final class AddAdyenSourceTypeToViewSubscriber implements SubscriberInterface
         ];
     }
 
-    public function __invoke(Enlight_Event_EventArgs $args)
+    public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Models;
 
 use Throwable;
@@ -13,14 +15,10 @@ class NotificationException extends \Exception
 
     /**
      * NotificationException constructor.
-     * @param Notification $notification
-     * @param string $message
-     * @param int $code
-     * @param Throwable|null $previous
      */
     public function __construct(
         Notification $notification,
-        string $message = "",
+        string $message = '',
         int $code = 0,
         Throwable $previous = null
     ) {
@@ -29,9 +27,6 @@ class NotificationException extends \Exception
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return Notification
-     */
     public function getNotification(): Notification
     {
         return $this->notification;

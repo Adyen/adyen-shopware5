@@ -23,11 +23,11 @@ final class ImportPaymentMethodSubscriber implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            Event::cronImportPaymentMethods()->getName()=> '__invoke',
+            Event::cronImportPaymentMethods()->getName() => '__invoke',
         ];
     }
 
-    public function __invoke(\Shopware_Components_Cron_CronJob $job)
+    public function __invoke(\Shopware_Components_Cron_CronJob $job): void
     {
         iterator_to_array($this->paymentMethodImporter->importAll());
     }

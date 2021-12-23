@@ -6,3 +6,11 @@
 #composer
 vendor/
 composer.lock
+
+# project
+.php-cs-fixer.php
+psalm.xml
+grumphp.yml
+.*.cache
+tools/vendor
+!tools/composer.lock

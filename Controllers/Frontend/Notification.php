@@ -32,16 +32,21 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
 
     /**
      * @throws Exception
+     *
+     * @return void
      */
     public function preDispatch()
     {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
         $this->events = $this->get('events');
-        $this->incomingNotificationsManager = $this->get('adyen_payment.components.incoming_notification_manager');
+        $this->incomingNotificationsManager = $this->get('AdyenPayment\Components\IncomingNotificationManager');
         $this->logger = $this->get('adyen_payment.logger.notifications');
         $this->authorizationValidator = $this->get('AdyenPayment\Http\Validator\Notification\AuthorizationValidator');
     }
 
+    /**
+     * @return void
+     */
     public function postDispatch()
     {
         $data = $this->View()->getAssign();
@@ -56,12 +61,19 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
 
     /**
      * POST: /notification/adyen
+     *
+     * @return void
      */
     public function adyenAction()
     {
         try {
             $notifications = $this->getNotificationItems();
             $this->authorizationValidator->validate($notifications);
+
+            if (!$this->saveTextNotification($notifications)) {
+                $this->View()->assign('[notification save error]');
+                return;
+            }
         } catch (AuthorizationException $exception) {
             $this->View()->assign('responseData', NotificationResponseFactory::unauthorized($exception->getMessage()));
 
@@ -73,17 +85,16 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
             ]);
         }
 
-        if (!$this->saveTextNotification($notifications)) {
-            $this->View()->assign('[notification save error]');
-            return;
-        }
-
         // on valid credentials, always return ACCEPTED
         $this->View()->assign('responseData', NotificationResponseFactory::accepted());
     }
 
     /**
      * Whitelist notifyAction
+     *
+     * @return string[]
+     *
+     * @psalm-return array{0: 'adyen'}
      */
     public function getWhitelistedCSRFActions()
     {
@@ -114,10 +125,10 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
 
     /**
      * @param array $notifications
-     * @return Generator
+     *
      * @throws Enlight_Event_Exception
      */
-    private function saveTextNotification(array $notifications)
+    private function saveTextNotification(array $notifications): bool
     {
         $notifications = $this->events->filter(
             Event::NOTIFICATION_SAVE_FILTER_NOTIFICATIONS,

@@ -17,11 +17,12 @@
 {/block}
 
 {block name='frontend_index_body_attributes'}
-    {assign var=adyenType value=$sUserData.additional.payment.attribute->get('adyen_type')}
-
+    {if $mAdyenSnippets}data-adyensnippets="{$mAdyenSnippets}"{/if}
+    {$adyenType=$sUserData.additional.payment['adyenType']|default:''}
     {$smarty.block.parent}
     data-adyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
     data-adyenAjaxPaymentDetails="{url module='frontend' controller='adyen' action='paymentDetails'}"
+    data-checkoutShippingPaymentUrl="{url controller='checkout' action='shippingPayment' sTarget='checkout'}"
     data-adyenAjaxThreeDsUrl="{url module='frontend' controller='adyen' action='ajaxThreeDs'}"
     {if $mAdyenSnippets}
         data-adyenSnippets="{$mAdyenSnippets}"
@@ -45,7 +46,8 @@
 
 
 {block name='frontend_checkout_confirm_error_messages'}
-    <div data-adyen-checkout-error="true"></div>
-
+    <div data-adyen-checkout-error="true">
+        {if $sErrorMessages}{include file="frontend/register/error_message.tpl" error_messages=$sErrorMessages}{/if}
+    </div>
     {$smarty.block.parent}
 {/block}

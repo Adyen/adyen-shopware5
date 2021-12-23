@@ -136,7 +136,7 @@ class Notification extends ModelEntity implements \JsonSerializable
     /**
      * @return Order|null
      */
-    public function getOrder(): Order
+    public function getOrder(): ?Order
     {
         return $this->order;
     }

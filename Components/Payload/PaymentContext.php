@@ -9,8 +9,7 @@ use sBasket;
 use Shopware\Models\Order\Order;
 
 /**
- * Class PaymentContext
- * @package AdyenPayment\Components\Payload
+ * Class PaymentContext.
  */
 class PaymentContext
 {
@@ -56,14 +55,6 @@ class PaymentContext
 
     /**
      * PaymentContext constructor.
-     * @param array $paymentInfo
-     * @param Order $order
-     * @param sBasket $basket
-     * @param array $browserInfo
-     * @param array $shopperInfo
-     * @param string $origin
-     * @param PaymentInfo $transaction
-     * @param bool $storePaymentMethod
      */
     public function __construct(
         array $paymentInfo,

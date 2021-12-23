@@ -9,17 +9,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class NotificationProcessorCompilerPass
- * @package AdyenPayment\Components\CompilerPass
+ * Class NotificationProcessorCompilerPass.
  */
 class NotificationProcessorCompilerPass implements CompilerPassInterface
 {
-    /**
-     * @param ContainerBuilder $container
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        $definition = $container->getDefinition('adyen_payment.components.notification_processor');
+        $definition = $container->getDefinition('AdyenPayment\Components\NotificationProcessor');
         $taggedServices = $container->findTaggedServiceIds('adyen.payment.notificationprocessor');
 
         foreach ($taggedServices as $id => $tags) {

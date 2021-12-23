@@ -1,31 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components\Payload\Providers;
 
 use Adyen\Util\Currency;
-use Enlight_Event_Exception;
-use Enlight_Exception;
 use AdyenPayment\Components\Calculator\PriceCalculationService;
 use AdyenPayment\Components\Payload\PaymentContext;
 use AdyenPayment\Components\Payload\PaymentPayloadProvider;
+use Enlight_Event_Exception;
+use Enlight_Exception;
 use Shopware\Models\Order\Detail;
 use Zend_Db_Adapter_Exception;
 
-/**
- * Class LineItemsInfoProvider
- * @package AdyenPayment\Components\Payload\Providers
- */
 class LineItemsInfoProvider implements PaymentPayloadProvider
 {
-    /**
-     * @var PriceCalculationService
-     */
-    private $priceCalculationService;
-
-    /**
-     * @var Currency
-     */
-    private $adyenCurrency;
+    private PriceCalculationService $priceCalculationService;
+    private Currency $adyenCurrency;
 
     public function __construct(PriceCalculationService $priceCalculationService)
     {
@@ -34,8 +25,6 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
     }
 
     /**
-     * @param PaymentContext $context
-     * @return array
      * @throws Enlight_Event_Exception
      * @throws Enlight_Exception
      * @throws Zend_Db_Adapter_Exception
@@ -50,11 +39,7 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
         ];
     }
 
-    /**
-     * @param PaymentContext $context
-     * @return array
-     */
-    private function buildOrderLines(PaymentContext $context)
+    private function buildOrderLines(PaymentContext $context): array
     {
         $orderLines = [];
         $currencyCode = $context->getOrder()->getCurrency();
@@ -81,11 +66,7 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
         return $orderLines;
     }
 
-    /**
-     * @param PaymentContext $context
-     * @return array
-     */
-    private function buildShippingLines(PaymentContext $context)
+    private function buildShippingLines(PaymentContext $context): array
     {
         $currencyCode = $context->getOrder()->getCurrency();
         $amountExcludingTax = $this->adyenCurrency->sanitize(
@@ -98,19 +79,19 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
         );
         $dispatch = $context->getOrder()->getDispatch();
 
-        $shippingLines[] = [
-            'quantity' => 1,
-            'amountExcludingTax' => $amountExcludingTax,
-            'taxPercentage' => $this->adyenCurrency->sanitize(
-                $context->getOrder()->getInvoiceShippingTaxRate(),
-                $currencyCode
-            ),
-            'description' => $dispatch && $dispatch->getId() ? $dispatch->getName(): '',
-            'id' => $dispatch && $dispatch->getId(),
-            'taxAmount' => $amountIncludingTax - $amountExcludingTax,
-            'amountIncludingTax' => $amountIncludingTax
+        return [
+            [
+                'quantity' => 1,
+                'amountExcludingTax' => $amountExcludingTax,
+                'taxPercentage' => $this->adyenCurrency->sanitize(
+                    $context->getOrder()->getInvoiceShippingTaxRate(),
+                    $currencyCode
+                ),
+                'description' => $dispatch && $dispatch->getId() ? $dispatch->getName() : '',
+                'id' => $dispatch && $dispatch->getId(),
+                'taxAmount' => $amountIncludingTax - $amountExcludingTax,
+                'amountIncludingTax' => $amountIncludingTax,
+            ],
         ];
-
-        return $shippingLines;
     }
 }

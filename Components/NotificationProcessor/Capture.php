@@ -1,55 +1,56 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components\NotificationProcessor;
 
+use AdyenPayment\Components\PaymentStatusUpdate;
+use AdyenPayment\Models\Event;
+use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
 use Enlight_Event_Exception;
-use AdyenPayment\Components\PaymentStatusUpdate;
-use AdyenPayment\Models\Event;
-use AdyenPayment\Models\Notification;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Status;
 
 /**
- * Class Capture
- * @package AdyenPayment\Components\NotificationProcessor
+ * Class Capture.
  */
 class Capture implements NotificationProcessorInterface
 {
-    const EVENT_CODE = 'CAPTURE';
+    public const EVENT_CODE = 'CAPTURE';
 
     /**
      * @var LoggerInterface
      */
     private $logger;
+
     /**
      * @var ContainerAwareEventManager
      */
     private $eventManager;
+
     /**
      * @var PaymentStatusUpdate
      */
     private $paymentStatusUpdate;
+
     /**
      * @var ModelManager
      */
     private $modelManager;
+
     /**
-     * @var \Doctrine\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository
      */
     private $paymentInfoRepository;
 
-
     /**
      * Capture constructor.
-     * @param LoggerInterface $logger
-     * @param ContainerAwareEventManager $eventManager
-     * @param PaymentStatusUpdate $paymentStatusUpdate
      */
     public function __construct(
         LoggerInterface $logger,
@@ -65,33 +66,33 @@ class Capture implements NotificationProcessorInterface
     }
 
     /**
-     * Returns boolean on whether this processor can process the Notification object
-     *
-     * @param Notification $notification
-     * @return boolean
+     * Returns boolean on whether this processor can process the Notification object.
      */
     public function supports(Notification $notification): bool
     {
-        return strtoupper($notification->getEventCode()) === self::EVENT_CODE;
+        return self::EVENT_CODE === mb_strtoupper($notification->getEventCode());
     }
 
     /**
-     * Actual processing of the notification
-     * @param Notification $notification
+     * Actual processing of the notification.
+     *
      * @throws ORMException
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      * @throws Enlight_Event_Exception
      */
-    public function process(Notification $notification)
+    public function process(Notification $notification): void
     {
         $order = $notification->getOrder();
+        if (!$order) {
+            return;
+        }
 
         $this->eventManager->notify(
             Event::NOTIFICATION_PROCESS_CAPTURE,
             [
                 'order' => $order,
-                'notification' => $notification
+                'notification' => $notification,
             ]
         );
 
@@ -103,7 +104,7 @@ class Capture implements NotificationProcessorInterface
 
             /** @var PaymentInfo $paymentInfo */
             $paymentInfo = $this->paymentInfoRepository->findOneBy([
-                'orderId' => $order->getId()
+                'orderId' => $order->getId(),
             ]);
 
             $paymentInfo->setPspReference($notification->getPspReference());

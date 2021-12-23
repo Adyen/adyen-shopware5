@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components\Payload\Providers;
 
 use AdyenPayment\AdyenPayment;
@@ -12,9 +14,7 @@ use Shopware\Components\Routing\RouterInterface;
 use Shopware\Models\Plugin\Plugin;
 
 /**
- * Class ApplicationInfoProvider
- *
- * @package AdyenPayment\Components
+ * Class ApplicationInfoProvider.
  */
 class ApplicationInfoProvider implements PaymentPayloadProvider
 {
@@ -22,10 +22,12 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
      * @var EntityManagerInterface
      */
     private $modelManager;
+
     /**
      * @var Configuration
      */
     private $configuration;
+
     /**
      * @var RouterInterface
      */
@@ -41,19 +43,14 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
         $this->configuration = $configuration;
     }
 
-    /**
-     * @param PaymentContext $context
-     *
-     * @return array
-     */
     public function provide(PaymentContext $context): array
     {
         $returnUrl = $this->router->assemble([
-                'controller' => 'process',
-                'action' => 'return',
-            ]).'?'.http_build_query([
-                'merchantReference' => $context->getOrder()->getNumber(),
-            ]);
+            'controller' => 'process',
+            'action' => 'return',
+        ]).'?'.http_build_query([
+            'merchantReference' => $context->getOrder()->getNumber(),
+        ]);
         $plugin = $this->modelManager->getRepository(Plugin::class)->findOneBy(['name' => AdyenPayment::NAME]);
 
         return [

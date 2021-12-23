@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Basket\Restore;
 
 use AdyenPayment\Dbal\BasketDetailAttributes;
@@ -35,15 +37,13 @@ class DetailAttributesRestorer
     }
 
     /**
-     * Copies attributes from the supplied order detail article ID to a basket detail ID
+     * Copies attributes from the supplied order detail article ID to a basket detail ID.
      *
-     * @param int $orderDetailId
-     * @param int $basketDetailId
      * @throws Zend_Db_Adapter_Exception
      */
-    public function restore(int $orderDetailId, int $basketDetailId)
+    public function restore(int $orderDetailId, int $basketDetailId): void
     {
-        $orderDetailAttributes = $this->orderDetailAttributes->fetchByOrderDetailId($orderDetailId);
+        $orderDetailAttributes = $this->orderDetailAttributes->fetchByOrderDetailId((string) $orderDetailId);
         if (!count($orderDetailAttributes)) {
             return;
         }
@@ -66,16 +66,11 @@ class DetailAttributesRestorer
             return;
         }
 
-        if ($this->basketDetailAttributes->hasBasketDetails($basketDetailId)) {
-            $this->basketDetailAttributes->update($basketDetailId, $attributeValues);
-        } else {
-            $this->basketDetailAttributes->insert($basketDetailId, $attributeValues);
-        }
+        $this->basketDetailAttributes->hasBasketDetails($basketDetailId)
+            ? $this->basketDetailAttributes->update($basketDetailId, $attributeValues)
+            : $this->basketDetailAttributes->insert($basketDetailId, $attributeValues);
     }
 
-    /**
-     * @return array
-     */
     private function provideFillableAttributeColumns(): array
     {
         // Getting order attributes columns to possibly fill
@@ -86,8 +81,9 @@ class DetailAttributesRestorer
         // These columns shouldn't be translated from the order detail to the basket detail
         $columnsToSkip = [
             'id',
-            'detailID'
+            'detailID',
         ];
+
         return array_diff($basketAttributesColumns, $columnsToSkip);
     }
 }

@@ -1,21 +1,20 @@
 parameters:
     grumphp.ignore_patterns:
         - '*/vendor'
+        - '.idea'
         - '.gitlab-ci'
-        - 'bin'
-        - 'custom/plugins/'
-        - 'public'
-        - 'src/Command/'
-        - 'tests'
-        - 'var'
+        - '.github/'
+        - 'tests/'
+        - 'tools/'
 
 grumphp:
+    environment:
+        paths:
+            - 'tools/vendor/bin'
     tasks:
-        # Git
         git_commit_message:
             matchers:
                 - /^(ASW-[0-9]*)/
-            case_insensitive: true
             multiline: false
             max_subject_width: 80
         git_blacklist:
@@ -26,33 +25,19 @@ grumphp:
                 - 'die('
                 - 'dump('
                 - 'exit;'
-                - "\\bdd\\b("
-            whitelist_patterns:
-                - /^public/(.*)
-            triggered_by: [ php,js ]
-            metadata:
-                priority: 300
+                - "\\bdd\\b\\("
+            triggered_by: [php,js,tpl]
         file_size:
             max_size: 5M
         composer: ~
-
-        # Linters
         phplint:
-            metadata:
-                priority: 100
+            triggered_by: ['php']
         xmllint:
-            metadata:
-                priority: 100
+            triggered_by: ['xml', 'xml.dist']
         yamllint:
             parse_custom_tags: true
-            metadata:
-                priority: 100
-
-        # PHP
         phpcsfixer:
             config: '.php-cs-fixer.dist.php'
-            metadata:
-                priority: 200
         phpparser:
             ignore_patterns: '%grumphp.ignore_patterns%'
             visitors:
@@ -60,19 +45,19 @@ grumphp:
                 never_use_else: ~
                 forbidden_function_calls:
                     blacklist: [ echo, print, print_r, phpinfo ]
-            metadata:
-                priority: 200
         psalm:
             config: psalm.xml.dist
             ignore_patterns: '%grumphp.ignore_patterns%'
-            metadata:
-                priority: 200
         phpunit:
             always_execute: true
+        php_compatibility:
+            scripts:
+                - ["-c", "php ./tools/vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 7.4- --extensions=php --ignore=*/vendor/*,*/tests/*"]
             metadata:
-                priority: 50
-        phpcs:
-            standard: [ PHPCompatibility ]
-            report: full
-            ignore_patterns: [ '*/vendor/*','*/node_modules/*' ]
-            triggered_by: [ php ]
+                task: shell
+
+    testsuites:
+        code-compatibility:
+            tasks: ['composer', 'php_compatibility']
+        slim:
+            tasks: ['file_size', 'composer', 'phplint', 'xmllint', 'yamllint', 'phpcsfixer', 'phpparser', 'php_compatibility']

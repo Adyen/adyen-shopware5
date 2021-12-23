@@ -7,10 +7,8 @@
             <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsProvider"/>
             <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
             <argument type="service" id="AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule" />
-            <argument type="service" id="AdyenPayment\Components\Adyen\Mapper\PaymentMethodMapper" />
             <argument type="service" id="AdyenPayment\Doctrine\Writer\PaymentMethodWriter"/>
-            <argument type="service" id="models"/>
-            <argument type="service" id="AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubshopsWriter"/>
+            <argument type="service" id="AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubShopsWriter"/>
         </service>
         <service id="AdyenPayment\Import\TraceablePaymentMethodImporter"
                  decorates="AdyenPayment\Import\PaymentMethodImporter">

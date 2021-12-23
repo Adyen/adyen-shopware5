@@ -1,81 +1,53 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
-use Adyen\AdyenException;
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
-use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
-use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
-use Enlight\Event\SubscriberInterface;
-use Enlight_Event_EventArgs;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\DataConversion;
-use sAdmin;
-use Shopware_Controllers_Frontend_Checkout;
+use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Models\Payment\PaymentMean;
+use AdyenPayment\Serializer\PaymentMeanCollectionSerializer;
+use Enlight\Event\SubscriberInterface;
 
-/**
- * Class CheckoutSubscriber
- * @package AdyenPayment\Subscriber
- */
-class CheckoutSubscriber implements SubscriberInterface
+final class CheckoutSubscriber implements SubscriberInterface
 {
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
-    /**
-     * @var PaymentMethodService
-     */
-    protected $paymentMethodService;
-    /**
-     * @var DataConversion
-     */
-    private $dataConversion;
-    /**
-     * @var EnrichedPaymentMeanProviderInterface
-     */
-    private $enrichedPaymentMeanProvider;
-    /**
-     * @var sAdmin
-     */
-    private $admin;
-    /**
-     * @var PaymentMethodOptionsBuilderInterface
-     */
-    private $paymentMethodOptionsBuilder;
+    private Configuration $configuration;
+    private PaymentMethodService $paymentMethodService;
+    private DataConversion $dataConversion;
+    private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
+    private PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder;
+    private PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer;
 
     public function __construct(
         Configuration $configuration,
         PaymentMethodService $paymentMethodService,
         DataConversion $dataConversion,
         EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider,
-        PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder
+        PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder,
+        PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
         $this->dataConversion = $dataConversion;
         $this->enrichedPaymentMeanProvider = $enrichedPaymentMeanProvider;
         $this->paymentMethodOptionsBuilder = $paymentMethodOptionsBuilder;
+        $this->paymentMeanCollectionSerializer = $paymentMeanCollectionSerializer;
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
-            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => 'checkoutFrontendPostDispatch',
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => '__invoke',
         ];
     }
 
-    /**
-     * @param Enlight_Event_EventArgs $args
-     * @throws AdyenException
-     */
-    public function checkoutFrontendPostDispatch(Enlight_Event_EventArgs $args)
+    public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
 
@@ -84,16 +56,12 @@ class CheckoutSubscriber implements SubscriberInterface
         $this->addAdyenConfigOnShipping($subject);
     }
 
-    /**
-     * @param Shopware_Controllers_Frontend_Checkout $subject
-     * @throws \Exception
-     */
-    private function checkBasketAmount(Shopware_Controllers_Frontend_Checkout $subject)
+    private function checkBasketAmount(\Enlight_Controller_Action $subject): void
     {
         $userData = $subject->View()->getAssign('sUserData');
 
-        $source = (int) ($userData['additional']['payment']['source'] ?? null);
-        if (!SourceType::load($source)->equals(SourceType::adyen())) {
+        $paymentMean = PaymentMean::createFromShopwareArray($userData['additional']['payment'] ?? []);
+        if (!$paymentMean->getSource()->equals(SourceType::adyen())) {
             return;
         }
 
@@ -107,95 +75,78 @@ class CheckoutSubscriber implements SubscriberInterface
         }
     }
 
-    /**
-     * @param Shopware_Controllers_Frontend_Checkout $subject
-     * @throws AdyenException
-     */
-    private function addAdyenConfigOnShipping(Shopware_Controllers_Frontend_Checkout $subject)
+    private function addAdyenConfigOnShipping(\Enlight_Controller_Action $subject): void
     {
-        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'confirm'])) {
+        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'confirm'], true)) {
             return;
         }
 
-        $this->admin = Shopware()->Modules()->Admin();
+        $admin = Shopware()->Modules()->Admin();
         $enrichedPaymentMethods = ($this->enrichedPaymentMeanProvider)(
-            PaymentMeanCollection::createFromShopwareArray($this->admin->sGetPaymentMeans())
+            PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
         );
 
         $shop = Shopware()->Shop();
 
         $adyenConfig = [
-            "shopLocale" => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
-            "clientKey" => $this->configuration->getClientKey($shop),
-            "environment" => $this->configuration->getEnvironment($shop),
-            "enrichedPaymentMethods" => $enrichedPaymentMethods->toShopwareArray(),
+            'shopLocale' => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
+            'clientKey' => $this->configuration->getClientKey($shop),
+            'environment' => $this->configuration->getEnvironment($shop),
+            'enrichedPaymentMethods' => json_encode(
+                ($this->paymentMeanCollectionSerializer)($enrichedPaymentMethods),
+                JSON_THROW_ON_ERROR),
         ];
 
         $view = $subject->View();
         $view->assign('sAdyenConfig', $adyenConfig);
     }
 
-    /**
-     * @param Shopware_Controllers_Frontend_Checkout $subject
-     * @throws AdyenException
-     */
-    private function checkFirstCheckoutStep(Shopware_Controllers_Frontend_Checkout $subject)
+    private function checkFirstCheckoutStep(\Enlight_Controller_Action $subject): void
     {
-        if (!in_array($subject->Request()->getActionName(), ['confirm'])) {
+        if ('confirm' !== $subject->Request()->getActionName()) {
             return;
         }
 
         if ($this->shouldRedirectToStep2($subject)) {
-            $subject->forward(
-                'shippingPayment',
-                'checkout'
-            );
+            $subject->forward('shippingPayment', 'checkout');
         }
     }
 
-    /**
-     * @param Shopware_Controllers_Frontend_Checkout $subject
-     * @return bool
-     * @throws AdyenException
-     */
-    private function shouldRedirectToStep2(Shopware_Controllers_Frontend_Checkout $subject): bool
+    private function shouldRedirectToStep2(\Enlight_Controller_Action $subject): bool
     {
         $userData = $subject->View()->getAssign('sUserData');
-        $source = (int) ($userData['additional']['payment']['source'] ?? null);
-        if (SourceType::load($source)->equals(SourceType::adyen())) {
+        $swPaymentMean = PaymentMean::createFromShopwareArray($userData['additional']['payment'] ?? []);
+        if (!$swPaymentMean->isAdyenSourceType()) {
             return false;
         }
 
         $paymentMethodOptions = ($this->paymentMethodOptionsBuilder)();
-        if ($paymentMethodOptions['value'] == 0) {
+        if (0 === (int) $paymentMethodOptions['value']) {
             return false;
         }
 
-        $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
-            $this->paymentMethodService->getPaymentMethods(
-                $paymentMethodOptions['countryCode'],
-                $paymentMethodOptions['currency'],
-                $paymentMethodOptions['value']
-            )
+        $adyenPaymentMethods = $this->paymentMethodService->getPaymentMethods(
+            $paymentMethodOptions['countryCode'],
+            $paymentMethodOptions['currency'],
+            $paymentMethodOptions['value']
         );
 
-        $selectedId = $userData['additional']['payment']['id'] ?? null;
-        $paymentMethod = $adyenPaymentMethods->fetchByTypeOrId($selectedId);
-        if (!$paymentMethod) {
+        $adyenPaymentMethod = $adyenPaymentMethods->fetchByPaymentMean($swPaymentMean);
+        if (!$adyenPaymentMethod) {
             return true;
         }
 
-        if (!$paymentMethod->hasDetails() && !$paymentMethod->isStoredPayment()) {
-            $subject->View()->assign('adyenPaymentState', $paymentMethod->serializeMinimalState());
+        // @TODO Adyen Checkout API 68 'details' are removed
+        if (!$adyenPaymentMethod->hasDetails() && !$adyenPaymentMethod->isStoredPayment()) {
+            $subject->View()->assign('adyenPaymentState', $adyenPaymentMethod->serializeMinimalState());
 
             return false;
         }
 
-        return true;
+        return false;
     }
 
-
-    private function revertToDefaultPaymentMethod(Shopware_Controllers_Frontend_Checkout $subject)
+    private function revertToDefaultPaymentMethod(\Enlight_Controller_Action $subject): void
     {
         $defaultPaymentId = Shopware()->Config()->get('defaultPayment');
         $defaultPayment = Shopware()->Modules()->Admin()->sGetPaymentMeanById($defaultPaymentId);

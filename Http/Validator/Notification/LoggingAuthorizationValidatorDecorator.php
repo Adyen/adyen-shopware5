@@ -13,6 +13,7 @@ class LoggingAuthorizationValidatorDecorator implements NotificationValidatorInt
      * @var NotificationValidatorInterface
      */
     private $authorizationValidator;
+
     /**
      * @var LoggerInterface
      */
@@ -24,7 +25,7 @@ class LoggingAuthorizationValidatorDecorator implements NotificationValidatorInt
         $this->logger = $logger;
     }
 
-    public function validate(array $notifications)
+    public function validate(array $notifications): void
     {
         try {
             $this->authorizationValidator->validate($notifications);

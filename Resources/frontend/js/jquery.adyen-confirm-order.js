@@ -8,16 +8,16 @@
         defaults: {
             placeOrderSelector: '.table--actions button[type=submit]',
             confirmFormSelector: '#confirm--form',
-            mountRedirectSelector: '.is--act-confirm',
             adyenType: '',
             adyenGoogleConfig: {},
             adyenPaymentState: {},
             adyenIsAdyenPayment: false,
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
+            checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
             adyenSnippets: {
                 errorTransactionCancelled: 'Your transaction was cancelled by the Payment Service Provider.',
-                errorTransactionProcessing: 'An error occured while processing your payment.',
+                errorTransactionProcessing: 'An error occurred while processing your payment.',
                 errorTransactionRefused: 'Your transaction was refused by the Payment Service Provider.',
                 errorTransactionUnknown: 'Your transaction was cancelled due to an unknown reason.',
                 errorTransactionNoSession: 'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
@@ -54,14 +54,20 @@
                 return;
             }
 
-            if (!$.isEmptyObject(me.opts.adyenPaymentState)) {
+            if (!me.cookiesAllowed()) {
+                this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
+                return;
+            }
+
+            var parsedPaymentMethodSession = JSON.parse(me.getPaymentMethod() || '{}');
+            if (!$.isEmptyObject(me.opts.adyenPaymentState)
+                && 0 === Object.keys(parsedPaymentMethodSession).length) {
                 me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenPaymentState));
                 return;
             }
 
             if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
-                this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
-                return;
+                window.location.href = me.opts.checkoutShippingPaymentUrl;
             }
         },
         onPlaceOrder: function (event) {
@@ -73,49 +79,49 @@
 
             me.clearAdyenError();
 
-            if (me.sessionStorage.getItem(me.paymentMethodSession)) {
-                if (!$(me.opts.confirmFormSelector)[0].checkValidity()) {
-                    return;
-                }
-
-                $.loadingIndicator.open();
-
-                var data = {
-                    'paymentMethod': me.getPaymentMethod(),
-                    'storePaymentMethod': me.getStorePaymentMethod(),
-                    'browserInfo': me.getBrowserInfo(),
-                    'origin': window.location.origin,
-                    'sComment': me.getComment()
-                };
-
-                $.ajax({
-                    method: 'POST',
-                    dataType: 'json',
-                    url: me.opts.adyenAjaxDoPaymentUrl,
-                    data: data,
-                    success: function (response) {
-                        if (response['status'] === 'success') {
-                            me.handlePaymentData(response['content'], response['sUniqueID']);
-                        } else {
-                            me.addAdyenError(response['content']);
-                        }
-
-                        $.loadingIndicator.close();
-                    }
-                });
-            } else {
+            if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
                 if (me.opts.adyenIsAdyenPayment) {
                     this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
+
                     return;
                 }
 
                 $(me.opts.confirmFormSelector).submit();
+                return;
             }
+
+            if (!$(me.opts.confirmFormSelector)[0].checkValidity()) {
+                return;
+            }
+
+            $.loadingIndicator.open();
+
+            var data = {
+                'paymentMethod': me.getPaymentMethod(),
+                'storePaymentMethod': me.getStorePaymentMethod(),
+                'browserInfo': me.getBrowserInfo(),
+                'origin': window.location.origin,
+                'sComment': me.getComment()
+            };
+
+            $.ajax({
+                method: 'POST',
+                dataType: 'json',
+                url: me.opts.adyenAjaxDoPaymentUrl,
+                data: data,
+                success: function (response) {
+                    if (response['status'] === 'success') {
+                        me.handlePaymentData(response['content'], response['sUniqueID']);
+                    } else {
+                        me.addAdyenError(response['content']);
+                    }
+
+                    $.loadingIndicator.close();
+                }
+            });
         },
         handlePaymentData: function (data, sUniqueID = null) {
-
             var me = this;
-
             switch (data.resultCode) {
                 case 'Authorised':
                     me.handlePaymentDataAuthorised(data, sUniqueID);
@@ -133,7 +139,7 @@
         },
         handlePaymentDataAuthorised: function (data, sUniqueID = null) {
             var me = this;
-            let input = $("<input>").attr("type", "hidden").attr("name", "sUniqueID").val(sUniqueID);
+            var input = $("<input>").attr("type", "hidden").attr("name", "sUniqueID").val(sUniqueID);
             $(me.opts.confirmFormSelector).append(input).submit();
         },
         handlePaymentDataCreateFromAction: function (data) {
@@ -149,6 +155,7 @@
                 additionalClass: 'adyen-modal'
             });
 
+            // data.action: "redirect" errors are handled by Process::returnAction()
             me.adyenCheckout
                 .createFromAction(data.action, {
                     onAdditionalDetails: function (state) {
@@ -171,14 +178,6 @@
                     }
                 })
                 .mount('#AdyenModal');
-        },
-        handlePaymentDataRedirectShopper: function (data) {
-            var me = this;
-            if ('redirect' === data.action.type || 'qrCode' === data.action.type) {
-                me.adyenCheckout
-                    .createFromAction(data.action)
-                    .mount(me.opts.mountRedirectSelector);
-            }
         },
         handlePaymentDataError: function (data) {
             var me = this;
@@ -209,6 +208,12 @@
         },
         replaceCheckoutButtonForGooglePay: function () {
             var me = this;
+
+            if (0 === Object.keys(me.opts.adyenGoogleConfig).length) {
+                this.addAdyenError(me.opts.adyenSnippets.errorGooglePayNotAvailable);
+                console.error('Adyen: Missing google configuration');
+                return;
+            }
 
             var orderButton = $(me.opts.placeOrderSelector);
             orderButton.parent().append(
@@ -309,6 +314,18 @@
         },
         handleOnAdditionalDetails: function (state, component) {
             $.loadingIndicator.close();
+        },
+        cookiesAllowed: function () {
+            var cookie = window.document.cookie;
+            var cookiePreferences = JSON.parse(
+                (cookie.split('; ').filter(row => 0 === row.indexOf('cookiePreferences='))[0] || '')
+                    .split('cookiePreferences=')[1] || '{}'
+            );
+
+            var defaultPreferences = {groups:{technical:{cookies:{allowCookie:{active:false}}}}};
+            var preferences = $.extend({}, defaultPreferences, cookiePreferences);
+
+            return preferences.groups.technical.cookies.allowCookie.active;
         }
     });
 })(jQuery);

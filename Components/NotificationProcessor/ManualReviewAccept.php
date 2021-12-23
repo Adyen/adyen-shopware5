@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components\NotificationProcessor;
 
 use AdyenPayment\Models\Event;
@@ -7,12 +9,11 @@ use AdyenPayment\Models\Notification;
 use Shopware\Components\ContainerAwareEventManager;
 
 /**
- * Class ManualReviewReject
- * @package AdyenPayment\Components\NotificationProcessor
+ * Class ManualReviewReject.
  */
 class ManualReviewAccept implements NotificationProcessorInterface
 {
-    const EVENT_CODE = 'MANUAL_REVIEW_ACCEPT';
+    public const EVENT_CODE = 'MANUAL_REVIEW_ACCEPT';
 
     /**
      * @var ContainerAwareEventManager
@@ -21,7 +22,6 @@ class ManualReviewAccept implements NotificationProcessorInterface
 
     /**
      * Cancellation constructor.
-     * @param ContainerAwareEventManager $eventManager
      */
     public function __construct(
         ContainerAwareEventManager $eventManager
@@ -30,23 +30,19 @@ class ManualReviewAccept implements NotificationProcessorInterface
     }
 
     /**
-     * Returns boolean on whether this processor can process the Notification object
-     *
-     * @param Notification $notification
-     * @return boolean
+     * Returns boolean on whether this processor can process the Notification object.
      */
     public function supports(Notification $notification): bool
     {
-        return strtoupper($notification->getEventCode()) === self::EVENT_CODE;
+        return self::EVENT_CODE === mb_strtoupper($notification->getEventCode());
     }
 
     /**
-     * Actual processing of the notification
+     * Actual processing of the notification.
      *
-     * @param Notification $notification
      * @throws \Enlight_Event_Exception
      */
-    public function process(Notification $notification)
+    public function process(Notification $notification): void
     {
         $order = $notification->getOrder();
 
@@ -54,7 +50,7 @@ class ManualReviewAccept implements NotificationProcessorInterface
             Event::NOTIFICATION_PROCESS_CANCELLATION,
             [
                 'order' => $order,
-                'notification' => $notification
+                'notification' => $notification,
             ]
         );
     }

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components\Payload;
 
 /**
- * Class Chain
- * @package AdyenPayment\Components
+ * Class Chain.
  */
 class Chain implements PaymentPayloadProvider
 {
@@ -15,6 +16,7 @@ class Chain implements PaymentPayloadProvider
 
     /**
      * Chain constructor.
+     *
      * @param PaymentPayloadProvider ...$providers
      */
     public function __construct(
@@ -23,15 +25,11 @@ class Chain implements PaymentPayloadProvider
         $this->providers = $providers;
     }
 
-    /**
-     * @param PaymentContext $context
-     * @return array
-     */
     public function provide(PaymentContext $context): array
     {
         return array_reduce(
             $this->providers,
-            function (array $payload, PaymentPayloadProvider $provider) use ($context) : array {
+            static function(array $payload, PaymentPayloadProvider $provider) use ($context): array {
                 return array_merge_recursive($payload, $provider->provide($context));
             },
             []

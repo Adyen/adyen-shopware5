@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Dbal;
 
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
@@ -20,7 +22,7 @@ class BasketDetailAttributes
     /**
      * @throws Zend_Db_Adapter_Exception
      */
-    public function update(string $basketDetailId, array $attributeValues): int
+    public function update(int $basketDetailId, array $attributeValues): int
     {
         return $this->db->update(
             's_order_basket_attributes',
@@ -32,7 +34,7 @@ class BasketDetailAttributes
     /**
      * @throws Zend_Db_Adapter_Exception
      */
-    public function insert(string $basketDetailId, array $attributeValues): int
+    public function insert(int $basketDetailId, array $attributeValues): int
     {
         return $this->db->insert(
             's_order_basket_attributes',
@@ -40,7 +42,7 @@ class BasketDetailAttributes
         );
     }
 
-    public function hasBasketDetails(string $basketDetailId): bool
+    public function hasBasketDetails(int $basketDetailId): bool
     {
         return count(
             $this->db

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AdyenPayment\Subscriber\Checkout;
 
 use Enlight\Event\SubscriberInterface;
-use Enlight_Event_EventArgs;
 use Shopware_Components_Snippet_Manager;
 
 final class RegisterConfirmSnippetsSubscriber implements SubscriberInterface
@@ -27,7 +26,7 @@ final class RegisterConfirmSnippetsSubscriber implements SubscriberInterface
         ];
     }
 
-    public function __invoke(Enlight_Event_EventArgs $args)
+    public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
 
@@ -61,6 +60,11 @@ final class RegisterConfirmSnippetsSubscriber implements SubscriberInterface
         $snippets['errorTransactionNoSession'] = $errorSnippets->get(
             'errorTransactionNoSession',
             'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
+            true
+        );
+        $snippets['errorGooglePayNotAvailable'] = $errorSnippets->get(
+            'errorGooglePayNotAvailable',
+            'Google Pay is currently not available.',
             true
         );
 

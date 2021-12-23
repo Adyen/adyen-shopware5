@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.1.0</version>
+    <version>3.2.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -253,6 +253,16 @@
         </changes>
         <changes lang="de">
             Kompatibilität PHP 7.4 Shopware 5.7.x
+        </changes>
+    </changelog>
+    <changelog version="3.2.0">
+        <changes lang="en">
+            Stability fixes
+            Support Gift cards
+        </changes>
+        <changes lang="de">
+            Stabilitätskorrekturen
+            Unterstützung Geschenkkarten
         </changes>
     </changelog>
 </plugin>

@@ -1,20 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdyenPayment\Components\Payload\Providers;
 
 use AdyenPayment\Components\Payload\PaymentContext;
 use AdyenPayment\Components\Payload\PaymentPayloadProvider;
 
 /**
- * Class ShopperInfoProvider
- * @package AdyenPayment\Components\Payload\Providers
+ * Class ShopperInfoProvider.
  */
 class ShopperInfoProvider implements PaymentPayloadProvider
 {
-    /**
-     * @param PaymentContext $context
-     * @return array
-     */
     public function provide(PaymentContext $context): array
     {
         return [

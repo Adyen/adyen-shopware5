@@ -4,7 +4,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="AdyenPayment\Components\WebComponents\GooglePayConfigProvider" public="true">
-            <argument type="service" id="adyen_payment.components.configuration" />
+            <argument type="service" id="AdyenPayment\Components\Configuration" />
         </service>
     </services>
 </container>

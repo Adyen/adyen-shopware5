@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Components\Adyen\PaymentMethod;
 
+use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
-use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
+use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Models\Payment\PaymentMean;
+use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterface
 {
@@ -26,21 +29,48 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
         $this->paymentMethodEnricher = $paymentMethodEnricher;
     }
 
+    /**
+     * @throws \Adyen\AdyenException
+     */
     public function __invoke(PaymentMeanCollection $paymentMeans): PaymentMeanCollection
     {
         $paymentMethodOptions = ($this->paymentMethodOptionsBuilder)();
-        if (0 === $paymentMethodOptions['value']) {
+        if (0.0 === $paymentMethodOptions['value']) {
             return $paymentMeans->filterExcludeAdyen();
         }
 
-        $adyenPaymentMethods = PaymentMethodCollection::fromAdyenMethods(
-            $this->paymentMethodService->getPaymentMethods(
-                $paymentMethodOptions['countryCode'],
-                $paymentMethodOptions['currency'],
-                $paymentMethodOptions['value']
-            )
+        $adyenPaymentMethods = $this->paymentMethodService->getPaymentMethods(
+            $paymentMethodOptions['countryCode'],
+            $paymentMethodOptions['currency'],
+            $paymentMethodOptions['value']
         );
 
-        return $paymentMeans->enrichAdyenPaymentMeans($adyenPaymentMethods, $this->paymentMethodEnricher);
+        $enricher = $this->paymentMethodEnricher;
+
+        return new PaymentMeanCollection(...$paymentMeans->map(
+            static function(PaymentMean $shopwareMethod) use ($adyenPaymentMethods, $enricher): ?PaymentMean {
+                if (!$shopwareMethod->getSource()->equals(SourceType::adyen())) {
+                    return $shopwareMethod;
+                }
+
+                /** @var Attribute $attribute */
+                $attribute = $shopwareMethod->getValue('attribute');
+                if (!$attribute) {
+                    return $shopwareMethod;
+                }
+
+                $identifierOrStoredId = '' !== (string) $attribute->get(AdyenPayment::ADYEN_STORED_METHOD_ID)
+                    ? $attribute->get(AdyenPayment::ADYEN_STORED_METHOD_ID)
+                    : $attribute->get(AdyenPayment::ADYEN_CODE);
+
+                $paymentMethod = $adyenPaymentMethods->fetchByIdentifierOrStoredId($identifierOrStoredId);
+
+                if (null === $paymentMethod) {
+                    return null;
+                }
+
+                return PaymentMean::createFromShopwareArray(($enricher)($shopwareMethod->getRaw(), $paymentMethod));
+            }
+        ));
     }
 }

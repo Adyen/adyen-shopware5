@@ -1,6 +1,5 @@
 ;(function ($) {
     'use strict';
-
     $.plugin('adyen-payment-selection', {
         /**
          * Plugin default options.
@@ -21,6 +20,12 @@
              * @type {string}
              */
             shopLocale: 'en-US',
+            /**
+             * Selector for the shipping payment content.
+             *
+             * @type {String}
+             */
+            shippingPaymentContentSelector: '#shipping_payment_wrapper',
             /**
              * Selector for the payment form.
              *
@@ -54,6 +59,10 @@
              */
             giftCardGroupName: 'Gift Card',
             /**
+             * @type {string} Adyen payment method type for ApplePay
+             */
+            applePayType: 'applepay',
+            /**
              * @type {string} Snippets associated with the payment page
              */
             adyenSnippets: {
@@ -70,12 +79,12 @@
         storePaymentMethodSession: 'storePaymentMethod',
         adyenConfigSession: 'adyenConfig',
 
-
         init: function () {
             var me = this;
             me.sessionStorage = StorageManager.getStorage('session');
 
             me.applyDataAttributes();
+            me.enableVisibility();
             me.eventListeners();
             me.setConfig();
             me.setCheckout();
@@ -87,6 +96,26 @@
             $(document).on('submit', me.opts.formSelector, $.proxy(me.onPaymentFormSubmit, me));
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
+        },
+        enableVisibility: function () {
+            this.handleApplePayVisibility();
+            $(this.opts.shippingPaymentContentSelector).removeClass('adyen-hidden--all');
+        },
+        handleApplePayVisibility: function () {
+            var me = this;
+            var applePayAvailable = window.ApplePaySession || false;
+            if (applePayAvailable) {
+                return;
+            }
+
+            var applePayMethod = me.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
+                return enrichedPaymentMethod.adyenType === me.opts.applePayType;
+            })[0] || {};
+            if (!applePayMethod) {
+                return;
+            }
+
+            $('#payment_mean'+applePayMethod.id).parents(this.opts.paymentMethodSelector).addClass('adyen-hidden--all');
         },
         onPaymentFormSubmit: function (e) {
             var me = this;
@@ -100,6 +129,8 @@
         },
         onPaymentChangedBefore: function ($event) {
             var me = this;
+
+            var previousSelectedPaymentElementId = me.selectedPaymentElementId;
             var selectedPaymentElementId = event.target.id;
 
             // only update when switching payment-methods (not on shipping methods)
@@ -109,13 +140,24 @@
 
             me.selectedPaymentElementId = selectedPaymentElementId;
             me.selectedPaymentId = $(event.target).val();
+
+            var paymentMethodSession = this.getPaymentSession();
+            if (0 === Object.keys(paymentMethodSession).length) {
+                return;
+            }
+
+            if (previousSelectedPaymentElementId !== me.selectedPaymentElementId) {
+                me.clearPaymentSession();
+            }
         },
         onPaymentChangedAfter: function () {
             var me = this;
 
-            // Return & clear when no adyen payment
+            me.enableVisibility();
+
             var payment = me.getPaymentMethodById(me.selectedPaymentId);
 
+            // Return & clear when no adyen payment
             if (!me.__isAdyenPaymentMethod(payment)) {
                 me.clearPaymentSession();
                 return;
@@ -141,7 +183,7 @@
         setConfig: function () {
             var me = this;
 
-            var adyenPaymentMethodsResponseConfig = Object.values(me.opts.enrichedPaymentMethods).reduce(
+            var adyenPaymentMethodsResponse = Object.values(me.opts.enrichedPaymentMethods).reduce(
                 function (rawAdyen, enrichedPaymentMethod) {
                     var isAdyenPaymentMethod = enrichedPaymentMethod.isAdyenPaymentMethod || false;
                     if (true === isAdyenPaymentMethod) {
@@ -157,7 +199,7 @@
                 locale: me.opts.shopLocale,
                 environment: me.opts.adyenEnvironment,
                 clientKey: me.opts.adyenClientKey,
-                paymentMethodsResponse: Object.assign({}, adyenPaymentMethodsResponseConfig),
+                paymentMethodsResponse: {'paymentMethods':adyenPaymentMethodsResponse},
                 onChange: $.proxy(me.handleOnChange, me)
             };
             me.saveAdyenConfigInSession(me.adyenConfiguration);
@@ -167,9 +209,10 @@
         },
         getPaymentMethodById: function (id) {
             var me = this;
-            var paymentMethod = me.opts.enrichedPaymentMethods[id] || {};
 
-            return paymentMethod;
+            return this.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
+                return enrichedPaymentMethod.id === id;
+            })[0] || {};
         },
         /**
          * @param {object} paymentMethod
@@ -194,7 +237,11 @@
         handleComponent: function (paymentMethod) {
             var me = this;
 
+            if (me.opts.applePayType === paymentMethod.adyenType) {
+                me.setPaymentSession(me.__buildMinimalState(paymentMethod));
+            }
             if ('paywithgoogle' === paymentMethod.adyenType) {
+                me.setPaymentSession(me.__buildMinimalState(paymentMethod));
                 me.handleComponentPayWithGoogle();
                 return;
             }
@@ -292,6 +339,11 @@
             me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
             me.sessionStorage.setItem(me.storePaymentMethodSession, state.data.storePaymentMethod || false);
         },
+        getPaymentSession: function () {
+            var me = this;
+
+            return JSON.parse(me.sessionStorage.getItem(me.paymentMethodSession) || "{}");
+        },
         clearPaymentSession: function () {
             var me = this;
             me.sessionStorage.removeItem(me.paymentMethodSession);
@@ -324,6 +376,7 @@
             }
 
             // minimal state has no info that needs updating
+            var payment = me.getPaymentMethodById(me.selectedPaymentId);
             if (me.__hasActiveMinimalPaymentMethodState()) {
                 return;
             }
@@ -337,16 +390,14 @@
                 .append(me.changeInfosButton);
         },
         /**
-         * @param {string} paymentType
+         * @param {object} paymentMethod
          * @return {boolean}
          * @private
          */
-        __isGiftCardType: function (paymentType) {
+        __isGiftCard: function (paymentMethod) {
             var me = this;
 
-            var paymentBrand = me.adyenConfiguration.paymentMethodsResponse['brand'] || '';
-
-            return '' !== paymentBrand || 'giftcard' === paymentType;
+            return 'giftcard' === paymentMethod.metadata.type;
         },
         /**
          * @param {object} paymentMethod
@@ -376,7 +427,7 @@
             if (!this.__hasActivePaymentMethod()) {
                 return false;
             }
-            var storedPaymentMethod = this.sessionStorage.getItem(this.paymentMethodSession);
+            var storedPaymentMethod = this.getPaymentSession();
             var keys = Object.keys(storedPaymentMethod);
 
             return 1 === keys.length && 'type' === keys[0]; // Minimal state structure @see __buildMinimalState()
@@ -406,7 +457,8 @@
             }
 
             // not all adyen payment methods have "details", these cannot be handled by webcomponents (e.g. Paypal)
-            return "undefined" !== typeof paymentMethod.metadata.details;
+            return "undefined" !== typeof paymentMethod.metadata.details
+                || "undefined" !== typeof paymentMethod.metadata.brand;
         },
         /**
          * @param  {object} paymentMethod
@@ -439,17 +491,18 @@
                 });
             }
 
-            if (this.__isGiftCardType(paymentMethod.adyenType)) {
+            if (this.__isGiftCard(paymentMethod)) {
                 var pinRequiredDetail = this.__retrievePaymentMethodDetailByKey(
                     paymentMethod,
                     'encryptedSecurityCode'
-                );
+                ) || false;
 
                 return $.extend(true, {}, defaultData, {
                     cardType: 'giftcard',
                     paymentMethodData: {
                         type: paymentMethod.adyenType,
-                        pinRequired: false === pinRequiredDetail.optional || false
+                        brand: paymentMethod.metadata.brand,
+                        pinRequired: pinRequiredDetail && (false !== pinRequiredDetail.optional || false)
                     }
                 });
             }
