@@ -64,7 +64,6 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
                     : $attribute->get(AdyenPayment::ADYEN_CODE));
 
                 $paymentMethod = $adyenPaymentMethods->fetchByIdentifierOrStoredId($identifierOrStoredId);
-
                 if (null === $paymentMethod) {
                     return null;
                 }
