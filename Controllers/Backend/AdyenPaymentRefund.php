@@ -1,5 +1,6 @@
 <?php
 
+use AdyenPayment\Components\Adyen\RefundService;
 use Shopware\Components\CSRFWhitelistAware;
 
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps, Generic.Files.LineLength.TooLong
@@ -8,7 +9,8 @@ class Shopware_Controllers_Backend_AdyenPaymentRefund extends Shopware_Controlle
     public function refundAction(): void
     {
         $orderId = $this->Request()->getParam('orderId');
-        $notificationManager = $this->get('AdyenPayment\Components\Adyen\RefundService');
+        $notificationManager = $this->get(RefundService::class);
+
         $refund = $notificationManager->doRefund($orderId);
 
         $this->View()->assign('refundReference', $refund->getPspReference());
@@ -21,7 +23,7 @@ class Shopware_Controllers_Backend_AdyenPaymentRefund extends Shopware_Controlle
      *
      * @psalm-return array{0: 'refund'}
      */
-    public function getWhitelistedCSRFActions()
+    public function getWhitelistedCSRFActions(): array
     {
         return ['refund'];
     }
