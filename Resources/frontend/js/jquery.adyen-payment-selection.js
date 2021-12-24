@@ -503,10 +503,7 @@
          * @private
          */
         __enableStoreDetails: function (paymentMethod) {
-            // ignore property "paymentMethod.supportsRecurring"
-            // return 'scheme' === paymentMethod.adyenType;
-            // @fixme temporarily disable stored payment details
-            return false;
+            return 'scheme' === paymentMethod.adyenType;
         },
         /**
          * Modify AdyenPaymentMethod with additional data for the web-component library

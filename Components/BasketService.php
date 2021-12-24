@@ -279,7 +279,7 @@ class BasketService
             'currencyFactor' => Shopware()->Shop()->getCurrency()->getFactor(),
         ]);
 
-        return $this->db->lastInsertId();
+        return (int) $this->db->lastInsertId();
     }
 
     /**
