@@ -35,12 +35,12 @@ final class PaymentMethod
         return $new;
     }
 
-    public function withCode(string $code): self
+    public function withCode(string $name): self
     {
         $new = clone $this;
         $new->code = mb_strtolower(sprintf('%s_%s',
             $this->type->type(),
-            Sanitize::removeNonWord($code)
+            Sanitize::removeNonWord($name)
         ));
 
         return $new;

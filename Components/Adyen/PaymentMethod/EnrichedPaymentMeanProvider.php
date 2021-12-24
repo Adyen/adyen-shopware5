@@ -7,7 +7,7 @@ namespace AdyenPayment\Components\Adyen\PaymentMethod;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
-use AdyenPayment\Components\Adyen\PaymentMethodService;
+use AdyenPayment\Components\Adyen\PaymentMethodServiceInterface;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMean;
@@ -15,12 +15,12 @@ use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterface
 {
-    private PaymentMethodService $paymentMethodService;
+    private PaymentMethodServiceInterface $paymentMethodService;
     private PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder;
     private PaymentMethodEnricherInterface $paymentMethodEnricher;
 
     public function __construct(
-        PaymentMethodService $paymentMethodService,
+        PaymentMethodServiceInterface $paymentMethodService,
         PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder,
         PaymentMethodEnricherInterface $paymentMethodEnricher
     ) {
@@ -59,9 +59,9 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
                     return $shopwareMethod;
                 }
 
-                $identifierOrStoredId = '' !== (string) $attribute->get(AdyenPayment::ADYEN_STORED_METHOD_ID)
+                $identifierOrStoredId = (string) ('' !== (string) $attribute->get(AdyenPayment::ADYEN_STORED_METHOD_ID)
                     ? $attribute->get(AdyenPayment::ADYEN_STORED_METHOD_ID)
-                    : $attribute->get(AdyenPayment::ADYEN_CODE);
+                    : $attribute->get(AdyenPayment::ADYEN_CODE));
 
                 $paymentMethod = $adyenPaymentMethods->fetchByIdentifierOrStoredId($identifierOrStoredId);
 
