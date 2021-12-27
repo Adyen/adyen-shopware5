@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Shopware\Plugin;
 
-use AdyenPayment\AdyenPayment;
-use AdyenPayment\Subscriber\Backend\HideStoredPaymentUmbrellaSubscriber;
+use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Subscriber\Backend\HideStoredPaymentsSubscriber;
 use Enlight\Event\SubscriberInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Response;
 
-final class HideStoredPaymentUmbrellaSubscriberTest extends TestCase
+final class HideStoredPaymentsSubscriberTest extends TestCase
 {
     use ProphecyTrait;
-    private HideStoredPaymentUmbrellaSubscriber $subscriber;
+    private HideStoredPaymentsSubscriber $subscriber;
 
     /** @var \Enlight_Controller_ActionEventArgs|ObjectProphecy */
     private $args;
@@ -32,7 +33,7 @@ final class HideStoredPaymentUmbrellaSubscriberTest extends TestCase
         $this->request = $this->prophesize(\Enlight_Controller_Request_Request::class);
         $this->response = $this->prophesize(\Enlight_Controller_Response_Response::class);
 
-        $this->subscriber = new HideStoredPaymentUmbrellaSubscriber();
+        $this->subscriber = new HideStoredPaymentsSubscriber();
     }
 
     /** @test */
@@ -49,7 +50,7 @@ final class HideStoredPaymentUmbrellaSubscriberTest extends TestCase
                 'Enlight_Controller_Action_PostDispatchSecure_Backend_Payment' => '__invoke',
                 'Enlight_Controller_Action_PostDispatchSecure_Backend_Shipping' => '__invoke',
             ],
-            HideStoredPaymentUmbrellaSubscriber::getSubscribedEvents()
+            HideStoredPaymentsSubscriber::getSubscribedEvents()
         );
     }
 
@@ -111,6 +112,7 @@ final class HideStoredPaymentUmbrellaSubscriberTest extends TestCase
         $this->response->getHttpResponseCode()->willReturn(Response::HTTP_OK);
         $this->request->getActionName()->willReturn('getPayments');
         $this->args->getSubject()->willReturn($subject->reveal());
+        $view->assign(Argument::cetera())->shouldNotBeCalled();
 
         ($this->subscriber)($this->args->reveal());
     }
@@ -123,7 +125,7 @@ final class HideStoredPaymentUmbrellaSubscriberTest extends TestCase
             ['name' => 'Payment Method 2'],
         ];
         $rawMethods = ['data' => array_merge(
-            [['name' => AdyenPayment::ADYEN_STORED_PAYMENT_UMBRELLA_CODE]],
+            [['hide' => 1, 'source' => SourceType::adyen()->getType()]],
             $expected
         )];
 
@@ -137,7 +139,7 @@ final class HideStoredPaymentUmbrellaSubscriberTest extends TestCase
         $this->response->getHttpResponseCode()->willReturn(Response::HTTP_OK);
         $this->request->getActionName()->willReturn('getPayments');
         $this->args->getSubject()->willReturn($subject->reveal());
-        $view->assign(['success' => true, 'data' => $expected])->shouldBeCalled();
+        $view->assign('data', $expected)->shouldBeCalled();
 
         ($this->subscriber)($this->args->reveal());
     }

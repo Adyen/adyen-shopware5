@@ -33,7 +33,7 @@
         <service id="AdyenPayment\Subscriber\Applepay\MerchantAssociation\PerformanceLoaderSubscriber">
             <argument>%adyen_payment.plugin_dir%</argument>
         </service>
-        <service id="AdyenPayment\Subscriber\Backend\HideStoredPaymentUmbrellaSubscriber">
+        <service id="AdyenPayment\Subscriber\Backend\HideStoredPaymentsSubscriber">
             <tag name="shopware.event_subscriber"/>
         </service>
 

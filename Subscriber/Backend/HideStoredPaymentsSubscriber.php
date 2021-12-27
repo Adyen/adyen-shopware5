@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber\Backend;
 
-use AdyenPayment\AdyenPayment;
+use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use Enlight\Event\SubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-final class HideStoredPaymentUmbrellaSubscriber implements SubscriberInterface
+final class HideStoredPaymentsSubscriber implements SubscriberInterface
 {
     private const GET_PAYMENTS_ACTION = 'getPayments';
 
@@ -41,10 +41,20 @@ final class HideStoredPaymentUmbrellaSubscriber implements SubscriberInterface
             return;
         }
 
-        $filtered = array_values(array_filter($data, static function($paymentMethod) {
-            return AdyenPayment::ADYEN_STORED_PAYMENT_UMBRELLA_CODE !== $paymentMethod['name'];
-        }));
+        $adyenSourceType = SourceType::adyen();
+        foreach ($data as $key => $paymentMethod) {
+            if (false === (bool) ($paymentMethod['hide'] ?? false)) {
+                continue;
+            }
 
-        $args->getSubject()->View()->assign(['success' => true, 'data' => $filtered]);
+            $sourceType = SourceType::load($paymentMethod['source'] ?? null);
+            if (!$sourceType->equals($adyenSourceType)) {
+                continue;
+            }
+
+            unset($data[$key]);
+        }
+
+        $args->getSubject()->View()->assign('data', array_values($data));
     }
 }
