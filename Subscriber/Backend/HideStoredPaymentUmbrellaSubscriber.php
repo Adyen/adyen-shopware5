@@ -15,8 +15,8 @@ final class HideStoredPaymentUmbrellaSubscriber implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'Enlight_Controller_Action_PostDispatch_Backend_Payment' => '__invoke',
-            'Enlight_Controller_Action_PostDispatch_Backend_Shipping' => '__invoke',
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Payment' => '__invoke',
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Shipping' => '__invoke',
         ];
     }
 
