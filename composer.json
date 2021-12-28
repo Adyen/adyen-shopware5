@@ -27,7 +27,7 @@
         "ext-json": "*",
         "adyen/php-api-library": "^10.0",
         "monolog/monolog": "2.1.1",
-        "guzzlehttp/guzzle": "^7.0"
+        "phpro/http-tools": "^1.2"
     },
     "require-dev": {
         "phpro/grumphp-shim": "^1.5"

@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="AdyenPayment\Certificate\Mapper\HttpCodeToLogLevel"/>
+        <service id="AdyenPayment\Certificate\Mapper\ResponseStatusToLogLevel"/>
+
+        <service id="AdyenPayment\Certificate\Middleware\HeaderLoggingMiddleware">
+            <argument type="service" id="AdyenPayment\Certificate\Mapper\HttpCodeToLogLevel"/>
+            <argument type="service" id="adyen_payment.logger"/>
+            <tag name="certificate.client.middleware"/>
+        </service>
+        <service id="AdyenPayment\Certificate\Middleware\BodyLoggingMiddleware">
+            <argument type="service" id="AdyenPayment\Certificate\Mapper\ResponseStatusToLogLevel"/>
+            <argument type="service" id="adyen_payment.logger"/>
+            <tag name="certificate.client.middleware"/>
+        </service>
+
+        <service id="AdyenPayment\Certificate\Client\HttpClient">
+            <factory class="Phpro\HttpTools\Client\Factory\GuzzleClientFactory" method="create" />
+            <argument key="$middlewares" type="tagged_iterator" tag="certificate.client.middleware"/>
+            <argument key="$options" type="collection">
+                <!-- As the plugin has no .env file, we have to add the url directly in here -->
+                <argument key="base_uri">
+                    https://docs.adyen.com/reuse/payment-method-pages/apple-pay/adyen-certificate/apple-developer-merchantid-domain-association.zip
+                </argument>
+            </argument>
+        </service>
+
+        <service id="AdyenPayment\Certificate\Request\Handler\ApplePayHandler">
+        </service>
+
+        <service id="AdyenPayment\Certificate\Transport\StreamTransportFactory">
+            <argument type="service" id="AdyenPayment\Certificate\Client\HttpClient"/>
+            <argument type="service" id="Phpro\HttpTools\Uri\TemplatedUriBuilder"/>
+        </service>
+
+        <service id="AdyenPayment\Certificate\Encoder\ApplePayCertificateEncoder"/>
+        <service id="AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder"/>
+    </services>
+</container>
