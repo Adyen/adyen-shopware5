@@ -42,19 +42,20 @@ final class HideStoredPaymentsSubscriber implements SubscriberInterface
         }
 
         $adyenSourceType = SourceType::adyen();
-        foreach ($data as $key => $paymentMethod) {
+
+        $data = array_values(array_filter($data, static function($paymentMethod) use ($adyenSourceType) {
             if (false === (bool) ($paymentMethod['hide'] ?? false)) {
-                continue;
+                return true;
             }
 
             $sourceType = SourceType::load($paymentMethod['source'] ?? null);
             if (!$sourceType->equals($adyenSourceType)) {
-                continue;
+                return true;
             }
 
-            unset($data[$key]);
-        }
+            return false;
+        }));
 
-        $args->getSubject()->View()->assign('data', array_values($data));
+        $args->getSubject()->View()->assign('data', $data);
     }
 }

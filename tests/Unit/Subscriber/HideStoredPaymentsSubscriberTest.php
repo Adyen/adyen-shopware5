@@ -59,6 +59,7 @@ final class HideStoredPaymentsSubscriberTest extends TestCase
     {
         $this->args->get('request')->willReturn(false);
         $this->args->get('response')->willReturn($this->response->reveal());
+        $this->args->getSubject()->shouldNotBeCalled();
         $this->response->getHttpResponseCode()->shouldNotBeCalled();
         $this->request->getActionName()->shouldNotBeCalled();
 
@@ -70,6 +71,7 @@ final class HideStoredPaymentsSubscriberTest extends TestCase
     {
         $this->args->get('request')->willReturn($this->request->reveal());
         $this->args->get('response')->willReturn(false);
+        $this->args->getSubject()->shouldNotBeCalled();
         $this->response->getHttpResponseCode()->shouldNotBeCalled();
         $this->request->getActionName()->shouldNotBeCalled();
 
@@ -81,6 +83,7 @@ final class HideStoredPaymentsSubscriberTest extends TestCase
     {
         $this->args->get('request')->willReturn($this->request->reveal());
         $this->args->get('response')->willReturn($this->response->reveal());
+        $this->args->getSubject()->shouldNotBeCalled();
         $this->response->getHttpResponseCode()->willReturn('any-code');
         $this->request->getActionName()->shouldNotBeCalled();
 
