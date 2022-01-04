@@ -144,7 +144,7 @@ class EnrichedPaymentMeanProviderTest extends TestCase
         $result = $this->provider->__invoke($paymentMeans);
         $this->assertInstanceOf(PaymentMeanCollection::class, $result);
         $this->assertCount(1, $result);
-        $this->assertEquals(new PaymentMeanCollection($paymentMeanOne), $result);
+        $this->assertEquals($paymentMeanOne, iterator_to_array($result)[0]);
     }
 
     /** @test */
