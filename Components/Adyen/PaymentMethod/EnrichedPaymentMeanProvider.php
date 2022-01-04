@@ -49,6 +49,10 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
 
         return new PaymentMeanCollection(...$paymentMeans->map(
             static function(PaymentMean $shopwareMethod) use ($adyenPaymentMethods, $enricher): ?PaymentMean {
+                $hiddenPayment = (bool) $shopwareMethod->getValue('hide');
+                if ($hiddenPayment) {
+                    return null;
+                }
                 if (!$shopwareMethod->getSource()->equals(SourceType::adyen())) {
                     return $shopwareMethod;
                 }
