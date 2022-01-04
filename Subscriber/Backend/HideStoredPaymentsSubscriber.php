@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber\Backend;
 
-use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
+use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use Enlight\Event\SubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,40 +22,32 @@ final class HideStoredPaymentsSubscriber implements SubscriberInterface
 
     public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
-        $request = $args->get('request') ?? false;
-        $response = $args->get('response') ?? false;
-
-        if (!$request || !$response) {
+        if (!$this->isSuccessGetPaymentAction($args)) {
             return;
         }
 
-        if (
-            Response::HTTP_OK !== $response->getHttpResponseCode()
-            || self::GET_PAYMENTS_ACTION !== $request->getActionName()
-        ) {
+        $data = $args->getSubject()->View()->getAssign('data') ?? [];
+        if (!count($data)) {
             return;
         }
 
-        $data = $args->getSubject()->View()->getAssign()['data'] ?? [];
-        if (0 === count($data)) {
-            return;
-        }
+        $data = PaymentMeanCollection::createFromShopwareArray($data)
+            ->filterExcludeHidden()
+            ->toShopwareArray();
 
-        $adyenSourceType = SourceType::adyen();
+        $args->getSubject()->View()->assign('data', array_values($data));
+    }
 
-        $data = array_values(array_filter($data, static function($paymentMethod) use ($adyenSourceType) {
-            if (false === (bool) ($paymentMethod['hide'] ?? false)) {
-                return true;
-            }
-
-            $sourceType = SourceType::load($paymentMethod['source'] ?? null);
-            if (!$sourceType->equals($adyenSourceType)) {
-                return true;
-            }
-
+    private function isSuccessGetPaymentAction(\Enlight_Controller_ActionEventArgs $args): bool
+    {
+        if (!$args->getResponse() || Response::HTTP_OK !== $args->getResponse()->getHttpResponseCode()) {
             return false;
-        }));
+        }
 
-        $args->getSubject()->View()->assign('data', $data);
+        if (!$args->getRequest() || self::GET_PAYMENTS_ACTION !== $args->getRequest()->getActionName()) {
+            return false;
+        }
+
+        return true;
     }
 }
