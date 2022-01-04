@@ -25,6 +25,7 @@ final class PaymentMeanTest extends TestCase
             ]),
             'enriched' => true,
             'adyenType' => 'adyen-type',
+            'hide' => true,
         ]);
     }
 
@@ -43,6 +44,12 @@ final class PaymentMeanTest extends TestCase
     }
 
     /** @test */
+    public function it_knows_it_is_hidden(): void
+    {
+        $this->assertTrue($this->paymentMean->isHidden());
+    }
+
+    /** @test */
     public function it_contains_raw_data(): void
     {
         $this->assertIsArray($this->paymentMean->getRaw());
@@ -55,6 +62,7 @@ final class PaymentMeanTest extends TestCase
             ]),
             'enriched' => true,
             'adyenType' => 'adyen-type',
+            'hide' => true,
         ], $this->paymentMean->getRaw());
     }
 

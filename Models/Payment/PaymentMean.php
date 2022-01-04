@@ -38,6 +38,11 @@ final class PaymentMean
         return $this->source;
     }
 
+    public function isHidden(): bool
+    {
+        return (bool) ($this->raw['hide'] ?? false);
+    }
+
     public function getAttribute(): Attribute
     {
         return $this->raw['attribute'] ?? new Attribute();

@@ -83,7 +83,7 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
      * $identifierOrStoredId is the Adyen "unique identifier" or Adyen "stored payment id"
      * NOT the Shopware id.
      */
-    public function fetchByIdentifierOrStoredId(string $identifierOrStoredId): ?PaymentMethod
+    private function fetchByIdentifierOrStoredId(string $identifierOrStoredId): ?PaymentMethod
     {
         foreach ($this->paymentMethods as $paymentMethod) {
             if ($paymentMethod->getStoredPaymentMethodId() === $identifierOrStoredId) {

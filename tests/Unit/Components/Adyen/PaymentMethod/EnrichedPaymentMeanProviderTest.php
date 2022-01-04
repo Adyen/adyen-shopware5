@@ -122,11 +122,11 @@ class EnrichedPaymentMeanProviderTest extends TestCase
     public function it_does_not_enrich_payment_means_without_attribute(): void
     {
         $paymentMeans = new PaymentMeanCollection(
-            $paymentMean = PaymentMean::createFromShopwareArray([
+            $paymentMeanOne = PaymentMean::createFromShopwareArray([
                 'id' => 19,
                 'source' => SourceType::shopwareDefault()->getType(),
             ]),
-            $paymentMean = PaymentMean::createFromShopwareArray([
+            $paymentMeanTwo = PaymentMean::createFromShopwareArray([
                 'id' => 21,
                 'source' => SourceType::adyen()->getType(),
             ]),
@@ -143,9 +143,8 @@ class EnrichedPaymentMeanProviderTest extends TestCase
 
         $result = $this->provider->__invoke($paymentMeans);
         $this->assertInstanceOf(PaymentMeanCollection::class, $result);
-        $this->assertCount(2, $result);
-        $this->assertNotSame($paymentMeans, $result);
-        $this->assertEquals($paymentMeans, $result);
+        $this->assertCount(1, $result);
+        $this->assertEquals(new PaymentMeanCollection($paymentMeanOne), $result);
     }
 
     /** @test */

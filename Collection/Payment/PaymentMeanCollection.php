@@ -6,10 +6,8 @@ namespace AdyenPayment\Collection\Payment;
 
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMean;
-use Countable;
-use IteratorAggregate;
 
-final class PaymentMeanCollection implements IteratorAggregate, Countable
+final class PaymentMeanCollection implements \IteratorAggregate, \Countable
 {
     /**
      * @var array<PaymentMean>
@@ -23,12 +21,10 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
 
     public static function createFromShopwareArray(array $paymentMeans): self
     {
-        return new self(
-            ...array_map(
-                static fn(array $paymentMean) => PaymentMean::createFromShopwareArray($paymentMean),
-                $paymentMeans
-            )
-        );
+        return new self(...array_map(
+            static fn(array $paymentMean): PaymentMean => PaymentMean::createFromShopwareArray($paymentMean),
+            $paymentMeans
+        ));
     }
 
     /**
@@ -57,7 +53,7 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     public function filterBySource(SourceType $source): self
     {
         return $this->filter(
-            static function(PaymentMean $paymentMean) use ($source) {
+            static function(PaymentMean $paymentMean) use ($source): bool {
                 return $source->equals($paymentMean->getSource());
             }
         );
@@ -66,10 +62,18 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
     public function filterExcludeAdyen(): self
     {
         return $this->filter(
-            static function(PaymentMean $paymentMean) {
+            static function(PaymentMean $paymentMean): bool {
                 return !$paymentMean->getSource()->equals(SourceType::adyen());
             }
         );
+    }
+
+    public function filterExcludeHidden(): self
+    {
+        return new self(...array_filter(
+            $this->paymentMeans,
+            static fn(PaymentMean $paymentMean): bool => !$paymentMean->isHidden()
+        ));
     }
 
     public function filterByAdyenSource(): self
@@ -79,14 +83,10 @@ final class PaymentMeanCollection implements IteratorAggregate, Countable
 
     public function toShopwareArray(): array
     {
-        return array_reduce(
-            $this->paymentMeans,
-            static function(array $payload, PaymentMean $paymentMean) {
-                $payload[$paymentMean->getId()] = $paymentMean->getRaw();
+        return array_reduce($this->paymentMeans, static function(array $payload, PaymentMean $paymentMean): array {
+            $payload[$paymentMean->getId()] = $paymentMean->getRaw();
 
-                return $payload;
-            },
-            []
-        );
+            return $payload;
+        }, []);
     }
 }
