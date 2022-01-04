@@ -119,7 +119,7 @@ class EnrichedPaymentMeanProviderTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_enrich_payment_means_without_attribute(): void
+    public function it_does_not_enrich_and_removes_payment_means_without_attribute(): void
     {
         $paymentMeans = new PaymentMeanCollection(
             $paymentMeanOne = PaymentMean::createFromShopwareArray([
