@@ -8,18 +8,11 @@ use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Models\Payment\PaymentMean;
 use AdyenPayment\Models\Payment\PaymentMethod;
-use AdyenPayment\Utils\Sanitize;
 use PHPUnit\Framework\TestCase;
 use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class PaymentMethodCollectionTest extends TestCase
 {
-    /** @test */
-    public function it_implements_countable(): void
-    {
-        self::assertInstanceOf(\Countable::class, new PaymentMethodCollection());
-    }
-
     /** @test */
     public function it_implements_iterable(): void
     {
@@ -27,19 +20,12 @@ final class PaymentMethodCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_return_an_iterator(): void
+    public function it_can_count(): void
     {
         $result = PaymentMethodCollection::fromAdyenMethods(['paymentMethods' => [['type' => 'someType']]]);
 
-        self::assertInstanceOf(\Traversable::class, $result->getIterator());
-    }
-
-    /** @test */
-    public function it_can_count_the_payment_methods(): void
-    {
-        $result = PaymentMethodCollection::fromAdyenMethods(['paymentMethods' => [['type' => 'someType']]]);
-
-        self::assertEquals(1, $result->count());
+        self::assertInstanceOf(\Countable::class, $result);
+        self::assertCount(1, $result);
     }
 
     /** @test */
@@ -59,7 +45,7 @@ final class PaymentMethodCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_cam_map_to_raw(): void
+    public function it_can_map_to_raw(): void
     {
         $expected = [
             ['type' => 'someType'],
@@ -70,55 +56,6 @@ final class PaymentMethodCollectionTest extends TestCase
         $result = $collection->mapToRaw();
 
         self::assertEquals($expected, $result);
-    }
-
-    /** @test */
-    public function it_can_fetch_by_identifier(): void
-    {
-        $paymentMethod = PaymentMethod::fromRaw($paymentMethodData = [
-            'type' => $type = 'someType',
-            'name' => $name = 'someName',
-        ]);
-        $expectedMethod = $paymentMethod->withCode($name);
-        $paymentMethodsCollection = PaymentMethodCollection::fromAdyenMethods([
-            'paymentMethods' => [
-                $paymentMethodData,
-                ['type' => 'anotherPaymentMethods'],
-            ],
-        ]);
-        $expectedCode = mb_strtolower(sprintf('%s_%s', $type, Sanitize::removeNonWord($name)));
-        $collectionWithCodes = $paymentMethodsCollection->withImportLocale($paymentMethodsCollection);
-
-        $result = $collectionWithCodes->fetchByIdentifierOrStoredId($expectedCode);
-
-        self::assertEquals($expectedMethod, $result);
-    }
-
-    /** @test */
-    public function it_can_fetch_by_stored_id(): void
-    {
-        $expectedPayment = PaymentMethod::fromRaw($methodData = [
-            'type' => 'someType2',
-            'id' => $methodStoredId = 'methodWithId',
-        ]);
-        $collection = PaymentMethodCollection::fromAdyenMethods(['paymentMethods' => [
-            ['type' => 'someType'],
-            $methodData,
-        ]]);
-
-        $result = $collection->fetchByIdentifierOrStoredId($methodStoredId);
-
-        self::assertEquals($expectedPayment, $result);
-    }
-
-    /** @test */
-    public function it_will_return_null_if_method_not_found_by_identifier_or_stored_id(): void
-    {
-        $collection = new PaymentMethodCollection();
-
-        $result = $collection->fetchByIdentifierOrStoredId('missing-method');
-
-        self::assertNull($result);
     }
 
     /** @test */
@@ -142,7 +79,7 @@ final class PaymentMethodCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_map_import_locale(): void
+    public function it_can_enrich_with_import_locale(): void
     {
         $paymentMethod = PaymentMethod::fromRaw($paymentMethodData = [
             'type' => 'someType',
@@ -184,18 +121,13 @@ final class PaymentMethodCollectionTest extends TestCase
             'source' => 1425514,
             'attribute' => $attribute,
         ]);
-        $expectedPayment = PaymentMethod::fromRaw($methodData = [
-            'type' => 'someType2',
-            'id' => $methodStoredId,
-        ]);
-        $collection = PaymentMethodCollection::fromAdyenMethods(['paymentMethods' => [
-            ['type' => 'someType'],
-            $methodData,
-        ]]);
+        $testPayment = PaymentMethod::fromRaw(['type' => 'someType']);
+        $expectedPayment = PaymentMethod::fromRaw(['type' => 'someType2', 'id' => $methodStoredId]);
+        $collection = new PaymentMethodCollection($testPayment, $expectedPayment);
 
         $result = $collection->fetchByPaymentMean($paymentMean);
 
-        self::assertEquals($expectedPayment, $result);
+        self::assertSame($expectedPayment, $result);
     }
 
     /** @test */
@@ -205,7 +137,6 @@ final class PaymentMethodCollectionTest extends TestCase
             ['type' => $filteredType = 'someType'],
             ['type' => 'otherType'],
         ]]);
-
         $expected = PaymentMethodCollection::fromAdyenMethods(['paymentMethods' => [
             ['type' => $filteredType],
         ]]);
