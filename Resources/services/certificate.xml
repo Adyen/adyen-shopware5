@@ -22,13 +22,16 @@
             <argument key="$middlewares" type="tagged_iterator" tag="certificate.client.middleware"/>
             <argument key="$options" type="collection">
                 <!-- As the plugin has no .env file, we have to add the url directly in here -->
-                <argument key="base_uri">
-                    https://docs.adyen.com/reuse/payment-method-pages/apple-pay/adyen-certificate/apple-developer-merchantid-domain-association.zip
-                </argument>
+                <argument key="base_uri">https://eu.adyen.link/.well-known/apple-developer-merchantid-domain-association</argument>
             </argument>
         </service>
 
+        <service id="Phpro\HttpTools\Uri\TemplatedUriBuilder"/>
+
         <service id="AdyenPayment\Certificate\Request\Handler\ApplePayHandler">
+            <argument type="service" id="AdyenPayment\Certificate\Transport\StreamTransportFactory"/>
+            <argument type="service" id="AdyenPayment\Certificate\Encoder\ApplePayCertificateEncoder"/>
+            <argument type="service" id="AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder"/>
         </service>
 
         <service id="AdyenPayment\Certificate\Transport\StreamTransportFactory">
@@ -36,7 +39,22 @@
             <argument type="service" id="Phpro\HttpTools\Uri\TemplatedUriBuilder"/>
         </service>
 
+        <service id="AdyenPayment\Certificate\Service\ZipExtractor">
+            <argument type="service" id="adyen_payment.logger"/>
+        </service>
+        <service id="AdyenPayment\Certificate\Service\CertificateWriter">
+            <argument type="service" id="adyen_payment.logger"/>
+        </service>
+
         <service id="AdyenPayment\Certificate\Encoder\ApplePayCertificateEncoder"/>
-        <service id="AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder"/>
+        <service id="AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder">
+            <argument type="service" id="AdyenPayment\Certificate\Service\ZipExtractor"/>
+            <argument type="service" id="AdyenPayment\Certificate\Service\CertificateWriter"/>
+        </service>
+
+        <service id="AdyenPayment\Certificate\Response\ApplePayResponse">
+            <argument type="service" id="AdyenPayment\Certificate\Service\ZipExtractor"/>
+            <argument type="service" id="AdyenPayment\Certificate\Service\CertificateWriter"/>
+        </service>
     </services>
 </container>

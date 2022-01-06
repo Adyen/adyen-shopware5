@@ -140,13 +140,14 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->Response()->setBody(json_encode($paymentInfo));
     }
 
-    public function applePayCertificateAction(): void
-    {
-        $this->Request()->setHeader('Content-Type', 'text/plain');
-        $this->Front()->Plugins()->ViewRenderer()->setNoRender(); // TODO: not sure on this one
-
-        $response = ($this->applePayHandler->__invoke(new ApplePayRequest()));
-    }
+    // TODO: remove or change in ASW-430
+//    public function applePayCertificateAction(): void
+//    {
+//        $this->Request()->setHeader('Content-Type', 'text/plain');
+//        $this->Front()->Plugins()->ViewRenderer()->setNoRender(); // TODO: not sure on this one
+//
+//        $response = ($this->applePayHandler->__invoke(new ApplePayRequest()));
+//    }
 
     /**
      * @return PaymentContext

@@ -10,7 +10,6 @@ final class ResponseStatusToLogLevel implements ResponseStatusToLogLevelInterfac
 {
     public function __invoke(string $responseBody): int
     {
-        // TODO dump responseBody to see if other codes are possible and different log levels are neccessary
         if ('' === $responseBody) {
             return Logger::ERROR;
         }

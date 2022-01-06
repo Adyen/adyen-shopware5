@@ -27,11 +27,17 @@
         "ext-json": "*",
         "adyen/php-api-library": "^10.0",
         "monolog/monolog": "2.1.1",
-        "phpro/http-tools": "^1.2"
+        "guzzlehttp/guzzle": "^7.4",
+        "phpro/http-tools": "1.1.0"
     },
     "require-dev": {
         "phpro/grumphp-shim": "^1.5"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "phpro/grumphp-shim": true
+        }
+    }
 }
