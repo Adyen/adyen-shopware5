@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace AdyenPayment\Tests\Unit\Certificate\Middleware;
+
 use AdyenPayment\Certificate\Mapper\ResponseStatusToLogLevelInterface;
 use AdyenPayment\Certificate\Middleware\BodyLoggingMiddleware;
 use AdyenPayment\Certificate\Middleware\MiddlewareInterface;
