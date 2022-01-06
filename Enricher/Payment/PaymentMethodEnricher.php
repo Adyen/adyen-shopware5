@@ -25,16 +25,24 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
     {
         return array_merge($shopwareMethod, [
             'enriched' => true,
-            'additionaldescription' => $this->enrichDescription($paymentMethod),
+            'additionaldescription' => $this->enrichAdditionalDescription($paymentMethod),
             'image' => $this->imageLogoProvider->provideByType($paymentMethod->adyenType()->type()),
             'isStoredPayment' => $paymentMethod->isStoredPayment(),
             'isAdyenPaymentMethod' => true,
             'adyenType' => $paymentMethod->adyenType()->type(),
             'metadata' => $paymentMethod->rawData(),
-        ]);
+            'stored_method_umbrella_id' => $paymentMethod->isStoredPayment() ? sprintf(
+                '%s_%s',
+                $shopwareMethod['id'],
+                $paymentMethod->getStoredPaymentMethodId()
+            ) : null,
+            'stored_method_id' => $paymentMethod->isStoredPayment() ? $paymentMethod->getStoredPaymentMethodId() : null,
+        ],
+            $paymentMethod->isStoredPayment() ? ['description' => $paymentMethod->getValue('name')] : []
+        );
     }
 
-    private function enrichDescription(PaymentMethod $adyenMethod): string
+    private function enrichAdditionalDescription(PaymentMethod $adyenMethod): string
     {
         $description = $this->snippets
             ->getNamespace('adyen/method/description')

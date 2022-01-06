@@ -142,7 +142,7 @@
             }
 
             me.selectedPaymentElementId = selectedPaymentElementId;
-            me.selectedPaymentId = $(event.target).val();
+            me.selectedPaymentId = me.extractShopwarePaymentId($(event.target).val());
 
             var paymentMethodSession = this.getPaymentSession();
             if (0 === Object.keys(paymentMethodSession).length) {
@@ -152,6 +152,13 @@
             if (previousSelectedPaymentElementId !== me.selectedPaymentElementId) {
                 me.clearPaymentSession();
             }
+        },
+        extractShopwarePaymentId: function (targetElementValue) {
+            if(-1 === targetElementValue.indexOf('_')){
+                return targetElementValue;
+            }
+
+            return targetElementValue.split('_')[1];
         },
         onPaymentChangedAfter: function () {
             var me = this;
@@ -235,6 +242,9 @@
             var me = this;
 
             return me.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
+                if(enrichedPaymentMethod.isStoredPayment === true && enrichedPaymentMethod.stored_method_id === id){
+                    return true;
+                }
                 return enrichedPaymentMethod.id === id;
             })[0] || {};
         },

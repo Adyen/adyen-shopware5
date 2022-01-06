@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Collection\Payment;
 
+use AdyenPayment\AdyenPayment;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMean;
 
@@ -79,6 +80,17 @@ final class PaymentMeanCollection implements \IteratorAggregate, \Countable
     public function filterByAdyenSource(): self
     {
         return $this->filterBySource(SourceType::adyen());
+    }
+
+    public function fetchUmbrellaMean(): ?PaymentMean
+    {
+        foreach ($this->paymentMeans as $paymentMean) {
+            if (AdyenPayment::ADYEN_STORED_PAYMENT_UMBRELLA_CODE === $paymentMean->getRaw()['name']) {
+                return $paymentMean;
+            }
+        }
+
+        return null;
     }
 
     public function toShopwareArray(): array

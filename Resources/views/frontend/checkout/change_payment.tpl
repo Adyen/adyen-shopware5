@@ -8,6 +8,7 @@
     {assign var="storedPaymentMethods" value=[]}
     {foreach $sPayments as $paymentMethod}
         {if 'isStoredPayment'|array_key_exists:$paymentMethod && true === $paymentMethod.isStoredPayment}
+            {append var="paymentMethod" value=$paymentMethod.stored_method_umbrella_id index='id'}
             {$storedPaymentMethods[] = $paymentMethod}
         {else}
             {$paymentMethods[] = $paymentMethod}
