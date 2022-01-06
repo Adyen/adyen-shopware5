@@ -28,7 +28,6 @@ final class ApplePayHandler implements ApplePayHandlerInterface
 
     public function __invoke(ApplePayRequest $applePayRequest): ApplePay
     {
-        /** @var ApplePayHandler $transport */
         $transport = $this->streamTransport->create(
             $this->encoder,
             $this->decoder

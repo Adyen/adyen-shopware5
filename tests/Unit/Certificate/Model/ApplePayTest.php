@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AdyenPayment\Tests\Unit\Certificate\Model;
 
 use AdyenPayment\Certificate\Model\ApplePay;
-use Dexis\Erp\Model\Offer\OfferStatus;
 use PHPUnit\Framework\TestCase;
 
 class ApplePayTest extends TestCase
