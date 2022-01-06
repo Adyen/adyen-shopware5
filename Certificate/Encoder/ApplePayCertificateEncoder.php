@@ -11,6 +11,7 @@ class ApplePayCertificateEncoder implements EncoderInterface
 {
     public function __invoke(RequestInterface $request, $data): RequestInterface
     {
-        return $request;
+        return $request
+            ->withAddedHeader('Content-Type', 'text/plain');
     }
 }
