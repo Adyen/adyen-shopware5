@@ -37,7 +37,7 @@ final class ZipExtractor implements ZipExtractorInterface
                 $zip->extractTo($toDir);
                 $zip->close();
 
-                return file_get_contents($fromDir.'/'.$filename.$extension);
+                return file_get_contents($toDir.'/'.$filename);
             }
 
             $this->logger->error('Extracting zip of Adyen Apple Pay certificate failed.');

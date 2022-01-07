@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class ZipExtractorTest extends TestCase
 {
@@ -33,19 +34,29 @@ class ZipExtractorTest extends TestCase
         $this->assertInstanceOf(ZipExtractorInterface::class, $this->zipExtractor);
     }
 
-    // TODO: fix
-//    /** @test */
-//    public function it_writes_content_to_file(): void
-//    {
-//        $content = $this->zipExtractor->__invoke(
-//            'var/storage/apple/archive',
-//            '.well-known',
-//            'apple-developer-merchantid-domain-association',
-//            '.zip'
-//        );
-//
-//        $zip = $this->prophesize(\ZipArchive::class)->reveal();
-//        $zip->extractTo('.well-known')->shouldBeCalledOnce()->willReturn(true);
-//        self::assertEquals('certificate content', $content);
-//    }
+    /** @test */
+    public function it_writes_content_to_file(): void
+    {
+        $filesystem = new Filesystem();
+
+        $content = $this->zipExtractor->__invoke(
+            $fromDir = 'tests/Integration/Fixtures',
+            $toDir = 'tests/Integration/var/storage/temp/.well-known',
+            $filename = 'ZipExtractor',
+            $extension = '.zip'
+        );
+
+        self::assertStringContainsString('zip-extractor-content', $content);
+        self::assertTrue($filesystem->exists($fromDir));
+        self::assertTrue($filesystem->exists($toDir));
+        self::assertTrue($filesystem->exists($toDir.'/'.$filename));
+
+        $filesystem->remove([
+            'tests/Integration/var/storage/temp/.well-known/ZipExtractor',
+            'tests/Integration/var',
+        ]);
+
+        self::assertFalse($filesystem->exists($toDir));
+        self::assertFalse($filesystem->exists('tests/Integration/var'));
+    }
 }
