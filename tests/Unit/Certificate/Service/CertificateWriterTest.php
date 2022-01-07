@@ -37,14 +37,24 @@ class CertificateWriterTest extends TestCase
     /** @test */
     public function it_writes_content_to_file(): void
     {
-        $filesystem = $this->prophesize(Filesystem::class);
+        $filesystem = new Filesystem();
 
         $content = $this->certificateWriter->__invoke(
-            'to',
-            'file',
+            $toDir = 'tests/Integration/var/storage/temp/',
+            $filename = 'file',
             'certificate content'
         );
 
         self::assertEquals('certificate content', $content);
+        self::assertTrue($filesystem->exists($toDir));
+        self::assertTrue($filesystem->exists($toDir.$filename));
+
+        $filesystem->remove([
+            'tests/Integration/var/storage/temp/file',
+            'tests/Integration/var',
+        ]);
+
+        self::assertFalse($filesystem->exists($toDir));
+        self::assertFalse($filesystem->exists('tests/Integration/var'));
     }
 }
