@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Enricher\Payment;
 
+use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Adyen\PaymentMethod\ImageLogoProviderInterface;
 use AdyenPayment\Models\Payment\PaymentMethod;
+use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 use Shopware_Components_Snippet_Manager;
 
 final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
@@ -23,6 +25,13 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
 
     public function __invoke(array $shopwareMethod, PaymentMethod $paymentMethod): array
     {
+        /** @TODO - ASW-377: WIP, clean up. */
+        $storedMethodUmbrellaId = $paymentMethod->isStoredPayment() ? sprintf(
+            '%s_%s',
+            $shopwareMethod['id'],
+            $paymentMethod->getStoredPaymentMethodId()
+        ) : null;
+
         return array_merge($shopwareMethod, [
             'enriched' => true,
             'additionaldescription' => $this->enrichAdditionalDescription($paymentMethod),
@@ -31,14 +40,15 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
             'isAdyenPaymentMethod' => true,
             'adyenType' => $paymentMethod->adyenType()->type(),
             'metadata' => $paymentMethod->rawData(),
-            'stored_method_umbrella_id' => $paymentMethod->isStoredPayment() ? sprintf(
-                '%s_%s',
-                $shopwareMethod['id'],
-                $paymentMethod->getStoredPaymentMethodId()
-            ) : null,
+            'stored_method_umbrella_id' => $storedMethodUmbrellaId,
             'stored_method_id' => $paymentMethod->isStoredPayment() ? $paymentMethod->getStoredPaymentMethodId() : null,
         ],
-            $paymentMethod->isStoredPayment() ? ['description' => $paymentMethod->getValue('name')] : []
+            $paymentMethod->isStoredPayment() ? [
+                'description' => $paymentMethod->getValue('name'),
+                'attribute' => new Attribute([
+                    AdyenPayment::ADYEN_STORED_METHOD_ID => $paymentMethod->getStoredPaymentMethodId(),
+                ]),
+            ] : []
         );
     }
 

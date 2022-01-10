@@ -90,7 +90,11 @@
             <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Checkout\EnrichUserAdditionalPaymentSubscriber">
-            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider" />
+            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\Checkout\EnrichViewDataForUmbrellaPaymentSubscriber">
+            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider"/>
             <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Applepay\MerchantAssociation\RegisterUrlCountSubscriber">

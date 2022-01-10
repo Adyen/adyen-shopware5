@@ -126,6 +126,8 @@
                 e.preventDefault();
                 return false;
             }
+            var $paymentElement = $('.payment--method [name="payment"]:checked')[0];
+            $paymentElement.value = this.extractShopwarePaymentId($paymentElement.value);
         },
         isPaymentElement: function (elementId) {
             return $('#' + elementId).parents(this.opts.paymentMethodSelector).length > 0;
@@ -142,7 +144,7 @@
             }
 
             me.selectedPaymentElementId = selectedPaymentElementId;
-            me.selectedPaymentId = me.extractShopwarePaymentId($(event.target).val());
+            me.selectedPaymentId = me.extractStoredPaymentId($(event.target).val());
 
             var paymentMethodSession = this.getPaymentSession();
             if (0 === Object.keys(paymentMethodSession).length) {
@@ -154,6 +156,13 @@
             }
         },
         extractShopwarePaymentId: function (targetElementValue) {
+            if(-1 === targetElementValue.indexOf('_')){
+                return targetElementValue;
+            }
+
+            return targetElementValue.split('_')[0];
+        },
+        extractStoredPaymentId: function (targetElementValue) {
             if(-1 === targetElementValue.indexOf('_')){
                 return targetElementValue;
             }
