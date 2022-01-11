@@ -79,6 +79,12 @@ class PaymentInfo extends ModelEntity
      */
     private $paymentData;
 
+    /**
+     * @var string
+     * @ORM\Column(name="stored_method_id", type="text", nullable=true)
+     */
+    private $storedMethodId;
+
     public function __construct()
     {
         $this->setCreatedAt(new \DateTime('now'));
@@ -276,6 +282,18 @@ class PaymentInfo extends ModelEntity
     public function setPaymentData(string $paymentData): self
     {
         $this->paymentData = $paymentData;
+
+        return $this;
+    }
+
+    public function getStoredMethodId(): string
+    {
+        return $this->storedMethodId;
+    }
+
+    public function setStoredMethodId(string $storedMethodId): self
+    {
+        $this->storedMethodId = $storedMethodId;
 
         return $this;
     }

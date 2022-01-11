@@ -9,7 +9,7 @@ use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInter
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
 
-final class EnrichUserAdditionalPaymentSubscriber implements SubscriberInterface
+final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
 {
     private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
     private Enlight_Components_Session_Namespace $session;
@@ -25,23 +25,21 @@ final class EnrichUserAdditionalPaymentSubscriber implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            // run as early as possible, before AddGooglePayConfigToViewSubscriber
-            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => ['__invoke', -99999],
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => '__invoke',
         ];
     }
 
     public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
-        if ('confirm' !== $subject->Request()->getActionName()) {
+        $actionName = $subject->Request()->getActionName();
+        $isShippingPaymentView = 'shippingPayment' === $actionName && !$subject->Request()->getParam('isXHR');
+        if (!$isShippingPaymentView) {
             return;
         }
 
         $storedMethodId = $this->session->get('storedMethodId');
-        $userData = $subject->View()->getAssign('sUserData');
-        $paymentMeanId = $userData['additional']['payment']['id'] ?? null;
-
-        if (null === $storedMethodId && null === $paymentMeanId) {
+        if (null === $storedMethodId) {
             return;
         }
 
@@ -50,14 +48,14 @@ final class EnrichUserAdditionalPaymentSubscriber implements SubscriberInterface
             PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
         );
 
-        $paymentMean = null === $storedMethodId
-            ? $enrichedPaymentMeans->fetchById((int) $paymentMeanId)
-            : $enrichedPaymentMeans->fetchByStoredMethodUmbrellaId($storedMethodId);
+        $paymentMean = $enrichedPaymentMeans->fetchByStoredMethodUmbrellaId($storedMethodId);
         if (null === $paymentMean) {
             return;
         }
 
+        $userData = $subject->View()->getAssign('sUserData');
         $userData['additional']['payment'] = $paymentMean->getRaw();
         $subject->View()->assign('sUserData', $userData);
+        $subject->View()->assign('sFormData', ['payment' => $paymentMean->getRaw()['stored_method_umbrella_id']]);
     }
 }

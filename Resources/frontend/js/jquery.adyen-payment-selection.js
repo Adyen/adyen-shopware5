@@ -122,12 +122,19 @@
         },
         onPaymentFormSubmit: function (e) {
             var me = this;
-            if ($(me.opts.paymentMethodFormSubmitSelector).hasClass('is--disabled')) {
+            let $formSubmit = $(me.opts.paymentMethodFormSubmitSelector);
+            if ($formSubmit.hasClass('is--disabled')) {
                 e.preventDefault();
                 return false;
             }
             var $paymentElement = $('.payment--method [name="payment"]:checked')[0];
-            $paymentElement.value = this.extractShopwarePaymentId($paymentElement.value);
+            var paymentMethod = this.getPaymentMethodById($paymentElement.value);
+            if(paymentMethod.isStoredPayment){
+                var $storedMethodElement = $('<input type="hidden" name="storedMethodId"/>');
+                $storedMethodElement.val(paymentMethod.stored_method_id);
+                $formSubmit.append($storedMethodElement);
+            }
+            $paymentElement.value = paymentMethod.id;
         },
         isPaymentElement: function (elementId) {
             return $('#' + elementId).parents(this.opts.paymentMethodSelector).length > 0;
@@ -144,7 +151,10 @@
             }
 
             me.selectedPaymentElementId = selectedPaymentElementId;
-            me.selectedPaymentId = me.extractStoredPaymentId($(event.target).val());
+
+            var elementValue = $(event.target).val();
+            var paymentMethod = this.getPaymentMethodById(elementValue);
+            me.selectedPaymentId = paymentMethod.isStoredPayment ? paymentMethod.stored_method_id : elementValue;
 
             var paymentMethodSession = this.getPaymentSession();
             if (0 === Object.keys(paymentMethodSession).length) {
@@ -154,20 +164,6 @@
             if (previousSelectedPaymentElementId !== me.selectedPaymentElementId) {
                 me.clearPaymentSession();
             }
-        },
-        extractShopwarePaymentId: function (targetElementValue) {
-            if(-1 === targetElementValue.indexOf('_')){
-                return targetElementValue;
-            }
-
-            return targetElementValue.split('_')[0];
-        },
-        extractStoredPaymentId: function (targetElementValue) {
-            if(-1 === targetElementValue.indexOf('_')){
-                return targetElementValue;
-            }
-
-            return targetElementValue.split('_')[1];
         },
         onPaymentChangedAfter: function () {
             var me = this;
@@ -250,11 +246,10 @@
         getPaymentMethodById: function (id) {
             var me = this;
 
-            return me.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
-                if(enrichedPaymentMethod.isStoredPayment === true && enrichedPaymentMethod.stored_method_id === id){
-                    return true;
-                }
-                return enrichedPaymentMethod.id === id;
+            return me.opts.enrichedPaymentMethods.filter(function(paymentMethod) {
+                return paymentMethod.id === id || (
+                    paymentMethod.isStoredPayment === true
+                    && (paymentMethod.stored_method_id === id || paymentMethod.stored_method_umbrella_id === id));
             })[0] || {};
         },
         /**
