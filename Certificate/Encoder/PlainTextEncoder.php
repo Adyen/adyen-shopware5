@@ -7,7 +7,7 @@ namespace AdyenPayment\Certificate\Encoder;
 use Phpro\HttpTools\Encoding\EncoderInterface;
 use Psr\Http\Message\RequestInterface;
 
-class PlainTextEncoder implements EncoderInterface
+final class PlainTextEncoder implements EncoderInterface
 {
     public function __invoke(RequestInterface $request, $data): RequestInterface
     {
