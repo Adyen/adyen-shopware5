@@ -25,11 +25,9 @@ final class HeaderLoggingMiddleware implements MiddlewareInterface
 
     public function __invoke(callable $nextHandler): callable
     {
-        /** @psalm-suppress MixedInferredReturnType */
         return function(RequestInterface $request, array $options) use ($nextHandler): PromiseInterface {
             $this->logRequestHeaders($request);
 
-            /** @psalm-suppress  MixedReturnStatement,MixedMethodCall */
             return $nextHandler($request, $options)->then(
                 $this->logResponseHeaders()
             );
