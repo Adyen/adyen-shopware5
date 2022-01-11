@@ -81,8 +81,6 @@ class ApplePayCertificateDecoderTest extends TestCase
     public function it_uses_adyen_apple_pay_certificate_from_response(): void
     {
         $this->certificateWriter->__invoke(
-            Argument::type('string'),
-            Argument::type('string'),
             $content = 'apple pay certificate from adyen'
         )->shouldBeCalledOnce();
 

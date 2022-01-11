@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Tests\Unit\Certificate\Service;
+namespace AdyenPayment\Tests\Integration\Certificate\Filesystem;
 
 use AdyenPayment\Certificate\Filesystem\ZipExtractor;
 use AdyenPayment\Certificate\Filesystem\ZipExtractorInterface;

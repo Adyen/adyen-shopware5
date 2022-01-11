@@ -20,10 +20,10 @@ final class TraceableCertificateWriterDecorator implements CertificateWriterInte
         $this->logger = $logger;
     }
 
-    public function __invoke(string $toDir, string $filename, string $content): void
+    public function __invoke(string $content): void
     {
         try {
-            ($this->certificateWriter)($toDir, $filename, $content);
+            ($this->certificateWriter)($content);
         } catch (CouldNotWriteCertificate $exception) {
             $this->logger->error($exception);
         }

@@ -6,5 +6,5 @@ namespace AdyenPayment\Certificate\Filesystem;
 
 interface CertificateWriterInterface
 {
-    public function __invoke(string $toDir, string $filename, string $content): void;
+    public function __invoke(string $content): void;
 }

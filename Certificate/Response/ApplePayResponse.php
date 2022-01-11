@@ -27,11 +27,7 @@ final class ApplePayResponse implements ApplePayResponseInterface
 
     public function createFromRaw(string $response): ApplePay
     {
-        ($this->certificateWriter)(
-            self::ADYEN_APPLE_PAY_CERTIFICATE_DIR,
-            self::ADYEN_APPLE_PAY_CERTIFICATE,
-            $response
-        );
+        ($this->certificateWriter)($response);
 
         return ApplePay::create($response);
     }

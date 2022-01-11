@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Tests\Unit\Certificate\Filesystem;
+namespace AdyenPayment\Tests\Integration\Certificate\Filesystem;
 
 use AdyenPayment\Certificate\Filesystem\CertificateWriter;
 use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
@@ -29,21 +29,18 @@ class CertificateWriterTest extends TestCase
     {
         $filesystem = new Filesystem();
 
-        $this->certificateWriter->__invoke(
-            $toDir = 'tests/Integration/var/storage/temp/',
-            $filename = 'file',
-            'certificate content'
+        $this->certificateWriter->__invoke('certificate content');
+
+        self::assertTrue($filesystem->exists('.well-known'));
+        self::assertTrue($filesystem->exists('.well-known/apple-developer-merchantid-domain-association'));
+        self::assertEquals(
+            'certificate content',
+            file_get_contents('.well-known/apple-developer-merchantid-domain-association')
         );
 
-        self::assertTrue($filesystem->exists($toDir));
-        self::assertTrue($filesystem->exists($toDir.$filename));
-
         $filesystem->remove([
-            'tests/Integration/var/storage/temp/file',
-            'tests/Integration/var',
+            '.well-known/apple-developer-merchantid-domain-association',
+            '.well-known',
         ]);
-
-        self::assertFalse($filesystem->exists($toDir));
-        self::assertFalse($filesystem->exists('tests/Integration/var'));
     }
 }
