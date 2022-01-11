@@ -56,9 +56,6 @@ final class BodyLoggingMiddleware implements MiddlewareInterface
             $this->logger->log(
                 $logLevel,
                 'Response from Adyen - apple pay certificate',
-                [
-                    'body' => mb_substr($responseBody, 0, 5),
-                ]
             );
 
             return $response;

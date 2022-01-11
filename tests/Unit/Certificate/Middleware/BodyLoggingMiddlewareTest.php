@@ -78,9 +78,6 @@ class BodyLoggingMiddlewareTest extends TestCase
         $this->logger->log(
             $logLevel,
             'Response from Adyen - apple pay certificate',
-            [
-                'body' => mb_substr($responseBody, 0, 5),
-            ]
         )->shouldBeCalled();
 
         $client->send(
