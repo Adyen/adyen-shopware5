@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Certificate\Mapper;
+namespace AdyenPayment\Certificate\Logging;
 
 use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Response;
 
-final class HttpCodeToLogLevel implements HttpCodeToLogLevelInterface
+final class HttpCodeToLogLevelProvider implements HttpCodeToLogLevelProviderInterface
 {
     public function __invoke(int $statusCode): int
     {

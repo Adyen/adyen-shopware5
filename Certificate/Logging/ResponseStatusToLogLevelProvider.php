@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Certificate\Mapper;
+namespace AdyenPayment\Certificate\Logging;
 
 use Monolog\Logger;
 
-final class ResponseStatusToLogLevel implements ResponseStatusToLogLevelInterface
+final class ResponseStatusToLogLevelProvider implements ResponseStatusToLogLevelProviderInterface
 {
     public function __invoke(string $responseBody): int
     {

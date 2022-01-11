@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Certificate\Mapper;
+namespace AdyenPayment\Certificate\Logging;
 
-interface HttpCodeToLogLevelInterface
+interface HttpCodeToLogLevelProviderInterface
 {
     public function __invoke(int $statusCode): int;
 }

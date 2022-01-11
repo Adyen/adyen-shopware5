@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Certificate\Request\Handler;
 
-use AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder;
-use AdyenPayment\Certificate\Encoder\ApplePayCertificateEncoder;
 use AdyenPayment\Certificate\Model\ApplePay;
 use AdyenPayment\Certificate\Request\ApplePayRequest;
 use AdyenPayment\Certificate\Transport\StreamTransportFactory;
+use Phpro\HttpTools\Encoding\DecoderInterface;
+use Phpro\HttpTools\Encoding\EncoderInterface;
 
 final class ApplePayHandler implements ApplePayHandlerInterface
 {
     private StreamTransportFactory $streamTransport;
-    private ApplePayCertificateEncoder $encoder;
-    private ApplePayCertificateDecoder $decoder;
+    private EncoderInterface $encoder;
+    private DecoderInterface $decoder;
 
     public function __construct(
         StreamTransportFactory $streamTransport,
-        ApplePayCertificateEncoder $applePayCertificateEncoder,
-        ApplePayCertificateDecoder $applePayCertificateDecoder
+        EncoderInterface $applePayCertificateEncoder,
+        DecoderInterface $applePayCertificateDecoder
     ) {
         $this->streamTransport = $streamTransport;
         $this->encoder = $applePayCertificateEncoder;

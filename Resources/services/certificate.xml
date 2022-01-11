@@ -3,16 +3,16 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="AdyenPayment\Certificate\Mapper\HttpCodeToLogLevel"/>
-        <service id="AdyenPayment\Certificate\Mapper\ResponseStatusToLogLevel"/>
+        <service id="AdyenPayment\Certificate\Logging\HttpCodeToLogLevelProvider"/>
+        <service id="AdyenPayment\Certificate\Logging\ResponseStatusToLogLevelProvider"/>
 
         <service id="AdyenPayment\Certificate\Middleware\HeaderLoggingMiddleware">
-            <argument type="service" id="AdyenPayment\Certificate\Mapper\HttpCodeToLogLevel"/>
+            <argument type="service" id="HttpCodeToLogLevelProvider"/>
             <argument type="service" id="adyen_payment.logger"/>
             <tag name="certificate.client.middleware"/>
         </service>
         <service id="AdyenPayment\Certificate\Middleware\BodyLoggingMiddleware">
-            <argument type="service" id="AdyenPayment\Certificate\Mapper\ResponseStatusToLogLevel"/>
+            <argument type="service" id="AdyenPayment\Certificate\Logging\ResponseStatusToLogLevelProvider"/>
             <argument type="service" id="adyen_payment.logger"/>
             <tag name="certificate.client.middleware"/>
         </service>
@@ -30,7 +30,7 @@
 
         <service id="AdyenPayment\Certificate\Request\Handler\ApplePayHandler">
             <argument type="service" id="AdyenPayment\Certificate\Transport\StreamTransportFactory"/>
-            <argument type="service" id="AdyenPayment\Certificate\Encoder\ApplePayCertificateEncoder"/>
+            <argument type="service" id="AdyenPayment\Certificate\Encoder\PlainTextEncoder"/>
             <argument type="service" id="AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder"/>
         </service>
 
@@ -39,22 +39,31 @@
             <argument type="service" id="Phpro\HttpTools\Uri\TemplatedUriBuilder"/>
         </service>
 
-        <service id="AdyenPayment\Certificate\Service\ZipExtractor">
+        <service id="AdyenPayment\Certificate\Filesystem\ZipExtractor">
             <argument type="service" id="adyen_payment.logger"/>
         </service>
-        <service id="AdyenPayment\Certificate\Service\CertificateWriter">
+        <service id="AdyenPayment\Certificate\Filesystem\TraceableZipExtractorDecorator"
+                 decorates="AdyenPayment\Certificate\Filesystem\ZipExtractor">
+            <argument type="service" id="AdyenPayment\Certificate\Filesystem\TraceableZipExtractorDecorator.inner"/>
             <argument type="service" id="adyen_payment.logger"/>
         </service>
 
-        <service id="AdyenPayment\Certificate\Encoder\ApplePayCertificateEncoder"/>
+        <service id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>
+        <service id="AdyenPayment\Certificate\Filesystem\TraceableCertificateWriterDecorator"
+            decorates="AdyenPayment\Certificate\Filesystem\CertificateWriter">
+            <argument type="service" id="AdyenPayment\Certificate\Filesystem\TraceableCertificateWriterDecorator.inner"/>
+            <argument type="service" id="adyen_payment.logger"/>
+        </service>
+
+        <service id="AdyenPayment\Certificate\Encoder\PlainTextEncoder"/>
         <service id="AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder">
             <argument type="service" id="AdyenPayment\Certificate\Service\ZipExtractor"/>
             <argument type="service" id="AdyenPayment\Certificate\Service\CertificateWriter"/>
         </service>
 
         <service id="AdyenPayment\Certificate\Response\ApplePayResponse">
-            <argument type="service" id="AdyenPayment\Certificate\Service\ZipExtractor"/>
-            <argument type="service" id="AdyenPayment\Certificate\Service\CertificateWriter"/>
+            <argument type="service" id="AdyenPayment\Certificate\Filesystem\ZipExtractor"/>
+            <argument type="service" id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>
         </service>
     </services>
 </container>

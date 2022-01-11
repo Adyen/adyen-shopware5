@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Certificate\Response;
 
+use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
+use AdyenPayment\Certificate\Filesystem\ZipExtractorInterface;
 use AdyenPayment\Certificate\Model\ApplePay;
-use AdyenPayment\Certificate\Service\CertificateWriterInterface;
-use AdyenPayment\Certificate\Service\ZipExtractorInterface;
 
-final class ApplePayResponse
+final class ApplePayResponse implements ApplePayResponseInterface
 {
     private ZipExtractorInterface $zipExtractor;
     private CertificateWriterInterface $certificateWriter;
@@ -25,27 +25,24 @@ final class ApplePayResponse
         $this->certificateWriter = $certificateWriter;
     }
 
-    public function createFromString(string $response): ApplePay
+    public function createFromRaw(string $response): ApplePay
     {
-        $adyenCertificate = ($this->certificateWriter)(
+        ($this->certificateWriter)(
             self::ADYEN_APPLE_PAY_CERTIFICATE_DIR,
             self::ADYEN_APPLE_PAY_CERTIFICATE,
             $response
         );
 
-        return ApplePay::create($adyenCertificate);
+        return ApplePay::create($response);
     }
 
-    public function createFromFallbackZip(): ApplePay
+    public function createFromFallbackZip(): void
     {
-        $fallbackCertificate = ($this->zipExtractor)(
+        ($this->zipExtractor)(
             self::ADYEN_APPLE_PAY_CERTIFICATE_FALLBACK_DIR,
             self::ADYEN_APPLE_PAY_CERTIFICATE_DIR,
             self::ADYEN_APPLE_PAY_CERTIFICATE,
             self::ADYEN_APPLE_PAY_ZIP_EXTENSION
         );
-        $fallbackCertificate = !$fallbackCertificate ? '' : $fallbackCertificate;
-
-        return ApplePay::create($fallbackCertificate);
     }
 }

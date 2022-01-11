@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-use AdyenPayment\Certificate\Encoder\ApplePayCertificateEncoder;
+use AdyenPayment\Certificate\Encoder\PlainTextEncoder;
 use GuzzleHttp\Psr7\Request;
 use Phpro\HttpTools\Encoding\EncoderInterface;
 use PHPUnit\Framework\TestCase;
 
-class ApplePayCertificateEncoderTest extends TestCase
+class PlainTextEncoderTest extends TestCase
 {
-    private ApplePayCertificateEncoder $applePayCertificateEncoder;
+    private PlainTextEncoder $applePayCertificateEncoder;
 
     protected function setUp(): void
     {
-        $this->applePayCertificateEncoder = new ApplePayCertificateEncoder();
+        $this->applePayCertificateEncoder = new PlainTextEncoder();
     }
 
     /** @test */

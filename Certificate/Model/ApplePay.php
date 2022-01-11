@@ -6,20 +6,20 @@ namespace AdyenPayment\Certificate\Model;
 
 final class ApplePay
 {
-    private string $certificateString;
+    private string $certificate;
 
-    private function __construct(string $certificateString)
+    private function __construct(string $certificate)
     {
-        $this->certificateString = $certificateString;
+        $this->certificate = $certificate;
     }
 
-    public static function create(string $certificateString): self
+    public static function create(string $certificate): self
     {
-        return new self($certificateString);
+        return new self($certificate);
     }
 
-    public function certificateString(): string
+    public function certificate(): string
     {
-        return $this->certificateString;
+        return $this->certificate;
     }
 }

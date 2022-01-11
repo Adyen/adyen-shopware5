@@ -46,11 +46,6 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     private $paymentPayloadProvider;
 
     /**
-     * @var ApplePayHandlerInterface
-     */
-    private $applePayHandler;
-
-    /**
      * @return void
      */
     public function preDispatch()
@@ -60,7 +55,6 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->basketService = $this->get('AdyenPayment\Components\BasketService');
         $this->logger = $this->get('adyen_payment.logger');
         $this->paymentPayloadProvider = $this->get('AdyenPayment\Components\Payload\PaymentPayloadProvider');
-        $this->applePayHandler = $this->get('AdyenPayment\Certificate\Request\Handler\ApplePayHandler');
     }
 
     public function ajaxDoPaymentAction(): void
@@ -139,15 +133,6 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
 
         $this->Response()->setBody(json_encode($paymentInfo));
     }
-
-    // TODO: remove or change in ASW-430
-//    public function applePayCertificateAction(): void
-//    {
-//        $this->Request()->setHeader('Content-Type', 'text/plain');
-//        $this->Front()->Plugins()->ViewRenderer()->setNoRender(); // TODO: not sure on this one
-//
-//        $response = ($this->applePayHandler->__invoke(new ApplePayRequest()));
-//    }
 
     /**
      * @return PaymentContext

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Certificate\Middleware;
 
-use AdyenPayment\Certificate\Mapper\HttpCodeToLogLevelInterface;
+use AdyenPayment\Certificate\Logging\HttpCodeToLogLevelProviderInterface;
 use AdyenPayment\Certificate\Middleware\HeaderLoggingMiddleware;
 use AdyenPayment\Certificate\Middleware\MiddlewareInterface;
 use GuzzleHttp\Client;
@@ -22,7 +22,7 @@ class HeaderLoggingMiddlewareTest extends TestCase
     use ProphecyTrait;
 
     /**
-     * @var HttpCodeToLogLevelInterface|ObjectProphecy
+     * @var HttpCodeToLogLevelProviderInterface|ObjectProphecy
      */
     private $httpCodeToLogLevel;
 
@@ -34,7 +34,7 @@ class HeaderLoggingMiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->httpCodeToLogLevel = $this->prophesize(HttpCodeToLogLevelInterface::class);
+        $this->httpCodeToLogLevel = $this->prophesize(HttpCodeToLogLevelProviderInterface::class);
         $this->logger = $this->prophesize(LoggerInterface::class);
 
         $this->headerLoggingMiddleware = new HeaderLoggingMiddleware(

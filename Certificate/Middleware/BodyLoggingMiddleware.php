@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Certificate\Middleware;
 
-use AdyenPayment\Certificate\Mapper\ResponseStatusToLogLevelInterface;
+use AdyenPayment\Certificate\Logging\ResponseStatusToLogLevelProviderInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,11 +12,11 @@ use Psr\Log\LoggerInterface;
 
 final class BodyLoggingMiddleware implements MiddlewareInterface
 {
-    private ResponseStatusToLogLevelInterface $responseStatusToLogLevel;
+    private ResponseStatusToLogLevelProviderInterface $responseStatusToLogLevel;
     private LoggerInterface $logger;
 
     public function __construct(
-        ResponseStatusToLogLevelInterface $responseStatusToLogLevel,
+        ResponseStatusToLogLevelProviderInterface $responseStatusToLogLevel,
         LoggerInterface $logger
     ) {
         $this->responseStatusToLogLevel = $responseStatusToLogLevel;
@@ -25,11 +25,9 @@ final class BodyLoggingMiddleware implements MiddlewareInterface
 
     public function __invoke(callable $nextHandler): callable
     {
-        /** @psalm-suppress MixedInferredReturnType */
         return function(RequestInterface $request, array $options) use ($nextHandler): PromiseInterface {
             $this->logRequestBody($request);
 
-            /** @psalm-suppress  MixedReturnStatement,MixedMethodCall */
             return $nextHandler($request, $options)->then(
                 $this->logResponseBody()
             );
@@ -40,7 +38,7 @@ final class BodyLoggingMiddleware implements MiddlewareInterface
     {
         $request->getBody()->rewind();
         $this->logger->debug(
-            'Sending request to Adyen apple pay certificate domain with body',
+            'Request to Adyen - apple pay certificate',
             [
                 'body' => $request->getBody()->getContents(),
             ]
@@ -57,9 +55,9 @@ final class BodyLoggingMiddleware implements MiddlewareInterface
 
             $this->logger->log(
                 $logLevel,
-                'Receiving response from Adyen apple pay certificate domain with body',
+                'Response from Adyen - apple pay certificate',
                 [
-                    'body' => $responseBody,
+                    'body' => mb_substr($responseBody, 0, 5),
                 ]
             );
 

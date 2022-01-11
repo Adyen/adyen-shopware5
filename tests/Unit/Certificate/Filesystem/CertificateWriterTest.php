@@ -2,30 +2,20 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Tests\Unit\Certificate\Service;
+namespace AdyenPayment\Tests\Unit\Certificate\Filesystem;
 
-use AdyenPayment\Certificate\Service\CertificateWriter;
-use AdyenPayment\Certificate\Service\CertificateWriterInterface;
+use AdyenPayment\Certificate\Filesystem\CertificateWriter;
+use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Prophecy\ObjectProphecy;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 class CertificateWriterTest extends TestCase
 {
-    use ProphecyTrait;
-
-    /** @var LoggerInterface|ObjectProphecy */
-    private $logger;
     private $certificateWriter;
 
     protected function setUp(): void
     {
-        $this->logger = $this->prophesize(LoggerInterface::class);
-        $this->certificateWriter = new CertificateWriter(
-            $this->logger->reveal()
-        );
+        $this->certificateWriter = new CertificateWriter();
     }
 
     /** @test */
@@ -39,13 +29,12 @@ class CertificateWriterTest extends TestCase
     {
         $filesystem = new Filesystem();
 
-        $content = $this->certificateWriter->__invoke(
+        $this->certificateWriter->__invoke(
             $toDir = 'tests/Integration/var/storage/temp/',
             $filename = 'file',
             'certificate content'
         );
 
-        self::assertEquals('certificate content', $content);
         self::assertTrue($filesystem->exists($toDir));
         self::assertTrue($filesystem->exists($toDir.$filename));
 

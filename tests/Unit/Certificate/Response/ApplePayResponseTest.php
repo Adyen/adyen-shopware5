@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Certificate\Response;
 
+use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
+use AdyenPayment\Certificate\Filesystem\ZipExtractorInterface;
 use AdyenPayment\Certificate\Model\ApplePay;
 use AdyenPayment\Certificate\Response\ApplePayResponse;
-use AdyenPayment\Certificate\Service\CertificateWriterInterface;
-use AdyenPayment\Certificate\Service\ZipExtractorInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -30,22 +30,21 @@ class ApplePayResponseTest extends TestCase
     }
 
     /** @test */
-    public function it_creates_from_string(): void
+    public function it_creates_from_raw(): void
     {
         $applePayResponse = new ApplePayResponse(
             $this->zipExtractor->reveal(),
             $this->certificateWriter->reveal()
         );
 
-        $applePay = ApplePay::create($certificateString = 'test');
+        $applePay = ApplePay::create($certificate = 'test');
         $this->certificateWriter->__invoke(
             Argument::cetera(),
             Argument::cetera(),
-            $applePay->certificateString()
-        )->shouldBeCalledOnce()
-            ->willReturn($certificateString);
+            $applePay->certificate()
+        )->shouldBeCalledOnce();
 
-        $response = $applePayResponse->createFromString($certificateString);
+        $response = $applePayResponse->createFromRaw($certificate);
 
         self::assertEquals($applePay, $response);
     }
@@ -58,17 +57,14 @@ class ApplePayResponseTest extends TestCase
             $this->certificateWriter->reveal()
         );
 
-        $applePay = ApplePay::create($certificateString = 'test fallback');
+        $applePay = ApplePay::create($certificate = 'test fallback');
         $this->zipExtractor->__invoke(
             Argument::cetera(),
             Argument::cetera(),
             Argument::cetera(),
             Argument::cetera(),
-        )->shouldBeCalledOnce()
-            ->willReturn($certificateString);
+        )->shouldBeCalledOnce();
 
-        $response = $applePayResponse->createFromFallbackZip();
-
-        self::assertEquals($applePay, $response);
+        $applePayResponse->createFromFallbackZip();
     }
 }

@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace AdyenPayment\Tests\Unit\Certificate\Decoder;
 
 use AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder;
-use AdyenPayment\Certificate\Service\CertificateWriter;
-use AdyenPayment\Certificate\Service\CertificateWriterInterface;
-use AdyenPayment\Certificate\Service\ZipExtractor;
-use AdyenPayment\Certificate\Service\ZipExtractorInterface;
+use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
+use AdyenPayment\Certificate\Filesystem\ZipExtractorInterface;
+use AdyenPayment\Certificate\Response\ApplePayResponseInterface;
 use GuzzleHttp\Psr7\Response;
 use Phpro\HttpTools\Encoding\DecoderInterface;
 use PHPUnit\Framework\TestCase;
@@ -20,17 +19,21 @@ class ApplePayCertificateDecoderTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ObjectProphecy|ZipExtractor */
+    /** @var ObjectProphecy|ZipExtractorInterface */
     private $zipExtractor;
 
-    /** @var CertificateWriter|ObjectProphecy */
+    /** @var CertificateWriterInterface|ObjectProphecy */
     private $certificateWriter;
+
+    /** @var ApplePayResponseInterface|ObjectProphecy */
+    private $applePayResponse;
     private ApplePayCertificateDecoder $applePayCertificateDecoder;
 
     protected function setUp(): void
     {
         $this->zipExtractor = $this->prophesize(ZipExtractorInterface::class);
         $this->certificateWriter = $this->prophesize(CertificateWriterInterface::class);
+        $this->applePayResponse = $this->prophesize(ApplePayResponseInterface::class);
 
         $this->applePayCertificateDecoder = new ApplePayCertificateDecoder(
             $this->zipExtractor->reveal(),
@@ -47,18 +50,16 @@ class ApplePayCertificateDecoderTest extends TestCase
     /** @test */
     public function it_uses_fallback_zip_when_body_is_empty(): void
     {
+        $response = new Response(200, [], '');
+
         $this->zipExtractor->__invoke(
             Argument::type('string'),
             Argument::type('string'),
             Argument::type('string'),
             Argument::type('string')
-        )->willReturn('zip string');
+        )->shouldBeCalledOnce();
 
-        $response = new Response(200, [], '');
-
-        $actual = ($this->applePayCertificateDecoder)($response);
-
-        self::assertEquals('zip string', $actual->certificateString());
+        ($this->applePayCertificateDecoder)($response);
     }
 
     /** @test */
@@ -68,14 +69,12 @@ class ApplePayCertificateDecoderTest extends TestCase
             Argument::type('string'),
             Argument::type('string'),
             Argument::type('string'),
-            Argument::type('string')
-        )->willReturn('zip string');
+            Argument::type('string'),
+        )->shouldBeCalledOnce();
 
         $response = new Response(403, [], 'test');
 
-        $actual = ($this->applePayCertificateDecoder)($response);
-
-        self::assertEquals('zip string', $actual->certificateString());
+        ($this->applePayCertificateDecoder)($response);
     }
 
     /** @test */
@@ -85,12 +84,10 @@ class ApplePayCertificateDecoderTest extends TestCase
             Argument::type('string'),
             Argument::type('string'),
             $content = 'apple pay certificate from adyen'
-        )->willReturn($content);
+        )->shouldBeCalledOnce();
 
         $response = new Response(200, [], $content);
 
-        $actual = ($this->applePayCertificateDecoder)($response);
-
-        self::assertEquals('apple pay certificate from adyen', $actual->certificateString());
+        ($this->applePayCertificateDecoder)($response);
     }
 }

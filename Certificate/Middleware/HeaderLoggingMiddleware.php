@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Certificate\Middleware;
 
-use AdyenPayment\Certificate\Mapper\HttpCodeToLogLevelInterface;
+use AdyenPayment\Certificate\Logging\HttpCodeToLogLevelProviderInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,14 +12,14 @@ use Psr\Log\LoggerInterface;
 
 final class HeaderLoggingMiddleware implements MiddlewareInterface
 {
-    private HttpCodeToLogLevelInterface $httpCodeToLogLevel;
+    private HttpCodeToLogLevelProviderInterface $httpCodeToLogLevelProvider;
     private LoggerInterface $logger;
 
     public function __construct(
-        HttpCodeToLogLevelInterface $httpCodeToLogLevel,
+        HttpCodeToLogLevelProviderInterface $httpCodeToLogLevelProvider,
         LoggerInterface $logger
     ) {
-        $this->httpCodeToLogLevel = $httpCodeToLogLevel;
+        $this->httpCodeToLogLevelProvider = $httpCodeToLogLevelProvider;
         $this->logger = $logger;
     }
 
@@ -53,7 +53,7 @@ final class HeaderLoggingMiddleware implements MiddlewareInterface
         return function(ResponseInterface $response): ResponseInterface {
             $responseStatusCode = $response->getStatusCode();
 
-            $logLevel = ($this->httpCodeToLogLevel)($responseStatusCode);
+            $logLevel = ($this->httpCodeToLogLevelProvider)($responseStatusCode);
 
             $this->logger->log(
                 $logLevel,

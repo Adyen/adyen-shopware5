@@ -19,13 +19,13 @@ class ApplePayTest extends TestCase
     /** @test */
     public function it_contains_a_certificate_string(): void
     {
-        $this->assertEquals('certificate string', $this->applePay->certificateString());
+        $this->assertEquals('certificate string', $this->applePay->certificate());
     }
 
     /** @test */
     public function it_can_be_constructed_by_load(): void
     {
         $applePay = ApplePay::create($certificateString = 'test');
-        $this->assertEquals($certificateString, $applePay->certificateString());
+        $this->assertEquals($certificateString, $applePay->certificate());
     }
 }

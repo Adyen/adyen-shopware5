@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Certificate\Decoder;
 
-use AdyenPayment\Certificate\Model\ApplePay;
+use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
+use AdyenPayment\Certificate\Filesystem\ZipExtractorInterface;
 use AdyenPayment\Certificate\Response\ApplePayResponse;
-use AdyenPayment\Certificate\Service\CertificateWriterInterface;
-use AdyenPayment\Certificate\Service\ZipExtractorInterface;
 use Phpro\HttpTools\Encoding\DecoderInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class ApplePayCertificateDecoder implements DecoderInterface
+final class ApplePayCertificateDecoder implements DecoderInterface
 {
     private ZipExtractorInterface $zipExtractor;
     private CertificateWriterInterface $certificateWriter;
@@ -23,16 +22,16 @@ class ApplePayCertificateDecoder implements DecoderInterface
         $this->certificateWriter = $certificateWriter;
     }
 
-    public function __invoke(ResponseInterface $response): ApplePay
+    public function __invoke(ResponseInterface $response): void
     {
         $appleResponse = new ApplePayResponse($this->zipExtractor, $this->certificateWriter);
 
         $responseBody = $response->getBody()->getContents();
 
         if ('' === $responseBody || Response::HTTP_OK !== $response->getStatusCode()) {
-            return $appleResponse->createFromFallbackZip();
+            $appleResponse->createFromFallbackZip();
         }
 
-        return $appleResponse->createFromString($responseBody);
+        $appleResponse->createFromRaw($responseBody);
     }
 }

@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Tests\Unit\Certificate\Mapper;
+namespace AdyenPayment\Tests\Unit\Certificate\Logging;
 
-use AdyenPayment\Certificate\Mapper\HttpCodeToLogLevel;
-use AdyenPayment\Certificate\Mapper\HttpCodeToLogLevelInterface;
+use AdyenPayment\Certificate\Logging\HttpCodeToLogLevelProvider;
+use AdyenPayment\Certificate\Logging\HttpCodeToLogLevelProviderInterface;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 
-class HttpCodeToLogLevelTest extends TestCase
+class HttpCodeToLogLevelProviderTest extends TestCase
 {
-    public HttpCodeToLogLevel $httpCodeToLogLevel;
+    public HttpCodeToLogLevelProvider $httpCodeToLogLevel;
 
     protected function setUp(): void
     {
-        $this->httpCodeToLogLevel = new HttpCodeToLogLevel();
+        $this->httpCodeToLogLevel = new HttpCodeToLogLevelProvider();
     }
 
     /** @test */
     public function it_is_http_code_to_log_level_service(): void
     {
-        static::assertInstanceOf(HttpCodeToLogLevelInterface::class, $this->httpCodeToLogLevel);
+        static::assertInstanceOf(HttpCodeToLogLevelProviderInterface::class, $this->httpCodeToLogLevel);
     }
 
     /** @test */

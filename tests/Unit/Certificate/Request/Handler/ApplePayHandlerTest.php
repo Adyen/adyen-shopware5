@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Certificate\Request\Handler;
 
-use AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder;
-use AdyenPayment\Certificate\Encoder\ApplePayCertificateEncoder;
 use AdyenPayment\Certificate\Model\ApplePay;
 use AdyenPayment\Certificate\Request\ApplePayRequest;
 use AdyenPayment\Certificate\Request\Handler\ApplePayHandler;
 use AdyenPayment\Certificate\Request\Handler\ApplePayHandlerInterface;
 use AdyenPayment\Certificate\Transport\StreamTransportFactory;
+use Phpro\HttpTools\Encoding\DecoderInterface;
+use Phpro\HttpTools\Encoding\EncoderInterface;
 use Phpro\HttpTools\Transport\TransportInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -24,18 +24,18 @@ class ApplePayHandlerTest extends TestCase
     /** @var ObjectProphecy|StreamTransportFactory */
     private $streamTransportFactory;
 
-    /** @var ApplePayCertificateEncoder|ObjectProphecy */
+    /** @var EncoderInterface|ObjectProphecy */
     private $applePayCertificateEncoder;
 
-    /** @var ApplePayCertificateDecoder|ObjectProphecy */
+    /** @var DecoderInterface|ObjectProphecy */
     private $applePayCertificateDecoder;
     private ApplePayHandler $applePayHandler;
 
     protected function setUp(): void
     {
         $this->streamTransportFactory = $this->prophesize(StreamTransportFactory::class);
-        $this->applePayCertificateEncoder = $this->prophesize(ApplePayCertificateEncoder::class);
-        $this->applePayCertificateDecoder = $this->prophesize(ApplePayCertificateDecoder::class);
+        $this->applePayCertificateEncoder = $this->prophesize(EncoderInterface::class);
+        $this->applePayCertificateDecoder = $this->prophesize(DecoderInterface::class);
 
         $this->applePayHandler = new ApplePayHandler(
             $this->streamTransportFactory->reveal(),

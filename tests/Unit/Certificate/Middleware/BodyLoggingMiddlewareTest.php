@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Certificate\Middleware;
 
-use AdyenPayment\Certificate\Mapper\ResponseStatusToLogLevelInterface;
+use AdyenPayment\Certificate\Logging\ResponseStatusToLogLevelProviderInterface;
 use AdyenPayment\Certificate\Middleware\BodyLoggingMiddleware;
 use AdyenPayment\Certificate\Middleware\MiddlewareInterface;
 use GuzzleHttp\Client;
@@ -22,7 +22,7 @@ class BodyLoggingMiddlewareTest extends TestCase
     use ProphecyTrait;
 
     /**
-     * @var ObjectProphecy|ResponseStatusToLogLevelInterface
+     * @var ObjectProphecy|ResponseStatusToLogLevelProviderInterface
      */
     private $responseStatusToLogLevel;
 
@@ -34,7 +34,7 @@ class BodyLoggingMiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->responseStatusToLogLevel = $this->prophesize(ResponseStatusToLogLevelInterface::class);
+        $this->responseStatusToLogLevel = $this->prophesize(ResponseStatusToLogLevelProviderInterface::class);
         $this->logger = $this->prophesize(LoggerInterface::class);
 
         $this->bodyLoggingMiddleware = new BodyLoggingMiddleware(
@@ -69,7 +69,7 @@ class BodyLoggingMiddlewareTest extends TestCase
         );
 
         $this->logger->debug(
-            'Sending request to Adyen apple pay certificate domain with body',
+            'Request to Adyen - apple pay certificate',
             [
                 'body' => $requestBody = 'This is an example request body',
             ]
@@ -77,9 +77,9 @@ class BodyLoggingMiddlewareTest extends TestCase
 
         $this->logger->log(
             $logLevel,
-            'Receiving response from Adyen apple pay certificate domain with body',
+            'Response from Adyen - apple pay certificate',
             [
-                'body' => $responseBody,
+                'body' => mb_substr($responseBody, 0, 5),
             ]
         )->shouldBeCalled();
 
