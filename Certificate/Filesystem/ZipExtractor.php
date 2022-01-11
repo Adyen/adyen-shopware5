@@ -26,7 +26,7 @@ final class ZipExtractor implements ZipExtractorInterface
                 $zip->close();
             }
         } catch (IOExceptionInterface $exception) {
-            throw CouldNotWriteCertificate::withFilepath($toDir.'/'.$filename.$extension);
+            throw CouldNotWriteCertificate::withFilepath($toDir.'/'.$filename.$extension, $exception);
         }
     }
 }

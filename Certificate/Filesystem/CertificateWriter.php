@@ -13,15 +13,16 @@ final class CertificateWriter implements CertificateWriterInterface
     public function __invoke(string $toDir, string $filename, string $content): void
     {
         $filesystem = new Filesystem();
+        $filepath = $toDir.'/'.$filename;
 
         try {
             $filesystem->mkdir($toDir, 0700);
             $filesystem->dumpFile(
-                $toDir.'/'.$filename,
+                $filepath,
                 $content
             );
         } catch (IOExceptionInterface $exception) {
-            throw CouldNotWriteCertificate::withFilepath($toDir.'/'.$filename);
+            throw CouldNotWriteCertificate::withFilepath($filepath, $exception);
         }
     }
 }

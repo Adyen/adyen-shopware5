@@ -6,12 +6,8 @@ namespace AdyenPayment\Certificate\Exception;
 
 final class CouldNotWriteCertificate extends \RuntimeException
 {
-    public static function withFilepath(string $filepath): self
+    public static function withFilepath(string $filepath, \Throwable $previous): self
     {
-        return new self(
-            sprintf(
-            'Could not write certificate to %s',
-            $filepath
-        ));
+        return new self('Could not write certificate to "'.$filepath.'"', $previous->getCode(), $previous);
     }
 }
