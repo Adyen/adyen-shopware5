@@ -11,7 +11,6 @@ use AdyenPayment\Certificate\Response\ApplePayResponseInterface;
 use GuzzleHttp\Psr7\Response;
 use Phpro\HttpTools\Encoding\DecoderInterface;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -52,12 +51,7 @@ class ApplePayCertificateDecoderTest extends TestCase
     {
         $response = new Response(200, [], '');
 
-        $this->zipExtractor->__invoke(
-            Argument::type('string'),
-            Argument::type('string'),
-            Argument::type('string'),
-            Argument::type('string')
-        )->shouldBeCalledOnce();
+        $this->zipExtractor->__invoke()->shouldBeCalledOnce();
 
         ($this->applePayCertificateDecoder)($response);
     }
@@ -65,12 +59,7 @@ class ApplePayCertificateDecoderTest extends TestCase
     /** @test */
     public function it_uses_fallback_zip_when_response_is_not_ok(): void
     {
-        $this->zipExtractor->__invoke(
-            Argument::type('string'),
-            Argument::type('string'),
-            Argument::type('string'),
-            Argument::type('string'),
-        )->shouldBeCalledOnce();
+        $this->zipExtractor->__invoke()->shouldBeCalledOnce();
 
         $response = new Response(403, [], 'test');
 

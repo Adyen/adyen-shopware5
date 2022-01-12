@@ -29,27 +29,17 @@ class ZipExtractorTest extends TestCase
     {
         $filesystem = new Filesystem();
 
-        $this->zipExtractor->__invoke(
-            $fromDir = 'tests/Integration/Fixtures',
-            $toDir = 'tests/Integration/var/storage/temp/.well-known',
-            $filename = 'ZipExtractor',
-            $extension = '.zip'
-        );
+        $this->zipExtractor->__invoke();
 
+        self::assertTrue($filesystem->exists(__DIR__.'/../../../../.well-known'));
         self::assertStringContainsString(
-            'zip-extractor-content',
-            file_get_contents($toDir.'/'.$filename)
+            '2236304337424642364544314638313934',
+            file_get_contents(__DIR__.'/../../../../.well-known/apple-developer-merchantid-domain-association')
         );
-        self::assertTrue($filesystem->exists($fromDir));
-        self::assertTrue($filesystem->exists($toDir));
-        self::assertTrue($filesystem->exists($toDir.'/'.$filename));
 
         $filesystem->remove([
-            'tests/Integration/var/storage/temp/.well-known/ZipExtractor',
-            'tests/Integration/var',
+            '.well-known/apple-developer-merchantid-domain-association',
+            '.well-known',
         ]);
-
-        self::assertFalse($filesystem->exists($toDir));
-        self::assertFalse($filesystem->exists('tests/Integration/var'));
     }
 }

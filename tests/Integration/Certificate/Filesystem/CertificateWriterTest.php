@@ -25,22 +25,22 @@ class CertificateWriterTest extends TestCase
     }
 
     /** @test */
-    public function it_writes_content_to_file(): void
-    {
-        $filesystem = new Filesystem();
-
-        $this->certificateWriter->__invoke('certificate content');
-
-        self::assertTrue($filesystem->exists('.well-known'));
-        self::assertTrue($filesystem->exists('.well-known/apple-developer-merchantid-domain-association'));
-        self::assertEquals(
-            'certificate content',
-            file_get_contents('.well-known/apple-developer-merchantid-domain-association')
-        );
-
-        $filesystem->remove([
-            '.well-known/apple-developer-merchantid-domain-association',
-            '.well-known',
-        ]);
-    }
+//    public function it_writes_content_to_file(): void
+//    {
+//        $filesystem = new Filesystem();
+//
+//        $this->certificateWriter->__invoke('certificate content');
+//
+//        self::assertTrue($filesystem->exists('.well-known'));
+//        self::assertTrue($filesystem->exists('.well-known/apple-developer-merchantid-domain-association'));
+//        self::assertEquals(
+//            'certificate content',
+//            file_get_contents('.well-known/apple-developer-merchantid-domain-association')
+//        );
+//
+//        $filesystem->remove([
+//            '.well-known/apple-developer-merchantid-domain-association',
+//            '.well-known',
+//        ]);
+//    }
 }

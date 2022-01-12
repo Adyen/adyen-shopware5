@@ -10,23 +10,33 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class ZipExtractor implements ZipExtractorInterface
 {
-    public function __invoke(string $fromDir, string $toDir, string $filename, string $extension): void
+    private const ADYEN_APPLE_PAY_CERTIFICATE_FALLBACK_DIR = 'var/storage/apple/archive';
+    private const ADYEN_APPLE_PAY_CERTIFICATE_DIR = '.well-known';
+    private const ADYEN_APPLE_PAY_CERTIFICATE = 'apple-developer-merchantid-domain-association';
+    private const ADYEN_APPLE_PAY_ZIP_EXTENSION = '.zip';
+
+    public function __invoke(): void
     {
         $filesystem = new Filesystem();
 
         try {
             $zip = new \ZipArchive();
 
-            if (!$filesystem->exists($toDir)) {
-                $filesystem->mkdir($toDir, 0700);
+            if (!$filesystem->exists(self::ADYEN_APPLE_PAY_CERTIFICATE_DIR)) {
+                $filesystem->mkdir(self::ADYEN_APPLE_PAY_CERTIFICATE_DIR, 0700);
             }
 
-            if ($zip->open($fromDir.'/'.$filename.$extension)) {
-                $zip->extractTo($toDir);
+            if ($zip->open(
+                self::ADYEN_APPLE_PAY_CERTIFICATE_FALLBACK_DIR.
+                '/'.self::ADYEN_APPLE_PAY_CERTIFICATE.self::ADYEN_APPLE_PAY_ZIP_EXTENSION)) {
+                $zip->extractTo(self::ADYEN_APPLE_PAY_CERTIFICATE_DIR);
                 $zip->close();
             }
         } catch (IOExceptionInterface $exception) {
-            throw CouldNotWriteCertificate::withFilepath($toDir.'/'.$filename.$extension, $exception);
+            throw CouldNotWriteCertificate::withFilepath(
+                self::ADYEN_APPLE_PAY_CERTIFICATE_DIR.
+                '/'.self::ADYEN_APPLE_PAY_CERTIFICATE.self::ADYEN_APPLE_PAY_ZIP_EXTENSION,
+                $exception);
         }
     }
 }

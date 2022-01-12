@@ -18,10 +18,10 @@ final class TraceableZipExtractorDecorator implements ZipExtractorInterface
         $this->logger = $logger;
     }
 
-    public function __invoke(string $fromDir, string $toDir, string $filename, string $extension): void
+    public function __invoke(): void
     {
         try {
-            ($this->zipExtractor)($fromDir, $toDir, $filename, $extension);
+            ($this->zipExtractor)();
         } catch (CouldNotWriteCertificate $exception) {
             $this->logger->error($exception);
         }

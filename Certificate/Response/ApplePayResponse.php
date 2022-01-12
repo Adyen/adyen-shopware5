@@ -12,10 +12,6 @@ final class ApplePayResponse implements ApplePayResponseInterface
 {
     private ZipExtractorInterface $zipExtractor;
     private CertificateWriterInterface $certificateWriter;
-    private const ADYEN_APPLE_PAY_CERTIFICATE_FALLBACK_DIR = 'var/storage/apple/archive';
-    private const ADYEN_APPLE_PAY_CERTIFICATE_DIR = '.well-known';
-    private const ADYEN_APPLE_PAY_CERTIFICATE = 'apple-developer-merchantid-domain-association';
-    private const ADYEN_APPLE_PAY_ZIP_EXTENSION = '.zip';
 
     public function __construct(
         ZipExtractorInterface $zipExtractor,
@@ -34,11 +30,6 @@ final class ApplePayResponse implements ApplePayResponseInterface
 
     public function createFromFallbackZip(): void
     {
-        ($this->zipExtractor)(
-            self::ADYEN_APPLE_PAY_CERTIFICATE_FALLBACK_DIR,
-            self::ADYEN_APPLE_PAY_CERTIFICATE_DIR,
-            self::ADYEN_APPLE_PAY_CERTIFICATE,
-            self::ADYEN_APPLE_PAY_ZIP_EXTENSION
-        );
+        ($this->zipExtractor)();
     }
 }
