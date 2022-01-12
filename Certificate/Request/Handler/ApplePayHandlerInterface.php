@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Certificate\Request\Handler;
 
-use AdyenPayment\Certificate\Request\ApplePayRequest;
+use AdyenPayment\Certificate\Request\ApplePayCertificateRequest;
 
 interface ApplePayHandlerInterface
 {
-    public function __invoke(ApplePayRequest $applePayRequest): void;
+    public function __invoke(ApplePayCertificateRequest $applePayRequest): void;
 }

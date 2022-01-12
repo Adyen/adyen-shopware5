@@ -7,7 +7,7 @@ namespace AdyenPayment\Certificate\Request;
 use Phpro\HttpTools\Request\RequestInterface;
 
 /** @psalm-immutable */
-class ApplePayRequest implements RequestInterface
+final class ApplePayCertificateRequest implements RequestInterface
 {
     private function __construct()
     {

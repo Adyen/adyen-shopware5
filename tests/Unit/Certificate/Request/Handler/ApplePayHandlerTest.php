@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Tests\Unit\Certificate\Request\Handler;
 
 use AdyenPayment\Certificate\Model\ApplePayCertificate;
-use AdyenPayment\Certificate\Request\ApplePayRequest;
+use AdyenPayment\Certificate\Request\ApplePayCertificateRequest;
 use AdyenPayment\Certificate\Request\Handler\ApplePayHandler;
 use AdyenPayment\Certificate\Request\Handler\ApplePayHandlerInterface;
 use AdyenPayment\Certificate\Transport\StreamTransportFactory;
@@ -53,7 +53,7 @@ class ApplePayHandlerTest extends TestCase
     /** @test */
     public function it_uses_transport_to_make_request(): void
     {
-        $request = ApplePayRequest::create();
+        $request = ApplePayCertificateRequest::create();
         $applePay = ApplePayCertificate::create('test');
 
         $transport = $this->prophesize(TransportInterface::class);

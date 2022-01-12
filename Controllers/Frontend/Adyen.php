@@ -2,7 +2,7 @@
 
 use Adyen\AdyenException;
 use AdyenPayment\AdyenPayment;
-use AdyenPayment\Certificate\Request\ApplePayRequest;
+use AdyenPayment\Certificate\Request\ApplePayCertificateRequest;
 use AdyenPayment\Certificate\Request\Handler\ApplePayHandlerInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\BasketService;
