@@ -82,7 +82,7 @@ class HeaderLoggingMiddlewareTest extends TestCase
         $requestMethod = 'PATCH';
 
         $this->logger->info(
-            'Sending request to Adyen apple pay certificate domain with headers',
+            'Request to Adyen apple pay certificate domain with headers',
             [
                 'headers' => array_merge(
                     ['User-Agent' => ['GuzzleHttp/7']],
@@ -96,7 +96,7 @@ class HeaderLoggingMiddlewareTest extends TestCase
 
         $this->logger->log(
             $logLevel,
-            'Receiving response from Adyen apple pay certificate domain with headers',
+            'Response from Adyen apple pay certificate domain with headers',
             [
                 'headers' => array_map(static fn($value) => [$value], $responseHeaders),
                 'statusCode' => $responseStatusCode,

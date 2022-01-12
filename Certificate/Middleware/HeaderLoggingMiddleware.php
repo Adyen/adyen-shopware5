@@ -37,7 +37,7 @@ final class HeaderLoggingMiddleware implements MiddlewareInterface
     private function logRequestHeaders(RequestInterface $request): void
     {
         $this->logger->info(
-            'Sending request to Adyen apple pay certificate domain with headers',
+            'Request to Adyen apple pay certificate domain with headers',
             [
                 'headers' => $request->getHeaders(),
                 'uri' => $request->getUri()->getPath(),
@@ -55,7 +55,7 @@ final class HeaderLoggingMiddleware implements MiddlewareInterface
 
             $this->logger->log(
                 $logLevel,
-                'Receiving response from Adyen apple pay certificate domain with headers',
+                'Response from Adyen apple pay certificate domain with headers',
                 [
                     'headers' => $response->getHeaders(),
                     'statusCode' => $responseStatusCode,
