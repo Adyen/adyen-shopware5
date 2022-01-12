@@ -11,26 +11,32 @@ use Phpro\HttpTools\Transport\TransportInterface;
 use Phpro\HttpTools\Uri\UriBuilderInterface;
 use Psr\Http\Client\ClientInterface;
 
-class StreamTransportFactory
+class StreamTransportHandler
 {
     private ClientInterface $client;
     private UriBuilderInterface $uriBuilder;
+    private EncoderInterface $encoder;
+    private DecoderInterface $decoder;
 
     public function __construct(
         ClientInterface $client,
-        UriBuilderInterface $uriBuilder
+        UriBuilderInterface $uriBuilder,
+        EncoderInterface $encoder,
+        DecoderInterface $decoder
     ) {
         $this->client = $client;
         $this->uriBuilder = $uriBuilder;
+        $this->encoder = $encoder;
+        $this->decoder = $decoder;
     }
 
-    public function create(EncoderInterface $encoder, DecoderInterface $decoder): TransportInterface
+    public function __invoke(): TransportInterface
     {
         return EncodedTransportFactory::sync(
             $this->client,
             $this->uriBuilder,
-            $encoder,
-            $decoder
+            $this->encoder,
+            $this->decoder
         );
     }
 }

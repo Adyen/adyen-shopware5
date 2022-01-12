@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Certificate\Transport;
 
-use AdyenPayment\Certificate\Transport\StreamTransportFactory;
+use AdyenPayment\Certificate\Transport\StreamTransportHandler;
 use Phpro\HttpTools\Client\Factory\AutoDiscoveredClientFactory;
 use Phpro\HttpTools\Encoding\DecoderInterface;
 use Phpro\HttpTools\Encoding\EncoderInterface;
@@ -12,17 +12,29 @@ use Phpro\HttpTools\Transport\EncodedTransportFactory;
 use Phpro\HttpTools\Uri\TemplatedUriBuilder;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 
-class StreamTransportFactoryTest extends TestCase
+class StreamTransportHandlerTest extends TestCase
 {
     use ProphecyTrait;
-    private StreamTransportFactory $streamTransport;
+    private StreamTransportHandler $streamTransport;
+
+    /** @var EncoderInterface|ObjectProphecy */
+    private $applePayCertificateEncoder;
+
+    /** @var DecoderInterface|ObjectProphecy */
+    private $applePayCertificateDecoder;
 
     protected function setUp(): void
     {
-        $this->streamTransport = new StreamTransportFactory(
+        $this->applePayCertificateEncoder = $this->prophesize(EncoderInterface::class);
+        $this->applePayCertificateDecoder = $this->prophesize(DecoderInterface::class);
+
+        $this->streamTransport = new StreamTransportHandler(
             AutoDiscoveredClientFactory::create([]),
-            new TemplatedUriBuilder()
+            new TemplatedUriBuilder(),
+            $this->applePayCertificateEncoder->reveal(),
+            $this->applePayCertificateDecoder->reveal()
         );
     }
 
@@ -32,10 +44,7 @@ class StreamTransportFactoryTest extends TestCase
         $encoder = $this->prophesize(EncoderInterface::class);
         $decoder = $this->prophesize(DecoderInterface::class);
 
-        $transport = $this->streamTransport->create(
-            $encoder->reveal(),
-            $decoder->reveal()
-        );
+        $transport = $this->streamTransport->__invoke();
 
         static::assertEquals(EncodedTransportFactory::sync(
             AutoDiscoveredClientFactory::create([]),

@@ -32,15 +32,19 @@
 
         <service id="Phpro\HttpTools\Uri\TemplatedUriBuilder"/>
 
-        <service id="AdyenPayment\Certificate\Request\Handler\ApplePayHandler">
-            <argument type="service" id="AdyenPayment\Certificate\Transport\StreamTransportFactory"/>
-            <argument type="service" id="AdyenPayment\Certificate\Encoder\PlainTextEncoder"/>
-            <argument type="service" id="AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder"/>
+        <service id="AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler">
+            <argument type="service" id="AdyenPayment\Certificate\Transport\StreamTransportHandler"/>
+            <argument type="service" id="AdyenPayment\Certificate\Response\ApplePayCertificateHandler"/>
+            <argument type="service" id="AdyenPayment\Certificate\Filesystem\ZipExtractor"/>
         </service>
 
-        <service id="AdyenPayment\Certificate\Transport\StreamTransportFactory">
+        <service id="Phpro\HttpTools\Encoding\Stream\StreamDecoder"/>
+
+        <service id="AdyenPayment\Certificate\Transport\StreamTransportHandler">
             <argument type="service" id="AdyenPayment\Certificate\Client\HttpClient"/>
             <argument type="service" id="Phpro\HttpTools\Uri\TemplatedUriBuilder"/>
+            <argument type="service" id="AdyenPayment\Certificate\Encoder\PlainTextEncoder"/>
+            <argument type="service" id="Phpro\HttpTools\Encoding\Stream\StreamDecoder"/>
         </service>
 
         <service id="AdyenPayment\Certificate\Filesystem\ZipExtractor">
@@ -60,13 +64,8 @@
         </service>
 
         <service id="AdyenPayment\Certificate\Encoder\PlainTextEncoder"/>
-        <service id="AdyenPayment\Certificate\Decoder\ApplePayCertificateDecoder">
-            <argument type="service" id="AdyenPayment\Certificate\Filesystem\ZipExtractor"/>
-            <argument type="service" id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>
-        </service>
 
-        <service id="AdyenPayment\Certificate\Response\ApplePayResponse">
-            <argument type="service" id="AdyenPayment\Certificate\Filesystem\ZipExtractor"/>
+        <service id="AdyenPayment\Certificate\Response\ApplePayCertificateHandler">
             <argument type="service" id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>
         </service>
     </services>
