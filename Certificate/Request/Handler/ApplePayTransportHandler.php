@@ -38,7 +38,6 @@ final class ApplePayTransportHandler implements ApplePayTransportHandlerInterfac
 
         $streamDataContent = $streamData->getContents();
 
-        // TODO: no check on response status code???
         if ('' === $streamDataContent) {
             return ($this->zipExtractor)();
         }
