@@ -77,11 +77,6 @@ final class PaymentMeanCollection implements \IteratorAggregate, \Countable
         ));
     }
 
-    public function filterByAdyenSource(): self
-    {
-        return $this->filterBySource(SourceType::adyen());
-    }
-
     public function fetchStoredMethodUmbrellaPaymentMean(): ?PaymentMean
     {
         foreach ($this->paymentMeans as $paymentMean) {
@@ -97,17 +92,6 @@ final class PaymentMeanCollection implements \IteratorAggregate, \Countable
     {
         foreach ($this->paymentMeans as $paymentMean) {
             if ($paymentMean->getValue('stored_method_id') === $storedMethodId) {
-                return $paymentMean;
-            }
-        }
-
-        return null;
-    }
-
-    public function fetchById(int $id): ?PaymentMean
-    {
-        foreach ($this->paymentMeans as $paymentMean) {
-            if ($paymentMean->getId() === $id) {
                 return $paymentMean;
             }
         }
