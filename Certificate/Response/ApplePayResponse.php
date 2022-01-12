@@ -6,7 +6,7 @@ namespace AdyenPayment\Certificate\Response;
 
 use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
 use AdyenPayment\Certificate\Filesystem\ZipExtractorInterface;
-use AdyenPayment\Certificate\Model\ApplePay;
+use AdyenPayment\Certificate\Model\ApplePayCertificate;
 
 final class ApplePayResponse implements ApplePayResponseInterface
 {
@@ -21,11 +21,11 @@ final class ApplePayResponse implements ApplePayResponseInterface
         $this->certificateWriter = $certificateWriter;
     }
 
-    public function createFromRaw(string $response): ApplePay
+    public function createFromRaw(string $response): ApplePayCertificate
     {
         ($this->certificateWriter)($response);
 
-        return ApplePay::create($response);
+        return ApplePayCertificate::create($response);
     }
 
     public function createFromFallbackZip(): void

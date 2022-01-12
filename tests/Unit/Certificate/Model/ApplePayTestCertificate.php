@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Certificate\Model;
 
-use AdyenPayment\Certificate\Model\ApplePay;
+use AdyenPayment\Certificate\Model\ApplePayCertificate;
 use PHPUnit\Framework\TestCase;
 
-class ApplePayTest extends TestCase
+class ApplePayTestCertificate extends TestCase
 {
-    private ApplePay $applePay;
+    private ApplePayCertificate $applePay;
 
     protected function setUp(): void
     {
-        $this->applePay = ApplePay::create('certificate string');
+        $this->applePay = ApplePayCertificate::create('certificate string');
     }
 
     /** @test */
@@ -25,7 +25,7 @@ class ApplePayTest extends TestCase
     /** @test */
     public function it_can_be_constructed_by_load(): void
     {
-        $applePay = ApplePay::create($certificateString = 'test');
+        $applePay = ApplePayCertificate::create($certificateString = 'test');
         $this->assertEquals($certificateString, $applePay->certificate());
     }
 }

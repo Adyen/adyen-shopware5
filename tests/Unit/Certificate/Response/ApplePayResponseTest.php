@@ -6,7 +6,7 @@ namespace AdyenPayment\Tests\Unit\Certificate\Response;
 
 use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
 use AdyenPayment\Certificate\Filesystem\ZipExtractorInterface;
-use AdyenPayment\Certificate\Model\ApplePay;
+use AdyenPayment\Certificate\Model\ApplePayCertificate;
 use AdyenPayment\Certificate\Response\ApplePayResponse;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -37,7 +37,7 @@ class ApplePayResponseTest extends TestCase
             $this->certificateWriter->reveal()
         );
 
-        $applePay = ApplePay::create($certificate = 'test');
+        $applePay = ApplePayCertificate::create($certificate = 'test');
         $this->certificateWriter->__invoke(
             Argument::cetera(),
             Argument::cetera(),
@@ -57,7 +57,7 @@ class ApplePayResponseTest extends TestCase
             $this->certificateWriter->reveal()
         );
 
-        $applePay = ApplePay::create($certificate = 'test fallback');
+        $applePay = ApplePayCertificate::create($certificate = 'test fallback');
         $this->zipExtractor->__invoke(
             Argument::cetera(),
             Argument::cetera(),

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Certificate\Model;
 
-final class ApplePay
+final class ApplePayCertificate
 {
     private string $certificate;
 
