@@ -25,7 +25,7 @@ class ApplePayRequest implements RequestInterface
 
     public function uri(): string
     {
-        return '';
+        return '/.well-known/apple-developer-merchantid-domain-association';
     }
 
     public function uriParameters(): array

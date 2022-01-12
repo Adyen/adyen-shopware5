@@ -37,7 +37,7 @@ class ApplePayRequestTest extends TestCase
     /** @test */
     public function it_contains_uri(): void
     {
-        $this->assertEquals('', ApplePayRequest::create()->uri());
+        $this->assertEquals('/.well-known/apple-developer-merchantid-domain-association', ApplePayRequest::create()->uri());
     }
 
     /** @test */

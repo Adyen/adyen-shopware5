@@ -2,6 +2,11 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    
+    <parameters>
+        <parameter key="base_uri">https://eu.adyen.link</parameter>
+    </parameters>
+    
     <services>
         <service id="AdyenPayment\Certificate\Logging\HttpCodeToLogLevelProvider"/>
         <service id="AdyenPayment\Certificate\Logging\ResponseStatusToLogLevelProvider"/>
@@ -21,8 +26,7 @@
             <factory class="Phpro\HttpTools\Client\Factory\GuzzleClientFactory" method="create" />
             <argument key="$middlewares" type="tagged_iterator" tag="certificate.client.middleware"/>
             <argument key="$options" type="collection">
-                <!-- As the plugin has no .env file, we have to add the url directly in here -->
-                <argument key="base_uri">https://eu.adyen.link/.well-known/apple-developer-merchantid-domain-association</argument>
+                <argument key="base_uri">%base_uri%</argument>
             </argument>
         </service>
 

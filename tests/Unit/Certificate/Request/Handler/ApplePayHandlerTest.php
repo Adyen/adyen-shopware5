@@ -65,10 +65,8 @@ class ApplePayHandlerTest extends TestCase
 
         $transport
             ->__invoke($request)
-            ->willReturn($applePay);
+            ->shouldBeCalled();
 
-        $response = ($this->applePayHandler)($request);
-
-        self::assertEquals($applePay, $response);
+        ($this->applePayHandler)($request);
     }
 }
