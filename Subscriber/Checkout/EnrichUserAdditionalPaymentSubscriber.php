@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber\Checkout;
 
+use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
+use AdyenPayment\Models\Payment\PaymentMean;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
 
@@ -37,23 +39,23 @@ final class EnrichUserAdditionalPaymentSubscriber implements SubscriberInterface
             return;
         }
 
-        $storedMethodId = $this->session->get('storedMethodId');
-        $userData = $subject->View()->getAssign('sUserData');
-        $paymentMeanId = $userData['additional']['payment']['id'] ?? null;
+        $paymentMean = null;
 
-        if (null === $storedMethodId && null === $paymentMeanId) {
-            return;
+        $storedMethodId = $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
+        if (null !== $storedMethodId) {
+            $admin = Shopware()->Modules()->Admin();
+            $enrichedPaymentMeans = PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans());
+            $paymentMean = $enrichedPaymentMeans->fetchByStoredMethodId($storedMethodId);
         }
 
-        $admin = Shopware()->Modules()->Admin();
-        $enrichedPaymentMeans = ($this->enrichedPaymentMeanProvider)(
-            PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
-        );
-
-        $paymentMean = null === $storedMethodId
-            ? $enrichedPaymentMeans->fetchById((int) $paymentMeanId)
-            : $enrichedPaymentMeans->fetchByStoredMethodUmbrellaId($storedMethodId);
+        $userData = $subject->View()->getAssign('sUserData');
         if (null === $paymentMean) {
+            $paymentMean = PaymentMean::createFromShopwareArray($userData['additional']['payment'] ?? []);
+            $paymentMeans = ($this->enrichedPaymentMeanProvider)(new PaymentMeanCollection($paymentMean));
+            $paymentMean = iterator_to_array($paymentMeans->getIterator())[0];
+        }
+
+        if (!$paymentMean->getId()) {
             return;
         }
 

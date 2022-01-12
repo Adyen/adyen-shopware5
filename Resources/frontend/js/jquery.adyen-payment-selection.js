@@ -122,17 +122,17 @@
         },
         onPaymentFormSubmit: function (e) {
             var me = this;
-            let $formSubmit = $(me.opts.paymentMethodFormSubmitSelector);
+            var $formSubmit = $(me.opts.paymentMethodFormSubmitSelector);
             if ($formSubmit.hasClass('is--disabled')) {
                 e.preventDefault();
                 return false;
             }
-            var $paymentElement = $('.payment--method [name="payment"]:checked')[0];
+            var $paymentElement = $('#' + me.selectedPaymentElementId)[0];
             var paymentMethod = this.getPaymentMethodById($paymentElement.value);
             if(paymentMethod.isStoredPayment){
-                var $storedMethodElement = $('<input type="hidden" name="storedMethodId"/>');
-                $storedMethodElement.val(paymentMethod.stored_method_id);
-                $formSubmit.append($storedMethodElement);
+                $formSubmit.append(
+                    $('<input type="hidden" name="adyenStoredMethodId" value="'+paymentMethod.stored_method_id+'"/>')
+                );
             }
             $paymentElement.value = paymentMethod.id;
         },

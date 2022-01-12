@@ -34,20 +34,8 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
             'isAdyenPaymentMethod' => true,
             'adyenType' => $paymentMethod->adyenType()->type(),
             'metadata' => $paymentMethod->rawData(),
-            'stored_method_umbrella_id' => $paymentMethod->isStoredPayment() ? sprintf(
-                '%s_%s',
-                $shopwareMethod['id'],
-                $paymentMethod->getStoredPaymentMethodId()
-            ) : null,
-            'stored_method_id' => $paymentMethod->isStoredPayment() ? $paymentMethod->getStoredPaymentMethodId() : null,
         ],
-            $paymentMethod->isStoredPayment() ? [
-                'description' => $paymentMethod->getValue('name'),
-                'source' => SourceType::adyen()->getType(),
-                'attribute' => new Attribute([
-                    AdyenPayment::ADYEN_STORED_METHOD_ID => $paymentMethod->getStoredPaymentMethodId(),
-                ]),
-            ] : []
+            $this->enrichStoredPaymentMethodData($shopwareMethod, $paymentMethod)
         );
     }
 
@@ -69,5 +57,26 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
                 ->get('CardNumberEndingOn', 'Card number ending on', true),
             $adyenMethod->getValue('lastFour', '')
         );
+    }
+
+    private function enrichStoredPaymentMethodData(array $shopwareMethod, PaymentMethod $paymentMethod): array
+    {
+        if (!$paymentMethod->isStoredPayment()) {
+            return [];
+        }
+
+        return [
+            'stored_method_umbrella_id' => sprintf(
+                '%s_%s',
+                $shopwareMethod['id'],
+                $paymentMethod->getStoredPaymentMethodId()
+            ),
+            'stored_method_id' => $paymentMethod->getStoredPaymentMethodId(),
+            'description' => $paymentMethod->getValue('name'),
+            'source' => SourceType::adyen()->getType(),
+            'attribute' => new Attribute([
+                AdyenPayment::ADYEN_STORED_METHOD_ID => $paymentMethod->getStoredPaymentMethodId(),
+            ]),
+        ];
     }
 }

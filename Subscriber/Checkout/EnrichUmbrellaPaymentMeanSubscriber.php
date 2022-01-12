@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber\Checkout;
 
+use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
 use Enlight\Event\SubscriberInterface;
@@ -38,7 +39,7 @@ final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
             return;
         }
 
-        $storedMethodId = $this->session->get('storedMethodId');
+        $storedMethodId = $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
         if (null === $storedMethodId) {
             return;
         }
@@ -48,7 +49,7 @@ final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
             PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
         );
 
-        $paymentMean = $enrichedPaymentMeans->fetchByStoredMethodUmbrellaId($storedMethodId);
+        $paymentMean = $enrichedPaymentMeans->fetchByStoredMethodId($storedMethodId);
         if (null === $paymentMean) {
             return;
         }
@@ -56,6 +57,6 @@ final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
         $userData = $subject->View()->getAssign('sUserData');
         $userData['additional']['payment'] = $paymentMean->getRaw();
         $subject->View()->assign('sUserData', $userData);
-        $subject->View()->assign('sFormData', ['payment' => $paymentMean->getRaw()['stored_method_umbrella_id']]);
+        $subject->View()->assign('sFormData', ['payment' => $paymentMean->getValue('stored_method_umbrella_id')]);
     }
 }

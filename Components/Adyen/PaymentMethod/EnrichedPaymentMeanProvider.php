@@ -44,7 +44,7 @@ final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderIn
             $paymentMethodOptions['value']
         );
 
-        $umbrellaPaymentMean = $paymentMeans->fetchUmbrellaMean();
+        $umbrellaPaymentMean = $paymentMeans->fetchStoredMethodUmbrellaPaymentMean();
         if (null === $umbrellaPaymentMean) {
             throw UmbrellaPaymentMeanNotFoundException::missingUmbrellaPaymentMean();
         }

@@ -82,10 +82,10 @@ final class PaymentMeanCollection implements \IteratorAggregate, \Countable
         return $this->filterBySource(SourceType::adyen());
     }
 
-    public function fetchUmbrellaMean(): ?PaymentMean
+    public function fetchStoredMethodUmbrellaPaymentMean(): ?PaymentMean
     {
         foreach ($this->paymentMeans as $paymentMean) {
-            if (AdyenPayment::ADYEN_STORED_PAYMENT_UMBRELLA_CODE === $paymentMean->getRaw()['name']) {
+            if (AdyenPayment::ADYEN_STORED_PAYMENT_UMBRELLA_CODE === $paymentMean->getValue('name')) {
                 return $paymentMean;
             }
         }
@@ -93,10 +93,10 @@ final class PaymentMeanCollection implements \IteratorAggregate, \Countable
         return null;
     }
 
-    public function fetchByStoredMethodUmbrellaId(string $storedMethodId): ?PaymentMean
+    public function fetchByStoredMethodId(string $storedMethodId): ?PaymentMean
     {
         foreach ($this->paymentMeans as $paymentMean) {
-            if ($storedMethodId === ($paymentMean->getRaw()['stored_method_id'] ?? null)) {
+            if ($paymentMean->getValue('stored_method_id') === $storedMethodId) {
                 return $paymentMean;
             }
         }
@@ -107,7 +107,7 @@ final class PaymentMeanCollection implements \IteratorAggregate, \Countable
     public function fetchById(int $id): ?PaymentMean
     {
         foreach ($this->paymentMeans as $paymentMean) {
-            if ($id === $paymentMean->getId()) {
+            if ($paymentMean->getId() === $id) {
                 return $paymentMean;
             }
         }
