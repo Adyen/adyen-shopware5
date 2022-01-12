@@ -25,7 +25,7 @@ final class TraceableCertificateWriterDecorator implements CertificateWriterInte
         try {
             ($this->certificateWriter)($content);
         } catch (CouldNotWriteCertificate $exception) {
-            $this->logger->error($exception);
+            $this->logger->error($exception->getMessage(), [$exception]);
         }
     }
 }

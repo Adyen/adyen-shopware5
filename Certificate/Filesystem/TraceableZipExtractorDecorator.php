@@ -23,7 +23,7 @@ final class TraceableZipExtractorDecorator implements ZipExtractorInterface
         try {
             ($this->zipExtractor)();
         } catch (CouldNotWriteCertificate $exception) {
-            $this->logger->error($exception);
+            $this->logger->error($exception->getMessage(), [$exception]);
         }
     }
 }
