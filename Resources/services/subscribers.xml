@@ -53,6 +53,10 @@
             <argument type="service" id="models"/>
             <argument type="service" id="AdyenPayment\Components\OrderMailService"/>
         </service>
+        <service id="AdyenPayment\Subscriber\OrderStoredMethodIdSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="models"/>
+        </service>
         <service id="AdyenPayment\Subscriber\CheckoutSubscriber">
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="AdyenPayment\Components\Configuration"/>
@@ -95,7 +99,6 @@
             <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Checkout\EnrichUmbrellaPaymentMeanSubscriber">
-            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider"/>
             <argument type="service" id="session"/>
             <tag name="shopware.event_subscriber"/>
         </service>

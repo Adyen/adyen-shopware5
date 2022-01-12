@@ -65,6 +65,9 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
             return [];
         }
 
+        $attribute = $shopwareMethod['attribute'] ?? new Attribute();
+        $attribute->set(AdyenPayment::ADYEN_STORED_METHOD_ID, $paymentMethod->getStoredPaymentMethodId());
+
         return [
             'stored_method_umbrella_id' => sprintf(
                 '%s_%s',
@@ -74,9 +77,7 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
             'stored_method_id' => $paymentMethod->getStoredPaymentMethodId(),
             'description' => $paymentMethod->getValue('name'),
             'source' => SourceType::adyen()->getType(),
-            'attribute' => new Attribute([
-                AdyenPayment::ADYEN_STORED_METHOD_ID => $paymentMethod->getStoredPaymentMethodId(),
-            ]),
+            'attribute' => $attribute,
         ];
     }
 }

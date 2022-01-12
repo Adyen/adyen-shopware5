@@ -43,8 +43,9 @@ final class EnrichUserAdditionalPaymentSubscriber implements SubscriberInterface
 
         $storedMethodId = $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
         if (null !== $storedMethodId) {
-            $admin = Shopware()->Modules()->Admin();
-            $enrichedPaymentMeans = PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans());
+            $enrichedPaymentMeans = ($this->enrichedPaymentMeanProvider)(
+                PaymentMeanCollection::createFromShopwareArray(Shopware()->Modules()->Admin()->sGetPaymentMeans())
+            );
             $paymentMean = $enrichedPaymentMeans->fetchByStoredMethodId($storedMethodId);
         }
 

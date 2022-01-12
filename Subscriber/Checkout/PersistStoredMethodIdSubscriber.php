@@ -12,9 +12,8 @@ final class PersistStoredMethodIdSubscriber implements SubscriberInterface
 {
     private Enlight_Components_Session_Namespace $session;
 
-    public function __construct(
-        Enlight_Components_Session_Namespace $session
-    ) {
+    public function __construct(Enlight_Components_Session_Namespace $session)
+    {
         $this->session = $session;
     }
 
@@ -29,13 +28,14 @@ final class PersistStoredMethodIdSubscriber implements SubscriberInterface
     {
         $subject = $args->getSubject();
         $actionName = $subject->Request()->getActionName();
+
         $isShippingPaymentUpdate = 'shippingPayment' === $actionName && $subject->Request()->getParam('isXHR');
         $isSaveShippingPayment = 'saveShippingPayment' === $actionName;
-        if ($isShippingPaymentUpdate || $isSaveShippingPayment) {
-            $storedMethodId = $subject->Request()->getParam(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
-            null !== $storedMethodId
-                ? $this->session->set(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId)
-                : $this->session->remove(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
+        if (!$isShippingPaymentUpdate && !$isSaveShippingPayment) {
+            return;
         }
+
+        $storedMethodId = $subject->Request()->getParam(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
+        $this->session->set(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId);
     }
 }
