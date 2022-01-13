@@ -6,6 +6,6 @@
             <argument type="service" id="shopware_plugininstaller.plugin_manager"/>
             <argument type="service" id="adyen_payment.logger"/>
         </service>
-        <service id="AdyenPayment\Shopware\PaymentMeansProvider"/>
+        <service id="AdyenPayment\Shopware\Provider\PaymentMeansProvider"/>
     </services>
 </container>
