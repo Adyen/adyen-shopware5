@@ -6,16 +6,21 @@ namespace AdyenPayment\Subscriber\Checkout;
 
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
+use AdyenPayment\Shopware\Provider\PaymentMeansProviderInterface;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
 
 final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
 {
     private Enlight_Components_Session_Namespace $session;
+    private PaymentMeansProviderInterface $paymentMeansProvider;
 
-    public function __construct(Enlight_Components_Session_Namespace $session)
-    {
+    public function __construct(
+        Enlight_Components_Session_Namespace $session,
+        PaymentMeansProviderInterface $paymentMeansProvider
+    ) {
         $this->session = $session;
+        $this->paymentMeansProvider = $paymentMeansProvider;
     }
 
     public static function getSubscribedEvents(): array
@@ -26,8 +31,8 @@ final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
     public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
-        $actionName = $subject->Request()->getActionName();
-        $isShippingPaymentView = 'shippingPayment' === $actionName && !$subject->Request()->getParam('isXHR');
+        $actionName = $args->getRequest()->getActionName();
+        $isShippingPaymentView = 'shippingPayment' === $actionName && !$args->getRequest()->getParam('isXHR');
         if (!$isShippingPaymentView) {
             return;
         }
@@ -37,8 +42,7 @@ final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
             return;
         }
 
-        $admin = Shopware()->Modules()->Admin();
-        $enrichedPaymentMeans = PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans());
+        $enrichedPaymentMeans = PaymentMeanCollection::createFromShopwareArray(($this->paymentMeansProvider)());
 
         $paymentMean = $enrichedPaymentMeans->fetchByStoredMethodId($storedMethodId);
         if (null === $paymentMean) {
