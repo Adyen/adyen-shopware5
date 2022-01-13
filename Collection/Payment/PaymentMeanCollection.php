@@ -88,6 +88,17 @@ final class PaymentMeanCollection implements \IteratorAggregate, \Countable
         return null;
     }
 
+    public function fetchById(int $paymentId): ?PaymentMean
+    {
+        foreach ($this->paymentMeans as $paymentMean) {
+            if ($paymentMean->getId() === $paymentId) {
+                return $paymentMean;
+            }
+        }
+
+        return null;
+    }
+
     public function fetchByStoredMethodId(string $storedMethodId): ?PaymentMean
     {
         foreach ($this->paymentMeans as $paymentMean) {

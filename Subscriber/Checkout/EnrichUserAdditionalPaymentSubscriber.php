@@ -7,20 +7,23 @@ namespace AdyenPayment\Subscriber\Checkout;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
-use AdyenPayment\Models\Payment\PaymentMean;
+use AdyenPayment\Shopware\Provider\PaymentMeansProviderInterface;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
 
 final class EnrichUserAdditionalPaymentSubscriber implements SubscriberInterface
 {
     private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
+    private PaymentMeansProviderInterface $paymentMeansProvider;
     private Enlight_Components_Session_Namespace $session;
 
     public function __construct(
         EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider,
+        PaymentMeansProviderInterface $paymentMeansProvider,
         Enlight_Components_Session_Namespace $session
     ) {
         $this->enrichedPaymentMeanProvider = $enrichedPaymentMeanProvider;
+        $this->paymentMeansProvider = $paymentMeansProvider;
         $this->session = $session;
     }
 
@@ -35,28 +38,27 @@ final class EnrichUserAdditionalPaymentSubscriber implements SubscriberInterface
     public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
-        if ('confirm' !== $subject->Request()->getActionName()) {
+        if ('confirm' !== $args->getRequest()->getActionName()) {
             return;
         }
 
-        $paymentMean = null;
-
         $storedMethodId = $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
-        if (null !== $storedMethodId) {
-            $enrichedPaymentMeans = ($this->enrichedPaymentMeanProvider)(
-                PaymentMeanCollection::createFromShopwareArray(Shopware()->Modules()->Admin()->sGetPaymentMeans())
-            );
-            $paymentMean = $enrichedPaymentMeans->fetchByStoredMethodId($storedMethodId);
-        }
-
         $userData = $subject->View()->getAssign('sUserData');
-        if (null === $paymentMean) {
-            $paymentMean = PaymentMean::createFromShopwareArray($userData['additional']['payment'] ?? []);
-            $paymentMeans = ($this->enrichedPaymentMeanProvider)(new PaymentMeanCollection($paymentMean));
-            $paymentMean = iterator_to_array($paymentMeans->getIterator())[0];
+        $paymentMeanId = $userData['additional']['payment']['id'] ?? null;
+
+        if (null === $storedMethodId && null === $paymentMeanId) {
+            return;
         }
 
-        if (!$paymentMean->getId()) {
+        $enrichedPaymentMeans = ($this->enrichedPaymentMeanProvider)(
+            PaymentMeanCollection::createFromShopwareArray(($this->paymentMeansProvider)())
+        );
+
+        $paymentMean = null === $storedMethodId
+            ? $enrichedPaymentMeans->fetchById((int) $paymentMeanId)
+            : $enrichedPaymentMeans->fetchByStoredMethodId($storedMethodId);
+
+        if (null === $paymentMean) {
             return;
         }
 
