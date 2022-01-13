@@ -19,23 +19,21 @@ final class PersistStoredMethodIdSubscriber implements SubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return [
-            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => '__invoke',
-        ];
+        return ['Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => '__invoke'];
     }
 
     public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $subject = $args->getSubject();
-        $actionName = $subject->Request()->getActionName();
+        $actionName = $args->getRequest()->getActionName();
 
-        $isShippingPaymentUpdate = 'shippingPayment' === $actionName && $subject->Request()->getParam('isXHR');
+        $isShippingPaymentUpdate = 'shippingPayment' === $actionName && $args->getRequest()->getParam('isXHR');
         $isSaveShippingPayment = 'saveShippingPayment' === $actionName;
         if (!$isShippingPaymentUpdate && !$isSaveShippingPayment) {
             return;
         }
 
-        $storedMethodId = $subject->Request()->getParam(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
+        $storedMethodId = $args->getRequest()->getParam(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
         $this->session->set(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId);
     }
 }
