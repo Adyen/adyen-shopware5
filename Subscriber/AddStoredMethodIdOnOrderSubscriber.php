@@ -11,7 +11,7 @@ use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use Shopware\Components\Model\ModelManager;
 
-final class OrderStoredMethodIdSubscriber implements SubscriberInterface
+final class AddStoredMethodIdOnOrderSubscriber implements SubscriberInterface
 {
     private ModelManager $modelManager;
     private ObjectRepository $paymentInfoRepository;

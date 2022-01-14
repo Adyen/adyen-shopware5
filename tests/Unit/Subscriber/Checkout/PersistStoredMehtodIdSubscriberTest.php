@@ -46,9 +46,9 @@ final class PersistStoredMehtodIdSubscriberTest extends SubscriberTestCase
         $eventArgs = $this->buildEventArgs('', $viewData = []);
         $eventArgs->getRequest()->setParam('isXHR', true);
 
-        $this->subscriber->__invoke($eventArgs);
-
         $this->session->set(Argument::cetera())->shouldNotBeCalled();
+
+        $this->subscriber->__invoke($eventArgs);
     }
 
     /** @test */
@@ -57,9 +57,9 @@ final class PersistStoredMehtodIdSubscriberTest extends SubscriberTestCase
         $eventArgs = $this->buildEventArgs('shippingPayment', $viewData = []);
         $eventArgs->getRequest()->setParam('isXHR', false);
 
-        $this->subscriber->__invoke($eventArgs);
-
         $this->session->set(Argument::cetera())->shouldNotBeCalled();
+
+        $this->subscriber->__invoke($eventArgs);
     }
 
     /** @test */

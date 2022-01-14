@@ -53,7 +53,7 @@
             <argument type="service" id="models"/>
             <argument type="service" id="AdyenPayment\Components\OrderMailService"/>
         </service>
-        <service id="AdyenPayment\Subscriber\OrderStoredMethodIdSubscriber">
+        <service id="AdyenPayment\Subscriber\AddStoredMethodIdOnOrderSubscriber">
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="models"/>
         </service>
