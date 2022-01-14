@@ -115,11 +115,11 @@ final class PaymentMethodCollectionTest extends TestCase
     {
         $attribute = new Attribute();
         $attribute->set(AdyenPayment::ADYEN_CODE, 'my_adyen_code');
-        $attribute->set(AdyenPayment::ADYEN_STORED_METHOD_ID, $methodStoredId = 1);
         $paymentMean = PaymentMean::createFromShopwareArray([
-            'id' => $methodStoredId,
+            'id' => $methodStoredId = 'test_stored_method_id',
             'source' => 1425514,
             'attribute' => $attribute,
+            'stored_method_id' => $methodStoredId,
         ]);
         $testPayment = PaymentMethod::fromRaw(['type' => 'someType']);
         $expectedPayment = PaymentMethod::fromRaw(['type' => 'someType2', 'id' => $methodStoredId]);

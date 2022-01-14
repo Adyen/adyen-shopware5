@@ -126,7 +126,6 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
                 'source' => SourceType::shopwareDefault()->getType(),
                 'attribute' => new Attribute([
                     'adyen_type' => $adyenIdentifier,
-                    'adyen_stored_method_id' => null,
                 ]),
             ]),
         );
@@ -191,7 +190,6 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
                 'source' => SourceType::adyen()->getType(),
                 'attribute' => new Attribute([
                     'adyen_type' => null,
-                    'adyen_stored_method_id' => null,
                 ]),
             ]),
         );
@@ -220,7 +218,6 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
                 'source' => SourceType::adyen()->getType(),
                 'attribute' => new Attribute([
                     'adyen_type' => 'non_matching_adyen_identifier',
-                    'adyen_stored_method_id' => null,
                 ]),
             ]),
         );
@@ -249,7 +246,6 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
                 'source' => $source = SourceType::adyen()->getType(),
                 'attribute' => new Attribute([
                     'adyen_type' => $adyenIdentifier,
-                    'adyen_stored_method_id' => null,
                 ]),
             ]),
             $umbrellaMean = PaymentMean::createFromShopwareArray([

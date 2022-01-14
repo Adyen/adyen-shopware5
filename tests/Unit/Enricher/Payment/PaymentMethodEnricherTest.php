@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Enricher\Payment;
 
-use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Adyen\PaymentMethod\ImageLogoProviderInterface;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricher;
 use AdyenPayment\Enricher\Payment\PaymentMethodEnricherInterface;
@@ -13,7 +12,6 @@ use AdyenPayment\Models\Payment\PaymentMethod;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 use Shopware_Components_Snippet_Manager;
 
 final class PaymentMethodEnricherTest extends TestCase
@@ -110,7 +108,6 @@ final class PaymentMethodEnricherTest extends TestCase
             'stored_method_id' => $storedMethodId,
             'description' => $storedMethodName,
             'source' => SourceType::adyen()->getType(),
-            'attribute' => new Attribute([AdyenPayment::ADYEN_STORED_METHOD_ID => $storedMethodId]),
         ];
 
         self::assertEquals($expected, $result);

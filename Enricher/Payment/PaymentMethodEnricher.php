@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Enricher\Payment;
 
-use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Adyen\PaymentMethod\ImageLogoProviderInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMethod;
-use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 use Shopware_Components_Snippet_Manager;
 
 final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
@@ -65,9 +63,6 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
             return [];
         }
 
-        $attribute = $shopwareMethod['attribute'] ?? new Attribute();
-        $attribute->set(AdyenPayment::ADYEN_STORED_METHOD_ID, $paymentMethod->getStoredPaymentMethodId());
-
         return [
             'stored_method_umbrella_id' => sprintf(
                 '%s_%s',
@@ -77,7 +72,6 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
             'stored_method_id' => $paymentMethod->getStoredPaymentMethodId(),
             'description' => $paymentMethod->getValue('name'),
             'source' => SourceType::adyen()->getType(),
-            'attribute' => $attribute,
         ];
     }
 }

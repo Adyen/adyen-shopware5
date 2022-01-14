@@ -21,7 +21,6 @@ final class PaymentMeanTest extends TestCase
             'source' => '1425514',
             'attribute' => new Attribute([
                 'adyen_type' => 'adyen-type',
-                'adyen_stored_method_id' => 'stored payment method id',
             ]),
             'enriched' => true,
             'adyenType' => 'adyen-type',
@@ -58,7 +57,6 @@ final class PaymentMeanTest extends TestCase
             'source' => '1425514',
             'attribute' => new Attribute([
                 'adyen_type' => 'adyen-type',
-                'adyen_stored_method_id' => 'stored payment method id',
             ]),
             'enriched' => true,
             'adyenType' => 'adyen-type',
@@ -102,7 +100,6 @@ final class PaymentMeanTest extends TestCase
     {
         $this->assertEquals(new Attribute([
             'adyen_type' => 'adyen-type',
-            'adyen_stored_method_id' => 'stored payment method id',
         ]), $this->paymentMean->getAttribute());
     }
 
@@ -117,12 +114,6 @@ final class PaymentMeanTest extends TestCase
     {
         $paymentMean = PaymentMean::createFromShopwareArray(['source' => null]);
         $this->assertEquals('', $paymentMean->getAdyenCode());
-    }
-
-    /** @test */
-    public function it_can_retrieve_attribute_adyen_stored_method_id(): void
-    {
-        $this->assertEquals('stored payment method id', $this->paymentMean->getAdyenStoredMethodId());
     }
 
     /** @test */

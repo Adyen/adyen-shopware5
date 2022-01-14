@@ -64,11 +64,7 @@ final class PaymentMean
 
     public function getAdyenStoredMethodId(): string
     {
-        if ($this->getAttribute()->exists(AdyenPayment::ADYEN_STORED_METHOD_ID)) {
-            return (string) $this->getAttribute()->get(AdyenPayment::ADYEN_STORED_METHOD_ID);
-        }
-
-        return '';
+        return (string) $this->getValue('stored_method_id', '');
     }
 
     public function adyenType(): ?PaymentType

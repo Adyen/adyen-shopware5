@@ -32,7 +32,6 @@ final class AdyenPayment extends Plugin
 {
     public const NAME = 'AdyenPayment';
     public const ADYEN_CODE = 'adyen_type';
-    public const ADYEN_STORED_METHOD_ID = 'adyen_stored_method_id';
     public const ADYEN_STORED_PAYMENT_UMBRELLA_CODE = 'adyen_stored_payment_umbrella';
     public const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
     public const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';
@@ -136,7 +135,6 @@ final class AdyenPayment extends Plugin
     {
         $crudService = $this->container->get('shopware_attribute.crud_service');
         $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_CODE);
-        $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_STORED_METHOD_ID);
 
         $this->rebuildAttributeModels();
     }
@@ -155,16 +153,6 @@ final class AdyenPayment extends Plugin
                 'displayInBackend' => true,
                 'readonly' => true,
                 'label' => 'Adyen payment type',
-            ]
-        );
-        $crudService->update(
-            's_core_paymentmeans_attributes',
-            self::ADYEN_STORED_METHOD_ID,
-            TypeMapping::TYPE_STRING,
-            [
-                'displayInBackend' => true,
-                'readonly' => true,
-                'label' => 'Adyen stored payment method id',
             ]
         );
 
