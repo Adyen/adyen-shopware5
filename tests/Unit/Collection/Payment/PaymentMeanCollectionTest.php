@@ -12,54 +12,54 @@ use PHPUnit\Framework\TestCase;
 
 final class PaymentMeanCollectionTest extends TestCase
 {
+    private PaymentMeanCollection $collection;
+
+    protected function setUp(): void
+    {
+        $this->collection = new PaymentMeanCollection();
+    }
+
     /** @test */
     public function it_implements_iterable(): void
     {
-        self::assertInstanceOf(\IteratorAggregate::class, new PaymentMeanCollection());
+        self::assertInstanceOf(\IteratorAggregate::class, $this->collection);
     }
 
     /** @test */
     public function it_can_count(): void
     {
-        $result = PaymentMeanCollection::createFromShopwareArray([['source' => SourceType::adyen()->getType()]]);
-
-        self::assertInstanceOf(\Countable::class, $result);
-        self::assertCount(1, $result);
+        self::assertInstanceOf(\Countable::class, $this->collection);
+        self::assertCount(0, $this->collection);
     }
 
     /** @test */
     public function it_can_map_with_a_callback(): void
     {
-        $expectedMethod = [true];
         $filteredSource = SourceType::adyen();
         $collection = PaymentMeanCollection::createFromShopwareArray([
             ['source' => $filteredSource->getType()],
-            ['source' => '1'],
         ]);
 
-        $result = $collection->map(static function(PaymentMean $payment) use ($filteredSource) {
-            return $payment->getSource()->equals($filteredSource);
-        });
+        $result = $collection->map(static fn(PaymentMean $payment) => ['mapped']);
 
-        self::assertEquals($expectedMethod, $result);
+        self::assertEquals([['mapped']], $result);
     }
 
     /** @test */
     public function it_can_filter_by_source(): void
     {
         $filteredSource = SourceType::adyen();
-        $expected = PaymentMeanCollection::createFromShopwareArray([
-            ['source' => $filteredSource->getType()],
-        ]);
 
         $collection = PaymentMeanCollection::createFromShopwareArray([
-            ['source' => $filteredSource->getType()],
-            ['source' => '1'],
+            ['id' => $expected = 123, 'source' => $filteredSource->getType()],
+            ['id' => 456, 'source' => '1'],
         ]);
 
         $result = $collection->filterBySource($filteredSource);
 
-        self::assertEquals($expected, $result);
+        self::assertInstanceOf(PaymentMeanCollection::class, $result);
+        self::assertCount(1, $result);
+        self::assertEquals($expected, iterator_to_array($result)[0]->getId());
     }
 
     /** @test */
@@ -84,29 +84,23 @@ final class PaymentMeanCollectionTest extends TestCase
     public function it_can_exclude_hidden(): void
     {
         $filteredSource = SourceType::adyen();
-        $expected = PaymentMeanCollection::createFromShopwareArray([
-            ['source' => $filteredSource->getType()],
-            ['source' => '1'],
-        ]);
-
         $collection = PaymentMeanCollection::createFromShopwareArray([
-            ['source' => $filteredSource->getType(), 'hide' => true],
-            ['source' => $filteredSource->getType()],
-            ['source' => '1'],
-            ['source' => '1', 'hide' => true],
+            ['id' => 123, 'source' => $filteredSource->getType(), 'hide' => true],
+            ['id' => $expected = 345, 'source' => $filteredSource->getType()],
         ]);
 
         $result = $collection->filterExcludeHidden();
 
-        self::assertEquals($expected, $result);
+        self::assertInstanceOf(PaymentMeanCollection::class, $result);
+        self::assertCount(1, $result);
+        self::assertEquals($expected, iterator_to_array($result)[0]->getId());
     }
 
     /** @test */
     public function it_can_fetch_umbrella_payment_if_available(): void
     {
-        $filteredSource = SourceType::adyen();
         $collection = PaymentMeanCollection::createFromShopwareArray([
-            ['source' => $filteredSource->getType(), 'name' => AdyenPayment::ADYEN_STORED_PAYMENT_UMBRELLA_CODE],
+            ['source' => SourceType::adyen()->getType(), 'name' => AdyenPayment::ADYEN_STORED_PAYMENT_UMBRELLA_CODE],
             ['source' => '1'],
         ]);
 
@@ -119,9 +113,8 @@ final class PaymentMeanCollectionTest extends TestCase
     /** @test */
     public function it_will_return_null_on_fetch_umbrella_if_payment_not_available(): void
     {
-        $filteredSource = SourceType::adyen();
         $collection = PaymentMeanCollection::createFromShopwareArray([
-            ['source' => $filteredSource->getType()],
+            ['source' => SourceType::adyen()->getType()],
             ['source' => '1'],
         ]);
 
@@ -133,16 +126,16 @@ final class PaymentMeanCollectionTest extends TestCase
     /** @test */
     public function it_can_fetch_a_payment_by_stored_method_id(): void
     {
-        $filteredSource = SourceType::adyen();
         $collection = PaymentMeanCollection::createFromShopwareArray([
-            ['source' => $filteredSource->getType()],
-            ['source' => '1', 'stored_method_id' => $testId = 'test123'],
+            ['id' => 123, 'source' => SourceType::adyen()->getType()],
+            ['id' => $expected = 456, 'source' => '1', 'stored_method_id' => $paymentMeanId = 'test123'],
         ]);
 
-        $result = $collection->fetchByStoredMethodId($testId);
+        $result = $collection->fetchByStoredMethodId($paymentMeanId);
 
         self::assertInstanceOf(PaymentMean::class, $result);
         self::assertEquals(1, $result->getSource()->getType());
+        self::assertEquals($expected, $result->getId());
     }
 
     /** @test */
@@ -150,18 +143,18 @@ final class PaymentMeanCollectionTest extends TestCase
     {
         $filteredSource = SourceType::adyen();
         $collection = PaymentMeanCollection::createFromShopwareArray([
-            ['id' => $testId = 123, 'source' => $filteredSource->getType()],
-            ['' => '456', 'source' => '1'],
+            ['id' => $paymentMeanId = 123, 'source' => $filteredSource->getType()],
+            ['id' => '456', 'source' => '1'],
         ]);
 
-        $result = $collection->fetchById($testId);
+        $result = $collection->fetchById($paymentMeanId);
 
         self::assertInstanceOf(PaymentMean::class, $result);
-        self::assertEquals(123, $result->getId());
+        self::assertEquals($paymentMeanId, $result->getId());
     }
 
     /** @test */
-    public function it_will_return_null_on_fetch_by_stored_method_id_if_payment_not_available(): void
+    public function it_returns_collection_in_shopware_array_format(): void
     {
         $filteredSource = SourceType::adyen();
         $paymentData = ['id' => '123', 'source' => $filteredSource->getType()];
