@@ -67,5 +67,10 @@
         </service>
 
         <service id="AdyenPayment\Certificate\Encoder\PlainTextEncoder"/>
+
+        <service id="AdyenPayment\Certificate\Subscriber\Backend\ApplePayCertificateUrlRewriterSubscriber">
+            <argument type="service" id="modules"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
     </services>
 </container>

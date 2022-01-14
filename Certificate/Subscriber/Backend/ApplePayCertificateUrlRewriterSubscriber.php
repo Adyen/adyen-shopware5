@@ -10,9 +10,7 @@ final class ApplePayCertificateUrlRewriterSubscriber implements SubscriberInterf
 {
     private \Shopware_Components_Modules $modules;
 
-    public function __construct(
-        \Shopware_Components_Modules $modules
-    ) {
+    public function __construct(\Shopware_Components_Modules $modules) {
        $this->modules = $modules;
     }
 
@@ -28,16 +26,12 @@ final class ApplePayCertificateUrlRewriterSubscriber implements SubscriberInterf
 
     public function createApplePayCertificateRewriteTable(): void
     {
-//        dd('test');
-//        /** @var \sRewriteTable $rewriteTableModule */
-//        $rewriteTableModule = $this->modules->RewriteTable();
-
         /** @var \sRewriteTable $rewriteTableModule */
-        $rewriteTableModule = Shopware()->Container()->get('modules')->sRewriteTable();
-        $rewriteTableModule->sInsertUrl('sViewport=applepaycertificate', 'well-known/');
-
-//        dd('rewriter');
-
+        $rewriteTableModule = $this->modules->RewriteTable();
+        $rewriteTableModule->sInsertUrl(
+            'sViewport=applepaycertificate',
+            'well-known/apple-developer-merchantid-domain-association'
+        );
     }
 
     public function loadPerformanceExtension(\Enlight_Controller_ActionEventArgs $args)

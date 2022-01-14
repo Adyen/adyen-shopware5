@@ -18,16 +18,18 @@ class Shopware_Controllers_Frontend_ApplePayCertificate extends Enlight_Controll
 
     public function preDispatch()
     {
+        // TODO injecteer ApplePayCertificateReader
 //        $this->applePayHandler = $this->get('AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler');
     }
 
     public function indexAction(): void
     {
-        dd('apple pay certificate index');
-//        $this->Request()->setHeader('Content-Type', 'text/plain');
-//        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
-//
-//        ($this->applePayHandler)(ApplePayCertificateRequest::create());
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
+        $this->Response()->setHeader('Content-Type', 'text/plain');
+
+        // TODO roep $this->applePayCertificateReader op in setBody
+        $this->Response()->setBody('Hallo');
     }
 }
 
