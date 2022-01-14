@@ -7,7 +7,7 @@ namespace AdyenPayment\Tests\Unit\Certificate\Model;
 use AdyenPayment\Certificate\Model\ApplePayCertificate;
 use PHPUnit\Framework\TestCase;
 
-class ApplePayTestCertificate extends TestCase
+class ApplePayCertificateTest extends TestCase
 {
     private ApplePayCertificate $applePay;
 
