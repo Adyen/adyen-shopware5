@@ -14,16 +14,14 @@ final class CertificateReader implements CertificateReaderInterface
      */
     public function __invoke(): ApplePayCertificate
     {
-        $path = '.well-known'.'/'.'apple-developer-merchantid-domain-association';
+        $certificatePath = CertificateWriter::APPLE_PAY_CERTIFICATE_DIR.'/'.CertificateWriter::APPLE_PAY_CERTIFICATE;
         $fileContent = false;
-        if (file_exists($path)) {
-            $fileContent = file_get_contents(
-                '.well-known'.'/'.'apple-developer-merchantid-domain-association'
-            );
+        if (file_exists($certificatePath)) {
+            $fileContent = file_get_contents($certificatePath);
         }
 
         if (!$fileContent) {
-            throw CouldNotReadCertificate::withFilepath('.well-known'.'/'.'apple-developer-merchantid-domain-association');
+            throw CouldNotReadCertificate::withFilepath($certificatePath);
         }
 
         return ApplePayCertificate::create($fileContent);

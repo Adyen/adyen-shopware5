@@ -28,7 +28,8 @@ final class ZipExtractor implements ZipExtractorInterface
 
             if ($zip->open(
                 self::ADYEN_APPLE_PAY_CERTIFICATE_FALLBACK_DIR.
-                '/'.CertificateWriter::APPLE_PAY_CERTIFICATE.CertificateWriter::ADYEN_APPLE_PAY_ZIP_EXTENSION)) {
+                '/'.CertificateWriter::APPLE_PAY_CERTIFICATE.CertificateWriter::ADYEN_APPLE_PAY_ZIP_EXTENSION)
+            ) {
                 $zip->extractTo(CertificateWriter::APPLE_PAY_CERTIFICATE_DIR);
                 $zip->close();
             }
@@ -36,7 +37,8 @@ final class ZipExtractor implements ZipExtractorInterface
             throw CouldNotWriteCertificate::withFilepath(
                 CertificateWriter::APPLE_PAY_CERTIFICATE_DIR.
                 '/'.CertificateWriter::APPLE_PAY_CERTIFICATE.CertificateWriter::ADYEN_APPLE_PAY_ZIP_EXTENSION,
-                $exception);
+                $exception
+            );
         }
     }
 }
