@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use AdyenPayment\Certificate\Filesystem\CertificateReaderInterface;
 use AdyenPayment\Certificate\Request\ApplePayCertificateRequest;
 use AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandlerInterface;
 
@@ -12,14 +13,13 @@ use AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandlerInterface;
 class Shopware_Controllers_Frontend_ApplePayCertificate extends Enlight_Controller_Action
 {
     /**
-     * @var ApplePayTransportHandlerInterface
+     * @var CertificateReaderInterface
      */
-    private $applePayHandler;
+    private $certificateReader;
 
     public function preDispatch()
     {
-        // TODO injecteer ApplePayCertificateReader
-//        $this->applePayHandler = $this->get('AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler');
+        $this->certificateReader = $this->get('AdyenPayment\Certificate\Filesystem\CertificateReader');
     }
 
     public function indexAction(): void
@@ -27,9 +27,7 @@ class Shopware_Controllers_Frontend_ApplePayCertificate extends Enlight_Controll
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
         $this->Response()->setHeader('Content-Type', 'text/plain');
-
-        // TODO roep $this->applePayCertificateReader op in setBody
-        $this->Response()->setBody('Hallo');
+        $this->Response()->setBody(($this->certificateReader)()->certificate());
     }
 }
 

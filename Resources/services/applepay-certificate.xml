@@ -57,7 +57,7 @@
             <argument type="service" id="adyen_payment.logger"/>
         </service>
 
-        <service id="AdyenPayment\Certificate\Filesystem\CertificateReader"/>
+        <service id="AdyenPayment\Certificate\Filesystem\CertificateReader" public="true"/>
         <service id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>
 
         <service id="AdyenPayment\Certificate\Filesystem\TraceableCertificateWriterDecorator"
