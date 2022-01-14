@@ -34,7 +34,7 @@
 
         <service id="AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler">
             <argument type="service" id="AdyenPayment\Certificate\Transport\StreamTransportHandler"/>
-            <argument type="service" id="AdyenPayment\Certificate\Response\ApplePayCertificateHandler"/>
+            <argument type="service" id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>
             <argument type="service" id="AdyenPayment\Certificate\Filesystem\ZipExtractor"/>
         </service>
 
@@ -48,6 +48,7 @@
         </service>
 
         <service id="AdyenPayment\Certificate\Filesystem\ZipExtractor">
+            <argument type="service" id="AdyenPayment\Certificate\Filesystem\CertificateReader"/>
             <argument type="service" id="adyen_payment.logger"/>
         </service>
         <service id="AdyenPayment\Certificate\Filesystem\TraceableZipExtractorDecorator"
@@ -56,7 +57,9 @@
             <argument type="service" id="adyen_payment.logger"/>
         </service>
 
+        <service id="AdyenPayment\Certificate\Filesystem\CertificateReader"/>
         <service id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>
+
         <service id="AdyenPayment\Certificate\Filesystem\TraceableCertificateWriterDecorator"
             decorates="AdyenPayment\Certificate\Filesystem\CertificateWriter">
             <argument type="service" id="AdyenPayment\Certificate\Filesystem\TraceableCertificateWriterDecorator.inner"/>
@@ -64,9 +67,5 @@
         </service>
 
         <service id="AdyenPayment\Certificate\Encoder\PlainTextEncoder"/>
-
-        <service id="AdyenPayment\Certificate\Response\ApplePayCertificateHandler">
-            <argument type="service" id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>
-        </service>
     </services>
 </container>

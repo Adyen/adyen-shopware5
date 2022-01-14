@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Tests\Unit\Certificate\Transport;
 
 use AdyenPayment\Certificate\Transport\StreamTransportHandler;
+use AdyenPayment\Certificate\Transport\StreamTransportHandlerInterface;
 use Phpro\HttpTools\Client\Factory\AutoDiscoveredClientFactory;
 use Phpro\HttpTools\Encoding\DecoderInterface;
 use Phpro\HttpTools\Encoding\EncoderInterface;
@@ -17,7 +18,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 class StreamTransportHandlerTest extends TestCase
 {
     use ProphecyTrait;
-    private StreamTransportHandler $streamTransport;
+    private StreamTransportHandlerInterface $streamTransport;
 
     /** @var EncoderInterface|ObjectProphecy */
     private $applePayCertificateEncoder;
@@ -36,6 +37,12 @@ class StreamTransportHandlerTest extends TestCase
             $this->applePayCertificateEncoder->reveal(),
             $this->applePayCertificateDecoder->reveal()
         );
+    }
+
+    /** @test */
+    public function it_is_a_stream_transport_handler_interface(): void
+    {
+        $this->assertInstanceOf(StreamTransportHandlerInterface::class, $this->streamTransport);
     }
 
     /** @test */

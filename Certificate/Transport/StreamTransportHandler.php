@@ -11,7 +11,7 @@ use Phpro\HttpTools\Transport\TransportInterface;
 use Phpro\HttpTools\Uri\UriBuilderInterface;
 use Psr\Http\Client\ClientInterface;
 
-class StreamTransportHandler
+final class StreamTransportHandler implements StreamTransportHandlerInterface
 {
     private ClientInterface $client;
     private UriBuilderInterface $uriBuilder;

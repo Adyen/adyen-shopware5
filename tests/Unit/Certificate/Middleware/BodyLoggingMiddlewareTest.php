@@ -80,7 +80,7 @@ class BodyLoggingMiddlewareTest extends TestCase
             'Response from Adyen - apple pay certificate',
         )->shouldBeCalled();
 
-        $client->send(
+        $response = $client->send(
             new Request(
                 'POST',
                 '/some-uri-for-testing',
@@ -88,5 +88,7 @@ class BodyLoggingMiddlewareTest extends TestCase
                 $requestBody,
             )
         );
+
+        self::assertEquals(204, $response->getStatusCode());
     }
 }

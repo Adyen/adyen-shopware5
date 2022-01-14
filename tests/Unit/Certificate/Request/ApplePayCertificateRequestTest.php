@@ -7,19 +7,12 @@ namespace AdyenPayment\Tests\Unit\Certificate\Request;
 use AdyenPayment\Certificate\Request\ApplePayCertificateRequest;
 use Phpro\HttpTools\Request\RequestInterface;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Prophecy\ObjectProphecy;
 
 class ApplePayCertificateRequestTest extends TestCase
 {
-    use ProphecyTrait;
-
-    /** @var ObjectProphecy|RequestInterface */
-    private $applePayRequest;
-
     protected function setUp(): void
     {
-        $this->applePayRequest = $this->prophesize(RequestInterface::class);
+        parent::setUp();
     }
 
     /** @test */

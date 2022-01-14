@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Certificate\Request\Handler;
 
+use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
 use AdyenPayment\Certificate\Filesystem\ZipExtractorInterface;
-use AdyenPayment\Certificate\Model\ApplePayCertificate;
 use AdyenPayment\Certificate\Request\ApplePayCertificateRequest;
 use AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler;
 use AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandlerInterface;
-use AdyenPayment\Certificate\Response\ApplePayCertificateHandlerInterface;
-use AdyenPayment\Certificate\Transport\StreamTransportHandler;
+use AdyenPayment\Certificate\Transport\StreamTransportHandlerInterface;
 use Phpro\HttpTools\Transport\TransportInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -21,25 +20,25 @@ class ApplePayTransportHandlerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ObjectProphecy|StreamTransportHandler */
-    private $streamTransportFactory;
+    /** @var ObjectProphecy|StreamTransportHandlerInterface */
+    private $streamTransportHandler;
 
-    /** @var ApplePayCertificateHandlerInterface|ObjectProphecy */
-    private $applePayCertificateHandler;
-    private ApplePayTransportHandler $applePayTransportHandler;
+    /** @var CertificateWriterInterface|ObjectProphecy */
+    private $certificateWriter;
 
     /** @var ObjectProphecy|ZipExtractorInterface */
     private $zipExtractor;
+    private ApplePayTransportHandler $applePayTransportHandler;
 
     protected function setUp(): void
     {
-        $this->streamTransportFactory = $this->prophesize(StreamTransportHandler::class);
-        $this->applePayCertificateHandler = $this->prophesize(ApplePayCertificateHandlerInterface::class);
+        $this->streamTransportHandler = $this->prophesize(StreamTransportHandlerInterface::class);
+        $this->certificateWriter = $this->prophesize(CertificateWriterInterface::class);
         $this->zipExtractor = $this->prophesize(ZipExtractorInterface::class);
 
         $this->applePayTransportHandler = new ApplePayTransportHandler(
-            $this->streamTransportFactory->reveal(),
-            $this->applePayCertificateHandler->reveal(),
+            $this->streamTransportHandler->reveal(),
+            $this->certificateWriter->reveal(),
             $this->zipExtractor->reveal()
         );
     }
@@ -56,24 +55,16 @@ class ApplePayTransportHandlerTest extends TestCase
         $request = ApplePayCertificateRequest::create();
 
         $transport = $this->prophesize(TransportInterface::class);
-        $this->streamTransportFactory->__invoke()
-            ->shouldBeCalledOnce()
-            ->willReturn($transport->reveal());
+        $this->streamTransportHandler->__invoke()->willReturn($transport->reveal());
 
         $streamData = $this->prophesize(StreamInterface::class);
-        $transport
-            ->__invoke($request)
-            ->shouldBeCalled()
-            ->willReturn($streamData);
+        $transport->__invoke($request)->willReturn($streamData);
 
         $streamData->getContents()->willReturn($emptyStream = '');
 
-        $this->zipExtractor->__invoke()
-            ->shouldBeCalledOnce()
-            ->willReturn($defaultCertificate = ApplePayCertificate::create('default-content'));
+        $this->zipExtractor->__invoke()->shouldBeCalledOnce();
 
-        $transportHandlerResult = ($this->applePayTransportHandler)($request);
-        self::assertEquals($defaultCertificate->certificate(), $transportHandlerResult->certificate());
+        ($this->applePayTransportHandler)($request);
     }
 
     /** @test */
@@ -82,23 +73,15 @@ class ApplePayTransportHandlerTest extends TestCase
         $request = ApplePayCertificateRequest::create();
 
         $transport = $this->prophesize(TransportInterface::class);
-        $this->streamTransportFactory->__invoke()
-            ->shouldBeCalledOnce()
-            ->willReturn($transport->reveal());
+        $this->streamTransportHandler->__invoke()->willReturn($transport->reveal());
 
         $streamData = $this->prophesize(StreamInterface::class);
-        $transport
-            ->__invoke($request)
-            ->shouldBeCalled()
-            ->willReturn($streamData);
+        $transport->__invoke($request)->willReturn($streamData);
 
         $streamData->getContents()->willReturn($certificateContent = 'test-certificate');
 
-        $this->applePayCertificateHandler->__invoke($certificateContent)
-            ->shouldBeCalledOnce()
-            ->willReturn($adyenApplePayCertificate = ApplePayCertificate::create($certificateContent));
+        $this->certificateWriter->__invoke($certificateContent)->shouldBeCalledOnce();
 
-        $transportHandlerResult = ($this->applePayTransportHandler)($request);
-        self::assertEquals($adyenApplePayCertificate->certificate(), $transportHandlerResult->certificate());
+        ($this->applePayTransportHandler)($request);
     }
 }

@@ -6,6 +6,7 @@ use AdyenPayment\Certificate\Encoder\PlainTextEncoder;
 use GuzzleHttp\Psr7\Request;
 use Phpro\HttpTools\Encoding\EncoderInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 
 class PlainTextEncoderTest extends TestCase
 {
@@ -23,11 +24,13 @@ class PlainTextEncoderTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_the_request(): void
+    public function it_sets_the_content_header(): void
     {
         $request = new Request('GET', '/some-uri');
 
         $encodedRequest = ($this->applePayCertificateEncoder)($request, ['foo' => 'bar']);
-        static::assertEquals(['Content-Type' => ['text/plain']], $encodedRequest->getHeaders());
+        $this->assertEquals(['Content-Type' => ['text/plain']], $encodedRequest->getHeaders());
+        $this->assertInstanceOf(RequestInterface::class, $encodedRequest);
+        $this->assertNotEquals($request, $encodedRequest);
     }
 }

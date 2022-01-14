@@ -103,12 +103,13 @@ class HeaderLoggingMiddlewareTest extends TestCase
             ]
         )->shouldBeCalled();
 
-        $client->send(
+        $response = $client->send(
             new Request(
                 $requestMethod,
                 $requestUri,
                 $requestHeaders
             )
         );
+        self::assertEquals(333, $response->getStatusCode());
     }
 }
