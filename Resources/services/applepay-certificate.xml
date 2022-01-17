@@ -41,6 +41,7 @@
         <service id="Phpro\HttpTools\Encoding\Stream\StreamDecoder"/>
 
         <service id="AdyenPayment\Certificate\Transport\StreamTransportHandler">
+            <factory class="Phpro\HttpTools\Transport\EncodedTransportFactory" method="sync"/>
             <argument type="service" id="AdyenPayment\Certificate\Client\HttpClient"/>
             <argument type="service" id="Phpro\HttpTools\Uri\TemplatedUriBuilder"/>
             <argument type="service" id="AdyenPayment\Certificate\Encoder\PlainTextEncoder"/>

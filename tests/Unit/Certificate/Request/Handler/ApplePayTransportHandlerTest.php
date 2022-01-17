@@ -20,6 +20,9 @@ class ApplePayTransportHandlerTest extends TestCase
 {
     use ProphecyTrait;
 
+    /** @var ObjectProphecy|TransportInterface */
+    private $transport;
+
     /** @var ObjectProphecy|StreamTransportHandlerInterface */
     private $streamTransportHandler;
 
@@ -33,11 +36,12 @@ class ApplePayTransportHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->streamTransportHandler = $this->prophesize(StreamTransportHandlerInterface::class);
+        $this->transport = $this->prophesize(TransportInterface::class);
         $this->certificateWriter = $this->prophesize(CertificateWriterInterface::class);
         $this->zipExtractor = $this->prophesize(ZipExtractorInterface::class);
 
         $this->applePayTransportHandler = new ApplePayTransportHandler(
-            $this->streamTransportHandler->reveal(),
+            $this->transport->reveal(),
             $this->certificateWriter->reveal(),
             $this->zipExtractor->reveal()
         );
@@ -54,11 +58,8 @@ class ApplePayTransportHandlerTest extends TestCase
     {
         $request = ApplePayCertificateRequest::create();
 
-        $transport = $this->prophesize(TransportInterface::class);
-        $this->streamTransportHandler->__invoke()->willReturn($transport->reveal());
-
         $streamData = $this->prophesize(StreamInterface::class);
-        $transport->__invoke($request)->willReturn($streamData);
+        $this->transport->__invoke($request)->willReturn($streamData);
 
         $streamData->getContents()->willReturn($emptyStream = '');
 
@@ -72,11 +73,8 @@ class ApplePayTransportHandlerTest extends TestCase
     {
         $request = ApplePayCertificateRequest::create();
 
-        $transport = $this->prophesize(TransportInterface::class);
-        $this->streamTransportHandler->__invoke()->willReturn($transport->reveal());
-
         $streamData = $this->prophesize(StreamInterface::class);
-        $transport->__invoke($request)->willReturn($streamData);
+        $this->transport->__invoke($request)->willReturn($streamData);
 
         $streamData->getContents()->willReturn($certificateContent = 'test-certificate');
 
