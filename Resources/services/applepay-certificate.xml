@@ -32,7 +32,7 @@
 
         <service id="Phpro\HttpTools\Uri\TemplatedUriBuilder"/>
 
-        <service id="AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler">
+        <service id="AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler" public="true">
             <argument type="service" id="AdyenPayment\Certificate\Transport\StreamTransportHandler"/>
             <argument type="service" id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>
             <argument type="service" id="AdyenPayment\Certificate\Filesystem\ZipExtractor"/>
