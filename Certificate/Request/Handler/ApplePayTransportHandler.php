@@ -6,6 +6,7 @@ namespace AdyenPayment\Certificate\Request\Handler;
 
 use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
 use AdyenPayment\Certificate\Filesystem\ZipExtractorInterface;
+use AdyenPayment\Certificate\Model\ImportResult;
 use AdyenPayment\Certificate\Request\ApplePayCertificateRequest;
 use Phpro\HttpTools\Transport\TransportInterface;
 use Psr\Http\Message\StreamInterface;
@@ -26,7 +27,7 @@ final class ApplePayTransportHandler implements ApplePayTransportHandlerInterfac
         $this->zipExtractor = $zipExtractor;
     }
 
-    public function __invoke(ApplePayCertificateRequest $applePayRequest): void
+    public function __invoke(ApplePayCertificateRequest $applePayRequest): ImportResult
     {
         /** @var StreamInterface $streamData */
         $streamData = ($this->streamTransport)($applePayRequest);
@@ -35,8 +36,12 @@ final class ApplePayTransportHandler implements ApplePayTransportHandlerInterfac
 
         if ('' !== $streamDataContent) {
             ($this->certificateWriter)($streamDataContent);
+
+            return ImportResult::success();
         }
 
         ($this->zipExtractor)();
+
+        return ImportResult::successFallbackCertificate();
     }
 }

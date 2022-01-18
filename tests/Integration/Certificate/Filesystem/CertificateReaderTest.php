@@ -49,7 +49,7 @@ class CertificateReaderTest extends TestCase
 
         $this->expectException(CouldNotReadCertificate::class);
         $this->expectExceptionMessage(
-            'Could not read certificate from ".well-known/apple-developer-merchantid-domain-association"'
+            'Could not read certificate from "/app/custom/plugins/AdyenPayment/Certificate/Filesystem/../../../../../custom/plugins/AdyenPayment/.well-known/apple-developer-merchantid-domain-association"'
         );
 
         $this->certificateReader->__invoke();

@@ -6,6 +6,7 @@ namespace AdyenPayment\Tests\Unit\Certificate\Request\Handler;
 
 use AdyenPayment\Certificate\Filesystem\CertificateWriterInterface;
 use AdyenPayment\Certificate\Filesystem\ZipExtractorInterface;
+use AdyenPayment\Certificate\Model\ImportResult;
 use AdyenPayment\Certificate\Request\ApplePayCertificateRequest;
 use AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler;
 use AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandlerInterface;
@@ -65,7 +66,10 @@ class ApplePayTransportHandlerTest extends TestCase
 
         $this->zipExtractor->__invoke()->shouldBeCalledOnce();
 
-        ($this->applePayTransportHandler)($request);
+        $fallbackImportResult = ImportResult::successFallbackCertificate();
+        $result = ($this->applePayTransportHandler)($request);
+
+        $this->assertEquals($fallbackImportResult, $result);
     }
 
     /** @test */
@@ -80,6 +84,9 @@ class ApplePayTransportHandlerTest extends TestCase
 
         $this->certificateWriter->__invoke($certificateContent)->shouldBeCalledOnce();
 
-        ($this->applePayTransportHandler)($request);
+        $expectedImportResult = ImportResult::success();
+        $result = ($this->applePayTransportHandler)($request);
+
+        $this->assertEquals($expectedImportResult, $result);
     }
 }

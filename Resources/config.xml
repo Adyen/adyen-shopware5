@@ -158,5 +158,35 @@
                 </handler>
             </options>
         </element>
+        <element type="button">
+            <name>importApplePayCertificateMethod</name>
+            <label lang="en">Import / sync Adyen ApplePay Certificate</label>
+            <options>
+                <handler>
+                    <![CDATA[
+                        function() {
+                            console.log('should import apple pay here');
+                            Ext.Ajax.request({
+                                url: 'ImportApplePayCertificate/import',
+                                params: {},
+                                success: function(response) {
+                                    var value = Ext.decode(response.responseText);
+                                    Shopware.Msg.createGrowlMessage('success', value.responseText)
+                                },
+                                failure: function(response) {
+                                    console.log(response);
+                                    if (response.status === 404) {
+                                        Shopware.Msg.createGrowlMessage('Plugin Manager', 'A problem occurred while importing Adyen ApplePay certificate');
+                                    } else {
+                                        var value = Ext.decode(response.responseText);
+                                        Shopware.Msg.createGrowlMessage('failure', value.responseText)
+                                    }
+                                }
+                            });
+                        }
+                    ]]>
+                </handler>
+            </options>
+        </element>
     </elements>
 </config>

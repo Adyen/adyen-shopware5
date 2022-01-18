@@ -10,6 +10,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class CertificateWriter implements CertificateWriterInterface
 {
+    private const BASE_PATH_PLUGIN = __DIR__.'/../../../../../custom/plugins/AdyenPayment/';
     public const APPLE_PAY_CERTIFICATE_DIR = '.well-known';
     public const APPLE_PAY_CERTIFICATE = 'apple-developer-merchantid-domain-association';
     public const ADYEN_APPLE_PAY_ZIP_EXTENSION = '.zip';
@@ -20,13 +21,15 @@ final class CertificateWriter implements CertificateWriterInterface
         $filesystem = new Filesystem();
 
         try {
-            $filesystem->mkdir(self::APPLE_PAY_CERTIFICATE_DIR, 0700);
+            $filesystem->mkdir(self::BASE_PATH_PLUGIN.self::APPLE_PAY_CERTIFICATE_DIR, 0700);
             $filesystem->dumpFile(
-                self::APPLE_PAY_CERTIFICATE_FILE_PATH,
+                self::BASE_PATH_PLUGIN.self::APPLE_PAY_CERTIFICATE_FILE_PATH,
                 $content
             );
         } catch (IOExceptionInterface $exception) {
-            throw CouldNotWriteCertificate::withFilepath(self::APPLE_PAY_CERTIFICATE_FILE_PATH, $exception);
+            throw CouldNotWriteCertificate::withFilepath(
+                self::BASE_PATH_PLUGIN.self::APPLE_PAY_CERTIFICATE_FILE_PATH, $exception
+            );
         }
     }
 }

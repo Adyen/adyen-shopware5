@@ -22,6 +22,7 @@ final class TraceableZipExtractorDecorator implements ZipExtractorInterface
     {
         try {
             ($this->zipExtractor)();
+            $this->logger->warning('Fallback Adyen ApplePay certificate was used.');
         } catch (CouldNotWriteCertificate $exception) {
             $this->logger->error($exception->getMessage(), [$exception]);
         }

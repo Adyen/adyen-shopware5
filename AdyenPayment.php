@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 namespace AdyenPayment;
 
-use AdyenPayment\Certificate\Request\ApplePayCertificateRequest;
 use AdyenPayment\Components\CompilerPass\NotificationProcessorCompilerPass;
 use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
@@ -87,13 +86,6 @@ final class AdyenPayment extends Plugin
         $tool = new SchemaTool($this->container->get('models'));
         $classes = $this->getModelMetaData();
         $tool->updateSchema($classes, true);
-
-        $applePayTransportHandler = $this->container->get('AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler');
-        ($applePayTransportHandler)(ApplePayCertificateRequest::create());
-
-        $fileReader = $this->container->get('AdyenPayment\Certificate\Filesystem\CertificateReader');
-        $content = ($fileReader)();
-        dd($content->certificate());
     }
 
     public function update(UpdateContext $context): void

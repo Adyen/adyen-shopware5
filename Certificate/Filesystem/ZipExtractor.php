@@ -10,7 +10,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class ZipExtractor implements ZipExtractorInterface
 {
-    private const ADYEN_APPLE_PAY_CERTIFICATE_FALLBACK_DIR = 'var/storage/apple/archive';
+    private const BASE_PATH_PLUGIN = __DIR__.'/../../../../../custom/plugins/AdyenPayment/';
+    private const ADYEN_APPLE_PAY_CERTIFICATE_FALLBACK_DIR = 'var/storage/apple/archive/';
 
     /**
      * @throws CouldNotWriteCertificate
@@ -22,19 +23,21 @@ final class ZipExtractor implements ZipExtractorInterface
         try {
             $zip = new \ZipArchive();
 
-            if (!$filesystem->exists(CertificateWriter::APPLE_PAY_CERTIFICATE_DIR)) {
-                $filesystem->mkdir(CertificateWriter::APPLE_PAY_CERTIFICATE_DIR, 0700);
+            if (!$filesystem->exists(self::BASE_PATH_PLUGIN.CertificateWriter::APPLE_PAY_CERTIFICATE_DIR)) {
+                $filesystem->mkdir(self::BASE_PATH_PLUGIN.CertificateWriter::APPLE_PAY_CERTIFICATE_DIR, 0700);
             }
 
             if ($zip->open(
+                self::BASE_PATH_PLUGIN.
                 self::ADYEN_APPLE_PAY_CERTIFICATE_FALLBACK_DIR.
                 '/'.CertificateWriter::APPLE_PAY_CERTIFICATE.CertificateWriter::ADYEN_APPLE_PAY_ZIP_EXTENSION)
             ) {
-                $zip->extractTo(CertificateWriter::APPLE_PAY_CERTIFICATE_DIR);
+                $zip->extractTo(self::BASE_PATH_PLUGIN.CertificateWriter::APPLE_PAY_CERTIFICATE_DIR);
                 $zip->close();
             }
         } catch (IOExceptionInterface $exception) {
             throw CouldNotWriteCertificate::withFilepath(
+                self::BASE_PATH_PLUGIN.
                 CertificateWriter::APPLE_PAY_CERTIFICATE_DIR.
                 '/'.CertificateWriter::APPLE_PAY_CERTIFICATE.CertificateWriter::ADYEN_APPLE_PAY_ZIP_EXTENSION,
                 $exception

@@ -20,7 +20,7 @@ class Shopware_Controllers_Backend_ApplePayCertificate extends Shopware_Controll
         $rewriteTableModule->baseSetup();
         $rewriteTableModule->sInsertUrl(
             'sViewport=applepaycertificate',
-            'well-known/apple-developer-merchantid-domain-association'
+            '.well-known/apple-developer-merchantid-domain-association'
         );
 
         $this->View()->assign(['success' => true]);
