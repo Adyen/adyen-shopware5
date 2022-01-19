@@ -15,4 +15,9 @@ final class Sanitize
     {
         return htmlspecialchars($raw, ENT_NOQUOTES);
     }
+
+    public static function escapeWithQuotes(string $raw): string
+    {
+        return htmlspecialchars($raw, ENT_QUOTES);
+    }
 }
