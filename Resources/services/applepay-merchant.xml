@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <!-- Do NOT multiline parameter values -->
+    <parameters>
+        <parameter key="apple_pay.merchant_association.base_uri">https://eu.adyen.link</parameter>
+        <parameter key="apple_pay.merchant_association.storage_path">%kernel.project_dir%/.well-known/apple-developer-merchantid-domain-association</parameter>
+        <parameter key="apple_pay.merchant_association.archive_path">%adyen_payment.plugin_dir%/storage/apple-developer-merchantid-domain-association.zip</parameter>
+    </parameters>
+
+    <services>
+        <service id="AdyenPayment\Applepay\MerchantAssociation\StorageFilesystem" public="true">
+            <argument type="service" id="file_system"/>
+            <argument>%apple_pay.merchant_association.storage_path%</argument>
+        </service>
+
+        <service id="AdyenPayment\Applepay\MerchantAssociation\RewriteUrl\SeoUrlWriter">
+            <argument type="service" id="modules"/>
+        </service>
+
+        <!-- Http Client -->
+        <service id="AdyenPayment\Applepay\MerchantAssociation\Client" class="GuzzleHttp\Client">
+            <argument type="collection">
+                <argument key="handler" type="service" id="AdyenPayment\Applepay\MerchantAssociation\HandlerStack"/>
+                <argument key="base_uri">%apple_pay.merchant_association.base_uri%</argument>
+            </argument>
+        </service>
+        <service id="AdyenPayment\Applepay\MerchantAssociation\HandlerStack" class="GuzzleHttp\HandlerStack">
+            <factory class="GuzzleHttp\HandlerStack" method="create"/>
+            <call method="after">
+                <argument>http_errors</argument>
+                <argument type="expression">service('AdyenPayment\\Guzzle\\Middleware\\RequestLogger').__invoke()
+                </argument>
+                <argument>RequestLoggingMiddleware</argument>
+            </call>
+            <call method="after">
+                <argument>http_errors</argument>
+                <argument type="expression">service('AdyenPayment\\Guzzle\\Middleware\\ResponseLogger').__invoke()
+                </argument>
+                <argument>ResponseLoggingMiddleware</argument>
+            </call>
+        </service>
+
+        <!-- Installers -->
+        <service id="AdyenPayment\Applepay\MerchantAssociation\MerchantAssociationFileInstaller" public="true">
+            <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\InstallHandler\DownloadInstaller"/>
+            <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\InstallHandler\ArchiveInstaller"/>
+        </service>
+        <service id="AdyenPayment\Applepay\MerchantAssociation\TraceableFileInstaller"
+                 decorates="AdyenPayment\Applepay\MerchantAssociation\MerchantAssociationFileInstaller">
+            <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\TraceableFileInstaller.inner"/>
+            <argument type="service" id="adyen_payment.logger"/>
+        </service>
+        <service id="AdyenPayment\Applepay\MerchantAssociation\InstallHandler\DownloadInstaller">
+            <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\Client"/>
+            <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\StorageFilesystem"/>
+        </service>
+        <service id="AdyenPayment\Applepay\MerchantAssociation\InstallHandler\ArchiveInstaller">
+            <argument>%apple_pay.merchant_association.archive_path%</argument>
+            <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\StorageFilesystem"/>
+        </service>
+
+        <!--        <service id="AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler" public="true">-->
+        <!--            <argument type="service" id="AdyenPayment\Certificate\Transport\StreamTransportHandler"/>-->
+        <!--            <argument type="service" id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>-->
+        <!--            <argument type="service" id="AdyenPayment\Certificate\Filesystem\ZipExtractor"/>-->
+        <!--        </service>-->
+
+        <!--        <service id="AdyenPayment\Certificate\Filesystem\ZipExtractor">-->
+        <!--            <argument type="service" id="adyen_payment.logger"/>-->
+        <!--        </service>-->
+        <!--        <service id="AdyenPayment\Certificate\Filesystem\TraceableZipExtractorDecorator"-->
+        <!--                 decorates="AdyenPayment\Applepay\Certificate\Filesystem\ZipExtractor">-->
+        <!--            <argument type="service" id="AdyenPayment\Certificate\Filesystem\TraceableZipExtractorDecorator.inner"/>-->
+        <!--            <argument type="service" id="adyen_payment.logger"/>-->
+        <!--        </service>-->
+
+        <!--        <service id="AdyenPayment\Certificate\Filesystem\CertificateReader" public="true"/>-->
+
+
+        <!--        <service id="AdyenPayment\Certificate\Filesystem\TraceableCertificateWriterDecorator"-->
+        <!--                 decorates="AdyenPayment\Applepay\Certificate\Filesystem\CertificateWriter">-->
+        <!--            <argument type="service"-->
+        <!--                      id="AdyenPayment\Certificate\Filesystem\TraceableCertificateWriterDecorator.inner"/>-->
+        <!--            <argument type="service" id="adyen_payment.logger"/>-->
+        <!--        </service>-->
+    </services>
+</container>

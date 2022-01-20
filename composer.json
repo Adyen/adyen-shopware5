@@ -2,7 +2,11 @@
     "name": "adyen/adyen-shopware5",
     "description": "Adyen plugin Shopware 5",
     "type": "shopware-plugin",
-    "keywords": ["adyen", "payment", "payment platform"],
+    "keywords": [
+        "adyen",
+        "payment",
+        "payment platform"
+    ],
     "homepage": "https://adyen.com",
     "license": "MIT",
     "extra": {
@@ -25,10 +29,9 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-json": "*",
+        "ext-zip": "*",
         "adyen/php-api-library": "^10.0",
-        "monolog/monolog": "2.1.1",
-        "guzzlehttp/guzzle": "^7.4",
-        "phpro/http-tools": "1.1.0"
+        "monolog/monolog": "2.1.1"
     },
     "require-dev": {
         "phpro/grumphp-shim": "^1.5"
