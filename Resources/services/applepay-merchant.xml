@@ -60,30 +60,5 @@
             <argument>%apple_pay.merchant_association.archive_path%</argument>
             <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\StorageFilesystem"/>
         </service>
-
-        <!--        <service id="AdyenPayment\Certificate\Request\Handler\ApplePayTransportHandler" public="true">-->
-        <!--            <argument type="service" id="AdyenPayment\Certificate\Transport\StreamTransportHandler"/>-->
-        <!--            <argument type="service" id="AdyenPayment\Certificate\Filesystem\CertificateWriter"/>-->
-        <!--            <argument type="service" id="AdyenPayment\Certificate\Filesystem\ZipExtractor"/>-->
-        <!--        </service>-->
-
-        <!--        <service id="AdyenPayment\Certificate\Filesystem\ZipExtractor">-->
-        <!--            <argument type="service" id="adyen_payment.logger"/>-->
-        <!--        </service>-->
-        <!--        <service id="AdyenPayment\Certificate\Filesystem\TraceableZipExtractorDecorator"-->
-        <!--                 decorates="AdyenPayment\Applepay\Certificate\Filesystem\ZipExtractor">-->
-        <!--            <argument type="service" id="AdyenPayment\Certificate\Filesystem\TraceableZipExtractorDecorator.inner"/>-->
-        <!--            <argument type="service" id="adyen_payment.logger"/>-->
-        <!--        </service>-->
-
-        <!--        <service id="AdyenPayment\Certificate\Filesystem\CertificateReader" public="true"/>-->
-
-
-        <!--        <service id="AdyenPayment\Certificate\Filesystem\TraceableCertificateWriterDecorator"-->
-        <!--                 decorates="AdyenPayment\Applepay\Certificate\Filesystem\CertificateWriter">-->
-        <!--            <argument type="service"-->
-        <!--                      id="AdyenPayment\Certificate\Filesystem\TraceableCertificateWriterDecorator.inner"/>-->
-        <!--            <argument type="service" id="adyen_payment.logger"/>-->
-        <!--        </service>-->
     </services>
 </container>
