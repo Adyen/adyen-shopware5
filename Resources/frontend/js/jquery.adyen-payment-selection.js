@@ -183,7 +183,7 @@
         setConfig: function () {
             var me = this;
 
-            var adyenPaymentMethodsResponse = Object.values(me.opts.enrichedPaymentMethods).reduce(
+            var adyenPaymentMethodsResponse = me.opts.enrichedPaymentMethods.reduce(
                 function (rawAdyen, enrichedPaymentMethod) {
                     var isAdyenPaymentMethod = enrichedPaymentMethod.isAdyenPaymentMethod || false;
                     if (true === isAdyenPaymentMethod) {
