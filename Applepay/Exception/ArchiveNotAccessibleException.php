@@ -6,8 +6,8 @@ namespace AdyenPayment\Applepay\Exception;
 
 final class ArchiveNotAccessibleException extends \RuntimeException
 {
-    public static function fromPath(string $archivePath): self
+    public static function fromErrorCode(int $errorCode, string $archivePath): self
     {
-        return new self('Could not open "'.$archivePath.'"');
+        return new self('Could not open "'.$archivePath.'", ZipArchive error code: "'.$errorCode.'"');
     }
 }

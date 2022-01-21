@@ -28,8 +28,9 @@ final class ArchiveInstaller implements Installer
     public function install(): void
     {
         $archive = new \ZipArchive();
-        if (true !== $archive->open($this->archivePath)) {
-            throw ArchiveNotAccessibleException::fromPath($this->archivePath);
+        $result = $archive->open($this->archivePath);
+        if (true !== $result) {
+            throw ArchiveNotAccessibleException::fromErrorCode((int) $result, $this->archivePath);
         }
 
         $this->storageFilesystem->resetStorage();
