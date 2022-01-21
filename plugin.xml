@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.2.0</version>
+    <version>3.3.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -263,6 +263,28 @@
         <changes lang="de">
             Stabilitätskorrekturen
             Unterstützung Geschenkkarten
+        </changes>
+    </changelog>
+    <changelog version="3.3.0">
+        <changes lang="en">
+            ApplePay Merchant id association file
+                * path: .well-known/apple-developer-merchantid-domain-association
+                    * served directly by webserver if rules do not block access
+                    * served by shopware front-end route
+                * can be manually installed by backend button in plugin configuration
+                * will fetch the default adyen available file
+                * will fallback to file shipped with the plugin
+                * failsafe on url access if the file is not present it will be attempted to install
+        </changes>
+        <changes lang="de">
+            ApplePay Merchant id association file
+                * path: .well-known/apple-developer-merchantid-domain-association
+                    * served directly by webserver if rules do not block access
+                    * served by shopware front-end route
+                * can be manually installed by backend button in plugin configuration
+                * will fetch the default adyen available file
+                * will fallback to file shipped with the plugin
+                * failsafe on url access if the file is not present it will be attempted to install
         </changes>
     </changelog>
 </plugin>
