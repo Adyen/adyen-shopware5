@@ -183,6 +183,26 @@
         setConfig: function () {
             var me = this;
 
+            $.ajax({
+                method: 'GET',
+                async: false,
+                dataType: 'json',
+                url: '/frontend/adyenconfig/index',
+                success: function (response) {
+                    if (response['status'] === 'success') {
+                        me.opts.shopLocale = response['shopLocale'];
+                        me.opts.adyenClientKey = response['clientKey'];
+                        me.opts.adyenEnvironment = response['environment'];
+                        me.opts.enrichedPaymentMethods = response['enrichedPaymentMethods'];
+                        console.log(response);
+                    } else {
+                        me.addAdyenError(response['content']);
+                    }
+
+                    $.loadingIndicator.close();
+                }
+            });
+
             var adyenPaymentMethodsResponse = me.opts.enrichedPaymentMethods.reduce(
                 function (rawAdyen, enrichedPaymentMethod) {
                     var isAdyenPaymentMethod = enrichedPaymentMethod.isAdyenPaymentMethod || false;

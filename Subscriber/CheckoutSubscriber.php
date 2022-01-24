@@ -96,9 +96,10 @@ final class CheckoutSubscriber implements SubscriberInterface
                 ($this->paymentMeanCollectionSerializer)($enrichedPaymentMethods),
                 JSON_THROW_ON_ERROR),
         ];
+//        dd($adyenConfig);
 
         $view = $subject->View();
-        $view->assign('sAdyenConfig', $adyenConfig);
+//        $view->assign('sAdyenConfig', $adyenConfig);
     }
 
     private function checkFirstCheckoutStep(\Enlight_Controller_Action $subject): void

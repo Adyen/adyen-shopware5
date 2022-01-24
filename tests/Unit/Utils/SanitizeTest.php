@@ -18,7 +18,7 @@ final class SanitizeTest extends TestCase
     }
 
     /** @test */
-    public function it_can_escape_with_no_quotes(): void
+    public function it_can_escape_without_quotes(): void
     {
         $result = Sanitize::escape("<a href='test'>Test</a>");
 
