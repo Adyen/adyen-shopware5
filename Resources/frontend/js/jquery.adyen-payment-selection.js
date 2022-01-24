@@ -8,6 +8,7 @@
             adyenClientKey: '',
             enrichedPaymentMethods: {},
             resetSessionUrl: '',
+            adyenConfigAjaxUrl: '/frontend/adyenconfig/index',
             /**
              * Fallback environment variable
              *
@@ -187,7 +188,7 @@
                 method: 'GET',
                 async: false,
                 dataType: 'json',
-                url: '/frontend/adyenconfig/index',
+                url: me.opts.adyenConfigAjaxUrl,
                 success: function (response) {
                     if (response['status'] === 'success') {
                         me.opts.shopLocale = response['shopLocale'];

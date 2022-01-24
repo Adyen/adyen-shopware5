@@ -26,6 +26,7 @@
             adyenGoogleConfig: {},
             adyenPaymentState: {},
             adyenIsAdyenPayment: false,
+            adyenConfigAjaxUrl: '/frontend/adyenconfig/index',
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
             checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
@@ -275,7 +276,7 @@
                 method: 'GET',
                 async: false,
                 dataType: 'json',
-                url: '/frontend/adyenconfig/index',
+                url: me.opts.adyenConfigAjaxUrl,
                 success: function (response) {
                     if (response['status'] === 'success') {
                         me.opts.shopLocale = response['shopLocale'];

@@ -17,6 +17,7 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
     private Configuration $configuration;
     private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
     private PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer;
+    private Shopware_Components_Modules $modules;
 
     public function preDispatch(): void
     {
@@ -24,14 +25,17 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
         $this->dataConversion = $this->get(DataConversion::class);
         $this->enrichedPaymentMeanProvider = $this->get(EnrichedPaymentMeanProvider::class);
         $this->paymentMeanCollectionSerializer = $this->get(SwPaymentMeanCollectionSerializer::class);
+        $this->modules = $this->get('modules');
     }
 
     public function indexAction(): void
     {
-        try {
-            $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+        $this->Response()->setHeader('Content-Type', 'application/json');
 
-            $admin = Shopware()->Modules()->Admin();
+        try {
+            $admin = $this->modules->Admin();
+
             $enrichedPaymentMethods = ($this->enrichedPaymentMeanProvider)(
                 PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
             );
@@ -46,7 +50,6 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
                 'enrichedPaymentMethods' => ($this->paymentMeanCollectionSerializer)($enrichedPaymentMethods),
             ];
 
-            $this->Response()->setHeader('Content-Type', 'application/json');
             $this->Response()->setBody(
                 json_encode($adyenConfig, JSON_THROW_ON_ERROR)
             );
