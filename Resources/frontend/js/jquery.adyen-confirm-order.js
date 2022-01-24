@@ -282,7 +282,6 @@
                         me.opts.adyenClientKey = response['clientKey'];
                         me.opts.adyenEnvironment = response['environment'];
                         me.opts.enrichedPaymentMethods = response['enrichedPaymentMethods'];
-                        console.log(response);
                     } else {
                         me.addAdyenError(response['content']);
                     }

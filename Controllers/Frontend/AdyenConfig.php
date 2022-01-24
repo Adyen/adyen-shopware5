@@ -26,7 +26,7 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
         $this->paymentMeanCollectionSerializer = $this->get(SwPaymentMeanCollectionSerializer::class);
     }
 
-    public function indexAction(\Enlight_Controller_Action $subject): void
+    public function indexAction(): void
     {
         try {
             $this->Front()->Plugins()->ViewRenderer()->setNoRender();

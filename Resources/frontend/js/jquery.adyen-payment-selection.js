@@ -84,9 +84,9 @@
             me.sessionStorage = StorageManager.getStorage('session');
 
             me.applyDataAttributes();
-            me.enableVisibility();
             me.eventListeners();
             me.setConfig();
+            me.enableVisibility();
             me.setCheckout();
             me.handleSelectedMethod();
         },
@@ -194,7 +194,6 @@
                         me.opts.adyenClientKey = response['clientKey'];
                         me.opts.adyenEnvironment = response['environment'];
                         me.opts.enrichedPaymentMethods = response['enrichedPaymentMethods'];
-                        console.log(response);
                     } else {
                         me.addAdyenError(response['content']);
                     }
