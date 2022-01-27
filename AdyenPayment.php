@@ -22,6 +22,7 @@ use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\Context\UpdateContext;
 use Shopware\Models\Payment\Payment;
+use Shopware\Models\Shop\Shop;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -189,6 +190,9 @@ final class AdyenPayment extends Plugin
         /** @var ModelManager $modelsManager */
         $modelsManager = $this->container->get(ModelManager::class);
 
+        $models = $this->container->get('models');
+        $shops = $models->getRepository(Shop::class)->findAll();
+
         $payment = new Payment();
         $payment->setActive(true);
         $payment->setName(self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE);
@@ -197,6 +201,7 @@ final class AdyenPayment extends Plugin
         $payment->setPluginId($context->getPlugin()->getId());
         $payment->setDescription($description = 'Adyen Stored Payment Method');
         $payment->setAdditionalDescription($description);
+        $payment->setShops($shops);
 
         $paymentId = $database->fetchRow(
             'SELECT `id` FROM `s_core_paymentmeans` WHERE `name` = :name',
