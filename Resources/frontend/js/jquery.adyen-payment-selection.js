@@ -257,8 +257,11 @@
         handleComponent: function (paymentMethod) {
             var me = this;
 
+            var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
+
             if (me.opts.applePayType === paymentMethod.adyenType) {
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
+                me.handleComponentApplePay(adyenCheckoutData);
             }
             if ('paywithgoogle' === paymentMethod.adyenType) {
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
@@ -266,7 +269,6 @@
                 return;
             }
 
-            var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
             me.adyenCheckout
                 .create(adyenCheckoutData.cardType, adyenCheckoutData.paymentMethodData)
                 .mount('#' + me.getCurrentComponentId(me.selectedPaymentElementId));
@@ -274,6 +276,13 @@
         handleComponentPayWithGoogle: function () {
             var me = this;
             $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
+        },
+        handleComponentApplePay: function (adyenCheckoutData) {
+            var me = this;
+            adyenCheckoutData.paymentMethodData.amount = {
+                'value': (Number(document.getElementById('adyen_order_total').value)*100).toString(),
+                'currency': 'EUR'
+            };
         },
         handleOnChange: function (state) {
             var me = this;
