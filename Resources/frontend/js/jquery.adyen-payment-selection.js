@@ -281,7 +281,7 @@
             var me = this;
             adyenCheckoutData.paymentMethodData.amount = {
                 'value': (Number(document.getElementById('adyen_order_total').value)*100).toString(),
-                'currency': 'EUR'
+                'currency': (document.getElementById('adyen_order_currency').value).toString()
             };
         },
         handleOnChange: function (state) {
