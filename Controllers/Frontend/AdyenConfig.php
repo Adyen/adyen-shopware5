@@ -40,6 +40,11 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
                 PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
             );
 
+            $adyenOrderTotal = $this->View()->sBasket['sAmount'];
+            if ($this->View()->sBasket['sAmountWithTax'] && $this->View()->sUserData['additional']['charge_vat']) {
+                $adyenOrderTotal = $this->View()->sBasket['sAmountWithTax'];
+            }
+
             $shop = Shopware()->Shop();
 
             $adyenConfig = [
@@ -48,6 +53,8 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
                 'clientKey' => $this->configuration->getClientKey($shop),
                 'environment' => $this->configuration->getEnvironment($shop),
                 'enrichedPaymentMethods' => ($this->paymentMeanCollectionSerializer)($enrichedPaymentMethods),
+                'adyenOrderTotal' => $adyenOrderTotal,
+                'adyenOrderCurrency' => $this->View()->sBasket['sCurrencyName']
             ];
 
             $this->Response()->setBody(

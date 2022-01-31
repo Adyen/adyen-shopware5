@@ -3,10 +3,10 @@
 {block name='frontend_checkout_payment_content'}
     {include file="frontend/checkout/adyen_libaries.tpl"}
 
-    {block name='frontend_checkout_payment_adyen_order_total'}
-        <input type="hidden" id="adyen_order_total" value="{if $sAmountWithTax && $sUserData.additional.charge_vat}{$sAmountWithTax}{else}{$sAmount}{/if}"/>
-        <input type="hidden" id="adyen_order_currency" value="{$sBasket.sCurrencyName}"/>
-    {/block}
+{*    {block name='frontend_checkout_payment_adyen_order_total'}*}
+{*        <input type="hidden" id="adyen_order_total" value="{if $sAmountWithTax && $sUserData.additional.charge_vat}{$sAmountWithTax}{else}{$sAmount}{/if}"/>*}
+{*        <input type="hidden" id="adyen_order_currency" value="{$sBasket.sCurrencyName}"/>*}
+{*    {/block}*}
 
     {* Filter on storedPayments and default payment methods (SW 5 needs internally array<int, array> for $sPayments) *}
     {assign var="paymentMethods" value=[]}

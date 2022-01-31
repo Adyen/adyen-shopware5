@@ -7,6 +7,7 @@
         defaults: {
             adyenClientKey: '',
             enrichedPaymentMethods: {},
+            adyenOrderTotal: '',
             resetSessionUrl: '',
             adyenConfigAjaxUrl: '/frontend/adyenconfig/index',
             /**
@@ -190,11 +191,14 @@
                 dataType: 'json',
                 url: me.opts.adyenConfigAjaxUrl,
                 success: function (response) {
+                    console.log(response);
+                    debugger;
                     if (response['status'] === 'success') {
                         me.opts.shopLocale = response['shopLocale'];
                         me.opts.adyenClientKey = response['clientKey'];
                         me.opts.adyenEnvironment = response['environment'];
                         me.opts.enrichedPaymentMethods = response['enrichedPaymentMethods'];
+                        me.opts.adyenOrderTotal = response['adyenOrderTotal'];
                     } else {
                         me.addAdyenError(response['content']);
                     }
