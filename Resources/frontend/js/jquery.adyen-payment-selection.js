@@ -8,6 +8,7 @@
             adyenClientKey: '',
             enrichedPaymentMethods: {},
             adyenOrderTotal: '',
+            adyenOrderCurrency: '',
             resetSessionUrl: '',
             adyenConfigAjaxUrl: '/frontend/adyenconfig/index',
             /**
@@ -191,14 +192,13 @@
                 dataType: 'json',
                 url: me.opts.adyenConfigAjaxUrl,
                 success: function (response) {
-                    console.log(response);
-                    debugger;
                     if (response['status'] === 'success') {
                         me.opts.shopLocale = response['shopLocale'];
                         me.opts.adyenClientKey = response['clientKey'];
                         me.opts.adyenEnvironment = response['environment'];
                         me.opts.enrichedPaymentMethods = response['enrichedPaymentMethods'];
                         me.opts.adyenOrderTotal = response['adyenOrderTotal'];
+                        me.opts.adyenOrderCurrency = response['adyenOrderCurrency'];
                     } else {
                         me.addAdyenError(response['content']);
                     }
@@ -284,8 +284,8 @@
         handleComponentApplePay: function (adyenCheckoutData) {
             var me = this;
             adyenCheckoutData.paymentMethodData.amount = {
-                'value': (Number(document.getElementById('adyen_order_total').value)*100).toString(),
-                'currency': (document.getElementById('adyen_order_currency').value).toString()
+                'value': (Number(me.opts.adyenOrderTotal)*100).toString(),
+                'currency': (me.opts.adyenOrderCurrency).toString()
             };
         },
         handleOnChange: function (state) {

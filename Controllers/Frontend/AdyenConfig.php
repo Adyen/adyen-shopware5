@@ -18,6 +18,7 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
     private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
     private PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer;
     private Shopware_Components_Modules $modules;
+    private Enlight_Components_Session_Namespace $session;
 
     public function preDispatch(): void
     {
@@ -26,6 +27,7 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
         $this->enrichedPaymentMeanProvider = $this->get(EnrichedPaymentMeanProvider::class);
         $this->paymentMeanCollectionSerializer = $this->get(SwPaymentMeanCollectionSerializer::class);
         $this->modules = $this->get('modules');
+        $this->session = Shopware()->Session();
     }
 
     public function indexAction(): void
@@ -40,10 +42,7 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
                 PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
             );
 
-            $adyenOrderTotal = $this->View()->sBasket['sAmount'];
-            if ($this->View()->sBasket['sAmountWithTax'] && $this->View()->sUserData['additional']['charge_vat']) {
-                $adyenOrderTotal = $this->View()->sBasket['sAmountWithTax'];
-            }
+            $sBasket = $this->session->sOrderVariables['sBasket'];
 
             $shop = Shopware()->Shop();
 
@@ -53,8 +52,8 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
                 'clientKey' => $this->configuration->getClientKey($shop),
                 'environment' => $this->configuration->getEnvironment($shop),
                 'enrichedPaymentMethods' => ($this->paymentMeanCollectionSerializer)($enrichedPaymentMethods),
-                'adyenOrderTotal' => $adyenOrderTotal,
-                'adyenOrderCurrency' => $this->View()->sBasket['sCurrencyName']
+                'adyenOrderTotal' => $sBasket['sAmount'],
+                'adyenOrderCurrency' => $sBasket['sCurrencyName']
             ];
 
             $this->Response()->setBody(
