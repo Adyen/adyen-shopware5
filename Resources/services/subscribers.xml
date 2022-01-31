@@ -111,5 +111,15 @@
         <service id="AdyenPayment\Subscriber\Applepay\MerchantAssociation\RegisterUrlCountSubscriber">
             <tag name="shopware.event_subscriber"/>
         </service>
+        <service id="AdyenPayment\Subscriber\Account\PersistPreselectedStoredMethodIdSubscriber">
+            <argument type="service" id="session"/>
+            <argument type="service" id="AdyenPayment\Components\Manager\UserPreferenceManager"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\EnrichUserPreferenceSubscriber">
+            <argument type="service" id="session"/>
+            <argument type="service" id="models"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
     </services>
 </container>

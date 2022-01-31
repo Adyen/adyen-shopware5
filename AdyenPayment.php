@@ -12,6 +12,7 @@ use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
 use AdyenPayment\Models\Refund;
 use AdyenPayment\Models\TextNotification;
+use AdyenPayment\Models\UserPreference;
 use Doctrine\ORM\Tools\SchemaTool;
 use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
 use Shopware\Components\Logger;
@@ -169,6 +170,7 @@ final class AdyenPayment extends Plugin
             $entityManager->getClassMetadata(PaymentInfo::class),
             $entityManager->getClassMetadata(Refund::class),
             $entityManager->getClassMetadata(TextNotification::class),
+            $entityManager->getClassMetadata(UserPreference::class),
         ];
     }
 

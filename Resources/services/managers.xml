@@ -21,5 +21,8 @@
             <argument type="service" id="AdyenPayment\Components\Builder\NotificationBuilder"/>
             <argument type="service" id="models"/>
         </service>
+        <service id="AdyenPayment\Components\Manager\UserPreferenceManager">
+            <argument type="service" id="models"/>
+        </service>
     </services>
 </container>

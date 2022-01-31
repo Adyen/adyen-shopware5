@@ -24,7 +24,6 @@ final class PersistStoredMethodIdSubscriber implements SubscriberInterface
 
     public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
-        $subject = $args->getSubject();
         $actionName = $args->getRequest()->getActionName();
 
         $isShippingPaymentUpdate = 'shippingPayment' === $actionName && $args->getRequest()->getParam('isXHR');
