@@ -34,11 +34,15 @@ final class EnrichUserPreferenceSubscriber implements SubscriberInterface
     public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $userId = $this->session->get('sUserId');
-        if (!$userId) {
+        if (null === $userId) {
             return;
         }
 
         $userPreference = $this->modelsManager->getRepository(UserPreference::class)->findOneBy(['userId' => $userId]);
+        if (null === $userPreference) {
+            return;
+        }
+
         $args->getSubject()->View()->assign('adyenUserPreference', $userPreference->jsonSerialize());
     }
 }

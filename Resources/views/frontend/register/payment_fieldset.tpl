@@ -5,7 +5,7 @@
     {assign var='shouldBeChecked' value=false}
     {if $isStoredPayment}
         {append var="payment_mean" value=($payment_mean.stored_method_umbrella_id) index='id'}
-        {if $payment_mean.stored_method_id === $adyenUserPreference.storedMethodId}
+        {if $adyenUserPreference and $payment_mean.stored_method_id === $adyenUserPreference.storedMethodId}
             {assign var='shouldBeChecked' value=true}
         {/if}
     {/if}
