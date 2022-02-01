@@ -109,7 +109,7 @@ final class PersistPreselectedStoredMethodIdSubscriberTest extends TestCase
     }
 
     /** @test */
-    public function it_will_update_the_user_preferences_with_null_for_wrong_params(): void
+    public function it_will_update_the_user_preferences_with_null_for_none_stored_method_param(): void
     {
         $this->session->get('sUserId')->willReturn($userId = 123456);
         $this->request->getActionName()->willReturn('savePayment');
