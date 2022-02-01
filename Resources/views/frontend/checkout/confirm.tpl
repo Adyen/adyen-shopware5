@@ -20,6 +20,7 @@
     {if $mAdyenSnippets}data-adyensnippets="{$mAdyenSnippets}"{/if}
     {$adyenType=$sUserData.additional.payment['adyenType']|default:''}
     {$smarty.block.parent}
+    data-adyenConfigAjaxUrl="{url module='frontend' controller='adyenconfig' action='index'}"
     data-adyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
     data-adyenAjaxPaymentDetails="{url module='frontend' controller='adyen' action='paymentDetails'}"
     data-checkoutShippingPaymentUrl="{url controller='checkout' action='shippingPayment' sTarget='checkout'}"

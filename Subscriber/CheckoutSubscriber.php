@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
-use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
@@ -53,7 +52,6 @@ final class CheckoutSubscriber implements SubscriberInterface
 
         $this->checkBasketAmount($subject);
         $this->checkFirstCheckoutStep($subject);
-        $this->addAdyenConfigOnShipping($subject);
     }
 
     private function checkBasketAmount(\Enlight_Controller_Action $subject): void
@@ -73,32 +71,6 @@ final class CheckoutSubscriber implements SubscriberInterface
         if (empty($value)) {
             $this->revertToDefaultPaymentMethod($subject);
         }
-    }
-
-    private function addAdyenConfigOnShipping(\Enlight_Controller_Action $subject): void
-    {
-        if (!in_array($subject->Request()->getActionName(), ['shippingPayment', 'confirm'], true)) {
-            return;
-        }
-
-        $admin = Shopware()->Modules()->Admin();
-        $enrichedPaymentMethods = ($this->enrichedPaymentMeanProvider)(
-            PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
-        );
-
-        $shop = Shopware()->Shop();
-
-        $adyenConfig = [
-            'shopLocale' => $this->dataConversion->getISO3166FromLocale($shop->getLocale()->getLocale()),
-            'clientKey' => $this->configuration->getClientKey($shop),
-            'environment' => $this->configuration->getEnvironment($shop),
-            'enrichedPaymentMethods' => json_encode(
-                ($this->paymentMeanCollectionSerializer)($enrichedPaymentMethods),
-                JSON_THROW_ON_ERROR),
-        ];
-
-        $view = $subject->View();
-        $view->assign('sAdyenConfig', $adyenConfig);
     }
 
     private function checkFirstCheckoutStep(\Enlight_Controller_Action $subject): void

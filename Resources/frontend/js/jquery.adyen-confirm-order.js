@@ -6,12 +6,27 @@
          * Plugin default options.
          */
         defaults: {
+            /**
+             * Default shopLocale when no locate is assigned
+             *
+             * @type {string}
+             */
+            shopLocale: 'en-US',
+            /**
+             * Fallback environment variable
+             *
+             * @type {string}
+             */
+            adyenEnvironment: 'test',
+            adyenClientKey: '',
+            enrichedPaymentMethods: {},
             placeOrderSelector: '.table--actions button[type=submit]',
             confirmFormSelector: '#confirm--form',
             adyenType: '',
             adyenGoogleConfig: {},
             adyenPaymentState: {},
             adyenIsAdyenPayment: false,
+            adyenConfigAjaxUrl: '/frontend/adyenconfig/index',
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
             checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
@@ -256,9 +271,27 @@
             var me = this;
 
             var adyenConfigSession = JSON.parse(me.getAdyenConfigSession());
-            var adyenConfigTpl = document.querySelector('.adyen-payment-selection.adyen-config').dataset;
 
-            var adyenPaymentMethodsResponseConfig = Object.values(adyenConfigTpl.enrichedpaymentmethods).reduce(
+            $.ajax({
+                method: 'GET',
+                async: false,
+                dataType: 'json',
+                url: me.opts.adyenConfigAjaxUrl,
+                success: function (response) {
+                    if (response['status'] === 'success') {
+                        me.opts.shopLocale = response['shopLocale'];
+                        me.opts.adyenClientKey = response['clientKey'];
+                        me.opts.adyenEnvironment = response['environment'];
+                        me.opts.enrichedPaymentMethods = response['enrichedPaymentMethods'];
+                    } else {
+                        me.addAdyenError(response['content']);
+                    }
+
+                    $.loadingIndicator.close();
+                }
+            });
+
+            var adyenPaymentMethodsResponseConfig = me.opts.enrichedPaymentMethods.reduce(
                 function (rawAdyen, enrichedPaymentMethod) {
                     var isAdyenPaymentMethod = enrichedPaymentMethod.isAdyenPaymentMethod || false;
                     if (true === isAdyenPaymentMethod) {
@@ -271,9 +304,9 @@
             );
 
             me.adyenConfiguration = {
-                locale: adyenConfigSession ? adyenConfigSession.locale : adyenConfigTpl.shoplocale,
-                environment: adyenConfigSession ? adyenConfigSession.environment : adyenConfigTpl.adyenenvironment,
-                clientKey: adyenConfigSession ? adyenConfigSession.clientKey : adyenConfigTpl.adyenclientkey,
+                locale: adyenConfigSession ? adyenConfigSession.locale : me.opts.shoplocale,
+                environment: adyenConfigSession ? adyenConfigSession.environment : me.opts.adyenenvironment,
+                clientKey: adyenConfigSession ? adyenConfigSession.clientKey : me.opts.adyenclientkey,
                 paymentMethodsResponse: Object.assign({}, adyenPaymentMethodsResponseConfig),
                 onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
             };

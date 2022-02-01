@@ -16,5 +16,9 @@
             <argument type="service" id="AdyenPayment\Import\PaymentMethodImporter"/>
             <tag name="shopware.event_subscriber"/>
         </service>
+        <service id="AdyenPayment\Subscriber\Applepay\MerchantAssociation\AddSeoUrlSubscriber">
+            <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\RewriteUrl\SeoUrlWriter"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
     </services>
 </container>

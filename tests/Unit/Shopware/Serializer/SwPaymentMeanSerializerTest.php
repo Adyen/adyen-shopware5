@@ -46,8 +46,8 @@ final class SwPaymentMeanSerializerTest extends TestCase
             'id' => $id = 7845,
             'source' => $source = 1,
             'name' => '<some-tag> a name</some-tag> "quoted"',
-            'description' => 'description and<a>a link</a>',
-            'additionaldescription' => 'additional <div>a div</div>',
+            'description' => "description and<a href='test'>a link</a>",
+            'additionaldescription' => "additional <div>a div</div> and <a href='test'>link</a>",
         ]);
 
         $result = ($this->serializer)($paymentMean);
@@ -56,8 +56,8 @@ final class SwPaymentMeanSerializerTest extends TestCase
                 'id' => $id,
                 'source' => $source,
                 'name' => '&lt;some-tag&gt; a name&lt;/some-tag&gt; "quoted"',
-                'description' => 'description and&lt;a&gt;a link&lt;/a&gt;',
-                'additionaldescription' => 'additional &lt;div&gt;a div&lt;/div&gt;',
+                'description' => "description and&lt;a href='test'&gt;a link&lt;/a&gt;",
+                'additionaldescription' => 'additional &lt;div&gt;a div&lt;/div&gt; and &lt;a href=&#039;test&#039;&gt;link&lt;/a&gt;',
             ],
         ], $result);
     }

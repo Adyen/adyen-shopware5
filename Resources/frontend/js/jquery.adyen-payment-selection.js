@@ -7,7 +7,10 @@
         defaults: {
             adyenClientKey: '',
             enrichedPaymentMethods: {},
+            adyenOrderTotal: '',
+            adyenOrderCurrency: '',
             resetSessionUrl: '',
+            adyenConfigAjaxUrl: '/frontend/adyenconfig/index',
             /**
              * Fallback environment variable
              *
@@ -84,9 +87,9 @@
             me.sessionStorage = StorageManager.getStorage('session');
 
             me.applyDataAttributes();
-            me.enableVisibility();
             me.eventListeners();
             me.setConfig();
+            me.enableVisibility();
             me.setCheckout();
             me.handleSelectedMethod();
         },
@@ -183,7 +186,28 @@
         setConfig: function () {
             var me = this;
 
-            var adyenPaymentMethodsResponse = Object.values(me.opts.enrichedPaymentMethods).reduce(
+            $.ajax({
+                method: 'GET',
+                async: false,
+                dataType: 'json',
+                url: me.opts.adyenConfigAjaxUrl,
+                success: function (response) {
+                    if (response['status'] === 'success') {
+                        me.opts.shopLocale = response['shopLocale'];
+                        me.opts.adyenClientKey = response['clientKey'];
+                        me.opts.adyenEnvironment = response['environment'];
+                        me.opts.enrichedPaymentMethods = response['enrichedPaymentMethods'];
+                        me.opts.adyenOrderTotal = response['adyenOrderTotal'];
+                        me.opts.adyenOrderCurrency = response['adyenOrderCurrency'];
+                    } else {
+                        me.addAdyenError(response['content']);
+                    }
+
+                    $.loadingIndicator.close();
+                }
+            });
+
+            var adyenPaymentMethodsResponse = me.opts.enrichedPaymentMethods.reduce(
                 function (rawAdyen, enrichedPaymentMethod) {
                     var isAdyenPaymentMethod = enrichedPaymentMethod.isAdyenPaymentMethod || false;
                     if (true === isAdyenPaymentMethod) {
@@ -210,7 +234,7 @@
         getPaymentMethodById: function (id) {
             var me = this;
 
-            return this.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
+            return me.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
                 return enrichedPaymentMethod.id === id;
             })[0] || {};
         },
@@ -237,16 +261,18 @@
         handleComponent: function (paymentMethod) {
             var me = this;
 
-            if (me.opts.applePayType === paymentMethod.adyenType) {
+            var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
+
+            if (this.__isApplePayPaymentMethod(paymentMethod)) {
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
             }
+
             if ('paywithgoogle' === paymentMethod.adyenType) {
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
                 me.handleComponentPayWithGoogle();
                 return;
             }
 
-            var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
             me.adyenCheckout
                 .create(adyenCheckoutData.cardType, adyenCheckoutData.paymentMethodData)
                 .mount('#' + me.getCurrentComponentId(me.selectedPaymentElementId));
@@ -408,6 +434,17 @@
             return paymentMethod.isStoredPayment || false;
         },
         /**
+         *
+         * @param {object} paymentMethod
+         * @return {boolean}
+         * @private
+         */
+        __isApplePayPaymentMethod: function (paymentMethod) {
+            var me = this;
+
+            return me.opts.applePayType === paymentMethod.adyenType;
+        },
+        /**
          * @return {boolean}
          * @private
          */
@@ -487,6 +524,19 @@
                 return $.extend(true, {}, defaultData, {
                     paymentMethodData: {
                         storedPaymentMethodId: paymentMethod.metadata.id
+                    }
+                });
+            }
+
+            if (this.__isApplePayPaymentMethod(paymentMethod)) {
+                var me = this;
+
+                return $.extend(true, {}, defaultData, {
+                    paymentMethodData: {
+                        amount: {
+                            'value': (Number(me.opts.adyenOrderTotal)*100).toString(),
+                            'currency': (me.opts.adyenOrderCurrency).toString()
+                        }
                     }
                 });
             }

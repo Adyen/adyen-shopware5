@@ -14,3 +14,5 @@ grumphp.yml
 .*.cache
 tools/vendor
 !tools/composer.lock
+tests/fixtures/applepay/*
+!tests/fixtures/applepay/ZipExtractor.zip

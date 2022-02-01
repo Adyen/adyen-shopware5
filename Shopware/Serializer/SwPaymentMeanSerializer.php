@@ -16,7 +16,7 @@ final class SwPaymentMeanSerializer implements PaymentMeanSerializer
             $paymentMean->getId() => array_replace($paymentMean->getRaw(), [
                 'name' => Sanitize::escape($paymentMean->getValue('name')),
                 'description' => Sanitize::escape($paymentMean->getValue('description')),
-                'additionaldescription' => Sanitize::escape($paymentMean->getValue('additionaldescription')),
+                'additionaldescription' => Sanitize::escapeWithQuotes($paymentMean->getValue('additionaldescription')),
             ]),
         ];
     }
