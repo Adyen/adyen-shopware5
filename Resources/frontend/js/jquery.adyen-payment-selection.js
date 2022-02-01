@@ -264,7 +264,6 @@
             var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
 
             if (this.__isApplePayPaymentMethod(paymentMethod)) {
-                // TODO: check if early return is possible (not passing to adyen web component)
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
             }
 
