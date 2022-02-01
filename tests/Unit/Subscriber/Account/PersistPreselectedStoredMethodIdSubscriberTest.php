@@ -13,7 +13,6 @@ use Enlight_Controller_Request_Request;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Component\HttpFoundation\Request;
 
 final class PersistPreselectedStoredMethodIdSubscriberTest extends TestCase
 {
