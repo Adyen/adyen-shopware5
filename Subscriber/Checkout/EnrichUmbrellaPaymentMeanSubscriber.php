@@ -6,6 +6,7 @@ namespace AdyenPayment\Subscriber\Checkout;
 
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Collection\Payment\PaymentMeanCollection;
+use AdyenPayment\Exceptions\UmbrellaPaymentMeanNotFoundException;
 use AdyenPayment\Shopware\Provider\PaymentMeansProviderInterface;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
@@ -43,12 +44,17 @@ final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
         // if the stored method is not saved in session it means it was not selected in the payment step
         $storedMethodId = $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
         if (null === $storedMethodId) {
-            $umbrellaPayment = $enrichedPaymentMeans->fetchStoredMethodUmbrellaPaymentMean();
-            if (null === $umbrellaPayment) {
+            $preselectedPaymentId = $userData['additional']['payment']['id'] ?? null;
+            if (null === $preselectedPaymentId) {
                 return;
             }
+
+            $umbrellaPayment = $enrichedPaymentMeans->fetchStoredMethodUmbrellaPaymentMean();
+            if (null === $umbrellaPayment) {
+                throw UmbrellaPaymentMeanNotFoundException::missingUmbrellaPaymentMean();
+            }
             // but if the umbrella payment is in the user data it means a stored method was preselected by the user
-            if ($umbrellaPayment->getId() !== (int) $userData['additional']['payment']['id']) {
+            if ($umbrellaPayment->getId() !== (int) $preselectedPaymentId) {
                 return;
             }
             // we use the saved user preference to get the stored method and allow the rest of the flow work normally

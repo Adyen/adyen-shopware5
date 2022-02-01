@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Tests\Unit\Subscriber\Checkout;
 
 use AdyenPayment\AdyenPayment;
+use AdyenPayment\Exceptions\UmbrellaPaymentMeanNotFoundException;
 use AdyenPayment\Shopware\Provider\PaymentMeansProviderInterface;
 use AdyenPayment\Subscriber\Checkout\EnrichUmbrellaPaymentMeanSubscriber;
 use AdyenPayment\Tests\Unit\Subscriber\SubscriberTestCase;
@@ -67,13 +68,29 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
     }
 
     /** @test */
-    public function it_does_nothing_on_missing_session_stored_method_id(): void
+    public function it_does_nothing_on_missing_session_and_none_preselected_stored_method_id(): void
     {
         $eventArgs = $this->buildEventArgs('shippingPayment', $viewData = ['data' => 'view-data']);
         $eventArgs->getRequest()->setParam('isXHR', false);
 
-        $this->paymentMeansProvider->__invoke()->willReturn([]);
         $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID)->willReturn(null);
+        $this->paymentMeansProvider->__invoke()->willReturn([]);
+
+        $this->subscriber->__invoke($eventArgs);
+        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+    }
+
+    /** @test */
+    public function it_throws_an_exception_on_missing_missing_umbrella_method_for_preselected_payment(): void
+    {
+        $eventArgs = $this->buildEventArgs('shippingPayment', $viewData = [
+            'sUserData' => ['additional' => ['payment' => ['id' => 'preselectedPaymentId']]],
+        ]);
+        $eventArgs->getRequest()->setParam('isXHR', false);
+
+        $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID)->willReturn(null);
+        $this->paymentMeansProvider->__invoke()->willReturn([]);
+        self::expectException(UmbrellaPaymentMeanNotFoundException::class);
 
         $this->subscriber->__invoke($eventArgs);
         $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
@@ -89,6 +106,43 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
         $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID)->willReturn($storedMethodId = 'method-id');
         $this->subscriber->__invoke($eventArgs);
         $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+    }
+
+    /** @test */
+    public function it_use_the_preselected_stored_method_id_on_preselected_umbrella_payment(): void
+    {
+        $eventArgs = $this->buildEventArgs('shippingPayment', $viewData = [
+            'adyenUserPreference' => ['storedMethodId' => $preselectedStoredMethod = 'any-stored-method-id'],
+            'sUserData' => ['additional' => ['payment' => ['id' => $preselectedUmbrellaId = 'umbrellaPaymentId']]],
+            'sFormData' => [],
+        ]);
+        $eventArgs->getRequest()->setParam('isXHR', false);
+
+        $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID)->willReturn(null);
+        $this->paymentMeansProvider->__invoke()->willReturn([
+            $umbrellaPaymentMeanRaw = [
+                'id' => $preselectedUmbrellaId,
+                'name' => AdyenPayment::ADYEN_STORED_PAYMENT_UMBRELLA_CODE,
+                'source' => 123,
+                'adyenType' => 'test',
+            ],
+            $paymentMeanRaw = [
+                'source' => 1234,
+                'adyenType' => 'test',
+                'stored_method_id' => $preselectedStoredMethod,
+                'stored_method_umbrella_id' => $umbrellaId = 'umbrella-id',
+            ],
+        ]);
+
+        $this->subscriber->__invoke($eventArgs);
+
+        $expected = [
+            'adyenUserPreference' => ['storedMethodId' => $preselectedStoredMethod],
+            'sUserData' => ['additional' => ['payment' => $paymentMeanRaw]],
+            'sFormData' => ['payment' => $umbrellaId],
+        ];
+
+        $this->assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
