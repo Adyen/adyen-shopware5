@@ -24,7 +24,11 @@ final class EnrichUserPreferenceSubscriber implements SubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return ['Enlight_Controller_Action_PostDispatch_Frontend' => '__invoke'];
+        return [
+            // inject in the view as early as possible to get the info in the other subscribers
+            'Enlight_Controller_Action_PostDispatch_Frontend_Account' => ['__invoke', -99999],
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout' => ['__invoke', -99999],
+        ];
     }
 
     public function __invoke(\Enlight_Controller_ActionEventArgs $args): void

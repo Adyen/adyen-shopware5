@@ -37,12 +37,27 @@ final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
             return;
         }
 
+        $enrichedPaymentMeans = PaymentMeanCollection::createFromShopwareArray(($this->paymentMeansProvider)());
+        $userData = $subject->View()->getAssign('sUserData');
+
+        // if the stored method is not saved in session it means it was not selected in the payment step
         $storedMethodId = $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
+        if (null === $storedMethodId) {
+            $umbrellaPayment = $enrichedPaymentMeans->fetchStoredMethodUmbrellaPaymentMean();
+            if (null === $umbrellaPayment) {
+                return;
+            }
+            // but if the umbrella payment is in the user data it means a stored method was preselected by the user
+            if ($umbrellaPayment->getId() !== (int) $userData['additional']['payment']['id']) {
+                return;
+            }
+            // we use the saved user preference to get the stored method and allow the rest of the flow work normally
+            $storedMethodId = $args->getSubject()->View()->getAssign('adyenUserPreference')['storedMethodId'] ?? null;
+        }
+
         if (null === $storedMethodId) {
             return;
         }
-
-        $enrichedPaymentMeans = PaymentMeanCollection::createFromShopwareArray(($this->paymentMeansProvider)());
 
         $paymentMean = $enrichedPaymentMeans->fetchByStoredMethodId($storedMethodId);
         if (null === $paymentMean) {

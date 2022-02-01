@@ -72,6 +72,7 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
         $eventArgs = $this->buildEventArgs('shippingPayment', $viewData = ['data' => 'view-data']);
         $eventArgs->getRequest()->setParam('isXHR', false);
 
+        $this->paymentMeansProvider->__invoke()->willReturn([]);
         $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID)->willReturn(null);
 
         $this->subscriber->__invoke($eventArgs);
@@ -84,8 +85,8 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
         $eventArgs = $this->buildEventArgs('shippingPayment', $viewData = ['data' => 'view-data']);
         $eventArgs->getRequest()->setParam('isXHR', false);
 
-        $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID)->willReturn($storedMethodId = 'method-id');
         $this->paymentMeansProvider->__invoke()->willReturn([]);
+        $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID)->willReturn($storedMethodId = 'method-id');
         $this->subscriber->__invoke($eventArgs);
         $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
