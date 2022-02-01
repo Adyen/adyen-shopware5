@@ -263,6 +263,10 @@
 
             var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
 
+            if (this.__isApplePayPaymentMethod(paymentMethod)) {
+                me.setPaymentSession(me.__buildMinimalState(paymentMethod));
+            }
+
             if ('paywithgoogle' === paymentMethod.adyenType) {
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
                 me.handleComponentPayWithGoogle();
@@ -526,8 +530,6 @@
 
             if (this.__isApplePayPaymentMethod(paymentMethod)) {
                 var me = this;
-
-                me.setPaymentSession(me.__buildMinimalState(paymentMethod));
 
                 return $.extend(true, {}, defaultData, {
                     paymentMethodData: {
