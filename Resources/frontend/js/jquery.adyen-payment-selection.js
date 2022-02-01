@@ -263,10 +263,6 @@
 
             var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
 
-            if (me.opts.applePayType === paymentMethod.adyenType) {
-                me.setPaymentSession(me.__buildMinimalState(paymentMethod));
-                var adyenCheckoutData = me.buildComponentApplePay(adyenCheckoutData);
-            }
             if ('paywithgoogle' === paymentMethod.adyenType) {
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
                 me.handleComponentPayWithGoogle();
@@ -280,18 +276,6 @@
         handleComponentPayWithGoogle: function () {
             var me = this;
             $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
-        },
-        buildComponentApplePay: function (adyenCheckoutData) {
-            var me = this;
-
-            return $.extend(true, {}, adyenCheckoutData, {
-                paymentMethodData: {
-                    amount: {
-                        'value': (Number(me.opts.adyenOrderTotal)*100).toString(),
-                        'currency': (me.opts.adyenOrderCurrency).toString()
-                    }
-                }
-            });
         },
         handleOnChange: function (state) {
             var me = this;
@@ -446,6 +430,17 @@
             return paymentMethod.isStoredPayment || false;
         },
         /**
+         *
+         * @param {object} paymentMethod
+         * @return {boolean}
+         * @private
+         */
+        __isApplePayPaymentMethod: function (paymentMethod) {
+            var me = this;
+
+            return me.opts.applePayType === paymentMethod.adyenType;
+        },
+        /**
          * @return {boolean}
          * @private
          */
@@ -525,6 +520,21 @@
                 return $.extend(true, {}, defaultData, {
                     paymentMethodData: {
                         storedPaymentMethodId: paymentMethod.metadata.id
+                    }
+                });
+            }
+
+            if (this.__isApplePayPaymentMethod(paymentMethod)) {
+                var me = this;
+
+                me.setPaymentSession(me.__buildMinimalState(paymentMethod));
+
+                return $.extend(true, {}, defaultData, {
+                    paymentMethodData: {
+                        amount: {
+                            'value': (Number(me.opts.adyenOrderTotal)*100).toString(),
+                            'currency': (me.opts.adyenOrderCurrency).toString()
+                        }
                     }
                 });
             }
