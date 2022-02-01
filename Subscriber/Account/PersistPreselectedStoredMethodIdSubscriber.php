@@ -30,7 +30,7 @@ final class PersistPreselectedStoredMethodIdSubscriber implements SubscriberInte
     public function __invoke(\Enlight_Controller_ActionEventArgs $args): void
     {
         $userId = $this->session->get('sUserId');
-        if (!$userId) {
+        if (null === $userId) {
             return;
         }
 
@@ -42,7 +42,7 @@ final class PersistPreselectedStoredMethodIdSubscriber implements SubscriberInte
         }
 
         $storedMethodId = $this->storedMethodIdFromRequest($request);
-        $this->userPreferenceManager->upsertStoredMethodIdByUserId($userId, $storedMethodId);
+        $this->userPreferenceManager->upsertStoredMethodIdByUserId((int) $userId, $storedMethodId);
     }
 
     private function storedMethodIdFromRequest(Enlight_Controller_Request_Request $request): ?string
