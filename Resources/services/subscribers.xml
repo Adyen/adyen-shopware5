@@ -30,6 +30,9 @@
             <tag name="shopware.event_subscriber"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+        <service id="AdyenPayment\Subscriber\Applepay\MerchantAssociation\PerformanceLoaderSubscriber">
+            <argument>%adyen_payment.plugin_dir%</argument>
+        </service>
 
         <!-- Frontend Subscribers -->
         <service id="AdyenPayment\Subscriber\AddPluginTemplatesSubscriber">
@@ -85,6 +88,9 @@
         </service>
         <service id="AdyenPayment\Subscriber\Checkout\EnrichUserAdditionalPaymentSubscriber">
             <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider" />
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\Applepay\MerchantAssociation\RegisterUrlCountSubscriber">
             <tag name="shopware.event_subscriber"/>
         </service>
     </services>

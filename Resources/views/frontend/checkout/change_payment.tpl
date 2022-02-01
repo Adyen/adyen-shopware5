@@ -45,6 +45,21 @@
         <div class="method--image">
             <img src="{$payment_mean.image}" alt="{$payment_mean.description}"/>
         </div>
+        {$smarty.block.parent}
+    {* Plugin compatibility SwagPaymentPayPalUnified *}
+    {elseif $payment_mean.name|strstr:"SwagPaymentPayPalUnified"}
+        {include file="string:{$payment_mean.additionaldescription|unescape:'html'}"}
+    {else}
+        {$smarty.block.parent}
     {/if}
-    {$smarty.block.parent}
+{/block}
+
+{* Method Description *}
+{block name='frontend_checkout_payment_fieldset_description'}
+    {if $payment_mean.name|strstr:"SwagPaymentPayPal"}
+        <div class="method--description is--last">
+        </div>
+    {else}
+        {$smarty.block.parent}
+    {/if}
 {/block}

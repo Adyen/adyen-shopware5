@@ -4,7 +4,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <!-- Components -->
-        <service id="AdyenPayment\Components\DataConversion" />
+        <service id="AdyenPayment\Components\DataConversion" public="true"/>
         <service id="AdyenPayment\Components\Calculator\PriceCalculationService"/>
         <service id="AdyenPayment\Components\NotificationProcessor">
             <argument type="service" id="adyen_payment.logger.notifications"/>
@@ -18,7 +18,7 @@
             <argument type="service" id="session"/>
             <argument type="service" id="AdyenPayment\Basket\Restore\DetailAttributesRestorer"/>
         </service>
-        <service id="AdyenPayment\Components\Configuration">
+        <service id="AdyenPayment\Components\Configuration" public="true">
             <argument type="service" id="Shopware\Components\Plugin\Configuration\CachedReader"/>
             <argument type="service" id="dbal_connection"/>
         </service>
@@ -164,7 +164,7 @@
             <argument type="service" id="service_container" />
             <argument type="service" id="adyen_payment.logger"/>
         </service>
-        <service id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider">
+        <service id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider" public="true">
             <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethodService"/>
             <argument type="service" id="AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder"/>
             <argument type="service" id="AdyenPayment\Enricher\Payment\PaymentMethodEnricher"/>

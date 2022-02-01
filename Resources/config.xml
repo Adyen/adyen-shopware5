@@ -144,9 +144,36 @@
                                     Shopware.Msg.createGrowlMessage('success', value.responseText)
                                 },
                                 failure: function(response) {
-                                    console.log(response);
                                     if (response.status === 404) {
                                         Shopware.Msg.createGrowlMessage('Plugin Manager', 'A problem occurred while importing Adyen payment methods');
+                                    } else {
+                                        var value = Ext.decode(response.responseText);
+                                        Shopware.Msg.createGrowlMessage('failure', value.responseText)
+                                    }
+                                }
+                            });
+                        }
+                    ]]>
+                </handler>
+            </options>
+        </element>
+        <element type="button">
+            <name>InstallApplePayMerchantAssociation</name>
+            <label lang="en">Install Adyen default ApplePay Merchant Association file</label>
+            <options>
+                <handler>
+                    <![CDATA[
+                        function() {
+                            Ext.Ajax.request({
+                                url: 'InstallApplePayMerchantAssociation/install',
+                                params: {},
+                                success: function(response) {
+                                    var value = Ext.decode(response.responseText);
+                                    Shopware.Msg.createGrowlMessage('success', value.responseText)
+                                },
+                                failure: function(response) {
+                                    if (response.status === 404) {
+                                        Shopware.Msg.createGrowlMessage('Plugin Manager', 'A problem occurred while installing Adyen\'s ApplePay Merchant Association');
                                     } else {
                                         var value = Ext.decode(response.responseText);
                                         Shopware.Msg.createGrowlMessage('failure', value.responseText)
