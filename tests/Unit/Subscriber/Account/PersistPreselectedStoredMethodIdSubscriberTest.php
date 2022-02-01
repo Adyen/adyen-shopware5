@@ -114,7 +114,7 @@ final class PersistPreselectedStoredMethodIdSubscriberTest extends TestCase
         $this->session->get('sUserId')->willReturn($userId = 123456);
         $this->request->getActionName()->willReturn('savePayment');
         $this->request->isPost()->willReturn(true);
-        $this->request->getParam('register', [])->willReturn(['payment' => 'wrongPayment']);
+        $this->request->getParam('register', [])->willReturn(['payment' => 'noneStoredPaymentId']);
         $this->args->getRequest()->willReturn($this->request);
         $this->userPreferenceManager->upsertStoredMethodIdByUserId($userId, null)->shouldBeCalled();
 
