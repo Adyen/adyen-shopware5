@@ -272,9 +272,10 @@
                     * served directly by webserver if rules do not block access
                     * served by shopware front-end route
                 * can be manually installed by backend button in plugin configuration
-                * will fetch the default adyen available file
-                * will fallback to file shipped with the plugin
+                * will fetch the default adyen merchantid-domain-association available file
+                * will fall back to file shipped with the plugin
                 * failsafe on url access if the file is not present it will be attempted to install
+            Plugin compatibility with SwagPayPal
         </changes>
         <changes lang="de">
             ApplePay Merchant id association file
@@ -282,9 +283,10 @@
                     * served directly by webserver if rules do not block access
                     * served by shopware front-end route
                 * can be manually installed by backend button in plugin configuration
-                * will fetch the default adyen available file
-                * will fallback to file shipped with the plugin
+                * will fetch the default adyen merchantid-domain-association available file
+                * will fall back to file shipped with the plugin
                 * failsafe on url access if the file is not present it will be attempted to install
+            Plugin compatibility with SwagPayPal
         </changes>
     </changelog>
 </plugin>
