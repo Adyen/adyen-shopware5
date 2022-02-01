@@ -16,7 +16,7 @@ return (new PhpCsFixer\Config())
             ->name('*.php'))
     ->setRiskyAllowed(true)
     ->setRules([
-        '@PSR2' => true,
+        '@PSR12' => true,
         '@Symfony' => true,
         'align_multiline_comment' => true,
         'array_indentation' => true,
