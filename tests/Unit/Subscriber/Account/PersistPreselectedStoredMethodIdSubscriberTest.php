@@ -109,6 +109,19 @@ final class PersistPreselectedStoredMethodIdSubscriberTest extends TestCase
     }
 
     /** @test */
+    public function it_will_update_the_user_preferences_with_null_for_wrong_params(): void
+    {
+        $this->session->get('sUserId')->willReturn($userId = 123456);
+        $this->request->getActionName()->willReturn('savePayment');
+        $this->request->isPost()->willReturn(true);
+        $this->request->getParam('register', [])->willReturn(['payment' => 'wrongPayment']);
+        $this->args->getRequest()->willReturn($this->request);
+        $this->userPreferenceManager->upsertStoredMethodIdByUserId($userId, null)->shouldBeCalled();
+
+        $this->subscriber->__invoke($this->args->reveal());
+    }
+
+    /** @test */
     public function it_will_update_the_user_preferences_with_param_value(): void
     {
         $this->session->get('sUserId')->willReturn($userId = 123456);
