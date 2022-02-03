@@ -139,6 +139,21 @@ final class PaymentMeanCollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_can_fetch_a_payment_by_stored_method_umbrella_id(): void
+    {
+        $collection = PaymentMeanCollection::createFromShopwareArray([
+            ['id' => 123, 'source' => SourceType::adyen()->getType()],
+            ['id' => $expected = 456, 'source' => '1', 'stored_method_umbrella_id' => $paymentMeanId = 'test123'],
+        ]);
+
+        $result = $collection->fetchByUmbrellaStoredMethodId($paymentMeanId);
+
+        self::assertInstanceOf(PaymentMean::class, $result);
+        self::assertEquals(1, $result->getSource()->getType());
+        self::assertEquals($expected, $result->getId());
+    }
+
+    /** @test */
     public function it_can_fetch_a_payment_by_payment_id(): void
     {
         $filteredSource = SourceType::adyen();

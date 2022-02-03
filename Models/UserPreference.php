@@ -70,12 +70,8 @@ class UserPreference extends ModelEntity
         return $this;
     }
 
-    public function jsonSerialize()
+    public function toArray(): array
     {
-        return [
-            'id' => $this->getId(),
-            'userId' => $this->getUserId(),
-            'storedMethodId' => $this->getStoredMethodId(),
-        ];
+        return get_object_vars($this);
     }
 }

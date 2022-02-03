@@ -16,18 +16,8 @@ final class UserPreferenceManager implements UserPreferenceManagerInterface
         $this->modelManager = $modelManager;
     }
 
-    public function upsertStoredMethodIdByUserId(int $userId, ?string $storedMethodId): void
+    public function save(UserPreference $userPreference): void
     {
-        $userPreferenceRepository = $this->modelManager->getRepository(UserPreference::class);
-        $userPreference = $userPreferenceRepository->findOneBy(['userId' => $userId]);
-
-        if (null === $userPreference) {
-            $userPreference = new UserPreference();
-            $userPreference->setUserId($userId);
-        }
-
-        $userPreference = $userPreference->setStoredMethodId($storedMethodId);
-
         $this->modelManager->persist($userPreference);
         $this->modelManager->flush($userPreference);
     }

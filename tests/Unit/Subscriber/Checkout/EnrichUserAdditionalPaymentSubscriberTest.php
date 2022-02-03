@@ -12,10 +12,12 @@ use AdyenPayment\Subscriber\Checkout\EnrichUserAdditionalPaymentSubscriber;
 use AdyenPayment\Tests\Unit\Subscriber\SubscriberTestCase;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 final class EnrichUserAdditionalPaymentSubscriberTest extends SubscriberTestCase
 {
+    use ProphecyTrait;
     private EnrichUserAdditionalPaymentSubscriber $subscriber;
 
     /** @var EnrichedPaymentMeanProviderInterface|ObjectProphecy */

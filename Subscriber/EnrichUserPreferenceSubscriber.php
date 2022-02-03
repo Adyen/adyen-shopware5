@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
-use AdyenPayment\Models\UserPreference;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
 
 final class EnrichUserPreferenceSubscriber implements SubscriberInterface
 {
     private Enlight_Components_Session_Namespace $session;
-    private EntityManager $modelsManager;
+    private EntityRepository $userPreferenceRepository;
 
     public function __construct(
         Enlight_Components_Session_Namespace $session,
-        EntityManager $modelsManager
+        EntityRepository $userPreferenceRepository
     ) {
         $this->session = $session;
-        $this->modelsManager = $modelsManager;
+        $this->userPreferenceRepository = $userPreferenceRepository;
     }
 
     public static function getSubscribedEvents(): array
@@ -38,11 +37,11 @@ final class EnrichUserPreferenceSubscriber implements SubscriberInterface
             return;
         }
 
-        $userPreference = $this->modelsManager->getRepository(UserPreference::class)->findOneBy(['userId' => $userId]);
+        $userPreference = $this->userPreferenceRepository->findOneBy(['userId' => $userId]);
         if (null === $userPreference) {
             return;
         }
 
-        $args->getSubject()->View()->assign('adyenUserPreference', $userPreference->jsonSerialize());
+        $args->getSubject()->View()->assign('adyenUserPreference', $userPreference->toArray());
     }
 }

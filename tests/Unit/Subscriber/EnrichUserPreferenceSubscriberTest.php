@@ -7,7 +7,6 @@ namespace AdyenPayment\Tests\Unit\Subscriber\Checkout;
 use AdyenPayment\Models\UserPreference;
 use AdyenPayment\Subscriber\EnrichUserPreferenceSubscriber;
 use AdyenPayment\Tests\Unit\Subscriber\SubscriberTestCase;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
@@ -20,16 +19,16 @@ final class EnrichUserPreferenceSubscriberTest extends SubscriberTestCase
     /** @var Enlight_Components_Session_Namespace|ObjectProphecy */
     private $session;
 
-    /** @var EntityManager|ObjectProphecy */
-    private $modelsManager;
+    /** @var EntityRepository|ObjectProphecy */
+    private $userPreferenceRepository;
 
     protected function setUp(): void
     {
         $this->session = $this->prophesize(Enlight_Components_Session_Namespace::class);
-        $this->modelsManager = $this->prophesize(EntityManager::class);
+        $this->userPreferenceRepository = $this->prophesize(EntityRepository::class);
         $this->subscriber = new EnrichUserPreferenceSubscriber(
             $this->session->reveal(),
-            $this->modelsManager->reveal()
+            $this->userPreferenceRepository->reveal()
         );
     }
 
@@ -59,6 +58,7 @@ final class EnrichUserPreferenceSubscriberTest extends SubscriberTestCase
         $eventArgs = $this->buildEventArgs('', $viewData = ['data' => 'view-data']);
 
         $this->subscriber->__invoke($eventArgs);
+
         $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
@@ -66,15 +66,12 @@ final class EnrichUserPreferenceSubscriberTest extends SubscriberTestCase
     public function it_does_nothing_on_missing_user_preference(): void
     {
         $this->session->get('sUserId')->willReturn($userId = 1234);
-
-        $repositoryMock = $this->prophesize(EntityRepository::class);
-        $repositoryMock->findOneBy(['userId' => $userId])->willReturn(null);
-
-        $this->modelsManager->getRepository(UserPreference::class)->willReturn($repositoryMock);
+        $this->userPreferenceRepository->findOneBy(['userId' => $userId])->willReturn(null);
 
         $eventArgs = $this->buildEventArgs('', $viewData = ['data' => 'view-data']);
 
         $this->subscriber->__invoke($eventArgs);
+
         $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
@@ -87,15 +84,12 @@ final class EnrichUserPreferenceSubscriberTest extends SubscriberTestCase
         $userPreference->setId($id = 123123123);
         $userPreference->setUserId($userId);
         $userPreference->setStoredMethodId($storedMethodId = 'storedMethodId');
-
-        $repositoryMock = $this->prophesize(EntityRepository::class);
-        $repositoryMock->findOneBy(['userId' => $userId])->willReturn($userPreference);
-
-        $this->modelsManager->getRepository(UserPreference::class)->willReturn($repositoryMock);
+        $this->userPreferenceRepository->findOneBy(['userId' => $userId])->willReturn($userPreference);
 
         $eventArgs = $this->buildEventArgs('', $viewData = ['data' => 'view-data']);
 
         $this->subscriber->__invoke($eventArgs);
+
         $expected = [
             'data' => 'view-data',
             'adyenUserPreference' => [

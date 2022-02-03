@@ -110,6 +110,17 @@ final class PaymentMeanCollection implements \IteratorAggregate, \Countable
         return null;
     }
 
+    public function fetchByUmbrellaStoredMethodId(string $storedMethodId): ?PaymentMean
+    {
+        foreach ($this->paymentMeans as $paymentMean) {
+            if ($paymentMean->getValue('stored_method_umbrella_id') === $storedMethodId) {
+                return $paymentMean;
+            }
+        }
+
+        return null;
+    }
+
     public function toShopwareArray(): array
     {
         return array_reduce($this->paymentMeans, static function(array $payload, PaymentMean $paymentMean): array {

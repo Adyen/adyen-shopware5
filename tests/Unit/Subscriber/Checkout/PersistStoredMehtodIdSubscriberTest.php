@@ -10,10 +10,12 @@ use AdyenPayment\Tests\Unit\Subscriber\SubscriberTestCase;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 final class PersistStoredMehtodIdSubscriberTest extends SubscriberTestCase
 {
+    use ProphecyTrait;
     private PersistStoredMethodIdSubscriber $subscriber;
 
     /** @var Enlight_Components_Session_Namespace|ObjectProphecy */
