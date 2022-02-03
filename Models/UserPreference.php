@@ -58,9 +58,9 @@ class UserPreference extends ModelEntity
         return $this;
     }
 
-    public function getStoredMethodId(): ?string
+    public function getStoredMethodId(): string
     {
-        return $this->storedMethodId;
+        return (string) $this->storedMethodId;
     }
 
     public function setStoredMethodId(?string $storedMethodId): self
