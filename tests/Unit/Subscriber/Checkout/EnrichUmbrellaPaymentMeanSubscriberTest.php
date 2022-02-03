@@ -56,7 +56,7 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
         $eventArgs = $this->buildEventArgs('', $viewData = ['data' => 'view-data']);
 
         $this->subscriber->__invoke($eventArgs);
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -66,7 +66,7 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
         $eventArgs->getRequest()->setParam('isXHR', true);
 
         $this->subscriber->__invoke($eventArgs);
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -79,7 +79,7 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
         $this->paymentMeansProvider->__invoke()->willReturn([]);
 
         $this->subscriber->__invoke($eventArgs);
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -95,7 +95,7 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
         self::expectException(UmbrellaPaymentMeanNotFoundException::class);
 
         $this->subscriber->__invoke($eventArgs);
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -107,7 +107,7 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
         $this->paymentMeansProvider->__invoke()->willReturn([]);
         $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID)->willReturn($storedMethodId = 'method-id');
         $this->subscriber->__invoke($eventArgs);
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -144,7 +144,7 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
             'sFormData' => ['payment' => $umbrellaId],
         ];
 
-        $this->assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -171,6 +171,6 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
             'sFormData' => ['payment' => $umbrellaId],
         ];
 
-        $this->assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
+use AdyenPayment\Models\UserPreference;
 use Doctrine\ORM\EntityRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
@@ -37,11 +38,12 @@ final class EnrichUserPreferenceSubscriber implements SubscriberInterface
             return;
         }
 
+        /** @var UserPreference $userPreference */
         $userPreference = $this->userPreferenceRepository->findOneBy(['userId' => $userId]);
         if (null === $userPreference) {
             return;
         }
 
-        $args->getSubject()->View()->assign('adyenUserPreference', $userPreference->toArray());
+        $args->getSubject()->View()->assign('adyenUserPreference', $userPreference->mapToView());
     }
 }

@@ -62,7 +62,7 @@ final class EnrichUserAdditionalPaymentSubscriberTest extends SubscriberTestCase
         $eventArgs = $this->buildEventArgs('', $viewData = ['data' => 'view-data']);
 
         $this->subscriber->__invoke($eventArgs);
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -73,7 +73,7 @@ final class EnrichUserAdditionalPaymentSubscriberTest extends SubscriberTestCase
         $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID)->willReturn(null);
 
         $this->subscriber->__invoke($eventArgs);
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -92,7 +92,7 @@ final class EnrichUserAdditionalPaymentSubscriberTest extends SubscriberTestCase
 
         $this->subscriber->__invoke($eventArgs);
 
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -113,7 +113,7 @@ final class EnrichUserAdditionalPaymentSubscriberTest extends SubscriberTestCase
 
         $this->subscriber->__invoke($eventArgs);
 
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -137,7 +137,7 @@ final class EnrichUserAdditionalPaymentSubscriberTest extends SubscriberTestCase
             'sUserData' => ['additional' => ['payment' => $paymentMeanRaw]],
         ];
 
-        $this->assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -163,6 +163,6 @@ final class EnrichUserAdditionalPaymentSubscriberTest extends SubscriberTestCase
             'sUserData' => ['additional' => ['payment' => $paymentMeanRaw]],
         ];
 
-        $this->assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
     }
 }

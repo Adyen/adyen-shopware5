@@ -59,7 +59,7 @@ final class EnrichUserPreferenceSubscriberTest extends SubscriberTestCase
 
         $this->subscriber->__invoke($eventArgs);
 
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -72,7 +72,7 @@ final class EnrichUserPreferenceSubscriberTest extends SubscriberTestCase
 
         $this->subscriber->__invoke($eventArgs);
 
-        $this->assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());
     }
 
     /** @test */
@@ -98,6 +98,6 @@ final class EnrichUserPreferenceSubscriberTest extends SubscriberTestCase
                 'storedMethodId' => $storedMethodId,
             ],
         ];
-        $this->assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
+        self::assertEquals($expected, $eventArgs->getSubject()->View()->getAssign());
     }
 }
