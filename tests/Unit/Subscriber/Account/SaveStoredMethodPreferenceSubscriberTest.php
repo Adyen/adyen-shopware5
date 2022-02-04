@@ -6,7 +6,6 @@ namespace AdyenPayment\Tests\Unit\Subscriber\Checkout;
 
 use AdyenPayment\Components\Adyen\PaymentMethod\StoredPaymentMeanProviderInterface;
 use AdyenPayment\Components\Manager\UserPreferenceManagerInterface;
-use AdyenPayment\Models\Payment\PaymentMean;
 use AdyenPayment\Models\UserPreference;
 use AdyenPayment\Subscriber\Account\SaveStoredMethodPreferenceSubscriber;
 use Doctrine\ORM\EntityRepository;
@@ -158,11 +157,7 @@ final class SaveStoredMethodPreferenceSubscriberTest extends TestCase
             'payment' => 'proper_'.($storedMethodId = 'storedMethodId'),
         ]);
         $this->args->getRequest()->willReturn($this->request->reveal());
-        $storedPaymentMean = PaymentMean::createFromShopwareArray([
-            'source' => 'any',
-            'stored_method_id' => $storedMethodId,
-        ]);
-        $this->storedPaymentMeanProvider->fromRequest($this->request->reveal())->willReturn($storedPaymentMean);
+        $this->storedPaymentMeanProvider->fromRequest($this->request->reveal())->willReturn($storedMethodId);
 
         $userPreference = new UserPreference();
         $userPreference->setUserId($userId);
@@ -183,11 +178,7 @@ final class SaveStoredMethodPreferenceSubscriberTest extends TestCase
             'payment' => 'proper_'.($storedMethodId = 'storedMethodId'),
         ]);
         $this->args->getRequest()->willReturn($this->request->reveal());
-        $storedPaymentMean = PaymentMean::createFromShopwareArray([
-            'source' => 'any',
-            'stored_method_id' => $storedMethodId,
-        ]);
-        $this->storedPaymentMeanProvider->fromRequest($this->request->reveal())->willReturn($storedPaymentMean);
+        $this->storedPaymentMeanProvider->fromRequest($this->request->reveal())->willReturn($storedMethodId);
 
         $userPreference = new UserPreference();
         $userPreference->setId(123);

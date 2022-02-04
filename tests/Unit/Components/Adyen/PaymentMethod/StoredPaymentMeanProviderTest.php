@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Components\Adyen\PaymentMethod;
 
-use AdyenPayment\Collection\Payment\PaymentMeanCollection;
 use AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProviderInterface;
 use AdyenPayment\Components\Adyen\PaymentMethod\StoredPaymentMeanProvider;
 use AdyenPayment\Components\Adyen\PaymentMethod\StoredPaymentMeanProviderInterface;
@@ -30,10 +29,7 @@ final class StoredPaymentMeanProviderTest extends TestCase
         $this->enrichedPaymentMeanProvider = $this->prophesize(EnrichedPaymentMeanProviderInterface::class);
         $this->paymentMeansProvider = $this->prophesize(PaymentMeansProviderInterface::class);
 
-        $this->storedPaymentMeanProvider = new StoredPaymentMeanProvider(
-            $this->enrichedPaymentMeanProvider->reveal(),
-            $this->paymentMeansProvider->reveal(),
-        );
+        $this->storedPaymentMeanProvider = new StoredPaymentMeanProvider();
     }
 
     /** @test */
@@ -54,17 +50,24 @@ final class StoredPaymentMeanProviderTest extends TestCase
     }
 
     /** @test */
-    public function it_will_try_to_provide_a_payment_by_umbrella_stored_method_id(): void
+    public function it_will_return_null_on_none_combined_id_param(): void
     {
         $request = $this->prophesize(Enlight_Controller_Request_Request::class);
-        $request->getParam('register', [])->willReturn(['payment' => $id = 'stored_method_umbrella_id']);
-
-        $emptyCollection = PaymentMeanCollection::createFromShopwareArray([]);
-        $this->enrichedPaymentMeanProvider->__invoke($emptyCollection)->willReturn($emptyCollection);
-        $this->paymentMeansProvider->__invoke()->willReturn([]);
+        $request->getParam('register', [])->willReturn(['payment' => $id = 'anyPaymentId']);
 
         $result = $this->storedPaymentMeanProvider->fromRequest($request->reveal());
 
         self::assertNull($result);
+    }
+
+    /** @test */
+    public function it_will_return_the_stored_method_id_from_a_combined_id_param(): void
+    {
+        $request = $this->prophesize(Enlight_Controller_Request_Request::class);
+        $request->getParam('register', [])->willReturn(['payment' => 'umbrellaId_'.($expectedId = 'storedMethodId')]);
+
+        $result = $this->storedPaymentMeanProvider->fromRequest($request->reveal());
+
+        self::assertEquals($expectedId, $result);
     }
 }

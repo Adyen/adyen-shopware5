@@ -49,8 +49,7 @@ final class SaveStoredMethodPreferenceSubscriber implements SubscriberInterface
             return;
         }
 
-        $storedMethod = $this->storedPaymentMeanProvider->fromRequest($request);
-        $storedMethodId = null !== $storedMethod ? $storedMethod->getValue('stored_method_id') : null;
+        $storedMethodId = $this->storedPaymentMeanProvider->fromRequest($request);
 
         $userPreference = $this->userPreferenceRepository->findOneBy(['userId' => $userId]);
         if (null === $userPreference) {
