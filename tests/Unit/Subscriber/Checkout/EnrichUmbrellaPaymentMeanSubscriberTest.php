@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AdyenPayment\Tests\Unit\Subscriber\Checkout;
 
 use AdyenPayment\AdyenPayment;
-use AdyenPayment\Exceptions\UmbrellaPaymentMeanNotFoundException;
 use AdyenPayment\Shopware\Provider\PaymentMeansProviderInterface;
 use AdyenPayment\Subscriber\Checkout\EnrichUmbrellaPaymentMeanSubscriber;
 use AdyenPayment\Tests\Unit\Subscriber\SubscriberTestCase;
@@ -92,7 +91,6 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
 
         $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID)->willReturn(null);
         $this->paymentMeansProvider->__invoke()->willReturn([]);
-        self::expectException(UmbrellaPaymentMeanNotFoundException::class);
 
         $this->subscriber->__invoke($eventArgs);
         self::assertEquals($viewData, $eventArgs->getSubject()->View()->getAssign());

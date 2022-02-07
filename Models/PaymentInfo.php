@@ -291,7 +291,7 @@ class PaymentInfo extends ModelEntity
         return (string) $this->storedMethodId;
     }
 
-    public function setStoredMethodId(string $storedMethodId): self
+    public function setStoredMethodId(?string $storedMethodId): self
     {
         $this->storedMethodId = $storedMethodId;
 
