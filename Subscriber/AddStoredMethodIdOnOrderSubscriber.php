@@ -30,7 +30,7 @@ final class AddStoredMethodIdOnOrderSubscriber implements SubscriberInterface
     public function persistPaymentInfoStoredMethodId(Enlight_Event_EventArgs $args)
     {
         $paymentInfoId = Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_PAYMENT_INFO_ID);
-        $storedMethodId = Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
+        $storedMethodId = Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, '');
 
         if (null === $paymentInfoId) {
             return $args->getReturn();
