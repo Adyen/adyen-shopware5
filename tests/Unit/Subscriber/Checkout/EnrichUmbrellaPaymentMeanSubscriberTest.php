@@ -82,7 +82,7 @@ final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_on_missing_missing_umbrella_method_for_preselected_payment(): void
+    public function it_does_nothing_on_missing_missing_umbrella_method_for_preselected_payment(): void
     {
         $eventArgs = $this->buildEventArgs('shippingPayment', $viewData = [
             'sUserData' => ['additional' => ['payment' => ['id' => 'preselectedPaymentId']]],
