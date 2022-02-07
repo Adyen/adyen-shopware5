@@ -56,6 +56,7 @@
         <service id="AdyenPayment\Subscriber\AddStoredMethodIdOnOrderSubscriber">
             <tag name="shopware.event_subscriber"/>
             <argument type="service" id="models"/>
+            <argument type="service" id="session"/>
         </service>
         <service id="AdyenPayment\Subscriber\CheckoutSubscriber">
             <tag name="shopware.event_subscriber"/>

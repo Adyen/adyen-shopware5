@@ -8,6 +8,7 @@ use AdyenPayment\AdyenPayment;
 use AdyenPayment\Models\PaymentInfo;
 use Doctrine\Persistence\ObjectRepository;
 use Enlight\Event\SubscriberInterface;
+use Enlight_Components_Session_Namespace;
 use Enlight_Event_EventArgs;
 use Shopware\Components\Model\ModelManager;
 
@@ -15,11 +16,13 @@ final class AddStoredMethodIdOnOrderSubscriber implements SubscriberInterface
 {
     private ModelManager $modelManager;
     private ObjectRepository $paymentInfoRepository;
+    private Enlight_Components_Session_Namespace $session;
 
-    public function __construct(ModelManager $modelManager)
+    public function __construct(ModelManager $modelManager, Enlight_Components_Session_Namespace $session)
     {
         $this->modelManager = $modelManager;
         $this->paymentInfoRepository = $this->modelManager->getRepository(PaymentInfo::class);
+        $this->session = $session;
     }
 
     public static function getSubscribedEvents()
@@ -29,8 +32,8 @@ final class AddStoredMethodIdOnOrderSubscriber implements SubscriberInterface
 
     public function persistPaymentInfoStoredMethodId(Enlight_Event_EventArgs $args)
     {
-        $paymentInfoId = Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_PAYMENT_INFO_ID);
-        $storedMethodId = Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, '');
+        $paymentInfoId = $this->session->get(AdyenPayment::SESSION_ADYEN_PAYMENT_INFO_ID);
+        $storedMethodId = (string) $this->session->get(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, '');
 
         if (null === $paymentInfoId) {
             return $args->getReturn();
