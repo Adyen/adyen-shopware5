@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Customer\Customer;
 
-final class PaymentMethodService
+final class PaymentMethodService implements PaymentMethodServiceInterface
 {
     /** @todo cleanup the public const (unify the services) */
     public const IMPORT_LOCALE = 'en_GB';

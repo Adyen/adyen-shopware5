@@ -38,6 +38,11 @@ final class PaymentMean
         return $this->source;
     }
 
+    public function isHidden(): bool
+    {
+        return (bool) ($this->raw['hide'] ?? false);
+    }
+
     public function getAttribute(): Attribute
     {
         return $this->raw['attribute'] ?? new Attribute();
@@ -59,11 +64,7 @@ final class PaymentMean
 
     public function getAdyenStoredMethodId(): string
     {
-        if ($this->getAttribute()->exists(AdyenPayment::ADYEN_STORED_METHOD_ID)) {
-            return (string) $this->getAttribute()->get(AdyenPayment::ADYEN_STORED_METHOD_ID);
-        }
-
-        return '';
+        return (string) $this->getValue('stored_method_id', '');
     }
 
     public function adyenType(): ?PaymentType

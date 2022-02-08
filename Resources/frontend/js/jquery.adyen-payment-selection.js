@@ -122,10 +122,19 @@
         },
         onPaymentFormSubmit: function (e) {
             var me = this;
-            if ($(me.opts.paymentMethodFormSubmitSelector).hasClass('is--disabled')) {
+            var $formSubmit = $(me.opts.paymentMethodFormSubmitSelector);
+            if ($formSubmit.hasClass('is--disabled')) {
                 e.preventDefault();
                 return false;
             }
+            var $paymentElement = $('#' + me.selectedPaymentElementId)[0];
+            var paymentMethod = this.getPaymentMethodById($paymentElement.value);
+            if(paymentMethod.isStoredPayment){
+                $formSubmit.append(
+                    $('<input type="hidden" name="adyenStoredMethodId" value="'+paymentMethod.stored_method_id+'"/>')
+                );
+            }
+            $paymentElement.value = paymentMethod.id;
         },
         isPaymentElement: function (elementId) {
             return $('#' + elementId).parents(this.opts.paymentMethodSelector).length > 0;
@@ -142,7 +151,10 @@
             }
 
             me.selectedPaymentElementId = selectedPaymentElementId;
-            me.selectedPaymentId = $(event.target).val();
+
+            var elementValue = $(event.target).val();
+            var paymentMethod = this.getPaymentMethodById(elementValue);
+            me.selectedPaymentId = paymentMethod.isStoredPayment ? paymentMethod.stored_method_id : elementValue;
 
             var paymentMethodSession = this.getPaymentSession();
             if (0 === Object.keys(paymentMethodSession).length) {
@@ -234,8 +246,10 @@
         getPaymentMethodById: function (id) {
             var me = this;
 
-            return me.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
-                return enrichedPaymentMethod.id === id;
+            return me.opts.enrichedPaymentMethods.filter(function(paymentMethod) {
+                return paymentMethod.id === id || (
+                    paymentMethod.isStoredPayment === true
+                    && (paymentMethod.stored_method_id === id || paymentMethod.stored_method_umbrella_id === id));
             })[0] || {};
         },
         /**
@@ -503,10 +517,7 @@
          * @private
          */
         __enableStoreDetails: function (paymentMethod) {
-            // ignore property "paymentMethod.supportsRecurring"
-            // return 'scheme' === paymentMethod.adyenType;
-            // @fixme temporarily disable stored payment details
-            return false;
+            return 'scheme' === paymentMethod.adyenType;
         },
         /**
          * Modify AdyenPaymentMethod with additional data for the web-component library
