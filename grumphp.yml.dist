@@ -25,7 +25,7 @@ grumphp:
                 - 'die('
                 - 'dump('
                 - 'exit;'
-                - "\\bdd\\b\\("
+                - "\\bdd\\b("
             triggered_by: [php,js,tpl]
         file_size:
             max_size: 5M

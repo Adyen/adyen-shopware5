@@ -8,6 +8,10 @@
             <argument type="service" id="AdyenPayment\Components\Adyen\ApiFactory"/>
             <argument type="service" id="adyen_payment.logger"/>
         </service>
+        <service id="AdyenPayment\Components\Adyen\PaymentMethod\StoredPaymentMeanProvider">
+            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider"/>
+            <argument type="service" id="dbal_connection"/>
+        </service>
     </services>
 </container>
 
