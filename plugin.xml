@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.3.0</version>
+    <version>3.3.1</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -287,6 +287,14 @@
                 * will fall back to file shipped with the plugin
                 * failsafe on url access if the file is not present it will be attempted to install
             Plugin compatibility with SwagPayPal
+        </changes>
+    </changelog>
+    <changelog version="3.3.1">
+        <changes lang="en">
+            Same release as 3.3.0, but alternate working for archive file
+        </changes>
+        <changes lang="de">
+            Same release as 3.3.0, but alternate working for archive file
         </changes>
     </changelog>
 </plugin>
