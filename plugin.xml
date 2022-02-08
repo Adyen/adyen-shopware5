@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.3.1</version>
+    <version>3.4.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -295,6 +295,14 @@
         </changes>
         <changes lang="de">
             Same release as 3.3.0, but alternate working for archive file
+        </changes>
+    </changelog>
+    <changelog version="3.4.0">
+        <changes lang="en">
+            Enable Adyen's stored payment methods feature
+        </changes>
+        <changes lang="de">
+            Enable Adyen's stored payment methods feature
         </changes>
     </changelog>
 </plugin>
