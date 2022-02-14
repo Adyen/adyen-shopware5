@@ -178,5 +178,8 @@
         </service>
         <service id="AdyenPayment\Components\Adyen\PaymentMethod\ImageLogoProvider">
         </service>
+        <service id="AdyenPayment\Components\Adyen\PaymentResultCodeHandler">
+            <argument type="service" id="AdyenPayment\Components\BasketService"/>
+        </service>
     </services>
 </container>

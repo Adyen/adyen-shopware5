@@ -6,7 +6,8 @@ use AdyenPayment\Components\BasketService;
 use AdyenPayment\Components\Manager\AdyenManager;
 use AdyenPayment\Components\Manager\OrderManagerInterface;
 use AdyenPayment\Components\OrderMailService;
-use AdyenPayment\Models\Enum\PaymentResultCodes;
+use AdyenPayment\Models\PaymentResultCodes;
+use AdyenPayment\Session\ErrorMessageProvider;
 use AdyenPayment\Session\MessageProvider;
 use AdyenPayment\Utils\RequestDataFormatter;
 use Shopware\Components\CSRFWhitelistAware;
@@ -43,14 +44,14 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
      */
     public function preDispatch()
     {
-        $this->adyenManager = $this->get('AdyenPayment\Components\Manager\AdyenManager');
-        $this->adyenCheckout = $this->get('AdyenPayment\Components\Adyen\PaymentMethodService');
-        $this->basketService = $this->get('AdyenPayment\Components\BasketService');
-        $this->orderMailService = $this->get('AdyenPayment\Components\OrderMailService');
+        $this->adyenManager = $this->get(AdyenManager::class);
+        $this->adyenCheckout = $this->get(PaymentMethodService::class);
+        $this->basketService = $this->get(BasketService::class);
+        $this->orderMailService = $this->get(OrderMailService::class);
         $this->logger = $this->get('adyen_payment.logger');
-        $this->orderManager = $this->get('AdyenPayment\Components\Manager\OrderManager');
+        $this->orderManager = $this->get(OrderManagerInterface::class);
         $this->snippets = $this->get('snippets');
-        $this->errorMessageProvider = $this->get('AdyenPayment\Session\ErrorMessageProvider');
+        $this->errorMessageProvider = $this->get(ErrorMessageProvider::class);
     }
 
     /**
@@ -70,10 +71,10 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
             $result = $this->validateResponse($response, $order);
             $this->handleReturnResult($result, $order);
 
-            switch ($result['resultCode']) {
-                case PaymentResultCodes::AUTHORISED:
-                case PaymentResultCodes::PENDING:
-                case PaymentResultCodes::RECEIVED:
+            switch(PaymentResultCodes::load($result['resultCode'])) {
+                case PaymentResultCodes::authorised():
+                case PaymentResultCodes::pending():
+                case PaymentResultCodes::received():
                     if (!empty($result['merchantReference'])) {
                         $this->orderMailService->sendOrderConfirmationMail($result['merchantReference']);
                     }
@@ -84,9 +85,9 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                         'sAGB' => true,
                     ]);
                     break;
-                case PaymentResultCodes::CANCELLED:
-                case PaymentResultCodes::ERROR:
-                case PaymentResultCodes::REFUSED:
+                case PaymentResultCodes::cancelled():
+                case PaymentResultCodes::error():
+                case PaymentResultCodes::refused():
                 default:
                     $this->errorMessageProvider->add(
                         $this->snippets->getNamespace('adyen/checkout/error')
@@ -121,18 +122,18 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
             return;
         }
 
-        switch ($result['resultCode']) {
-            case PaymentResultCodes::AUTHORISED:
-            case PaymentResultCodes::PENDING:
-            case PaymentResultCodes::RECEIVED:
+        switch (PaymentResultCodes::load($result['resultCode'])) {
+            case PaymentResultCodes::authorised():
+            case PaymentResultCodes::pending():
+            case PaymentResultCodes::received():
                 $paymentStatus = $this->getModelManager()->find(
                     Status::class,
                     Status::PAYMENT_STATE_THE_PAYMENT_HAS_BEEN_ORDERED
                 );
                 break;
-            case PaymentResultCodes::CANCELLED:
-            case PaymentResultCodes::ERROR:
-            case PaymentResultCodes::REFUSED:
+            case PaymentResultCodes::cancelled():
+            case PaymentResultCodes::error():
+            case PaymentResultCodes::refused():
                 $paymentStatus = $this->getModelManager()->find(
                     Status::class,
                     Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED
