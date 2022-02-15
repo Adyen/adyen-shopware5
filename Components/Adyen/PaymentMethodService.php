@@ -10,10 +10,8 @@ use Adyen\Util\Currency;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Models\Enum\Channel;
-use Enlight_Components_Session_Namespace;
+use AdyenPayment\Shopware\Provider\CustomerNumberProviderInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Components\Model\ModelManager;
-use Shopware\Models\Customer\Customer;
 
 final class PaymentMethodService implements PaymentMethodServiceInterface
 {
@@ -23,21 +21,18 @@ final class PaymentMethodService implements PaymentMethodServiceInterface
     private Configuration $configuration;
     private array $cache;
     private LoggerInterface $logger;
-    private Enlight_Components_Session_Namespace $session;
-    private ModelManager $modelManager;
+    private CustomerNumberProviderInterface $customerNumberProvider;
 
     public function __construct(
         ApiClientMap $apiClientMap,
         Configuration $configuration,
         LoggerInterface $logger,
-        Enlight_Components_Session_Namespace $session,
-        ModelManager $modelManager
+        CustomerNumberProviderInterface $customerNumberProvider
     ) {
         $this->apiClientMap = $apiClientMap;
         $this->configuration = $configuration;
         $this->logger = $logger;
-        $this->session = $session;
-        $this->modelManager = $modelManager;
+        $this->customerNumberProvider = $customerNumberProvider;
     }
 
     /**
@@ -70,7 +65,7 @@ final class PaymentMethodService implements PaymentMethodServiceInterface
             ],
             'channel' => Channel::WEB,
             'shopperLocale' => $locale,
-            'shopperReference' => $this->provideCustomerNumber(),
+            'shopperReference' => ($this->customerNumberProvider)(),
         ];
 
         try {
@@ -120,16 +115,5 @@ final class PaymentMethodService implements PaymentMethodServiceInterface
                 Shopware()->Shop()
             )
         );
-    }
-
-    private function provideCustomerNumber(): string
-    {
-        $userId = $this->session->get('sUserId');
-        if (!$userId) {
-            return '';
-        }
-        $customer = $this->modelManager->getRepository(Customer::class)->find($userId);
-
-        return $customer ? (string) $customer->getNumber() : '';
     }
 }
