@@ -62,18 +62,6 @@ class ShopperInteractionTest extends TestCase
     }
 
     /** @test  */
-    public function it_can_check_it_is_equal_to_another_value_object(): void
-    {
-        $this->assertTrue(ShopperInteraction::ecommerce()->equals(ShopperInteraction::ecommerce()));
-    }
-
-    /** @test  */
-    public function it_can_check_it_is_not_equal_to_another_value_object(): void
-    {
-        $this->assertFalse(ShopperInteraction::ecommerce()->equals(ShopperInteraction::contAuth()));
-    }
-
-    /** @test  */
     public function it_can_load_a_shopper_interaction(): void
     {
         $result = ShopperInteraction::ecommerce();
