@@ -8,7 +8,9 @@ final class ShopperInteraction
 {
     private const CONTAUTH = 'ContAuth';
     private const ECOMMERCE = 'Ecommerce';
-    private string $value;
+    private const MOTO = 'Moto';
+    private const POS = 'POS';
+    private string $shopperInteraction;
 
     private function __construct(string $shopperInteraction)
     {
@@ -16,30 +18,22 @@ final class ShopperInteraction
             throw new \InvalidArgumentException('Invalid shopper interaction: "'.$shopperInteraction.'"');
         }
 
-        $this->value = $shopperInteraction;
+        $this->shopperInteraction = $shopperInteraction;
     }
 
-    public function value(): string
+    public function shopperInteraction(): string
     {
-        return $this->value;
+        return $this->shopperInteraction;
     }
 
     public function equals(ShopperInteraction $paymentShopperInteraction): bool
     {
-        return $paymentShopperInteraction->value() === $this->value;
+        return $paymentShopperInteraction->shopperInteraction() === $this->shopperInteraction;
     }
 
     public static function load(string $shopperInteraction): self
     {
         return new self($shopperInteraction);
-    }
-
-    private function availableShopperInteractions(): array
-    {
-        return [
-            self::CONTAUTH,
-            self::ECOMMERCE,
-        ];
     }
 
     public static function contAuth(): self
@@ -50,5 +44,15 @@ final class ShopperInteraction
     public static function ecommerce(): self
     {
         return new self(self::ECOMMERCE);
+    }
+
+    private function availableShopperInteractions(): array
+    {
+        return [
+            self::CONTAUTH,
+            self::ECOMMERCE,
+            self::MOTO,
+            self::POS,
+        ];
     }
 }

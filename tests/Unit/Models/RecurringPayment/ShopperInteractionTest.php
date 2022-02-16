@@ -9,19 +9,41 @@ use PHPUnit\Framework\TestCase;
 
 class ShopperInteractionTest extends TestCase
 {
-    /** @test */
-    public function it_can_construct_through_named_constructor(): void
+    private ShopperInteraction $shopperInteraction;
+
+    protected function setUp(): void
     {
-        $this->assertInstanceOf(ShopperInteraction::class, ShopperInteraction::contAuth());
+        $this->shopperInteraction = ShopperInteraction::contAuth();
+    }
+
+    /** @test */
+    public function it_contains_a_shopper_interaction(): void
+    {
+        $this->assertInstanceOf(ShopperInteraction::class, $this->shopperInteraction);
+    }
+
+    /** @test */
+    public function it_can_compare_shopper_interaction_objects(): void
+    {
+        $this->assertTrue($this->shopperInteraction->equals(ShopperInteraction::contAuth()));
+        $this->assertFalse($this->shopperInteraction->equals(ShopperInteraction::ecommerce()));
+    }
+
+    /** @test */
+    public function it_checks_shopper_interaction_on_immutabillity(): void
+    {
+        $shopperInteractionContAuth = ShopperInteraction::contAuth();
+        $this->assertEquals($this->shopperInteraction, $shopperInteractionContAuth);
+        $this->assertNotSame($this->shopperInteraction, $shopperInteractionContAuth);
     }
 
     /**
      * @dataProvider shopperInteractionProvider
      * @test
      */
-    public function it_contains_shopper_interaction(ShopperInteraction $shopperInteraction, string $expected): void
+    public function it_can_be_constructed_with_named_constructors(ShopperInteraction $shopperInteraction, string $expected): void
     {
-        $this->assertEquals($expected, $shopperInteraction->value());
+        $this->assertEquals($expected, $shopperInteraction->shopperInteraction());
     }
 
     public function shopperInteractionProvider(): \Generator
@@ -54,9 +76,7 @@ class ShopperInteractionTest extends TestCase
     /** @test  */
     public function it_can_load_a_shopper_interaction(): void
     {
-        $this->assertEquals(
-            ShopperInteraction::ecommerce(),
-            ShopperInteraction::load('Ecommerce')
-        );
+        $result = ShopperInteraction::ecommerce();
+        $this->assertEquals(ShopperInteraction::ecommerce(), $result);
     }
 }
