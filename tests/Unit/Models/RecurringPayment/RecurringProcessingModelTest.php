@@ -9,10 +9,32 @@ use PHPUnit\Framework\TestCase;
 
 class RecurringProcessingModelTest extends TestCase
 {
-    /** @test */
-    public function it_can_construct_through_named_constructor(): void
+    private RecurringProcessingModel $recurringProcessingModel;
+
+    protected function setUp(): void
     {
-        $this->assertInstanceOf(RecurringProcessingModel::class, RecurringProcessingModel::cardOnFile());
+        $this->recurringProcessingModel = RecurringProcessingModel::cardOnFile();
+    }
+
+    /** @test */
+    public function it_contains_a_recurring_processing_model(): void
+    {
+        $this->assertInstanceOf(RecurringProcessingModel::class, $this->recurringProcessingModel);
+    }
+
+    /** @test */
+    public function it_can_compare_recurring_processing_model_objects(): void
+    {
+        $this->assertTrue($this->recurringProcessingModel->equals(RecurringProcessingModel::cardOnFile()));
+        $this->assertFalse($this->recurringProcessingModel->equals(RecurringProcessingModel::subscription()));
+    }
+
+    /** @test */
+    public function it_checks_recurring_processing_model_on_immutabillity(): void
+    {
+        $recurringProcessingModel = RecurringProcessingModel::cardOnFile();
+        $this->assertEquals($this->recurringProcessingModel, $recurringProcessingModel);
+        $this->assertNotSame($this->recurringProcessingModel, $recurringProcessingModel);
     }
 
     /**
@@ -22,7 +44,7 @@ class RecurringProcessingModelTest extends TestCase
     public function it_contains_recurring_processing_model(
         RecurringProcessingModel $recurringProcessingModel, string $expected
     ): void {
-        $this->assertEquals($expected, $recurringProcessingModel->value());
+        $this->assertEquals($expected, $recurringProcessingModel->recurringProcessingModel());
     }
 
     public function recurringProcessingModelProvider(): \Generator
@@ -38,18 +60,6 @@ class RecurringProcessingModelTest extends TestCase
         $this->expectExceptionMessage('Invalid recurring processing model: "test"');
 
         RecurringProcessingModel::load('test');
-    }
-
-    /** @test  */
-    public function it_can_check_it_is_equal_to_another_value_object(): void
-    {
-        $this->assertTrue(RecurringProcessingModel::cardOnFile()->equals(RecurringProcessingModel::cardOnFile()));
-    }
-
-    /** @test  */
-    public function it_can_check_it_is_not_equal_to_another_value_object(): void
-    {
-        $this->assertFalse(RecurringProcessingModel::cardOnFile()->equals(RecurringProcessingModel::subscription()));
     }
 
     /** @test  */

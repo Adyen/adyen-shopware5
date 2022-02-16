@@ -8,7 +8,8 @@ final class RecurringProcessingModel
 {
     private const CARDONFILE = 'CardOnFile';
     private const SUBSCRIPTION = 'Subscription';
-    private string $value;
+    private const UNSCHEDULED_CARD_ON_FILE = 'UnscheduledCardOnFile';
+    private string $recurringProcessingModel;
 
     private function __construct(string $recurringProcessingModel)
     {
@@ -16,30 +17,22 @@ final class RecurringProcessingModel
             throw new \InvalidArgumentException('Invalid recurring processing model: "'.$recurringProcessingModel.'"');
         }
 
-        $this->value = $recurringProcessingModel;
+        $this->recurringProcessingModel = $recurringProcessingModel;
     }
 
-    public function value(): string
+    public function recurringProcessingModel(): string
     {
-        return $this->value;
+        return $this->recurringProcessingModel;
     }
 
     public function equals(RecurringProcessingModel $recurringProcessingModel): bool
     {
-        return $recurringProcessingModel->value() === $this->value;
+        return $recurringProcessingModel->recurringProcessingModel() === $this->recurringProcessingModel;
     }
 
     public static function load(string $recurringProcessingModel): self
     {
         return new self($recurringProcessingModel);
-    }
-
-    private function availableRecurringProcessingModels(): array
-    {
-        return [
-            self::CARDONFILE,
-            self::SUBSCRIPTION,
-        ];
     }
 
     public static function cardOnFile(): self
@@ -50,5 +43,14 @@ final class RecurringProcessingModel
     public static function subscription(): self
     {
         return new self(self::SUBSCRIPTION);
+    }
+
+    private function availableRecurringProcessingModels(): array
+    {
+        return [
+            self::CARDONFILE,
+            self::SUBSCRIPTION,
+            self::UNSCHEDULED_CARD_ON_FILE,
+        ];
     }
 }
