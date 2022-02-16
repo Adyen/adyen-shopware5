@@ -37,7 +37,7 @@
             <argument type="service" id="AdyenPayment\Components\Adyen\ApiClientMap"/>
             <argument type="service" id="AdyenPayment\Components\Configuration"/>
             <argument type="service" id="adyen_payment.logger"/>
-            <argument type="service" id="AdyenPayment\Shopware\Provider\CustomerNumberProvider"/>
+            <argument type="service" id="AdyenPayment\Session\CustomerNumberProvider"/>
         </service>
         <service id="AdyenPayment\Components\Adyen\RefundService" public="true">
             <argument type="service" id="AdyenPayment\Components\Adyen\ApiClientMap"/>

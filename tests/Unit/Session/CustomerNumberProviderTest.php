@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Unit\Shopware\Provider;
+namespace Unit\Session;
 
-use AdyenPayment\Shopware\Provider\CustomerNumberProvider;
-use AdyenPayment\Shopware\Provider\CustomerNumberProviderInterface;
+use AdyenPayment\Session\CustomerNumberProvider;
+use AdyenPayment\Session\CustomerNumberProviderInterface;
 use Doctrine\ORM\EntityRepository;
 use Enlight_Components_Session_Namespace;
 use PHPUnit\Framework\TestCase;
@@ -42,7 +42,7 @@ class CustomerNumberProviderTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_empty_string_when_no_user_id_in_session(): void
+    public function it_provides_empty_string_when_no_user_id_in_session(): void
     {
         $this->session->get('sUserId')->shouldBeCalledOnce()->willReturn(null);
         $this->modelManager->getRepository(Customer::class)->shouldNotBeCalled();
@@ -52,7 +52,7 @@ class CustomerNumberProviderTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_empty_string_when_no_customer_returned_from_repository(): void
+    public function it_provides_empty_string_when_no_customer_returned_from_repository(): void
     {
         $customerRepository = $this->prophesize(EntityRepository::class);
 
@@ -67,7 +67,7 @@ class CustomerNumberProviderTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_customer_number(): void
+    public function it_provides_customer_number(): void
     {
         $customer = new Customer();
         $customer->setNumber($customerNumber = 'abc');

@@ -10,7 +10,7 @@ use Adyen\Util\Currency;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Models\Enum\Channel;
-use AdyenPayment\Shopware\Provider\CustomerNumberProviderInterface;
+use AdyenPayment\Session\CustomerNumberProviderInterface;
 use Psr\Log\LoggerInterface;
 
 final class PaymentMethodService implements PaymentMethodServiceInterface

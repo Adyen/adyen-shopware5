@@ -7,9 +7,5 @@
             <argument type="service" id="adyen_payment.logger"/>
         </service>
         <service id="AdyenPayment\Shopware\Provider\PaymentMeansProvider"/>
-        <service id="AdyenPayment\Shopware\Provider\CustomerNumberProvider">
-            <argument type="service" id="session"/>
-            <argument type="service" id="models"/>
-        </service>
     </services>
 </container>

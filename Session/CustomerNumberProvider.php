@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Shopware\Provider;
+namespace AdyenPayment\Session;
 
 use Enlight_Components_Session_Namespace;
 use Shopware\Components\Model\ModelManager;

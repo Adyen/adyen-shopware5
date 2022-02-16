@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Shopware\Provider;
+namespace AdyenPayment\Session;
 
 interface CustomerNumberProviderInterface
 {
