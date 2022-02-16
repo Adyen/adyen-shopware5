@@ -7,6 +7,7 @@ namespace Unit\Models\RecurringPayment;
 use AdyenPayment\Models\PaymentResultCodes;
 use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
 use PHPUnit\Framework\TestCase;
+use Shopware\Components\Model\ModelEntity;
 
 class RecurringPaymentTokenTest extends TestCase
 {
@@ -23,6 +24,12 @@ class RecurringPaymentTokenTest extends TestCase
             $amountValue = 10500,
             $amountCurrency = 'EUR'
         );
+    }
+
+    /** @test */
+    public function it_is_a_model_entity(): void
+    {
+        $this->assertInstanceOf(ModelEntity::class, $this->recurringPaymentToken);
     }
 
     /** @test */
@@ -58,7 +65,6 @@ class RecurringPaymentTokenTest extends TestCase
     /** @test */
     public function it_contains_an_amount_value(): void
     {
-        $this->assertIsInt($this->recurringPaymentToken->amountValue());
         $this->assertEquals(10500, $this->recurringPaymentToken->amountValue());
     }
 
@@ -71,13 +77,24 @@ class RecurringPaymentTokenTest extends TestCase
     /** @test */
     public function it_contains_a_created_at_timestamp(): void
     {
+        $createdAt = new \DateTimeImmutable();
+        $this->recurringPaymentToken->setCreatedAt($createdAt);
         $this->assertInstanceOf(\DateTimeImmutable::class, $this->recurringPaymentToken->createdAt());
+        $this->assertStringContainsString(
+            $createdAt->format('d/m/y'),
+            $this->recurringPaymentToken->createdAt()->format('d/m/y')
+        );
     }
 
     /** @test */
     public function it_contains_an_updated_at_timestamp(): void
     {
+        $updatedAt = new \DateTimeImmutable();
         $this->assertInstanceOf(\DateTimeImmutable::class, $this->recurringPaymentToken->updatedAt());
+        $this->assertStringContainsString(
+            $updatedAt->format('d/m/y'),
+            $this->recurringPaymentToken->updatedAt()->format('d/m/y')
+        );
     }
 
     /** @test */
@@ -89,17 +106,6 @@ class RecurringPaymentTokenTest extends TestCase
     /** @test */
     public function it_knows_when_it_is_a_subscription(): void
     {
-        $recurringPaymentTokenOrderNumberNull = RecurringPaymentToken::create(
-            'YOUR_UNIQUE_SHOPPER_ID_IOfW3k9G2PvXFu2j',
-            '8415698462516992',
-            '8515815919501547',
-            $orderNumber = null,
-            PaymentResultCodes::authorised(),
-            10500,
-            'EUR'
-        );
-        $this->assertTrue($recurringPaymentTokenOrderNumberNull->isSubscription());
-
         $recurringPaymentTokenOrderNumberEmpty = RecurringPaymentToken::create(
             'YOUR_UNIQUE_SHOPPER_ID_IOfW3k9G2PvXFu2j',
             '8415698462516992',

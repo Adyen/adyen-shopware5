@@ -10,7 +10,11 @@ use Shopware\Components\Model\ModelEntity;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="s_plugin_adyen_payment_recurring_payment_token")
+ * @ORM\Table(name="s_plugin_adyen_payment_recurring_payment_token", indexes={
+ *     @ORM\Index(name="idx_customer_id", columns={"customer_id"}),
+ *     @ORM\Index(name="idx_psp_reference", columns={"psp_reference"}),
+ *     @ORM\Index(name="idx_order_number", columns={"order_number"})
+ * })
  */
 class RecurringPaymentToken extends ModelEntity
 {
@@ -22,7 +26,7 @@ class RecurringPaymentToken extends ModelEntity
     private int $id;
 
     /**
-     * @ORM\Column(name="customer_id", type="text", nullable=false)
+     * @ORM\Column(name="customer_id", type="string", length=255, nullable=false)
      */
     private string $customerId;
 
@@ -32,12 +36,12 @@ class RecurringPaymentToken extends ModelEntity
     private string $recurringDetailReference;
 
     /**
-     * @ORM\Column(name="psp_reference", type="text", nullable=false)
+     * @ORM\Column(name="psp_reference", type="string", length=255, nullable=false)
      */
     private string $pspReference;
 
     /**
-     * @ORM\Column(name="order_number", type="text", nullable=false)
+     * @ORM\Column(name="order_number", type="string", length=255, nullable=false)
      */
     private string $orderNumber = '';
 
@@ -76,7 +80,7 @@ class RecurringPaymentToken extends ModelEntity
         string $customerId,
         string $recurringDetailReference,
         string $pspReference,
-        ?string $orderNumber,
+        string $orderNumber,
         PaymentResultCodes $resultCode,
         int $amountValue,
         string $amountCurrency
@@ -85,7 +89,7 @@ class RecurringPaymentToken extends ModelEntity
         $new->customerId = $customerId;
         $new->recurringDetailReference = $recurringDetailReference;
         $new->pspReference = $pspReference;
-        $new->orderNumber = $orderNumber ?? '';
+        $new->orderNumber = $orderNumber;
         $new->resultCode = $resultCode->resultCode();
         $new->amountValue = $amountValue;
         $new->amountCurrency = $amountCurrency;
