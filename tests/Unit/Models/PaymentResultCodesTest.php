@@ -9,17 +9,39 @@ use PHPUnit\Framework\TestCase;
 
 class PaymentResultCodesTest extends TestCase
 {
-    /** @test */
-    public function it_can_construct_through_named_constructor(): void
+    private PaymentResultCodes $paymentResultCodes;
+
+    protected function setUp(): void
     {
-        $this->assertInstanceOf(PaymentResultCodes::class, PaymentResultCodes::authorised());
+        $this->paymentResultCodes = PaymentResultCodes::authorised();
+    }
+
+    /** @test */
+    public function it_contains_payment_result_codes(): void
+    {
+        $this->assertInstanceOf(PaymentResultCodes::class, $this->paymentResultCodes);
+    }
+
+    /** @test */
+    public function it_can_compare_payment_result_codes_objects(): void
+    {
+        $this->assertTrue($this->paymentResultCodes->equals(PaymentResultCodes::authorised()));
+        $this->assertFalse($this->paymentResultCodes->equals(PaymentResultCodes::invalid()));
+    }
+
+    /** @test */
+    public function it_checks_payment_result_codes_on_immutabillity(): void
+    {
+        $paymentResultCodeAuthorised = PaymentResultCodes::authorised();
+        $this->assertEquals($this->paymentResultCodes, $paymentResultCodeAuthorised);
+        $this->assertNotSame($this->paymentResultCodes, $paymentResultCodeAuthorised);
     }
 
     /**
      * @dataProvider resultCodeProvider
      * @test
      */
-    public function it_contains_result_code(PaymentResultCodes $resultCode, string $code): void
+    public function it_can_be_constructed_with_named_constructors(PaymentResultCodes $resultCode, string $code): void
     {
         $this->assertEquals($code, $resultCode->resultCode());
     }
@@ -45,18 +67,6 @@ class PaymentResultCodesTest extends TestCase
         $this->expectExceptionMessage('Invalid result code: "test"');
 
         PaymentResultCodes::load('test');
-    }
-
-    /** @test  */
-    public function it_can_check_it_is_equal_to_another_value_object(): void
-    {
-        $this->assertTrue(PaymentResultCodes::authorised()->equals(PaymentResultCodes::authorised()));
-    }
-
-    /** @test  */
-    public function it_can_check_it_is_not_equal_to_another_value_object(): void
-    {
-        $this->assertFalse(PaymentResultCodes::authorised()->equals(PaymentResultCodes::cancelled()));
     }
 
     /** @test  */
