@@ -6,6 +6,7 @@ namespace Unit\Models\RecurringPayment;
 
 use AdyenPayment\Models\PaymentResultCodes;
 use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
+use AdyenPayment\Models\TokenIdentifier;
 use PHPUnit\Framework\TestCase;
 use Shopware\Components\Model\ModelEntity;
 
@@ -16,6 +17,7 @@ class RecurringPaymentTokenTest extends TestCase
     protected function setUp(): void
     {
         $this->recurringPaymentToken = RecurringPaymentToken::create(
+            $tokenIdentifier = TokenIdentifier::generateFromString($knownUuid = '033a6dad-5a58-4b74-b420-6772bab3946e'),
             $customerId = 'YOUR_UNIQUE_SHOPPER_ID_IOfW3k9G2PvXFu2j',
             $recurringDetailReference = '8415698462516992',
             $pspReference = '8515815919501547',
@@ -30,6 +32,21 @@ class RecurringPaymentTokenTest extends TestCase
     public function it_is_a_model_entity(): void
     {
         $this->assertInstanceOf(ModelEntity::class, $this->recurringPaymentToken);
+    }
+
+    /** @test */
+    public function it_contains_an_id(): void
+    {
+        $this->assertEquals('033a6dad-5a58-4b74-b420-6772bab3946e', $this->recurringPaymentToken->id());
+    }
+
+    /** @test */
+    public function it_contains_a_token_identifier(): void
+    {
+        $this->assertEquals(
+            TokenIdentifier::generateFromString('033a6dad-5a58-4b74-b420-6772bab3946e'),
+            $this->recurringPaymentToken->tokenIdentifier()
+        );
     }
 
     /** @test */
@@ -107,6 +124,7 @@ class RecurringPaymentTokenTest extends TestCase
     public function it_knows_when_it_is_a_subscription(): void
     {
         $recurringPaymentTokenOrderNumberEmpty = RecurringPaymentToken::create(
+            TokenIdentifier::generateFromString($uuid = 'f958e8a5-c707-4901-91dd-0e16b22b898c'),
             'YOUR_UNIQUE_SHOPPER_ID_IOfW3k9G2PvXFu2j',
             '8415698462516992',
             '8515815919501547',

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Models\RecurringPayment;
 
 use AdyenPayment\Models\PaymentResultCodes;
+use AdyenPayment\Models\TokenIdentifier;
 use Doctrine\ORM\Mapping as ORM;
 use Shopware\Components\Model\ModelEntity;
 
@@ -19,11 +20,14 @@ use Shopware\Components\Model\ModelEntity;
 class RecurringPaymentToken extends ModelEntity
 {
     /**
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(name="id", type="string", nullable=false)
      */
-    private int $id;
+    private string $id;
+
+    /**
+     * @ORM\Column(name="token_identifier", type="string", nullable=false)
+     */
+    private TokenIdentifier $tokenIdentifier;
 
     /**
      * @ORM\Column(name="customer_id", type="string", length=255, nullable=false)
@@ -77,6 +81,7 @@ class RecurringPaymentToken extends ModelEntity
     }
 
     public static function create(
+        TokenIdentifier $id,
         string $customerId,
         string $recurringDetailReference,
         string $pspReference,
@@ -86,6 +91,8 @@ class RecurringPaymentToken extends ModelEntity
         string $amountCurrency
     ): self {
         $new = new self();
+        $new->id = $id->identifier();
+        $new->tokenIdentifier = $id;
         $new->customerId = $customerId;
         $new->recurringDetailReference = $recurringDetailReference;
         $new->pspReference = $pspReference;
@@ -97,9 +104,14 @@ class RecurringPaymentToken extends ModelEntity
         return $new;
     }
 
-    public function getId(): int
+    public function id(): string
     {
         return $this->id;
+    }
+
+    public function tokenIdentifier(): TokenIdentifier
+    {
+        return $this->tokenIdentifier = TokenIdentifier::generateFromString($this->id);
     }
 
     public function customerId(): string

@@ -7,6 +7,7 @@ namespace AdyenPayment\Recurring\Mapper;
 use AdyenPayment\Exceptions\InvalidPaymentsResponseException;
 use AdyenPayment\Models\PaymentResultCodes;
 use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
+use AdyenPayment\Models\TokenIdentifier;
 
 final class RecurringTokenMapper implements RecurringTokenMapperInterface
 {
@@ -17,6 +18,7 @@ final class RecurringTokenMapper implements RecurringTokenMapperInterface
         }
 
         return RecurringPaymentToken::create(
+            TokenIdentifier::generate(),
             $rawData['additionalData']['recurring.shopperReference'] ?? '',
             $rawData['additionalData']['recurring.recurringDetailReference'] ?? '',
             $rawData['pspReference'] ?? '',
