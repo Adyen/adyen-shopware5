@@ -21,6 +21,8 @@ class RecurringPaymentToken extends ModelEntity
 {
     /**
      * @ORM\Column(name="id", type="string", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="NONE")
      */
     private string $id;
 
