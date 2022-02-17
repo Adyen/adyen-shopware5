@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Unit\Recurring\Mapper;
 
+use AdyenPayment\Exceptions\InvalidPaymentsResponseException;
 use AdyenPayment\Recurring\Mapper\RecurringTokenMapper;
 use AdyenPayment\Recurring\Mapper\RecurringTokenMapperInterface;
 use PHPUnit\Framework\TestCase;
@@ -41,6 +42,15 @@ class RecurringTokenMapperTest extends TestCase
     public function it_is_a_recurring_token_mapper(): void
     {
         $this->assertInstanceOf(RecurringTokenMapperInterface::class, $this->recurringTokenMapper);
+    }
+
+    /** @test */
+    public function it_throws_invalid_payments_response_exception(): void
+    {
+        $this->expectException(InvalidPaymentsResponseException::class);
+        $this->expectExceptionMessage('Payments response not found.');
+
+        ($this->recurringTokenMapper)([]);
     }
 
     /** @test */
