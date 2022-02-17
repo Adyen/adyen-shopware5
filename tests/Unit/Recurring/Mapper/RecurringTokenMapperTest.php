@@ -14,27 +14,12 @@ use Prophecy\Prophecy\ObjectProphecy;
 class RecurringTokenMapperTest extends TestCase
 {
     use ProphecyTrait;
-    private string $adyenPaymentsResponseJson;
 
     /** @var ObjectProphecy|RecurringTokenMapperInterface */
     private $recurringTokenMapper;
 
     protected function setUp(): void
     {
-        $this->adyenPaymentsResponseJson = '{
-          "additionalData": {
-            "recurring.recurringDetailReference": "8415698462516992",
-            "recurring.shopperReference": "YOUR_UNIQUE_SHOPPER_ID_IOfW3k9G2PvXFu2j"
-          },
-          "pspReference": "8515815919501547",
-          "resultCode": "Authorised",
-          "amount": {
-            "currency": "USD",
-            "value": 0
-          },
-          "merchantReference": "YOUR_ORDER_NUMBER"
-        }';
-
         $this->recurringTokenMapper = new RecurringTokenMapper();
     }
 
@@ -56,7 +41,20 @@ class RecurringTokenMapperTest extends TestCase
     /** @test */
     public function it_can_map_from_array(): void
     {
-        $recurringPaymentToken = ($this->recurringTokenMapper)(json_decode($this->adyenPaymentsResponseJson, true));
+        $adyenPaymentsResponseArray = [
+            'additionalData' => [
+                'recurring.recurringDetailReference' => '8415698462516992',
+                'recurring.shopperReference' => 'YOUR_UNIQUE_SHOPPER_ID_IOfW3k9G2PvXFu2j',
+            ],
+            'pspReference' => '8515815919501547',
+            'resultCode' => 'Authorised',
+            'amount' => [
+                'currency' => 'USD',
+                'value' => 0,
+            ],
+            'merchantReference' => 'YOUR_ORDER_NUMBER',
+        ];
+        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenPaymentsResponseArray);
 
         $this->assertEquals('YOUR_UNIQUE_SHOPPER_ID_IOfW3k9G2PvXFu2j', $recurringPaymentToken->customerId());
         $this->assertEquals('8415698462516992', $recurringPaymentToken->recurringDetailReference());
@@ -69,92 +67,56 @@ class RecurringTokenMapperTest extends TestCase
     }
 
     /** @test */
-    public function it_maps_empty_string_when_customer_id_not_in_response(): void
+    public function it_can_map_default_values(): void
     {
-        $adyenResponse = json_decode($this->adyenPaymentsResponseJson, true);
-        unset($adyenResponse['additionalData']['recurring.shopperReference']);
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenResponse);
+        $adyenPaymentsResponseArray = [
+            'additionalData' => [
+            ],
+            'amount' => [
+            ],
+        ];
+        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenPaymentsResponseArray);
 
         $this->assertEquals('', $recurringPaymentToken->customerId());
-    }
-
-    /** @test */
-    public function it_maps_empty_string_when_recurring_detail_reference_not_in_response(): void
-    {
-        $adyenResponse = json_decode($this->adyenPaymentsResponseJson, true);
-        unset($adyenResponse['additionalData']['recurring.recurringDetailReference']);
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenResponse);
-
         $this->assertEquals('', $recurringPaymentToken->recurringDetailReference());
+        $this->assertEquals('', $recurringPaymentToken->pspReference());
+        $this->assertEquals('', $recurringPaymentToken->orderNumber());
+        $this->assertEquals('Invalid', $recurringPaymentToken->resultCode());
+        $this->assertEquals(0, $recurringPaymentToken->amountValue());
+        $this->assertEquals('', $recurringPaymentToken->amountCurrency());
     }
 
     /** @test */
     public function it_maps_empty_string_when_additional_data_not_in_response(): void
     {
-        $adyenResponse = json_decode($this->adyenPaymentsResponseJson, true);
-        unset($adyenResponse['additionalData']);
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenResponse);
+        $adyenPaymentsResponseArray = [
+            'pspReference' => '8515815919501547',
+            'resultCode' => 'Authorised',
+            'amount' => [
+                'currency' => 'USD',
+                'value' => 0,
+            ],
+            'merchantReference' => 'YOUR_ORDER_NUMBER',
+        ];
+        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenPaymentsResponseArray);
 
         $this->assertEquals('', $recurringPaymentToken->customerId());
         $this->assertEquals('', $recurringPaymentToken->recurringDetailReference());
     }
 
     /** @test */
-    public function it_maps_empty_string_when_psp_reference_not_in_response(): void
-    {
-        $adyenResponse = json_decode($this->adyenPaymentsResponseJson, true);
-        unset($adyenResponse['pspReference']);
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenResponse);
-
-        $this->assertEquals('', $recurringPaymentToken->pspReference());
-    }
-
-    /** @test */
-    public function it_maps_empty_string_when_merchant_reference_not_in_response(): void
-    {
-        $adyenResponse = json_decode($this->adyenPaymentsResponseJson, true);
-        unset($adyenResponse['merchantReference']);
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenResponse);
-
-        $this->assertEquals('', $recurringPaymentToken->orderNumber());
-    }
-
-    /** @test */
-    public function it_maps_refused_result_code_when_result_code_not_in_response(): void
-    {
-        $adyenResponse = json_decode($this->adyenPaymentsResponseJson, true);
-        unset($adyenResponse['resultCode']);
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenResponse);
-
-        $this->assertEquals('Refused', $recurringPaymentToken->resultCode());
-    }
-
-    /** @test */
-    public function it_maps_to_zero_when_amount_value_not_in_response(): void
-    {
-        $adyenResponse = json_decode($this->adyenPaymentsResponseJson, true);
-        unset($adyenResponse['amount']['value']);
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenResponse);
-
-        $this->assertEquals(0, $recurringPaymentToken->amountValue());
-    }
-
-    /** @test */
-    public function it_maps_to_empty_string_when_amount_currency_not_in_response(): void
-    {
-        $adyenResponse = json_decode($this->adyenPaymentsResponseJson, true);
-        unset($adyenResponse['amount']['currency']);
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenResponse);
-
-        $this->assertEquals('', $recurringPaymentToken->amountCurrency());
-    }
-
-    /** @test */
     public function it_maps_to_empty_string_and_zero_when_amount_not_in_response(): void
     {
-        $adyenResponse = json_decode($this->adyenPaymentsResponseJson, true);
-        unset($adyenResponse['amount']);
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenResponse);
+        $adyenPaymentsResponseArray = [
+            'additionalData' => [
+                'recurring.recurringDetailReference' => '8415698462516992',
+                'recurring.shopperReference' => 'YOUR_UNIQUE_SHOPPER_ID_IOfW3k9G2PvXFu2j',
+            ],
+            'pspReference' => '8515815919501547',
+            'resultCode' => 'Authorised',
+            'merchantReference' => 'YOUR_ORDER_NUMBER',
+        ];
+        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenPaymentsResponseArray);
 
         $this->assertEquals(0, $recurringPaymentToken->amountValue());
         $this->assertEquals('', $recurringPaymentToken->amountCurrency());

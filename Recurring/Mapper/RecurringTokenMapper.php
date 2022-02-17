@@ -21,9 +21,9 @@ final class RecurringTokenMapper implements RecurringTokenMapperInterface
             $rawData['additionalData']['recurring.recurringDetailReference'] ?? '',
             $rawData['pspReference'] ?? '',
             $rawData['merchantReference'] ?? '',
-            isset($rawData['resultCode']) ?
+            array_key_exists('resultCode', $rawData) ?
                 PaymentResultCodes::load($rawData['resultCode']) :
-                PaymentResultCodes::refused(),
+                PaymentResultCodes::invalid(),
             $rawData['amount']['value'] ?? 0,
             $rawData['amount']['currency'] ?? ''
         );
