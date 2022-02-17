@@ -11,6 +11,7 @@ final class PaymentResultCodes
     private const CHALLENGESHOPPER = 'ChallengeShopper';
     private const ERROR = 'Error';
     private const IDENTIFYSHOPPER = 'IdentifyShopper';
+    private const INVALID = 'Invalid';
     private const PENDING = 'Pending';
     private const RECEIVED = 'Received';
     private const REDIRECTSHOPPER = 'RedirectShopper';
@@ -51,6 +52,7 @@ final class PaymentResultCodes
             self::CANCELLED,
             self::CHALLENGESHOPPER,
             self::ERROR,
+            self::INVALID,
             self::IDENTIFYSHOPPER,
             self::PENDING,
             self::RECEIVED,
@@ -77,6 +79,11 @@ final class PaymentResultCodes
     public static function error(): self
     {
         return new self(self::ERROR);
+    }
+
+    public static function invalid(): self
+    {
+        return new self(self::INVALID);
     }
 
     public static function identifyShopper(): self

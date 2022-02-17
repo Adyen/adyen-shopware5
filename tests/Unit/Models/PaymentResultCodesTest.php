@@ -30,6 +30,7 @@ class PaymentResultCodesTest extends TestCase
         yield [PaymentResultCodes::cancelled(), 'Cancelled'];
         yield [PaymentResultCodes::challengeShopper(), 'ChallengeShopper'];
         yield [PaymentResultCodes::error(), 'Error'];
+        yield [PaymentResultCodes::invalid(), 'Invalid'];
         yield [PaymentResultCodes::identifyShopper(), 'IdentifyShopper'];
         yield [PaymentResultCodes::pending(), 'Pending'];
         yield [PaymentResultCodes::received(), 'Received'];
