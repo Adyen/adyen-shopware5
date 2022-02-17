@@ -38,7 +38,7 @@ final class RecurringPaymentTokenRepository implements RecurringPaymentTokenRepo
             'orderNumber' => $orderNumber,
         ]);
 
-        if (!$recurringPaymentToken) {
+        if (!$recurringPaymentToken instanceof RecurringPaymentToken) {
             throw RecurringPaymentTokenNotFoundException::withCustomerIdAndOrderNumber($customerId, $orderNumber);
         }
 
@@ -52,7 +52,7 @@ final class RecurringPaymentTokenRepository implements RecurringPaymentTokenRepo
             'pspReference' => $pspReference,
         ]);
 
-        if (!$recurringPaymentToken) {
+        if (!$recurringPaymentToken instanceof RecurringPaymentToken) {
             throw RecurringPaymentTokenNotFoundException::withPendingResultCodeAndPspReference($pspReference);
         }
 

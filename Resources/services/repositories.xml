@@ -7,6 +7,16 @@
             <argument type="service" id="models"/>
         </service>
 
+        <service id="AdyenPayment\Models\RecurringPayment\RecurringPaymentTokenRepository">
+            <argument type="service" id="models"/>
+        </service>
+        <service id="AdyenPayment\Models\RecurringPayment\TraceableRecurringPaymentTokenRepository"
+                 decorates="AdyenPayment\Models\RecurringPayment\RecurringPaymentTokenRepository">
+            <argument type="service" id="AdyenPayment\Models\RecurringPayment\TraceableRecurringPaymentTokenRepository.inner"/>
+
+            <argument type="service" id="adyen_payment.logger" />
+        </service>
+
         <service id="AdyenPayment\Shopware\Crud\AttributeWriter">
             <argument type="service" id="shopware_attribute.crud_service"/>
             <argument type="service" id="models"/>
