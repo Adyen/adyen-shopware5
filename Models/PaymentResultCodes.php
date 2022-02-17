@@ -42,25 +42,6 @@ final class PaymentResultCodes
         return new self($resultCode);
     }
 
-    /**
-     * @return array<string>
-     */
-    private function availableResultCodes(): array
-    {
-        return [
-            self::AUTHORISED,
-            self::CANCELLED,
-            self::CHALLENGESHOPPER,
-            self::ERROR,
-            self::INVALID,
-            self::IDENTIFYSHOPPER,
-            self::PENDING,
-            self::RECEIVED,
-            self::REDIRECTSHOPPER,
-            self::REFUSED,
-        ];
-    }
-
     public static function authorised(): self
     {
         return new self(self::AUTHORISED);
@@ -109,5 +90,24 @@ final class PaymentResultCodes
     public static function refused(): self
     {
         return new self(self::REFUSED);
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function availableResultCodes(): array
+    {
+        return [
+            self::AUTHORISED,
+            self::CANCELLED,
+            self::CHALLENGESHOPPER,
+            self::ERROR,
+            self::INVALID,
+            self::IDENTIFYSHOPPER,
+            self::PENDING,
+            self::RECEIVED,
+            self::REDIRECTSHOPPER,
+            self::REFUSED,
+        ];
     }
 }

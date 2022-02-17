@@ -4,6 +4,7 @@ use Adyen\AdyenException;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\BasketService;
 use AdyenPayment\Components\Manager\AdyenManager;
+use AdyenPayment\Components\Manager\OrderManager;
 use AdyenPayment\Components\Manager\OrderManagerInterface;
 use AdyenPayment\Components\OrderMailService;
 use AdyenPayment\Models\PaymentResultCodes;
@@ -49,7 +50,7 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         $this->basketService = $this->get(BasketService::class);
         $this->orderMailService = $this->get(OrderMailService::class);
         $this->logger = $this->get('adyen_payment.logger');
-        $this->orderManager = $this->get(OrderManagerInterface::class);
+        $this->orderManager = $this->get(OrderManager::class);
         $this->snippets = $this->get('snippets');
         $this->errorMessageProvider = $this->get(ErrorMessageProvider::class);
     }

@@ -3,6 +3,8 @@
 use Adyen\AdyenException;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
+use AdyenPayment\Components\BasketService;
+use AdyenPayment\Models\PaymentResultCodes;
 use AdyenPayment\Components\Manager\AdyenManager;
 use AdyenPayment\Components\Payload\Chain;
 use AdyenPayment\Components\Payload\PaymentContext;
@@ -11,7 +13,6 @@ use AdyenPayment\Models\PaymentInfo;
 use Shopware\Components\Logger;
 use Shopware\Models\Order\Order;
 use Shopware\Models\Order\Status;
-use AdyenPayment\Components\Adyen\PaymentResultCodeHandlerInterface;
 
 /**
  * Class Shopware_Controllers_Frontend_Adyen
@@ -23,7 +24,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     private PaymentMethodService $adyenCheckout;
     private Logger $logger;
     private Chain $paymentPayloadProvider;
-    private PaymentResultCodeHandlerInterface $paymentResultCodeHandler;
+    private BasketService $basketService;
 
     /**
      * @return void
@@ -34,7 +35,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->adyenCheckout = $this->get(PaymentMethodService::class);
         $this->logger = $this->get('adyen_payment.logger');
         $this->paymentPayloadProvider = $this->get(PaymentPayloadProvider::class);
-        $this->paymentResultCodeHandler = $this->get(PaymentResultCodeHandlerInterface::class);
+        $this->basketService = $this->get(BasketService::class);
     }
 
     public function ajaxDoPaymentAction(): void
@@ -53,7 +54,8 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                 $context->getTransaction(),
                 $paymentInfo['paymentData'] ?? ''
             );
-            ($this->paymentResultCodeHandler)($paymentInfo);
+
+            $this->handlePaymentData($paymentInfo);
 
             $this->Response()->setBody(json_encode(
                 [
@@ -215,5 +217,39 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         return [
             'shopperIP' => $this->request->getClientIp(),
         ];
+    }
+
+    /**
+     * @param $paymentInfo
+     *
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function handlePaymentData($paymentInfo): void
+    {
+        try {
+            PaymentResultCodes::load($paymentInfo['resultCode']);
+        } catch (\InvalidArgumentException $exception) {
+            $this->handlePaymentDataError($paymentInfo);
+        }
+    }
+
+    /**
+     * @param $paymentInfo
+     *
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function handlePaymentDataError(array $paymentResponseInfo): void
+    {
+        if (array_key_exists('merchantReference', $paymentResponseInfo)) {
+            $this->basketService->cancelAndRestoreByOrderNumber($paymentResponseInfo['merchantReference']);
+        }
     }
 }
