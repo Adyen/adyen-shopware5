@@ -13,8 +13,8 @@ final class RecurringTokenMapper implements RecurringTokenMapperInterface
 {
     public function __invoke(array $rawData): RecurringPaymentToken
     {
-        if (!$rawData) {
-            throw InvalidPaymentsResponseException::missingPaymentsResponseContent();
+        if (0 === count($rawData)) {
+            throw InvalidPaymentsResponseException::invalid();
         }
 
         return RecurringPaymentToken::create(
