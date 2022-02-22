@@ -98,8 +98,8 @@ class RecurringPaymentTokenTest extends TestCase
         $this->recurringPaymentToken->setCreatedAt($createdAt);
         $this->assertInstanceOf(\DateTimeImmutable::class, $this->recurringPaymentToken->createdAt());
         $this->assertStringContainsString(
-            $createdAt->format('d/m/y'),
-            $this->recurringPaymentToken->createdAt()->format('d/m/y')
+            $createdAt->format('d/m/y H:i'),
+            $this->recurringPaymentToken->createdAt()->format('d/m/y H:i')
         );
     }
 

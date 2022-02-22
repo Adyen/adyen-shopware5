@@ -22,7 +22,6 @@ class RecurringPaymentToken extends ModelEntity
     /**
      * @ORM\Column(name="id", type="string", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
      */
     private string $id;
 
@@ -113,7 +112,9 @@ class RecurringPaymentToken extends ModelEntity
 
     public function tokenIdentifier(): TokenIdentifier
     {
-        return $this->tokenIdentifier = TokenIdentifier::generateFromString($this->id);
+        $this->tokenIdentifier = TokenIdentifier::generateFromString($this->id);
+
+        return $this->tokenIdentifier;
     }
 
     public function customerId(): string
