@@ -8,19 +8,19 @@ final class PaymentResultCodes
 {
     private const AUTHORISED = 'Authorised';
     private const CANCELLED = 'Cancelled';
-    private const CHALLENGESHOPPER = 'ChallengeShopper';
+    private const CHALLENGE_SHOPPER = 'ChallengeShopper';
     private const ERROR = 'Error';
-    private const IDENTIFYSHOPPER = 'IdentifyShopper';
+    private const IDENTIFY_SHOPPER = 'IdentifyShopper';
     private const INVALID = 'Invalid';
     private const PENDING = 'Pending';
     private const RECEIVED = 'Received';
-    private const REDIRECTSHOPPER = 'RedirectShopper';
+    private const REDIRECT_SHOPPER = 'RedirectShopper';
     private const REFUSED = 'Refused';
     private string $resultCode;
 
     private function __construct(string $resultCode)
     {
-        if (!in_array($resultCode, $this->availableResultCodes(), true)) {
+        if (!self::exists($resultCode)) {
             throw new \InvalidArgumentException('Invalid result code: "'.$resultCode.'"');
         }
 
@@ -42,6 +42,11 @@ final class PaymentResultCodes
         return new self($resultCode);
     }
 
+    public static function exists(string $resultCode): bool
+    {
+        return in_array($resultCode, self::availableResultCodes(), true);
+    }
+
     public static function authorised(): self
     {
         return new self(self::AUTHORISED);
@@ -49,7 +54,7 @@ final class PaymentResultCodes
 
     public static function challengeShopper(): self
     {
-        return new self(self::CHALLENGESHOPPER);
+        return new self(self::CHALLENGE_SHOPPER);
     }
 
     public static function cancelled(): self
@@ -69,7 +74,7 @@ final class PaymentResultCodes
 
     public static function identifyShopper(): self
     {
-        return new self(self::IDENTIFYSHOPPER);
+        return new self(self::IDENTIFY_SHOPPER);
     }
 
     public static function pending(): self
@@ -84,7 +89,7 @@ final class PaymentResultCodes
 
     public static function redirectShopper(): self
     {
-        return new self(self::REDIRECTSHOPPER);
+        return new self(self::REDIRECT_SHOPPER);
     }
 
     public static function refused(): self
@@ -95,18 +100,18 @@ final class PaymentResultCodes
     /**
      * @return array<string>
      */
-    private function availableResultCodes(): array
+    private static function availableResultCodes(): array
     {
         return [
             self::AUTHORISED,
             self::CANCELLED,
-            self::CHALLENGESHOPPER,
+            self::CHALLENGE_SHOPPER,
             self::ERROR,
             self::INVALID,
-            self::IDENTIFYSHOPPER,
+            self::IDENTIFY_SHOPPER,
             self::PENDING,
             self::RECEIVED,
-            self::REDIRECTSHOPPER,
+            self::REDIRECT_SHOPPER,
             self::REFUSED,
         ];
     }

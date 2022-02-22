@@ -230,11 +230,11 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private function handlePaymentData($paymentInfo): void
     {
-        try {
-            PaymentResultCodes::load($paymentInfo['resultCode']);
-        } catch (\InvalidArgumentException $exception) {
-            $this->handlePaymentDataError($paymentInfo);
+        if (PaymentResultCodes::exists((string) ($paymentInfo['resultCode'] ?? ''))) {
+            return;
         }
+
+        $this->handlePaymentDataError($paymentInfo);
     }
 
     /**
