@@ -23,34 +23,18 @@ class RecurringProcessingModelTest extends TestCase
     }
 
     /** @test */
-    public function it_can_compare_recurring_processing_model_objects(): void
+    public function it_knows_when_it_equals_a_processing_model(): void
     {
         $this->assertTrue($this->recurringProcessingModel->equals(RecurringProcessingModel::cardOnFile()));
         $this->assertFalse($this->recurringProcessingModel->equals(RecurringProcessingModel::subscription()));
     }
 
     /** @test */
-    public function it_checks_recurring_processing_model_on_immutabillity(): void
+    public function it_is_a_recurring_processing_model(): void
     {
         $recurringProcessingModel = RecurringProcessingModel::cardOnFile();
         $this->assertEquals($this->recurringProcessingModel, $recurringProcessingModel);
         $this->assertNotSame($this->recurringProcessingModel, $recurringProcessingModel);
-    }
-
-    /**
-     * @dataProvider recurringProcessingModelProvider
-     * @test
-     */
-    public function it_contains_recurring_processing_model(
-        RecurringProcessingModel $recurringProcessingModel, string $expected
-    ): void {
-        $this->assertEquals($expected, $recurringProcessingModel->recurringProcessingModel());
-    }
-
-    public function recurringProcessingModelProvider(): \Generator
-    {
-        yield [RecurringProcessingModel::cardOnFile(), 'CardOnFile'];
-        yield [RecurringProcessingModel::subscription(), 'Subscription'];
     }
 
     /** @test  */
@@ -69,5 +53,21 @@ class RecurringProcessingModelTest extends TestCase
             RecurringProcessingModel::cardOnFile(),
             RecurringProcessingModel::load('CardOnFile')
         );
+    }
+
+    /**
+     * @dataProvider recurringProcessingModelProvider
+     * @test
+     */
+    public function it_contains_recurring_processing_model(
+        RecurringProcessingModel $recurringProcessingModel, string $expected
+    ): void {
+        $this->assertEquals($expected, $recurringProcessingModel->recurringProcessingModel());
+    }
+
+    public function recurringProcessingModelProvider(): \Generator
+    {
+        yield [RecurringProcessingModel::cardOnFile(), 'CardOnFile'];
+        yield [RecurringProcessingModel::subscription(), 'Subscription'];
     }
 }

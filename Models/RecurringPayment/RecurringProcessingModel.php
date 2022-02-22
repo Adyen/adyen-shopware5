@@ -6,7 +6,7 @@ namespace AdyenPayment\Models\RecurringPayment;
 
 final class RecurringProcessingModel
 {
-    private const CARDONFILE = 'CardOnFile';
+    private const CARD_ON_FILE = 'CardOnFile';
     private const SUBSCRIPTION = 'Subscription';
     private const UNSCHEDULED_CARD_ON_FILE = 'UnscheduledCardOnFile';
     private string $recurringProcessingModel;
@@ -37,7 +37,7 @@ final class RecurringProcessingModel
 
     public static function cardOnFile(): self
     {
-        return new self(self::CARDONFILE);
+        return new self(self::CARD_ON_FILE);
     }
 
     public static function subscription(): self
@@ -48,7 +48,7 @@ final class RecurringProcessingModel
     private function availableRecurringProcessingModels(): array
     {
         return [
-            self::CARDONFILE,
+            self::CARD_ON_FILE,
             self::SUBSCRIPTION,
             self::UNSCHEDULED_CARD_ON_FILE,
         ];
