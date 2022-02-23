@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Models\RecurringPayment;
 
-use AdyenPayment\Models\PaymentResultCodes;
+use AdyenPayment\Models\PaymentResultCode;
 use AdyenPayment\Models\TokenIdentifier;
 use Doctrine\ORM\Mapping as ORM;
 use Shopware\Components\Model\ModelEntity;
@@ -88,7 +88,7 @@ class RecurringPaymentToken extends ModelEntity
         string $recurringDetailReference,
         string $pspReference,
         string $orderNumber,
-        PaymentResultCodes $resultCode,
+        PaymentResultCode $resultCode,
         int $amountValue,
         string $amountCurrency
     ): self {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Recurring\Mapper;
 
 use AdyenPayment\Exceptions\InvalidPaymentsResponseException;
-use AdyenPayment\Models\PaymentResultCodes;
+use AdyenPayment\Models\PaymentResultCode;
 use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
 use AdyenPayment\Models\TokenIdentifier;
 
@@ -24,8 +24,8 @@ final class RecurringTokenMapper implements RecurringTokenMapperInterface
             $rawData['pspReference'] ?? '',
             $rawData['merchantReference'] ?? '',
             array_key_exists('resultCode', $rawData) ?
-                PaymentResultCodes::load($rawData['resultCode']) :
-                PaymentResultCodes::invalid(),
+                PaymentResultCode::load($rawData['resultCode']) :
+                PaymentResultCode::invalid(),
             $rawData['amount']['value'] ?? 0,
             $rawData['amount']['currency'] ?? ''
         );

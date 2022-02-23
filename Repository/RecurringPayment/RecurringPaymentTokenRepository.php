@@ -2,30 +2,33 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Models\RecurringPayment;
+namespace AdyenPayment\Repository\RecurringPayment;
 
 use AdyenPayment\Exceptions\RecurringPaymentTokenNotFoundException;
 use AdyenPayment\Exceptions\RecurringPaymentTokenNotSavedException;
-use AdyenPayment\Models\PaymentResultCodes;
+use AdyenPayment\Models\PaymentResultCode;
+use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\ORMInvalidArgumentException;
-use Shopware\Components\Model\ModelManager;
 
 final class RecurringPaymentTokenRepository implements RecurringPaymentTokenRepositoryInterface
 {
-    /** @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository|RecurringPaymentTokenRepository */
-    private $recurringPaymentTokenRepository;
+    private EntityManager $entityManager;
+    private EntityRepository $recurringPaymentTokenEntityRepository;
 
-    public function __construct(ModelManager $manager)
+    public function __construct(EntityManager $entityManager, EntityRepository $recurringPaymentTokenEntityRepository)
     {
-        $this->recurringPaymentTokenRepository = $manager->getRepository(RecurringPaymentToken::class);
+        $this->entityManager = $entityManager;
+        $this->recurringPaymentTokenEntityRepository = $recurringPaymentTokenEntityRepository;
     }
 
     public function save(RecurringPaymentToken $recurringPaymentToken): void
     {
         try {
-            $this->recurringPaymentTokenRepository->persist($recurringPaymentToken);
-            $this->recurringPaymentTokenRepository->flush();
+            $this->entityManager->persist($recurringPaymentToken);
+            $this->entityManager->flush($recurringPaymentToken);
         } catch (ORMException|ORMInvalidArgumentException $exception) {
             throw RecurringPaymentTokenNotSavedException::withId($recurringPaymentToken->tokenIdentifier());
         }
@@ -33,12 +36,12 @@ final class RecurringPaymentTokenRepository implements RecurringPaymentTokenRepo
 
     public function fetchByCustomerIdAndOrderNumber(string $customerId, string $orderNumber): RecurringPaymentToken
     {
-        $recurringPaymentToken = $this->recurringPaymentTokenRepository->findBy([
+        $recurringPaymentToken = $this->recurringPaymentTokenEntityRepository->findOneBy([
             'customerId' => $customerId,
             'orderNumber' => $orderNumber,
         ]);
 
-        if (!$recurringPaymentToken instanceof RecurringPaymentToken) {
+        if (!($recurringPaymentToken instanceof RecurringPaymentToken)) {
             throw RecurringPaymentTokenNotFoundException::withCustomerIdAndOrderNumber($customerId, $orderNumber);
         }
 
@@ -47,12 +50,12 @@ final class RecurringPaymentTokenRepository implements RecurringPaymentTokenRepo
 
     public function fetchPendingByPspReference(string $pspReference): RecurringPaymentToken
     {
-        $recurringPaymentToken = $this->recurringPaymentTokenRepository->findBy([
-            'resultCode' => PaymentResultCodes::pending()->resultCode(),
+        $recurringPaymentToken = $this->recurringPaymentTokenEntityRepository->findOneBy([
+            'resultCode' => PaymentResultCode::pending()->resultCode(),
             'pspReference' => $pspReference,
         ]);
 
-        if (!$recurringPaymentToken instanceof RecurringPaymentToken) {
+        if (!($recurringPaymentToken instanceof RecurringPaymentToken)) {
             throw RecurringPaymentTokenNotFoundException::withPendingResultCodeAndPspReference($pspReference);
         }
 
@@ -62,8 +65,8 @@ final class RecurringPaymentTokenRepository implements RecurringPaymentTokenRepo
     public function update(RecurringPaymentToken $recurringPaymentToken): void
     {
         try {
-            $this->recurringPaymentTokenRepository->persist($recurringPaymentToken);
-            $this->recurringPaymentTokenRepository->flush();
+            $this->entityManager->persist($recurringPaymentToken);
+            $this->entityManager->flush($recurringPaymentToken);
         } catch (ORMException|ORMInvalidArgumentException $exception) {
             throw RecurringPaymentTokenNotSavedException::withId($recurringPaymentToken->tokenIdentifier());
         }

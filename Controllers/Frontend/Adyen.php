@@ -4,7 +4,7 @@ use Adyen\AdyenException;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\BasketService;
-use AdyenPayment\Models\PaymentResultCodes;
+use AdyenPayment\Models\PaymentResultCode;
 use AdyenPayment\Components\Manager\AdyenManager;
 use AdyenPayment\Components\Payload\Chain;
 use AdyenPayment\Components\Payload\PaymentContext;
@@ -230,7 +230,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private function handlePaymentData($paymentInfo): void
     {
-        if (PaymentResultCodes::exists((string) ($paymentInfo['resultCode'] ?? ''))) {
+        if (PaymentResultCode::exists((string) ($paymentInfo['resultCode'] ?? ''))) {
             return;
         }
 

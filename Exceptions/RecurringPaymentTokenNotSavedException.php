@@ -6,12 +6,10 @@ namespace AdyenPayment\Exceptions;
 
 use AdyenPayment\Models\TokenIdentifier;
 
-class RecurringPaymentTokenNotSavedException extends \Exception
+final class RecurringPaymentTokenNotSavedException extends \RuntimeException
 {
     public static function withId(TokenIdentifier $tokenIdentifier): self
     {
-        return new self(
-            'Recurring payment token with id: '.$tokenIdentifier->identifier().' could not be saved.'
-        );
+        return new self('Recurring payment token not saved with id:'.$tokenIdentifier->identifier());
     }
 }

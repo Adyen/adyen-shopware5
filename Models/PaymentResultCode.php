@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Models;
 
-final class PaymentResultCodes
+final class PaymentResultCode
 {
     private const AUTHORISED = 'Authorised';
     private const CANCELLED = 'Cancelled';
@@ -32,9 +32,9 @@ final class PaymentResultCodes
         return $this->resultCode;
     }
 
-    public function equals(PaymentResultCodes $paymentResultCodes): bool
+    public function equals(PaymentResultCode $paymentResultCode): bool
     {
-        return $paymentResultCodes->resultCode() === $this->resultCode;
+        return $paymentResultCode->resultCode() === $this->resultCode;
     }
 
     public static function load(string $resultCode): self

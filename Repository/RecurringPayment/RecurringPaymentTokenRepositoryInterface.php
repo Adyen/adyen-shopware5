@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Models\RecurringPayment;
+namespace AdyenPayment\Repository\RecurringPayment;
+
+use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
 
 interface RecurringPaymentTokenRepositoryInterface
 {

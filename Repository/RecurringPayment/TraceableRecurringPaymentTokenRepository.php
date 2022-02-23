@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Models\RecurringPayment;
+namespace AdyenPayment\Repository\RecurringPayment;
 
 use AdyenPayment\Exceptions\RecurringPaymentTokenNotFoundException;
+use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\ORMInvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -37,6 +38,7 @@ final class TraceableRecurringPaymentTokenRepository implements RecurringPayment
             return $this->recurringPaymentTokenRepository->fetchByCustomerIdAndOrderNumber($customerId, $orderNumber);
         } catch (RecurringPaymentTokenNotFoundException $exception) {
             $this->logger->info($exception->getMessage(), ['exception' => $exception]);
+
             throw $exception;
         }
     }
@@ -47,6 +49,7 @@ final class TraceableRecurringPaymentTokenRepository implements RecurringPayment
             return $this->recurringPaymentTokenRepository->fetchPendingByPspReference($pspReference);
         } catch (RecurringPaymentTokenNotFoundException $exception) {
             $this->logger->info($exception->getMessage(), ['exception' => $exception]);
+
             throw $exception;
         }
     }

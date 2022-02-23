@@ -6,7 +6,7 @@ namespace AdyenPayment\Models\RecurringPayment;
 
 final class ShopperInteraction
 {
-    private const CONTAUTH = 'ContAuth';
+    private const CONT_AUTH = 'ContAuth';
     private const ECOMMERCE = 'Ecommerce';
     private const MOTO = 'Moto';
     private const POS = 'POS';
@@ -38,7 +38,7 @@ final class ShopperInteraction
 
     public static function contAuth(): self
     {
-        return new self(self::CONTAUTH);
+        return new self(self::CONT_AUTH);
     }
 
     public static function ecommerce(): self
@@ -49,7 +49,7 @@ final class ShopperInteraction
     private function availableShopperInteractions(): array
     {
         return [
-            self::CONTAUTH,
+            self::CONT_AUTH,
             self::ECOMMERCE,
             self::MOTO,
             self::POS,

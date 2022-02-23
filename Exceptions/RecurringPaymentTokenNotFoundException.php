@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Exceptions;
 
-use AdyenPayment\Models\PaymentResultCodes;
+use AdyenPayment\Models\PaymentResultCode;
 
-class RecurringPaymentTokenNotFoundException extends \Exception
+final class RecurringPaymentTokenNotFoundException extends \RuntimeException
 {
     public static function withCustomerIdAndOrderNumber(string $customerId, string $orderNumber): self
     {
         return new self(sprintf(
-            'Recurring payment token with customer id: %s and order number: %s could not be found.',
+            'Recurring payment token not found with customer id: %s, order number: %s',
             $customerId,
             $orderNumber
         ));
@@ -20,8 +20,8 @@ class RecurringPaymentTokenNotFoundException extends \Exception
     public static function withPendingResultCodeAndPspReference(string $pspReference): self
     {
         return new self(sprintf(
-            'Recurring payment token with result code: %s and psp reference: %s could not be found.',
-            PaymentResultCodes::pending()->resultCode(),
+            'Recurring payment token not found with result code: %s, psp reference: %s',
+            PaymentResultCode::pending()->resultCode(),
             $pspReference
         ));
     }

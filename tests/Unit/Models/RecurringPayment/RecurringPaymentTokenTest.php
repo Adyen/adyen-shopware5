@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Unit\Models\RecurringPayment;
 
-use AdyenPayment\Models\PaymentResultCodes;
+use AdyenPayment\Models\PaymentResultCode;
 use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
 use AdyenPayment\Models\TokenIdentifier;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +22,7 @@ class RecurringPaymentTokenTest extends TestCase
             $recurringDetailReference = '8415698462516992',
             $pspReference = '8515815919501547',
             $orderNumber = 'YOUR_ORDER_NUMBER',
-            $resultCode = PaymentResultCodes::authorised(),
+            $resultCode = PaymentResultCode::authorised(),
             $amountValue = 10500,
             $amountCurrency = 'EUR'
         );
@@ -129,7 +129,7 @@ class RecurringPaymentTokenTest extends TestCase
             '8415698462516992',
             '8515815919501547',
             $orderNumber = '',
-            PaymentResultCodes::authorised(),
+            PaymentResultCode::authorised(),
             10500,
             'EUR'
         );
