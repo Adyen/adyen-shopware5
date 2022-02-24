@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace AdyenPayment\Repository\RecurringPayment;
 
 use AdyenPayment\Exceptions\RecurringPaymentTokenNotFoundException;
-use AdyenPayment\Exceptions\RecurringPaymentTokenNotSavedException;
 use AdyenPayment\Models\PaymentResultCode;
 use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\ORMException;
-use Doctrine\ORM\ORMInvalidArgumentException;
 
 final class RecurringPaymentTokenRepository implements RecurringPaymentTokenRepositoryInterface
 {
@@ -22,16 +19,6 @@ final class RecurringPaymentTokenRepository implements RecurringPaymentTokenRepo
     {
         $this->entityManager = $entityManager;
         $this->recurringPaymentTokenEntityRepository = $recurringPaymentTokenEntityRepository;
-    }
-
-    public function save(RecurringPaymentToken $recurringPaymentToken): void
-    {
-        try {
-            $this->entityManager->persist($recurringPaymentToken);
-            $this->entityManager->flush($recurringPaymentToken);
-        } catch (ORMException|ORMInvalidArgumentException $exception) {
-            throw RecurringPaymentTokenNotSavedException::withId($recurringPaymentToken->tokenIdentifier());
-        }
     }
 
     public function fetchByCustomerIdAndOrderNumber(string $customerId, string $orderNumber): RecurringPaymentToken
@@ -64,11 +51,7 @@ final class RecurringPaymentTokenRepository implements RecurringPaymentTokenRepo
 
     public function update(RecurringPaymentToken $recurringPaymentToken): void
     {
-        try {
-            $this->entityManager->persist($recurringPaymentToken);
-            $this->entityManager->flush($recurringPaymentToken);
-        } catch (ORMException|ORMInvalidArgumentException $exception) {
-            throw RecurringPaymentTokenNotSavedException::withId($recurringPaymentToken->tokenIdentifier());
-        }
+        $this->entityManager->persist($recurringPaymentToken);
+        $this->entityManager->flush($recurringPaymentToken);
     }
 }

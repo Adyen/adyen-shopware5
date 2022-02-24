@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Repository\RecurringPayment;
 
 use AdyenPayment\Exceptions\RecurringPaymentTokenNotFoundException;
+use AdyenPayment\Exceptions\RecurringPaymentTokenNotSavedException;
 use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\ORMInvalidArgumentException;
@@ -21,15 +22,6 @@ final class TraceableRecurringPaymentTokenRepository implements RecurringPayment
     ) {
         $this->recurringPaymentTokenRepository = $recurringPaymentTokenRepository;
         $this->logger = $logger;
-    }
-
-    public function save(RecurringPaymentToken $recurringPaymentToken): void
-    {
-        try {
-            $this->recurringPaymentTokenRepository->save($recurringPaymentToken);
-        } catch (ORMException|ORMInvalidArgumentException $exception) {
-            $this->logger->error($exception->getMessage(), ['exception' => $exception]);
-        }
     }
 
     public function fetchByCustomerIdAndOrderNumber(string $customerId, string $orderNumber): RecurringPaymentToken
@@ -60,6 +52,8 @@ final class TraceableRecurringPaymentTokenRepository implements RecurringPayment
             $this->recurringPaymentTokenRepository->update($recurringPaymentToken);
         } catch (ORMException|ORMInvalidArgumentException $exception) {
             $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+
+            throw RecurringPaymentTokenNotSavedException::withId($recurringPaymentToken->tokenIdentifier());
         }
     }
 }

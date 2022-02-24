@@ -8,7 +8,6 @@ use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
 
 interface RecurringPaymentTokenRepositoryInterface
 {
-    public function save(RecurringPaymentToken $recurringPaymentToken): void;
     public function fetchByCustomerIdAndOrderNumber(string $customerId, string $orderNumber): RecurringPaymentToken;
     public function fetchPendingByPspReference(string $pspReference): RecurringPaymentToken;
     public function update(RecurringPaymentToken $recurringPaymentToken): void;

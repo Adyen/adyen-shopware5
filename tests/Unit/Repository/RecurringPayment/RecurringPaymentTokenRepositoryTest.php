@@ -5,18 +5,13 @@ declare(strict_types=1);
 namespace AdyenPayment\Tests\Unit\Repository\RecurringPayment;
 
 use AdyenPayment\Exceptions\RecurringPaymentTokenNotFoundException;
-use AdyenPayment\Exceptions\RecurringPaymentTokenNotSavedException;
 use AdyenPayment\Models\PaymentResultCode;
 use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
-use AdyenPayment\Models\TokenIdentifier;
 use AdyenPayment\Repository\RecurringPayment\RecurringPaymentTokenRepository;
 use AdyenPayment\Repository\RecurringPayment\RecurringPaymentTokenRepositoryInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\ORMException;
-use Doctrine\ORM\ORMInvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -44,52 +39,7 @@ final class RecurringPaymentTokenRepositoryTest extends TestCase
     /** @test */
     public function it_is_a_recurring_payment_token_repository(): void
     {
-        $this->assertInstanceOf(
-            RecurringPaymentTokenRepositoryInterface::class,
-            $this->recurringPaymentTokenRepository
-        );
-    }
-
-    /** @test */
-    public function it_can_save_a_recurring_payment_token(): void
-    {
-        $recurringPaymentToken = $this->prophesize(RecurringPaymentToken::class);
-        $this->entityManager->persist($recurringPaymentToken->reveal())->shouldBeCalled();
-        $this->entityManager->flush($recurringPaymentToken->reveal())->shouldBeCalled();
-
-        $this->recurringPaymentTokenRepository->save($recurringPaymentToken->reveal());
-    }
-
-    /** @test */
-    public function it_can_catch_a_orm_exception_on_saving_a_recurring_payment_token(): void
-    {
-        $ormException = new ORMException();
-        $token = TokenIdentifier::generate();
-        $recurringPaymentToken = $this->prophesize(RecurringPaymentToken::class);
-        $recurringPaymentToken->tokenIdentifier()->willReturn($token);
-
-        $this->entityManager->persist($recurringPaymentToken->reveal())->willThrow($ormException);
-        $this->entityManager->flush(Argument::any())->shouldNotBeCalled();
-
-        self::expectException(RecurringPaymentTokenNotSavedException::class);
-
-        $this->recurringPaymentTokenRepository->save($recurringPaymentToken->reveal());
-    }
-
-    /** @test */
-    public function it_can_catch_a_orm_invalid_argument_exception_on_saving_a_recurring_payment_token(): void
-    {
-        $ormException = new ORMInvalidArgumentException();
-        $token = TokenIdentifier::generate();
-        $recurringPaymentToken = $this->prophesize(RecurringPaymentToken::class);
-        $recurringPaymentToken->tokenIdentifier()->willReturn($token);
-
-        $this->entityManager->persist($recurringPaymentToken->reveal())->willThrow($ormException);
-        $this->entityManager->flush(Argument::any())->shouldNotBeCalled();
-
-        self::expectException(RecurringPaymentTokenNotSavedException::class);
-
-        $this->recurringPaymentTokenRepository->save($recurringPaymentToken->reveal());
+        $this->assertInstanceOf(RecurringPaymentTokenRepositoryInterface::class, $this->recurringPaymentTokenRepository);
     }
 
     /** @test */
@@ -155,38 +105,6 @@ final class RecurringPaymentTokenRepositoryTest extends TestCase
         $this->entityManager->persist($recurringPaymentToken->reveal())->shouldBeCalled();
         $this->entityManager->flush($recurringPaymentToken->reveal())->shouldBeCalled();
 
-        $this->recurringPaymentTokenRepository->save($recurringPaymentToken->reveal());
-    }
-
-    /** @test */
-    public function it_can_catch_a_orm_exception_on_updating_a_recurring_payment_token(): void
-    {
-        $ormException = new ORMException();
-        $token = TokenIdentifier::generate();
-        $recurringPaymentToken = $this->prophesize(RecurringPaymentToken::class);
-        $recurringPaymentToken->tokenIdentifier()->willReturn($token);
-
-        $this->entityManager->persist($recurringPaymentToken->reveal())->willThrow($ormException);
-        $this->entityManager->flush(Argument::any())->shouldNotBeCalled();
-
-        self::expectException(RecurringPaymentTokenNotSavedException::class);
-
-        $this->recurringPaymentTokenRepository->save($recurringPaymentToken->reveal());
-    }
-
-    /** @test */
-    public function it_can_catch_a_orm_invalid_argument_exception_on_updating_a_recurring_payment_token(): void
-    {
-        $ormException = new ORMInvalidArgumentException();
-        $token = TokenIdentifier::generate();
-        $recurringPaymentToken = $this->prophesize(RecurringPaymentToken::class);
-        $recurringPaymentToken->tokenIdentifier()->willReturn($token);
-
-        $this->entityManager->persist($recurringPaymentToken->reveal())->willThrow($ormException);
-        $this->entityManager->flush(Argument::any())->shouldNotBeCalled();
-
-        self::expectException(RecurringPaymentTokenNotSavedException::class);
-
-        $this->recurringPaymentTokenRepository->save($recurringPaymentToken->reveal());
+        $this->recurringPaymentTokenRepository->update($recurringPaymentToken->reveal());
     }
 }
