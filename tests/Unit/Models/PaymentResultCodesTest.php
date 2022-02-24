@@ -17,24 +17,52 @@ class PaymentResultCodesTest extends TestCase
     }
 
     /** @test */
-    public function it_contains_payment_result_codes(): void
-    {
-        $this->assertInstanceOf(PaymentResultCodes::class, $this->paymentResultCodes);
-    }
-
-    /** @test */
-    public function it_can_compare_payment_result_codes_objects(): void
+    public function it_knows_when_it_equals_payment_result_codes_objects(): void
     {
         $this->assertTrue($this->paymentResultCodes->equals(PaymentResultCodes::authorised()));
         $this->assertFalse($this->paymentResultCodes->equals(PaymentResultCodes::invalid()));
     }
 
     /** @test */
-    public function it_checks_payment_result_codes_on_immutabillity(): void
+    public function it_is_immutable_constructed(): void
     {
         $paymentResultCodeAuthorised = PaymentResultCodes::authorised();
         $this->assertEquals($this->paymentResultCodes, $paymentResultCodeAuthorised);
         $this->assertNotSame($this->paymentResultCodes, $paymentResultCodeAuthorised);
+    }
+
+    /** @test  */
+    public function it_throws_an_invalid_argument_exception_when_result_code_is_unknown(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid result code: "test"');
+
+        PaymentResultCodes::load('test');
+    }
+
+    /** @test  */
+    public function it_can_load_a_result_code(): void
+    {
+        $this->assertEquals(
+            PaymentResultCodes::authorised(),
+            PaymentResultCodes::load('Authorised')
+        );
+    }
+
+    /** @test */
+    public function it_knows_when_a_result_code_exists(): void
+    {
+        $result = PaymentResultCodes::exists(PaymentResultCodes::cancelled()->resultCode());
+
+        $this->assertTrue($result);
+    }
+
+    /** @test */
+    public function it_knows_when_a_result_code_doesnt_exists(): void
+    {
+        $result = PaymentResultCodes::exists('invalid-code-test');
+
+        $this->assertFalse($result);
     }
 
     /**
@@ -58,23 +86,5 @@ class PaymentResultCodesTest extends TestCase
         yield [PaymentResultCodes::received(), 'Received'];
         yield [PaymentResultCodes::redirectShopper(), 'RedirectShopper'];
         yield [PaymentResultCodes::refused(), 'Refused'];
-    }
-
-    /** @test  */
-    public function it_throws_an_invalid_argument_exception_when_result_code_is_unknown(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid result code: "test"');
-
-        PaymentResultCodes::load('test');
-    }
-
-    /** @test  */
-    public function it_can_load_a_result_code(): void
-    {
-        $this->assertEquals(
-            PaymentResultCodes::authorised(),
-            PaymentResultCodes::load('Authorised')
-        );
     }
 }
