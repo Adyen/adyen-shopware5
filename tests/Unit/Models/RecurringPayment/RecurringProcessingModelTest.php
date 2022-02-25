@@ -30,7 +30,7 @@ class RecurringProcessingModelTest extends TestCase
     }
 
     /** @test */
-    public function it_is_a_recurring_processing_model(): void
+    public function it_knows_when_it_equals_a_recurring_processing_model(): void
     {
         $recurringProcessingModel = RecurringProcessingModel::cardOnFile();
         $this->assertEquals($this->recurringProcessingModel, $recurringProcessingModel);
