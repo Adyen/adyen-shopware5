@@ -14,8 +14,8 @@ final class RecurringOneOffPaymentTokenProvider implements PaymentPayloadProvide
     public function provide(PaymentContext $context): array
     {
         $paymentInfo = $context->getPaymentInfo();
-        $storedPaymentMethodId = $paymentInfo['storedPaymentMethodId'] ?? null;
-        if (!$storedPaymentMethodId) {
+        $storedPaymentMethodId = (string) ($paymentInfo['storedPaymentMethodId'] ?? '');
+        if ('' === $storedPaymentMethodId) {
             return [];
         }
 
