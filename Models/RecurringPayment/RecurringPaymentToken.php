@@ -26,11 +26,6 @@ class RecurringPaymentToken extends ModelEntity
     private string $id;
 
     /**
-     * @ORM\Column(name="token_identifier", type="string", nullable=false)
-     */
-    private TokenIdentifier $tokenIdentifier;
-
-    /**
      * @ORM\Column(name="customer_id", type="string", length=255, nullable=false)
      */
     private string $customerId;
@@ -93,7 +88,6 @@ class RecurringPaymentToken extends ModelEntity
     ): self {
         $new = new self();
         $new->id = $id->identifier();
-        $new->tokenIdentifier = $id;
         $new->customerId = $customerId;
         $new->recurringDetailReference = $recurringDetailReference;
         $new->pspReference = $pspReference;
@@ -105,6 +99,11 @@ class RecurringPaymentToken extends ModelEntity
         return $new;
     }
 
+    /**
+     * @internal
+     *
+     * @see RecurringPaymentToken::tokenIdentifier()
+     */
     public function id(): string
     {
         return $this->id;
@@ -112,9 +111,7 @@ class RecurringPaymentToken extends ModelEntity
 
     public function tokenIdentifier(): TokenIdentifier
     {
-        $this->tokenIdentifier = TokenIdentifier::generateFromString($this->id);
-
-        return $this->tokenIdentifier;
+        return TokenIdentifier::generateFromString($this->id);
     }
 
     public function customerId(): string
@@ -137,9 +134,19 @@ class RecurringPaymentToken extends ModelEntity
         return $this->orderNumber;
     }
 
-    public function resultCode(): string
+    /**
+     * @internal
+     *
+     * @see RecurringPaymentToken::resultCode()
+     */
+    public function getResultCode(): string
     {
         return $this->resultCode;
+    }
+
+    public function resultCode(): PaymentResultCode
+    {
+        return PaymentResultCode::load($this->resultCode);
     }
 
     public function amountValue(): int

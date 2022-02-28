@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Unit\Recurring\Mapper;
 
 use AdyenPayment\Exceptions\InvalidPaymentsResponseException;
+use AdyenPayment\Models\PaymentResultCode;
 use AdyenPayment\Recurring\Mapper\RecurringTokenMapper;
 use AdyenPayment\Recurring\Mapper\RecurringTokenMapperInterface;
 use PHPUnit\Framework\TestCase;
@@ -60,7 +61,7 @@ class RecurringTokenMapperTest extends TestCase
         $this->assertEquals('8415698462516992', $recurringPaymentToken->recurringDetailReference());
         $this->assertEquals('8515815919501547', $recurringPaymentToken->pspReference());
         $this->assertEquals('YOUR_ORDER_NUMBER', $recurringPaymentToken->orderNumber());
-        $this->assertEquals('Authorised', $recurringPaymentToken->resultCode());
+        $this->assertEquals(PaymentResultCode::load('Authorised'), $recurringPaymentToken->resultCode());
         $this->assertIsInt($recurringPaymentToken->amountValue());
         $this->assertEquals(0, $recurringPaymentToken->amountValue());
         $this->assertEquals('USD', $recurringPaymentToken->amountCurrency());
@@ -81,7 +82,7 @@ class RecurringTokenMapperTest extends TestCase
         $this->assertEquals('', $recurringPaymentToken->recurringDetailReference());
         $this->assertEquals('', $recurringPaymentToken->pspReference());
         $this->assertEquals('', $recurringPaymentToken->orderNumber());
-        $this->assertEquals('Invalid', $recurringPaymentToken->resultCode());
+        $this->assertEquals(PaymentResultCode::load('Invalid'), $recurringPaymentToken->resultCode());
         $this->assertEquals(0, $recurringPaymentToken->amountValue());
         $this->assertEquals('', $recurringPaymentToken->amountCurrency());
     }

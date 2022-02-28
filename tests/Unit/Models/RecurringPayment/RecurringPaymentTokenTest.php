@@ -74,9 +74,15 @@ class RecurringPaymentTokenTest extends TestCase
     }
 
     /** @test */
+    public function it_contains_a_result_code_string(): void
+    {
+        $this->assertEquals('Authorised', $this->recurringPaymentToken->getResultCode());
+    }
+
+    /** @test */
     public function it_contains_a_result_code(): void
     {
-        $this->assertEquals('Authorised', $this->recurringPaymentToken->resultCode());
+        $this->assertEquals(PaymentResultCode::load('Authorised'), $this->recurringPaymentToken->resultCode());
     }
 
     /** @test */
