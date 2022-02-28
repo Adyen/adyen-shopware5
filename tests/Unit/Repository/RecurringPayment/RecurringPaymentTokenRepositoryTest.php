@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
+// @TODO: refactor to integration test.
 final class RecurringPaymentTokenRepositoryTest extends TestCase
 {
     use ProphecyTrait;

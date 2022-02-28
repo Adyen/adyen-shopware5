@@ -10,15 +10,27 @@ use PHPUnit\Framework\TestCase;
 
 final class RecurringPaymentTokenNotFoundExceptionTest extends TestCase
 {
+    private RecurringPaymentTokenNotFoundException $exception;
+
+    protected function setUp(): void
+    {
+        $this->exception = new RecurringPaymentTokenNotFoundException();
+    }
+
     /** @test */
-    public function it_can_return_an_exception_with_customer_id_and_order_number(): void
+    public function is_a_runtime_exception(): void
+    {
+        self::assertInstanceOf(\RuntimeException::class, $this->exception);
+    }
+
+    /** @test */
+    public function it_can_be_constructed_with_customer_id_and_order_number(): void
     {
         $exception = RecurringPaymentTokenNotFoundException::withCustomerIdAndOrderNumber(
             $customerId = 'customer-id',
             $orderNumber = 'order-number'
         );
 
-        self::assertInstanceOf(\RuntimeException::class, $exception);
         self::assertInstanceOf(RecurringPaymentTokenNotFoundException::class, $exception);
         self::assertEquals(
             sprintf(
@@ -31,13 +43,12 @@ final class RecurringPaymentTokenNotFoundExceptionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_return_an_exception_with_psp_reference(): void
+    public function it_can_be_constructed_with_psp_reference(): void
     {
         $exception = RecurringPaymentTokenNotFoundException::withPendingResultCodeAndPspReference(
             $pspReference = 'psp-reference'
         );
 
-        self::assertInstanceOf(\RuntimeException::class, $exception);
         self::assertInstanceOf(RecurringPaymentTokenNotFoundException::class, $exception);
         self::assertEquals(
             sprintf(

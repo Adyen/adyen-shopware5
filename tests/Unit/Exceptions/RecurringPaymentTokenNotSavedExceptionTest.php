@@ -10,14 +10,26 @@ use PHPUnit\Framework\TestCase;
 
 final class RecurringPaymentTokenNotSavedExceptionTest extends TestCase
 {
+    private RecurringPaymentTokenNotSavedException $exception;
+
+    protected function setUp(): void
+    {
+        $this->exception = new RecurringPaymentTokenNotSavedException();
+    }
+
     /** @test */
-    public function it_can_return_an_exception_with_customer_id_and_order_number(): void
+    public function is_a_runtime_exception(): void
+    {
+        self::assertInstanceOf(\RuntimeException::class, $this->exception);
+    }
+
+    /** @test */
+    public function it_can_be_constructed_with_token_identifier(): void
     {
         $tokenIdentifier = TokenIdentifier::generate();
 
         $exception = RecurringPaymentTokenNotSavedException::withId($tokenIdentifier);
 
-        self::assertInstanceOf(\RuntimeException::class, $exception);
         self::assertInstanceOf(RecurringPaymentTokenNotSavedException::class, $exception);
         self::assertEquals(
             'Recurring payment token not saved with id:'.$tokenIdentifier->identifier(),

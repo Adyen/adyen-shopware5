@@ -17,6 +17,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
+// @TODO: refactor to integration test.
 final class TraceableRecurringPaymentTokenRepositoryTest extends TestCase
 {
     use ProphecyTrait;
