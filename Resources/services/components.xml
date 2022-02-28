@@ -59,34 +59,6 @@
             <argument type="service" id="models"/>
         </service>
 
-        <!-- Checkout Payment Payload -->
-        <service id="AdyenPayment\Components\Payload\PaymentPayloadProvider"
-                 class="AdyenPayment\Components\Payload\Chain" public="true">
-            <argument type="service" id="AdyenPayment\Components\Payload\Providers\ApplicationInfoProvider"/>
-            <argument type="service" id="AdyenPayment\Components\Payload\Providers\ShopperInfoProvider"/>
-            <argument type="service" id="AdyenPayment\Components\Payload\Providers\OrderInfoProvider"/>
-            <argument type="service" id="AdyenPayment\Components\Payload\Providers\PaymentMethodProvider"/>
-            <argument type="service" id="AdyenPayment\Components\Payload\Providers\LineItemsInfoProvider"/>
-            <argument type="service" id="AdyenPayment\Components\Payload\Providers\BrowserInfoProvider"/>
-            <argument type="service" id="AdyenPayment\Components\Payload\Providers\StorePaymentProvider"/>
-            <argument type="service" id="AdyenPayment\Components\Payload\Providers\RecurringPaymentProvider"/>
-        </service>
-        <service id="AdyenPayment\Components\Payload\Chain"/>
-        <service id="AdyenPayment\Components\Payload\Providers\ApplicationInfoProvider" public="true">
-            <argument type="service" id="router"/>
-            <argument type="service" id="models"/>
-            <argument type="service" id="AdyenPayment\Components\Configuration"/>
-        </service>
-        <service id="AdyenPayment\Components\Payload\Providers\BrowserInfoProvider"/>
-        <service id="AdyenPayment\Components\Payload\Providers\LineItemsInfoProvider">
-            <argument type="service" id="AdyenPayment\Components\Calculator\PriceCalculationService"/>
-        </service>
-        <service id="AdyenPayment\Components\Payload\Providers\OrderInfoProvider"/>
-        <service id="AdyenPayment\Components\Payload\Providers\PaymentMethodProvider"/>
-        <service id="AdyenPayment\Components\Payload\Providers\ShopperInfoProvider"/>
-        <service id="AdyenPayment\Components\Payload\Providers\StorePaymentProvider"/>
-        <service id="AdyenPayment\Components\Payload\Providers\RecurringPaymentProvider"/>
-
         <!-- Notification Processors -->
         <service id="AdyenPayment\Components\NotificationProcessor\Authorisation">
             <tag name="adyen.payment.notificationprocessor"/>

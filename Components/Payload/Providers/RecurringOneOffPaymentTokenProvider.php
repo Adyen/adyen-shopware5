@@ -6,9 +6,10 @@ namespace AdyenPayment\Components\Payload\Providers;
 
 use AdyenPayment\Components\Payload\PaymentContext;
 use AdyenPayment\Components\Payload\PaymentPayloadProvider;
+use AdyenPayment\Models\RecurringPayment\RecurringProcessingModel;
+use AdyenPayment\Models\RecurringPayment\ShopperInteraction;
 
-/** @TODO - Pending unit tests */
-final class RecurringPaymentProvider implements PaymentPayloadProvider
+final class RecurringOneOffPaymentTokenProvider implements PaymentPayloadProvider
 {
     public function provide(PaymentContext $context): array
     {
@@ -19,8 +20,8 @@ final class RecurringPaymentProvider implements PaymentPayloadProvider
         }
 
         return [
-            'shopperInteraction' => 'ContAuth',
-            'recurringProcessingModel' => 'CardOnFile',
+            'shopperInteraction' => ShopperInteraction::ecommerce()->shopperInteraction(),
+            'recurringProcessingModel' => RecurringProcessingModel::cardOnFile()->recurringProcessingModel(),
         ];
     }
 }
