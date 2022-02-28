@@ -13,9 +13,9 @@ use AdyenPayment\Models\Enum\Channel;
 use AdyenPayment\Session\CustomerNumberProviderInterface;
 use Psr\Log\LoggerInterface;
 
+/** @TODO - Cleanup the public const (unify the services) and create unit tests */
 final class PaymentMethodService implements PaymentMethodServiceInterface
 {
-    /** @todo cleanup the public const (unify the services) */
     public const IMPORT_LOCALE = 'en_GB';
     private ApiClientMap $apiClientMap;
     private Configuration $configuration;
