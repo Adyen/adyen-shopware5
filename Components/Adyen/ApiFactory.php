@@ -47,8 +47,12 @@ class ApiFactory
         );
     }
 
-    private function createClient(string $merchantAccount, string $apiKey, string $environment, ?string $prefix = null): Client
-    {
+    private function createClient(
+        string $merchantAccount,
+        string $apiKey,
+        string $environment,
+        ?string $prefix = null
+    ): Client {
         $urlPrefix = Environment::LIVE === $environment ? $prefix : null;
 
         $adyenClient = new Client();
