@@ -23,14 +23,14 @@ class ShopperInteractionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_compare_shopper_interaction_objects(): void
+    public function it_knows_when_it_equals_a_shopper_interaction(): void
     {
         $this->assertTrue($this->shopperInteraction->equals(ShopperInteraction::contAuth()));
         $this->assertFalse($this->shopperInteraction->equals(ShopperInteraction::ecommerce()));
     }
 
     /** @test */
-    public function it_checks_shopper_interaction_on_immutabillity(): void
+    public function it_is_immutable_constructed(): void
     {
         $shopperInteractionContAuth = ShopperInteraction::contAuth();
         $this->assertEquals($this->shopperInteraction, $shopperInteractionContAuth);
