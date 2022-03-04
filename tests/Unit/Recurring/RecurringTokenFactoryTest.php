@@ -6,37 +6,37 @@ namespace Unit\Recurring\Mapper;
 
 use AdyenPayment\Exceptions\InvalidPaymentsResponseException;
 use AdyenPayment\Models\PaymentResultCode;
-use AdyenPayment\Recurring\Mapper\RecurringTokenMapper;
-use AdyenPayment\Recurring\Mapper\RecurringTokenMapperInterface;
+use AdyenPayment\Recurring\RecurringTokenFactory;
+use AdyenPayment\Recurring\RecurringTokenFactoryInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class RecurringTokenMapperTest extends TestCase
+class RecurringTokenFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ObjectProphecy|RecurringTokenMapperInterface */
+    /** @var ObjectProphecy|RecurringTokenFactoryInterface */
     private $recurringTokenMapper;
 
     protected function setUp(): void
     {
-        $this->recurringTokenMapper = new RecurringTokenMapper();
+        $this->recurringTokenMapper = new RecurringTokenFactory();
     }
 
     /** @test */
     public function it_is_a_recurring_token_mapper(): void
     {
-        $this->assertInstanceOf(RecurringTokenMapperInterface::class, $this->recurringTokenMapper);
+        $this->assertInstanceOf(RecurringTokenFactoryInterface::class, $this->recurringTokenMapper);
     }
 
     /** @test */
     public function it_throws_invalid_payments_response_exception(): void
     {
         $this->expectException(InvalidPaymentsResponseException::class);
-        $this->expectExceptionMessage('Payments response not found.');
+        $this->expectExceptionMessage('Empty Payment data.');
 
-        ($this->recurringTokenMapper)([]);
+        RecurringTokenFactory::create([]);
     }
 
     /** @test */
@@ -55,7 +55,7 @@ class RecurringTokenMapperTest extends TestCase
             ],
             'merchantReference' => 'YOUR_ORDER_NUMBER',
         ];
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenPaymentsResponseArray);
+        $recurringPaymentToken = RecurringTokenFactory::create($adyenPaymentsResponseArray);
 
         $this->assertEquals('YOUR_UNIQUE_SHOPPER_ID_IOfW3k9G2PvXFu2j', $recurringPaymentToken->customerId());
         $this->assertEquals('8415698462516992', $recurringPaymentToken->recurringDetailReference());
@@ -76,7 +76,7 @@ class RecurringTokenMapperTest extends TestCase
             'amount' => [
             ],
         ];
-        $recurringPaymentToken = ($this->recurringTokenMapper)($adyenPaymentsResponseArray);
+        $recurringPaymentToken = RecurringTokenFactory::create($adyenPaymentsResponseArray);
 
         $this->assertEquals('', $recurringPaymentToken->customerId());
         $this->assertEquals('', $recurringPaymentToken->recurringDetailReference());

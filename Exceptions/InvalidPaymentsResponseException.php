@@ -6,8 +6,8 @@ namespace AdyenPayment\Exceptions;
 
 class InvalidPaymentsResponseException extends \Exception
 {
-    public static function invalid(): self
+    public static function empty(): self
     {
-        return new static('Payments response not found.');
+        return new static('Empty Payment data.');
     }
 }
