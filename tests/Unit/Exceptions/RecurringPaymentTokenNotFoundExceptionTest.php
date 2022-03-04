@@ -33,11 +33,7 @@ final class RecurringPaymentTokenNotFoundExceptionTest extends TestCase
 
         self::assertInstanceOf(RecurringPaymentTokenNotFoundException::class, $exception);
         self::assertEquals(
-            sprintf(
-                'Recurring payment token not found with customer id: %s, order number: %s',
-                $customerId,
-                $orderNumber
-            ),
+            'Recurring payment token not found with customer id: "'.$customerId.'", order number: "'.$orderNumber.'"',
             $exception->getMessage()
         );
     }
@@ -51,11 +47,8 @@ final class RecurringPaymentTokenNotFoundExceptionTest extends TestCase
 
         self::assertInstanceOf(RecurringPaymentTokenNotFoundException::class, $exception);
         self::assertEquals(
-            sprintf(
-                'Recurring payment token not found with result code: %s, psp reference: %s',
-                PaymentResultCode::pending()->resultCode(),
-                $pspReference
-            ),
+            'Recurring payment token not found with result code: "'.PaymentResultCode::pending()->resultCode()
+                .'", psp reference: "'.$pspReference.'"',
             $exception->getMessage()
         );
     }

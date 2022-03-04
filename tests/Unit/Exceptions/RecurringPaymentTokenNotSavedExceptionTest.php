@@ -32,7 +32,7 @@ final class RecurringPaymentTokenNotSavedExceptionTest extends TestCase
 
         self::assertInstanceOf(RecurringPaymentTokenNotSavedException::class, $exception);
         self::assertEquals(
-            'Recurring payment token not saved with id:'.$tokenIdentifier->identifier(),
+            'Recurring payment token not saved with id: "'.$tokenIdentifier->identifier().'"',
             $exception->getMessage()
         );
     }

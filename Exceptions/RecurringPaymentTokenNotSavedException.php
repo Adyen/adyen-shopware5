@@ -10,6 +10,6 @@ final class RecurringPaymentTokenNotSavedException extends \RuntimeException
 {
     public static function withId(TokenIdentifier $tokenIdentifier): self
     {
-        return new self('Recurring payment token not saved with id:'.$tokenIdentifier->identifier());
+        return new self('Recurring payment token not saved with id: "'.$tokenIdentifier->identifier().'"');
     }
 }

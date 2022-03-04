@@ -11,7 +11,7 @@ final class RecurringPaymentTokenNotFoundException extends \RuntimeException
     public static function withCustomerIdAndOrderNumber(string $customerId, string $orderNumber): self
     {
         return new self(sprintf(
-            'Recurring payment token not found with customer id: %s, order number: %s',
+            'Recurring payment token not found with customer id: "%s", order number: "%s"',
             $customerId,
             $orderNumber
         ));
@@ -20,7 +20,7 @@ final class RecurringPaymentTokenNotFoundException extends \RuntimeException
     public static function withPendingResultCodeAndPspReference(string $pspReference): self
     {
         return new self(sprintf(
-            'Recurring payment token not found with result code: %s, psp reference: %s',
+            'Recurring payment token not found with result code: "%s", psp reference: "%s"',
             PaymentResultCode::pending()->resultCode(),
             $pspReference
         ));
