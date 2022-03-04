@@ -35,9 +35,9 @@ class PaymentResultCodeTest extends TestCase
     public function it_throws_an_invalid_argument_exception_when_result_code_is_unknown(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid result code: "test"');
+        $this->expectExceptionMessage('Invalid result code: "INVALID_CODE"');
 
-        PaymentResultCode::load('test');
+        PaymentResultCode::load('INVALID_CODE');
     }
 
     /** @test  */
@@ -52,7 +52,7 @@ class PaymentResultCodeTest extends TestCase
     /** @test */
     public function it_knows_when_a_result_code_exists(): void
     {
-        $result = PaymentResultCode::exists(PaymentResultCode::cancelled()->resultCode());
+        $result = PaymentResultCode::exists('Authorised');
 
         $this->assertTrue($result);
     }
