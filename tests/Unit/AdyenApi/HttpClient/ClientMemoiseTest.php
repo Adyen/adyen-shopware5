@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace AdyenPayment\Tests\Unit\AdyenApi\HttpClient;
+
+use Adyen\Client;
+use AdyenPayment\AdyenApi\HttpClient\ClientFactoryInterface;
+use AdyenPayment\AdyenApi\HttpClient\ClientMemoise;
+use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
+use Shopware\Models\Shop\Shop;
+
+class ClientMemoiseTest extends TestCase
+{
+    use ProphecyTrait;
+    private ClientMemoise $clientMemoise;
+
+    /** @var ClientFactoryInterface|ObjectProphecy */
+    private $clientFactory;
+
+    protected function setUp(): void
+    {
+        $this->clientFactory = $this->prophesize(ClientFactoryInterface::class);
+        $this->clientMemoise = new ClientMemoise($this->clientFactory->reveal());
+    }
+
+    /** @test */
+    public function it_is_a_client_memoise(): void
+    {
+        $this->assertInstanceOf(ClientMemoise::class, $this->clientMemoise);
+    }
+
+    /** @test */
+    public function it_can_lookup_a_client(): void
+    {
+        $shop = $this->prophesize(Shop::class);
+        $shop->getId()->willReturn('shop-id');
+
+        $client = $this->prophesize(Client::class);
+
+        $this->clientFactory->provide($shop->reveal())->willReturn($client->reveal());
+
+        $result = $this->clientMemoise->lookup($shop->reveal());
+
+        $this->assertSame($client->reveal(), $result);
+    }
+}

@@ -7,15 +7,15 @@ namespace AdyenPayment\AdyenApi\HttpClient;
 use Adyen\Client;
 use Shopware\Models\Shop\Shop;
 
-class ClientMemoise
+final class ClientMemoise implements ClientMemoiseInterface
 {
     /**
      * @var array<int|string, Client>
      */
     private $memoisedClients = [];
-    private ClientFactory $factory;
+    private ClientFactoryInterface $factory;
 
-    public function __construct(ClientFactory $factory)
+    public function __construct(ClientFactoryInterface $factory)
     {
         $this->factory = $factory;
     }

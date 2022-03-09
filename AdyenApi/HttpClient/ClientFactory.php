@@ -7,19 +7,17 @@ namespace AdyenPayment\AdyenApi\HttpClient;
 use Adyen\AdyenException;
 use Adyen\Client;
 use Adyen\Environment;
-use AdyenPayment\Components\Configuration;
+use AdyenPayment\Components\ConfigurationInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Models\Shop\Shop;
 
-class ClientFactory
+final class ClientFactory implements ClientFactoryInterface
 {
-    private Configuration $configuration;
+    private ConfigurationInterface $configuration;
     private LoggerInterface $logger;
 
-    public function __construct(
-        Configuration $configuration,
-        LoggerInterface $logger
-    ) {
+    public function __construct(ConfigurationInterface $configuration, LoggerInterface $logger)
+    {
         $this->configuration = $configuration;
         $this->logger = $logger;
     }
