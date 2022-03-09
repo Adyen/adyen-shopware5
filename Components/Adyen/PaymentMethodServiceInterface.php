@@ -17,8 +17,9 @@ interface PaymentMethodServiceInterface
         bool $cache = true
     ): PaymentMethodCollection;
 
-    /**
-     * @internal
-     */
+    /** @internal */
     public function getCheckout(): Checkout;
+
+    /** @internal */
+    public function provideCustomerNumber(): string;
 }

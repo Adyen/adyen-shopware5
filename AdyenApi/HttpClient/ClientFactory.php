@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Components\Adyen;
+namespace AdyenPayment\AdyenApi\HttpClient;
 
 use Adyen\AdyenException;
 use Adyen\Client;
@@ -11,20 +11,10 @@ use AdyenPayment\Components\Configuration;
 use Psr\Log\LoggerInterface;
 use Shopware\Models\Shop\Shop;
 
-/**
- * Class ApiFactory.
- */
-class ApiFactory
+class ClientFactory
 {
-    /**
-     * @var Configuration
-     */
-    private $configuration;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private Configuration $configuration;
+    private LoggerInterface $logger;
 
     public function __construct(
         Configuration $configuration,

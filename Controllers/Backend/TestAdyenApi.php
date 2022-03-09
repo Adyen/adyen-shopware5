@@ -1,6 +1,6 @@
 <?php
 
-use AdyenPayment\Components\Adyen\ApiConfigValidator;
+use AdyenPayment\AdyenApi\HttpClient\ConfigValidator;
 use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRule;
 use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface;
 use Shopware\Components\CacheManager;
@@ -10,7 +10,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Backend_ExtJs
 {
-    private ApiConfigValidator $apiConfigValidator;
+    private ConfigValidator $apiConfigValidator;
     private UsedFallbackConfigRuleInterface $usedFallbackConfigRule;
     private CacheManager $cacheManager;
 
@@ -19,7 +19,7 @@ class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Bac
         parent::preDispatch();
 
         $this->cacheManager = $this->get(CacheManager::class);
-        $this->apiConfigValidator = $this->get(ApiConfigValidator::class);
+        $this->apiConfigValidator = $this->get(ConfigValidator::class);
         $this->usedFallbackConfigRule = $this->get(UsedFallbackConfigRule::class);
     }
 

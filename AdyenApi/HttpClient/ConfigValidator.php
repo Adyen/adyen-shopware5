@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Components\Adyen;
+namespace AdyenPayment\AdyenApi\HttpClient;
 
 use Adyen\AdyenException;
 use Adyen\Service\Checkout;
@@ -12,25 +12,14 @@ use Doctrine\Persistence\ObjectRepository;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class ApiConfigValidator
+class ConfigValidator
 {
-    /**
-     * @var ApiFactory
-     */
-    private $adyenApiFactory;
-
-    /**
-     * @var Configuration
-     */
-    private $configuration;
-
-    /**
-     * @var ObjectRepository
-     */
-    private $shopRepository;
+    private ClientFactory $adyenApiFactory;
+    private Configuration $configuration;
+    private ObjectRepository $shopRepository;
 
     public function __construct(
-        ApiFactory $adyenApiFactory,
+        ClientFactory $adyenApiFactory,
         Configuration $configuration,
         ObjectRepository $shopRepository
     ) {

@@ -7,6 +7,7 @@ namespace AdyenPayment\Components\Adyen;
 use Adyen\AdyenException;
 use Adyen\Service\Checkout;
 use Adyen\Util\Currency;
+use AdyenPayment\AdyenApi\HttpClient\ClientMemoise;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Models\Enum\Channel;
@@ -17,14 +18,14 @@ use Psr\Log\LoggerInterface;
 final class PaymentMethodService implements PaymentMethodServiceInterface
 {
     public const IMPORT_LOCALE = 'en_GB';
-    private ApiClientMap $apiClientMap;
+    private ClientMemoise $apiClientMap;
     private Configuration $configuration;
     private array $cache;
     private LoggerInterface $logger;
     private CustomerNumberProviderInterface $customerNumberProvider;
 
     public function __construct(
-        ApiClientMap $apiClientMap,
+        ClientMemoise $apiClientMap,
         Configuration $configuration,
         LoggerInterface $logger,
         CustomerNumberProviderInterface $customerNumberProvider
@@ -115,5 +116,16 @@ final class PaymentMethodService implements PaymentMethodServiceInterface
                 Shopware()->Shop()
             )
         );
+    }
+
+    public function provideCustomerNumber(): string
+    {
+        $userId = $this->session->get('sUserId');
+        if (!$userId) {
+            return '';
+        }
+        $customer = $this->modelManager->getRepository(Customer::class)->find($userId);
+
+        return $customer ? (string) $customer->getNumber() : '';
     }
 }

@@ -2,24 +2,20 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Components\Adyen;
+namespace AdyenPayment\AdyenApi\HttpClient;
 
 use Adyen\Client;
 use Shopware\Models\Shop\Shop;
 
-class ApiClientMap
+class ClientMemoise
 {
     /**
      * @var array<int|string, Client>
      */
     private $memoisedClients = [];
+    private ClientFactory $factory;
 
-    /**
-     * @var ApiFactory
-     */
-    private $factory;
-
-    public function __construct(ApiFactory $factory)
+    public function __construct(ClientFactory $factory)
     {
         $this->factory = $factory;
     }
