@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\AdyenApi\Recurring;
 
-use AdyenApi\Model\ApiResponse;
+use AdyenPayment\AdyenApi\Model\ApiResponse;
 use AdyenPayment\AdyenApi\TransportFactory;
 use AdyenPayment\Components\Adyen\PaymentMethodServiceInterface;
 use Shopware\Models\Shop\Shop;
