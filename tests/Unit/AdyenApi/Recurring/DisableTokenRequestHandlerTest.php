@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Tests\Unit\AdyenApi;
+namespace AdyenPayment\Tests\Unit\AdyenApi\Recurring;
 
 use Adyen\Service\Recurring;
 use AdyenPayment\AdyenApi\Model\ApiResponse;
