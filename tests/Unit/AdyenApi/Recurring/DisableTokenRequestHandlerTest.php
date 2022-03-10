@@ -67,7 +67,7 @@ class DisableTokenRequestHandlerTest extends TestCase
         ];
         $recurringTransport->disable($payload)->willReturn([
             'status' => $statusCode = 200,
-            'message' => $message = 'It worked',
+            'message' => $message = 'successfully-disabled',
         ]);
         $this->paymentMethodService->provideCustomerNumber()->willReturn($customerNumber);
         $this->transportFactory->recurring($shop->reveal())->willReturn($recurringTransport);
