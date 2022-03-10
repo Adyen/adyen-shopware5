@@ -37,6 +37,6 @@ final class DisableTokenRequestHandler implements DisableTokenRequestHandlerInte
 
         $result = $recurringTransport->disable($payload);
 
-        return ApiResponse::create($result['statusCode'], $result['success'], $result['message']);
+        return ApiResponse::create($result['status'], (200 === $result['status']), $result['message']);
     }
 }

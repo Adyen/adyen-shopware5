@@ -57,7 +57,7 @@ class DisableTokenRequestHandlerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_disable_a_token(): void
+    public function it_will_return_an_api_response_for_disable_token_success(): void
     {
         $shop = $this->prophesize(Shop::class);
         $recurringTransport = $this->prophesize(Recurring::class);
@@ -66,8 +66,7 @@ class DisableTokenRequestHandlerTest extends TestCase
             'recurringDetailReference' => $recurringTokenId = 'recurringTokenId',
         ];
         $recurringTransport->disable($payload)->willReturn($expected = [
-            'statusCode' => $statusCode = 200,
-            'success' => $success = true,
+            'status' => $statusCode = 200,
             'message' => $message = 'It worked',
         ]);
         $this->paymentMethodService->provideCustomerNumber()->willReturn($customerNumber);
@@ -75,6 +74,27 @@ class DisableTokenRequestHandlerTest extends TestCase
 
         $result = $this->disableTokenRequestHandler->disableToken($recurringTokenId, $shop->reveal());
 
-        $this->assertEquals(ApiResponse::create($statusCode, $success, $message), $result);
+        $this->assertEquals(ApiResponse::create($statusCode, true, $message), $result);
+    }
+
+    /** @test */
+    public function it_will_return_an_api_response_for_disable_token_error(): void
+    {
+        $shop = $this->prophesize(Shop::class);
+        $recurringTransport = $this->prophesize(Recurring::class);
+        $payload = [
+            'shopperReference' => $customerNumber = 'customer-number',
+            'recurringDetailReference' => $recurringTokenId = 'recurringTokenId',
+        ];
+        $recurringTransport->disable($payload)->willReturn($expected = [
+            'status' => $statusCode = 422,
+            'message' => $message = 'PaymentDetail not found',
+        ]);
+        $this->paymentMethodService->provideCustomerNumber()->willReturn($customerNumber);
+        $this->transportFactory->recurring($shop->reveal())->willReturn($recurringTransport);
+
+        $result = $this->disableTokenRequestHandler->disableToken($recurringTokenId, $shop->reveal());
+
+        $this->assertEquals(ApiResponse::create($statusCode, false, $message), $result);
     }
 }
