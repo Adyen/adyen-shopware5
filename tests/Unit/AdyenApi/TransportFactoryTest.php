@@ -36,7 +36,7 @@ class TransportFactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_provide_a_recurring_client_service(): void
+    public function it_can_provide_a_recurring_transport(): void
     {
         $shop = $this->prophesize(Shop::class);
         $adyenClient = $this->createClientMock();
@@ -49,7 +49,7 @@ class TransportFactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_provide_a_checkout_client_service(): void
+    public function it_can_provide_a_checkout_transport(): void
     {
         $shop = $this->prophesize(Shop::class);
         $adyenClient = $this->createClientMock();

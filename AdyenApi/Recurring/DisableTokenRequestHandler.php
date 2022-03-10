@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace AdyenPayment\AdyenApi\Recurring;
 
 use AdyenPayment\AdyenApi\Model\ApiResponse;
-use AdyenPayment\AdyenApi\TransportFactory;
+use AdyenPayment\AdyenApi\TransportFactoryInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodServiceInterface;
 use Shopware\Models\Shop\Shop;
 
 final class DisableTokenRequestHandler implements DisableTokenRequestHandlerInterface
 {
     private PaymentMethodServiceInterface $paymentMethodService;
-    private TransportFactory $transportFactory;
+    private TransportFactoryInterface $transportFactory;
 
     public function __construct(
         PaymentMethodServiceInterface $paymentMethodService,
-        TransportFactory $transportFactory
+        TransportFactoryInterface $transportFactory
     ) {
         $this->paymentMethodService = $paymentMethodService;
         $this->transportFactory = $transportFactory;
@@ -35,6 +35,8 @@ final class DisableTokenRequestHandler implements DisableTokenRequestHandlerInte
             'recurringDetailReference' => $recurringTokenId,
         ];
 
-        return ApiResponse::create(...$recurringTransport->disable($payload));
+        $result = $recurringTransport->disable($payload);
+
+        return ApiResponse::create($result['statusCode'], $result['success'], $result['message']);
     }
 }
