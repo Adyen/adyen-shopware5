@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace AdyenPayment\Tests\Unit\AdyenApi\HttpClient;
 
 use Adyen\AdyenException;
+use Adyen\Client;
+use Adyen\Config;
+use Adyen\Environment;
+use Adyen\HttpClient\ClientInterface;
 use AdyenPayment\AdyenApi\HttpClient\ClientFactoryInterface;
 use AdyenPayment\AdyenApi\HttpClient\ConfigValidator;
 use AdyenPayment\Components\ConfigurationInterface;
-use AdyenPayment\Tests\Unit\AdyenApi\ClientMockTrait;
 use AdyenPayment\Validator\ConstraintViolationFactory;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Shopware\Models\Shop\Shop;
@@ -20,7 +24,6 @@ use Symfony\Component\Validator\ConstraintViolationList;
 class ConfigValidatorTest extends TestCase
 {
     use ProphecyTrait;
-    use ClientMockTrait;
     private ConfigValidator $configValidator;
 
     /** @var ClientFactoryInterface|ObjectProphecy */
@@ -137,5 +140,23 @@ class ConfigValidatorTest extends TestCase
         $this->configuration->getMerchantAccount($shop->reveal())->willReturn($merchantAccount);
 
         $this->assertEquals(new ConstraintViolationList(), $this->configValidator->validate($shopId));
+    }
+
+    private function createClientMock(): ObjectProphecy
+    {
+        // we need to mock these to avoid fatal errors but the expected values are not required for these tests
+        $config = $this->prophesize(Config::class);
+        $config->get(Argument::any())->willReturn(Environment::TEST);
+        $config->getInputType(Argument::any())->willReturn('');
+        $httpClient = $this->prophesize(ClientInterface::class);
+        $httpClient->requestJson(Argument::cetera())->willReturn([]);
+
+        $client = $this->prophesize(Client::class);
+        $client->getConfig()->willReturn($config->reveal());
+        $client->getHttpClient()->willReturn($httpClient->reveal());
+        $client->getApiCheckoutVersion()->willReturn('');
+        $client->getApiRecurringVersion()->willReturn('');
+
+        return $client;
     }
 }

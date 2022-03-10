@@ -22,6 +22,11 @@ final class ApiResponse
         return new self($statusCode, $success, $message);
     }
 
+    public static function empty(): self
+    {
+        return new self(400, false, 'Customer number not found.');
+    }
+
     public function statusCode(): int
     {
         return $this->statusCode;

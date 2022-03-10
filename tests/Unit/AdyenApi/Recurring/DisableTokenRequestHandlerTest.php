@@ -45,7 +45,7 @@ class DisableTokenRequestHandlerTest extends TestCase
     }
 
     /** @test */
-    public function it_will_return_null_on_missing_customer_number(): void
+    public function it_will_return_a_400_on_missing_customer_number(): void
     {
         $shop = $this->prophesize(Shop::class);
         $this->paymentMethodService->provideCustomerNumber()->willReturn('');
@@ -53,7 +53,7 @@ class DisableTokenRequestHandlerTest extends TestCase
 
         $result = $this->disableTokenRequestHandler->disableToken('recurringTokenId', $shop->reveal());
 
-        $this->assertNull($result);
+        $this->assertEquals(ApiResponse::empty(), $result);
     }
 
     /** @test */

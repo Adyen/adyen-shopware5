@@ -22,11 +22,12 @@ final class DisableTokenRequestHandler implements DisableTokenRequestHandlerInte
         $this->transportFactory = $transportFactory;
     }
 
-    public function disableToken(string $recurringTokenId, Shop $shop): ?ApiResponse
+    public function disableToken(string $recurringTokenId, Shop $shop): ApiResponse
     {
+        // @TODO: replace with a new service.
         $customerNumber = $this->paymentMethodService->provideCustomerNumber();
         if ('' === $customerNumber) {
-            return null;
+            return ApiResponse::empty();
         }
         $recurringTransport = $this->transportFactory->recurring($shop);
 

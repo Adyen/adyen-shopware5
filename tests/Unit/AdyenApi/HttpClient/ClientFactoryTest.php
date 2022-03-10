@@ -49,14 +49,11 @@ class ClientFactoryTest extends TestCase
         $this->configuration->getEnvironment($shop)->willReturn($environment = Environment::TEST);
         $this->configuration->getApiUrlPrefix($shop)->willReturn($urlPrefix = 'api-url-prefix');
 
-        $adyenClient = new Client();
-        $adyenClient->setMerchantAccount($merchantAccount);
-        $adyenClient->setXApiKey($apiKey);
-        $adyenClient->setEnvironment($environment, $urlPrefix);
-        $adyenClient->setLogger($this->logger->reveal());
-
         $result = $this->clientFactory->provide($shop->reveal());
 
-        $this->assertEquals($adyenClient, $result);
+        $this->assertInstanceOf(Client::class, $result);
+        $this->assertEquals($merchantAccount, $result->getConfig()->getMerchantAccount());
+        $this->assertEquals($apiKey, $result->getConfig()->getXApiKey());
+        $this->assertEquals($environment, $result->getConfig()->getEnvironment());
     }
 }

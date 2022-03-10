@@ -7,11 +7,13 @@ namespace AdyenPayment\Tests\Unit\Http\Response;
 use AdyenPayment\Http\Response\ApiJsonResponse;
 use AdyenPayment\Http\Response\FrontendJsonResponse;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\Response;
 
 class FrontendJsonResponseTest extends TestCase
 {
+    use ProphecyTrait;
     private ApiJsonResponse $apiJsonResponse;
 
     protected function setUp(): void
@@ -30,25 +32,22 @@ class FrontendJsonResponseTest extends TestCase
     {
         $frontController = $this->prophesize(\Enlight_Controller_Front::class);
         $httpResponse = $this->prophesize(\Enlight_Controller_Response_ResponseHttp::class);
-        $response = $this->prophesize(JsonResponse::class);
+        $response = new JsonResponse([], Response::HTTP_OK);
         $plugins = $this->prophesize(\Enlight_Plugin_Namespace_Loader::class);
         $viewRenderer = $this->prophesize(\Enlight_Controller_Plugins_ViewRenderer_Bootstrap::class);
 
-        $response->headers = new ResponseHeaderBag(['Content-Type' => 'json']);
-        $response->getStatusCode()->willReturn($statusCode = 200);
-        $response->getContent()->willReturn($jsonContent = '{}');
         $viewRenderer->setNoRender()->shouldBeCalled();
-        $plugins->ViewRenderer()->willReturn($viewRenderer->reveal());
-        $frontController->Plugins()->willReturn($plugins->reveal());
+        $plugins->ViewRenderer()->willReturn($viewRenderer);
+        $frontController->Plugins()->willReturn($plugins);
 
         $httpResponse->setHeader('Content-type', $response->headers->get('Content-Type'), true)->shouldBeCalled();
-        $httpResponse->setHttpResponseCode($statusCode)->shouldBeCalled();
-        $httpResponse->setBody($jsonContent)->shouldBeCalled();
+        $httpResponse->setHttpResponseCode(Response::HTTP_OK)->shouldBeCalled();
+        $httpResponse->setBody($response->getContent())->shouldBeCalled();
 
         $result = $this->apiJsonResponse->sendJsonResponse(
             $frontController->reveal(),
             $httpResponse->reveal(),
-            $response->reveal()
+            $response
         );
 
         self::assertSame($httpResponse->reveal(), $result);

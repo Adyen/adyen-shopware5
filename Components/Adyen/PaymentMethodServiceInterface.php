@@ -17,9 +17,12 @@ interface PaymentMethodServiceInterface
         bool $cache = true
     ): PaymentMethodCollection;
 
-    /** @internal */
+    /**
+     * @deprecated
+     * @see \AdyenPayment\AdyenApi\TransportFactory::checkout()
+     */
     public function getCheckout(): Checkout;
 
-    /** @internal */
+    /** @deprecated */
     public function provideCustomerNumber(): string;
 }

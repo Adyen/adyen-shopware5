@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class DisableTokenRequestHandlerTest extends TestCase
 {
-    protected function setUp(): void
+    public function test(): void
     {
         $this->markTestIncomplete();
     }

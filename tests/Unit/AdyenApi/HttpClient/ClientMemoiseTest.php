@@ -46,4 +46,21 @@ class ClientMemoiseTest extends TestCase
 
         $this->assertSame($client->reveal(), $result);
     }
+
+    /** @test */
+    public function it_can_return_a_memoised_client(): void
+    {
+        $shop = $this->prophesize(Shop::class);
+        $shop->getId()->willReturn('shop-id');
+
+        $client = $this->prophesize(Client::class);
+
+        $this->clientFactory->provide($shop->reveal())->shouldBeCalledOnce()->willReturn($client->reveal());
+
+        $firstResult = $this->clientMemoise->lookup($shop->reveal());
+        $result = $this->clientMemoise->lookup($shop->reveal());
+
+        $this->assertSame($client->reveal(), $firstResult);
+        $this->assertSame($client->reveal(), $result);
+    }
 }
