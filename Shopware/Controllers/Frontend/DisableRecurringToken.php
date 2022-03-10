@@ -26,7 +26,7 @@ class DisableRecurringToken extends \Enlight_Controller_Action implements CSRFGe
     /**
      * POST: /disabled
      */
-    public function disabledAction(): void
+    public function disabled(): void
     {
         try {
             $recurringToken = $this->Request()->getParams()['recurringToken'] ?? '';
@@ -63,6 +63,6 @@ class DisableRecurringToken extends \Enlight_Controller_Action implements CSRFGe
 
     public function getCSRFProtectedActions()
     {
-        return ['disabledAction'];
+        return ['disabled'];
     }
 }
