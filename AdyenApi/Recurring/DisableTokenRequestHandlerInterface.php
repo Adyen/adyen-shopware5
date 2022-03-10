@@ -9,5 +9,5 @@ use Shopware\Models\Shop\Shop;
 
 interface DisableTokenRequestHandlerInterface
 {
-    public function disableToken(string $recurringTokenId, Shop $shop): ?ApiResponse;
+    public function disableToken(string $recurringTokenId, Shop $shop): ApiResponse;
 }
