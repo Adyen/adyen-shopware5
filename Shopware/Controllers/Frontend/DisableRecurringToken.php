@@ -45,22 +45,12 @@ class DisableRecurringToken extends \Enlight_Controller_Action implements CSRFGe
 
             $result = $this->disableTokenRequestHandler->disableToken($recurringToken, Shopware()->Shop());
 
-            if (null === $result) {
-                $this->frontendJsonResponse->sendJsonResponse(
-                    $this->Front(),
-                    $this->Response(),
-                    JsonResponse::create(
-                        ['error' => true, 'message' => 'Missing customer number.'],
-                        Response::HTTP_BAD_REQUEST
-                    )
-                );
-                return;
-            }
-
             $this->frontendJsonResponse->sendJsonResponse(
                 $this->Front(),
                 $this->Response(),
-                JsonResponse::create(['error' => false, 'message' => $result->message()], Response::HTTP_OK)
+                JsonResponse::create(
+                    ['error' => !$result->isSuccess(), 'message' => $result->message()], Response::HTTP_OK
+                )
             );
         } catch (\Exception $e) {
             $this->frontendJsonResponse->sendJsonResponse(
