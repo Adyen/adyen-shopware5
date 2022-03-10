@@ -65,7 +65,7 @@ class DisableTokenRequestHandlerTest extends TestCase
             'shopperReference' => $customerNumber = 'customer-number',
             'recurringDetailReference' => $recurringTokenId = 'recurringTokenId',
         ];
-        $recurringTransport->disable($payload)->willReturn($expected = [
+        $recurringTransport->disable($payload)->willReturn([
             'status' => $statusCode = 200,
             'message' => $message = 'It worked',
         ]);
@@ -86,7 +86,7 @@ class DisableTokenRequestHandlerTest extends TestCase
             'shopperReference' => $customerNumber = 'customer-number',
             'recurringDetailReference' => $recurringTokenId = 'recurringTokenId',
         ];
-        $recurringTransport->disable($payload)->willReturn($expected = [
+        $recurringTransport->disable($payload)->willReturn([
             'status' => $statusCode = 422,
             'message' => $message = 'PaymentDetail not found',
         ]);
