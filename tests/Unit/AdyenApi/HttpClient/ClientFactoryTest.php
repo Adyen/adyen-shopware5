@@ -55,5 +55,6 @@ class ClientFactoryTest extends TestCase
         $this->assertEquals($merchantAccount, $result->getConfig()->getMerchantAccount());
         $this->assertEquals($apiKey, $result->getConfig()->getXApiKey());
         $this->assertEquals($environment, $result->getConfig()->getEnvironment());
+        $this->assertEquals($this->logger->reveal(), $result->getLogger());
     }
 }
