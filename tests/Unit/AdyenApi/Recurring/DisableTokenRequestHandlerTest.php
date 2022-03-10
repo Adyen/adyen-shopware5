@@ -11,6 +11,7 @@ use AdyenPayment\AdyenApi\Recurring\DisableTokenRequestHandlerInterface;
 use AdyenPayment\AdyenApi\TransportFactoryInterface;
 use AdyenPayment\Components\Adyen\PaymentMethodServiceInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Shopware\Models\Shop\Shop;
@@ -48,6 +49,7 @@ class DisableTokenRequestHandlerTest extends TestCase
     {
         $shop = $this->prophesize(Shop::class);
         $this->paymentMethodService->provideCustomerNumber()->willReturn('');
+        $this->transportFactory->recurring(Argument::any())->shouldNotBeCalled();
 
         $result = $this->disableTokenRequestHandler->disableToken('recurringTokenId', $shop->reveal());
 
