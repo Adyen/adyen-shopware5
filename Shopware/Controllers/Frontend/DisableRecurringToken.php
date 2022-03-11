@@ -12,7 +12,7 @@ use Shopware\Components\CSRFGetProtectionAware;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class DisableRecurringToken extends \Enlight_Controller_Action implements CSRFGetProtectionAware
+class Shopware_Controllers_Frontend_DisableRecurringToken extends \Enlight_Controller_Action implements CSRFGetProtectionAware
 {
     private ApiJsonResponse $frontendJsonResponse;
     private DisableTokenRequestHandlerInterface $disableTokenRequestHandler;
@@ -26,7 +26,7 @@ class DisableRecurringToken extends \Enlight_Controller_Action implements CSRFGe
     /**
      * POST: /disabled
      */
-    public function disabled(): void
+    public function disabledAction(): void
     {
         try {
             $recurringToken = $this->Request()->getParams()['recurringToken'] ?? '';
