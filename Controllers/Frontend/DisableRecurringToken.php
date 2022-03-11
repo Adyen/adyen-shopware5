@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Shopware\Controllers\Frontend;
-
 use AdyenPayment\AdyenApi\Recurring\DisableTokenRequestHandler;
 use AdyenPayment\AdyenApi\Recurring\DisableTokenRequestHandlerInterface;
 use AdyenPayment\Http\Response\ApiJsonResponse;
@@ -12,7 +10,8 @@ use Shopware\Components\CSRFGetProtectionAware;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class Shopware_Controllers_Frontend_DisableRecurringToken extends \Enlight_Controller_Action implements CSRFGetProtectionAware
+class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Controller_Action
+    implements CSRFGetProtectionAware
 {
     private ApiJsonResponse $frontendJsonResponse;
     private DisableTokenRequestHandlerInterface $disableTokenRequestHandler;
@@ -23,23 +22,17 @@ class Shopware_Controllers_Frontend_DisableRecurringToken extends \Enlight_Contr
         $this->disableTokenRequestHandler = $this->get(DisableTokenRequestHandler::class);
     }
 
-    /**
-     * POST: /disabled
-     */
     public function disabledAction(): void
     {
         try {
-            $recurringToken = $this->Request()->getParams()['recurringToken'] ?? '';
+            if (!$this->Request()->isPost()) {
+                $this->sendJsonBadRequestResponse('Invalid method.');
+                return;
+            }
 
+            $recurringToken = $this->Request()->getParams()['recurringToken'] ?? '';
             if ('' === $recurringToken) {
-                $this->frontendJsonResponse->sendJsonResponse(
-                    $this->Front(),
-                    $this->Response(),
-                    JsonResponse::create(
-                        ['error' => true, 'message' => 'Missing recurring token param.'],
-                        Response::HTTP_BAD_REQUEST
-                    )
-                );
+                $this->sendJsonBadRequestResponse('Missing recurring token param.');
                 return;
             }
 
@@ -49,20 +42,29 @@ class Shopware_Controllers_Frontend_DisableRecurringToken extends \Enlight_Contr
                 $this->Front(),
                 $this->Response(),
                 JsonResponse::create(
-                    ['error' => !$result->isSuccess(), 'message' => $result->message()], Response::HTTP_OK
+                    ['error' => !$result->isSuccess(), 'message' => $result->message()],
+                    Response::HTTP_OK
                 )
             );
         } catch (\Exception $e) {
-            $this->frontendJsonResponse->sendJsonResponse(
-                $this->Front(),
-                $this->Response(),
-                JsonResponse::create(['error' => true, 'message' => $e->getMessage()], Response::HTTP_BAD_REQUEST)
-            );
+            $this->sendJsonBadRequestResponse($e->getMessage());
         }
     }
 
     public function getCSRFProtectedActions()
     {
         return ['disabled'];
+    }
+
+    private function sendJsonBadRequestResponse($message): void
+    {
+        $this->frontendJsonResponse->sendJsonResponse(
+            $this->Front(),
+            $this->Response(),
+            JsonResponse::create(
+                ['error' => true, 'message' => $message],
+                Response::HTTP_BAD_REQUEST
+            )
+        );
     }
 }
