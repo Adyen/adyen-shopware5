@@ -10,6 +10,8 @@ use Shopware\Components\CSRFGetProtectionAware;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+// @TODO: pending test with SW5 PSR-1 autoloading
+//phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Controller_Action
     implements CSRFGetProtectionAware
 {
