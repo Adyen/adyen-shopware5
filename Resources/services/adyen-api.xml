@@ -13,8 +13,8 @@
             <argument type="service" id="AdyenPayment\AdyenApi\HttpClient\ClientFactory"/>
         </service>
         <service id="AdyenPayment\AdyenApi\Recurring\DisableTokenRequestHandler" public="true">
-            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethodService"/>
             <argument type="service" id="AdyenPayment\AdyenApi\TransportFactory"/>
+            <argument type="service" id="AdyenPayment\Session\CustomerNumberProvider"/>
         </service>
     </services>
 </container>

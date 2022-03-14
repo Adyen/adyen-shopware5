@@ -6,27 +6,26 @@ namespace AdyenPayment\AdyenApi\Recurring;
 
 use AdyenPayment\AdyenApi\Model\ApiResponse;
 use AdyenPayment\AdyenApi\TransportFactoryInterface;
-use AdyenPayment\Components\Adyen\PaymentMethodServiceInterface;
+use AdyenPayment\Session\CustomerNumberProviderInterface;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\HttpFoundation\Response;
 
 final class DisableTokenRequestHandler implements DisableTokenRequestHandlerInterface
 {
-    private PaymentMethodServiceInterface $paymentMethodService;
     private TransportFactoryInterface $transportFactory;
+    private CustomerNumberProviderInterface $customerNumberProvider;
 
     public function __construct(
-        PaymentMethodServiceInterface $paymentMethodService,
-        TransportFactoryInterface $transportFactory
+        TransportFactoryInterface $transportFactory,
+        CustomerNumberProviderInterface $customerNumberProvider
     ) {
-        $this->paymentMethodService = $paymentMethodService;
         $this->transportFactory = $transportFactory;
+        $this->customerNumberProvider = $customerNumberProvider;
     }
 
     public function disableToken(string $recurringTokenId, Shop $shop): ApiResponse
     {
-        // @TODO: replace with a new service.
-        $customerNumber = $this->paymentMethodService->provideCustomerNumber();
+        $customerNumber = ($this->customerNumberProvider)();
         if ('' === $customerNumber) {
             return ApiResponse::empty();
         }

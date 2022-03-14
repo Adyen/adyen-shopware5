@@ -36,9 +36,6 @@ final class PaymentMethodService implements PaymentMethodServiceInterface
         $this->customerNumberProvider = $customerNumberProvider;
     }
 
-    /**
-     * @throws AdyenException
-     */
     public function getPaymentMethods(
         ?string $countryCode = null,
         ?string $currency = null,
@@ -106,9 +103,6 @@ final class PaymentMethodService implements PaymentMethodServiceInterface
         return md5(implode(',', $keys));
     }
 
-    /**
-     * @throws AdyenException
-     */
     public function getCheckout(): Checkout
     {
         return new Checkout(
@@ -116,16 +110,5 @@ final class PaymentMethodService implements PaymentMethodServiceInterface
                 Shopware()->Shop()
             )
         );
-    }
-
-    public function provideCustomerNumber(): string
-    {
-        $userId = $this->session->get('sUserId');
-        if (!$userId) {
-            return '';
-        }
-        $customer = $this->modelManager->getRepository(Customer::class)->find($userId);
-
-        return $customer ? (string) $customer->getNumber() : '';
     }
 }

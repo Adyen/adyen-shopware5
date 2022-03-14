@@ -9,7 +9,7 @@ use AdyenPayment\AdyenApi\Model\ApiResponse;
 use AdyenPayment\AdyenApi\Recurring\DisableTokenRequestHandler;
 use AdyenPayment\AdyenApi\Recurring\DisableTokenRequestHandlerInterface;
 use AdyenPayment\AdyenApi\TransportFactoryInterface;
-use AdyenPayment\Components\Adyen\PaymentMethodServiceInterface;
+use AdyenPayment\Session\CustomerNumberProviderInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -21,20 +21,20 @@ class DisableTokenRequestHandlerTest extends TestCase
     use ProphecyTrait;
     private DisableTokenRequestHandler $disableTokenRequestHandler;
 
-    /** @var ObjectProphecy|PaymentMethodServiceInterface */
-    private $paymentMethodService;
+    /** @var CustomerNumberProviderInterface|ObjectProphecy */
+    private $customerNumberProvider;
 
     /** @var ObjectProphecy|TransportFactoryInterface */
     private $transportFactory;
 
     protected function setUp(): void
     {
-        $this->paymentMethodService = $this->prophesize(PaymentMethodServiceInterface::class);
+        $this->customerNumberProvider = $this->prophesize(CustomerNumberProviderInterface::class);
         $this->transportFactory = $this->prophesize(TransportFactoryInterface::class);
 
         $this->disableTokenRequestHandler = new DisableTokenRequestHandler(
-            $this->paymentMethodService->reveal(),
-            $this->transportFactory->reveal()
+            $this->transportFactory->reveal(),
+            $this->customerNumberProvider->reveal()
         );
     }
 
@@ -48,7 +48,7 @@ class DisableTokenRequestHandlerTest extends TestCase
     public function it_will_return_a_400_on_missing_customer_number(): void
     {
         $shop = $this->prophesize(Shop::class);
-        $this->paymentMethodService->provideCustomerNumber()->willReturn('');
+        $this->customerNumberProvider->__invoke()->willReturn('');
         $this->transportFactory->recurring(Argument::any())->shouldNotBeCalled();
 
         $result = $this->disableTokenRequestHandler->disableToken('recurringTokenId', $shop->reveal());
@@ -69,7 +69,7 @@ class DisableTokenRequestHandlerTest extends TestCase
             'status' => $statusCode = 200,
             'message' => $message = 'successfully-disabled',
         ]);
-        $this->paymentMethodService->provideCustomerNumber()->willReturn($customerNumber);
+        $this->customerNumberProvider->__invoke()->willReturn($customerNumber);
         $this->transportFactory->recurring($shop->reveal())->willReturn($recurringTransport);
 
         $result = $this->disableTokenRequestHandler->disableToken($recurringTokenId, $shop->reveal());
@@ -90,7 +90,7 @@ class DisableTokenRequestHandlerTest extends TestCase
             'status' => $statusCode = 422,
             'message' => $message = 'PaymentDetail not found',
         ]);
-        $this->paymentMethodService->provideCustomerNumber()->willReturn($customerNumber);
+        $this->customerNumberProvider->__invoke()->willReturn($customerNumber);
         $this->transportFactory->recurring($shop->reveal())->willReturn($recurringTransport);
 
         $result = $this->disableTokenRequestHandler->disableToken($recurringTokenId, $shop->reveal());

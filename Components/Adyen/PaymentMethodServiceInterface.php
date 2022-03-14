@@ -22,7 +22,4 @@ interface PaymentMethodServiceInterface
      * @see \AdyenPayment\AdyenApi\TransportFactory::checkout()
      */
     public function getCheckout(): Checkout;
-
-    /** @deprecated */
-    public function provideCustomerNumber(): string;
 }
