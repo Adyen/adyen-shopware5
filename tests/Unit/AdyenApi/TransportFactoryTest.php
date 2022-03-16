@@ -42,12 +42,12 @@ class TransportFactoryTest extends TestCase
     /** @test */
     public function it_can_provide_a_recurring_transport(): void
     {
-        $shop = $this->prophesize(Shop::class);
+        $shop = new Shop();
         $adyenClient = $this->createClientMock();
 
-        $this->clientFactory->provide($shop->reveal())->willReturn($adyenClient->reveal());
+        $this->clientFactory->provide($shop)->willReturn($adyenClient);
 
-        $result = $this->transportFactory->recurring($shop->reveal());
+        $result = $this->transportFactory->recurring($shop);
 
         $this->assertInstanceOf(Recurring::class, $result);
     }
@@ -55,19 +55,18 @@ class TransportFactoryTest extends TestCase
     /** @test */
     public function it_can_provide_a_checkout_transport(): void
     {
-        $shop = $this->prophesize(Shop::class);
+        $shop = new Shop();
         $adyenClient = $this->createClientMock();
 
-        $this->clientFactory->provide($shop->reveal())->willReturn($adyenClient->reveal());
+        $this->clientFactory->provide($shop)->willReturn($adyenClient);
 
-        $result = $this->transportFactory->checkout($shop->reveal());
+        $result = $this->transportFactory->checkout($shop);
 
         $this->assertInstanceOf(Checkout::class, $result);
     }
 
     private function createClientMock(): ObjectProphecy
     {
-        // we need to mock these to avoid fatal errors but the expected values are not required for these tests
         $config = $this->prophesize(Config::class);
         $config->get(Argument::any())->willReturn(Environment::TEST);
         $config->getInputType(Argument::any())->willReturn('');

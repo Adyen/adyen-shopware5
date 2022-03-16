@@ -74,7 +74,10 @@ class DisableTokenRequestHandlerTest extends TestCase
 
         $result = $this->disableTokenRequestHandler->disableToken($recurringTokenId, $shop->reveal());
 
-        $this->assertEquals(ApiResponse::create($statusCode, true, $message), $result);
+        $this->assertInstanceOf(ApiResponse::class, $result);
+        $this->assertEquals($statusCode, $result->statusCode());
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals($message, $result->message());
     }
 
     /** @test */
@@ -95,6 +98,9 @@ class DisableTokenRequestHandlerTest extends TestCase
 
         $result = $this->disableTokenRequestHandler->disableToken($recurringTokenId, $shop->reveal());
 
-        $this->assertEquals(ApiResponse::create($statusCode, false, $message), $result);
+        $this->assertInstanceOf(ApiResponse::class, $result);
+        $this->assertEquals($statusCode, $result->statusCode());
+        $this->assertFalse($result->isSuccess());
+        $this->assertEquals($message, $result->message());
     }
 }
