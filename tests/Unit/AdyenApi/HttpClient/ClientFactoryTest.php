@@ -39,7 +39,7 @@ class ClientFactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_provide_a_client(): void
+    public function it_can_provide_a_client_for_test_environment(): void
     {
         $shop = $this->prophesize(Shop::class);
         $shop->getId()->willReturn('shop-id');
@@ -47,6 +47,27 @@ class ClientFactoryTest extends TestCase
         $this->configuration->getMerchantAccount($shop)->willReturn($merchantAccount = 'mock-merchantAccount');
         $this->configuration->getApiKey($shop)->willReturn($apiKey = 'mock-apiKey');
         $this->configuration->getEnvironment($shop)->willReturn($environment = Environment::TEST);
+        $this->configuration->getApiUrlPrefix($shop)->willReturn('api-url-prefix');
+
+        $result = $this->clientFactory->provide($shop->reveal());
+
+        $this->assertInstanceOf(Client::class, $result);
+        $this->assertEquals($merchantAccount, $result->getConfig()->getMerchantAccount());
+        $this->assertEquals($apiKey, $result->getConfig()->getXApiKey());
+        $this->assertEquals($environment, $result->getConfig()->getEnvironment());
+        $this->assertEquals(Client::ENDPOINT_TEST, $result->getConfig()->get('endpoint'));
+        $this->assertEquals($this->logger->reveal(), $result->getLogger());
+    }
+
+    /** @test */
+    public function it_can_provide_a_client_for_live_environment(): void
+    {
+        $shop = $this->prophesize(Shop::class);
+        $shop->getId()->willReturn('shop-id');
+
+        $this->configuration->getMerchantAccount($shop)->willReturn($merchantAccount = 'mock-merchantAccount');
+        $this->configuration->getApiKey($shop)->willReturn($apiKey = 'mock-apiKey');
+        $this->configuration->getEnvironment($shop)->willReturn($environment = Environment::LIVE);
         $this->configuration->getApiUrlPrefix($shop)->willReturn($urlPrefix = 'api-url-prefix');
 
         $result = $this->clientFactory->provide($shop->reveal());
@@ -55,6 +76,8 @@ class ClientFactoryTest extends TestCase
         $this->assertEquals($merchantAccount, $result->getConfig()->getMerchantAccount());
         $this->assertEquals($apiKey, $result->getConfig()->getXApiKey());
         $this->assertEquals($environment, $result->getConfig()->getEnvironment());
+        $expectedEndpoint = Client::ENDPOINT_PROTOCOL.$urlPrefix.Client::ENDPOINT_LIVE_SUFFIX;
+        $this->assertEquals($expectedEndpoint, $result->getConfig()->get('endpoint'));
         $this->assertEquals($this->logger->reveal(), $result->getLogger());
     }
 }

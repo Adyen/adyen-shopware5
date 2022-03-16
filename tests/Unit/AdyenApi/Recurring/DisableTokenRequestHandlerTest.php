@@ -65,12 +65,12 @@ class DisableTokenRequestHandlerTest extends TestCase
             'shopperReference' => $customerNumber = 'customer-number',
             'recurringDetailReference' => $recurringTokenId = 'recurringTokenId',
         ];
+        $this->customerNumberProvider->__invoke()->willReturn($customerNumber);
+        $this->transportFactory->recurring($shop)->willReturn($recurringTransport);
         $recurringTransport->disable($payload)->willReturn([
             'status' => $statusCode = 200,
             'message' => $message = 'successfully-disabled',
         ]);
-        $this->customerNumberProvider->__invoke()->willReturn($customerNumber);
-        $this->transportFactory->recurring($shop->reveal())->willReturn($recurringTransport);
 
         $result = $this->disableTokenRequestHandler->disableToken($recurringTokenId, $shop->reveal());
 
@@ -86,12 +86,12 @@ class DisableTokenRequestHandlerTest extends TestCase
             'shopperReference' => $customerNumber = 'customer-number',
             'recurringDetailReference' => $recurringTokenId = 'recurringTokenId',
         ];
+        $this->customerNumberProvider->__invoke()->willReturn($customerNumber);
+        $this->transportFactory->recurring($shop)->willReturn($recurringTransport);
         $recurringTransport->disable($payload)->willReturn([
             'status' => $statusCode = 422,
             'message' => $message = 'PaymentDetail not found',
         ]);
-        $this->customerNumberProvider->__invoke()->willReturn($customerNumber);
-        $this->transportFactory->recurring($shop->reveal())->willReturn($recurringTransport);
 
         $result = $this->disableTokenRequestHandler->disableToken($recurringTokenId, $shop->reveal());
 

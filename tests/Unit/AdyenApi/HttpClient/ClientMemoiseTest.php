@@ -35,14 +35,11 @@ class ClientMemoiseTest extends TestCase
     /** @test */
     public function it_can_lookup_a_client(): void
     {
-        $shop = $this->prophesize(Shop::class);
-        $shop->getId()->willReturn('shop-id');
-
+        $shop = new Shop();
         $client = $this->prophesize(Client::class);
+        $this->clientFactory->provide($shop)->willReturn($client);
 
-        $this->clientFactory->provide($shop->reveal())->willReturn($client->reveal());
-
-        $result = $this->clientMemoise->lookup($shop->reveal());
+        $result = $this->clientMemoise->lookup($shop);
 
         $this->assertSame($client->reveal(), $result);
     }
@@ -50,15 +47,13 @@ class ClientMemoiseTest extends TestCase
     /** @test */
     public function it_can_return_a_memoised_client(): void
     {
-        $shop = $this->prophesize(Shop::class);
-        $shop->getId()->willReturn('shop-id');
-
+        $shop = new Shop();
         $client = $this->prophesize(Client::class);
 
-        $this->clientFactory->provide($shop->reveal())->shouldBeCalledOnce()->willReturn($client->reveal());
+        $this->clientFactory->provide($shop)->shouldBeCalledOnce()->willReturn($client);
 
-        $firstResult = $this->clientMemoise->lookup($shop->reveal());
-        $result = $this->clientMemoise->lookup($shop->reveal());
+        $firstResult = $this->clientMemoise->lookup($shop);
+        $result = $this->clientMemoise->lookup($shop);
 
         $this->assertSame($client->reveal(), $firstResult);
         $this->assertSame($client->reveal(), $result);

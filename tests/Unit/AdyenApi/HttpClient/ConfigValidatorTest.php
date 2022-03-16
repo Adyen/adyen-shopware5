@@ -59,12 +59,11 @@ class ConfigValidatorTest extends TestCase
     {
         $this->shopRepository->find($shopId = 123456)->willReturn(null);
 
-        $this->assertEquals(
-            new ConstraintViolationList([
-                ConstraintViolationFactory::create('Shop not found for ID "'.$shopId.'".'),
-            ]),
-            $this->configValidator->validate($shopId)
-        );
+        $result = $this->configValidator->validate($shopId);
+
+        $this->assertInstanceOf(ConstraintViolationList::class, $result);
+        $this->assertCount(1, $result);
+        $this->assertEquals(ConstraintViolationFactory::create('Shop not found for ID "'.$shopId.'".'), $result->get(0));
     }
 
     /** @test */
@@ -77,12 +76,11 @@ class ConfigValidatorTest extends TestCase
         $this->configuration->getApiKey($shop)->willReturn('');
         $this->configuration->getMerchantAccount($shop->reveal())->willReturn('merchantAccount');
 
-        $this->assertEquals(
-            new ConstraintViolationList([
-                ConstraintViolationFactory::create('Missing configuration: API key.'),
-            ]),
-            $this->configValidator->validate($shopId)
-        );
+        $result = $this->configValidator->validate($shopId);
+
+        $this->assertInstanceOf(ConstraintViolationList::class, $result);
+        $this->assertCount(1, $result);
+        $this->assertEquals(ConstraintViolationFactory::create('Missing configuration: API key.'), $result->get(0));
     }
 
     /** @test */
@@ -104,17 +102,15 @@ class ConfigValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_will_return_a_violation_if_an_exception_was_throw(): void
+    public function it_will_return_a_violation_on_api_adyen_exception(): void
     {
         $shop = $this->prophesize(Shop::class);
         $shop->getId()->willReturn($shopId = 123456);
         $this->shopRepository->find($shopId)->willReturn($shop->reveal());
 
-        $this->configuration->getApiKey($shop->reveal())->willReturn('api-key');
-        $this->configuration->getMerchantAccount($shop->reveal())->willReturn('merchantAccount');
-        // we need to mock a throw exception here because if we don't mock the entire client we would get a
-        // fatal error instead an exception.
-        $this->adyenApiFactory->provide($shop->reveal())->willThrow(AdyenException::class);
+        $this->configuration->getApiKey($shop)->willReturn('api-key');
+        $this->configuration->getMerchantAccount($shop)->willReturn('merchantAccount');
+        $this->adyenApiFactory->provide($shop)->willThrow(AdyenException::class);
 
         $this->assertEquals(
             new ConstraintViolationList([
@@ -144,7 +140,6 @@ class ConfigValidatorTest extends TestCase
 
     private function createClientMock(): ObjectProphecy
     {
-        // we need to mock these to avoid fatal errors but the expected values are not required for these tests
         $config = $this->prophesize(Config::class);
         $config->get(Argument::any())->willReturn(Environment::TEST);
         $config->getInputType(Argument::any())->willReturn('');

@@ -26,40 +26,47 @@ class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Contro
     {
         try {
             if (!$this->Request()->isPost()) {
-                $this->sendJsonBadRequestResponse('Invalid method.');
+                $this->frontendJsonResponse->sendJsonBadRequestResponse(
+                    $this->Front(),
+                    $this->Response(),
+                    'Invalid method.'
+                );
+
                 return;
             }
 
             $recurringToken = $this->Request()->getParams()['recurringToken'] ?? '';
             if ('' === $recurringToken) {
-                $this->sendJsonBadRequestResponse('Missing recurring token param.');
+                $this->frontendJsonResponse->sendJsonBadRequestResponse(
+                    $this->Front(),
+                    $this->Response(),
+                    'Missing recurring token param.'
+                );
+
                 return;
             }
 
             $result = $this->disableTokenRequestHandler->disableToken($recurringToken, Shopware()->Shop());
+            if (!$result->isSuccess()) {
+               $this->frontendJsonResponse->sendJsonResponse(
+                   $this->Front(),
+                   $this->Response(),
+                   JsonResponse::create(
+                       ['error' => true, 'message' => $result->message()],
+                       Response::HTTP_OK
+                   )
+               );
+
+               return;
+            }
 
             $this->frontendJsonResponse->sendJsonResponse(
                 $this->Front(),
                 $this->Response(),
-                JsonResponse::create(
-                    ['error' => !$result->isSuccess(), 'message' => $result->message()],
-                    Response::HTTP_OK
-                )
+                JsonResponse::create(null, Response::HTTP_NO_CONTENT)
             );
         } catch (\Exception $e) {
-            $this->sendJsonBadRequestResponse($e->getMessage());
+            $this->frontendJsonResponse->sendJsonBadRequestResponse($this->Front(), $this->Response(), $e->getMessage());
         }
-    }
-
-    private function sendJsonBadRequestResponse($message): void
-    {
-        $this->frontendJsonResponse->sendJsonResponse(
-            $this->Front(),
-            $this->Response(),
-            JsonResponse::create(
-                ['error' => true, 'message' => $message],
-                Response::HTTP_BAD_REQUEST
-            )
-        );
     }
 }
