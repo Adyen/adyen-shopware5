@@ -16,3 +16,17 @@
         )} checked="checked"{/if}
         />
 {/block}
+
+{block name="frontend_register_payment_fieldset_description"}
+    {$smarty.block.parent}
+
+    {block name="frontend_register_payment_stored_method_action_disable"}
+        {if $isStoredPayment }
+            <div class="block is--align-right">
+                <button type="button" data-adyen-disable-payment="{$payment_mean.stored_method_id}" title="{s name="storedMethodActionDisableText"}Disable{/s}" class="btn is--warning is--right">
+                    {s name="storedMethodActionDisableText"}Disable{/s}
+                </button>
+            </div>
+        {/if}
+    {/block}
+{/block}
