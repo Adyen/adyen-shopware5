@@ -23,7 +23,10 @@
     {block name="frontend_register_payment_stored_method_action_disable"}
         {if $isStoredPayment }
             <div class="block is--align-right">
-                <button type="button" data-adyen-disable-payment="{$payment_mean.stored_method_id}" title="{s name="storedMethodActionDisableText"}Disable{/s}" class="btn is--warning is--right">
+                <button type="button"
+                    data-adyenDisableTokenUrl="{url module='frontend' controller='disableRecurringToken' action='disabled'}"
+                    data-adyen-disable-payment="{$payment_mean.stored_method_id}"
+                    title="{s name="storedMethodActionDisableText"}Disable{/s}" class="btn is--warning is--right">
                     {s name="storedMethodActionDisableText"}Disable{/s}
                 </button>
             </div>

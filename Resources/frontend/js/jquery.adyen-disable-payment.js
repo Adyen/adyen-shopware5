@@ -5,7 +5,6 @@
          * Plugin default options.
          */
         defaults: {
-            adyenDisableTokenUrl: '/frontend/disableRecurringToken/disabled',
             /**
              * Selector for the stored payment "disable" button.
              *
@@ -39,7 +38,7 @@
             }
             $.loadingIndicator.open();
             $.post({
-                url: me.opts.adyenDisableTokenUrl,
+                url: me.$el.data('adyenDisableTokenUrl'),
                 dataType: 'json',
                 data: {recurringToken: me.$el.data('adyenDisablePayment')},
                 success: function () {
