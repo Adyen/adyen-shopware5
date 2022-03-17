@@ -63,7 +63,7 @@ class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Contro
             $this->frontendJsonResponse->sendJsonResponse(
                 $this->Front(),
                 $this->Response(),
-                JsonResponse::create(null, Response::HTTP_OK)
+                JsonResponse::create(null, Response::HTTP_NO_CONTENT)
             );
         } catch (\Exception $e) {
             $this->frontendJsonResponse->sendJsonBadRequestResponse($this->Front(), $this->Response(), $e->getMessage());

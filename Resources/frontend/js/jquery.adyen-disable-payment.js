@@ -30,23 +30,25 @@
         },
         init: function () {
             var me = this;
-            me.$el.on('click', function (e) {
-                if(0 === me.$el.data('adyenDisablePayment').length){
-                    return;
+            me.$el.on('click', $.proxy(me.enableDisableButtonClick, me));
+        },
+        enableDisableButtonClick: function () {
+            var me = this;
+            if(0 === me.$el.data('adyenDisablePayment').length){
+                return;
+            }
+            $.loadingIndicator.open();
+            $.post({
+                url: me.opts.adyenDisableTokenUrl,
+                dataType: 'json',
+                data: {recurringToken: me.$el.data('adyenDisablePayment')},
+                success: function () {
+                    window.location.reload();
                 }
-                $.loadingIndicator.open();
-                $.post({
-                    url: me.opts.adyenDisableTokenUrl,
-                    dataType: 'json',
-                    data: {recurringToken: me.$el.data('adyenDisablePayment')},
-                    success: function () {
-                        $.loadingIndicator.close();
-                        window.location.reload();
-                    }
-                }).fail(function(response) {
-                    $.loadingIndicator.close();
-                    me.appendError(response.responseJSON.message);
-                });
+            }).fail(function(response) {
+                me.appendError(response.responseJSON.message);
+            }).always(function() {
+                $.loadingIndicator.close();
             });
         },
         appendError: function (message) {
