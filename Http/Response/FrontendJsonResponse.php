@@ -11,10 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FrontendJsonResponse implements ApiJsonResponse
 {
-    public function __construct()
-    {
-    }
-
     public function sendJsonResponse(
         Enlight_Controller_Front $frontController,
         Enlight_Controller_Response_ResponseHttp $httpResponse,
