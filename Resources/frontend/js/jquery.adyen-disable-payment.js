@@ -39,9 +39,9 @@
                     url: me.opts.adyenDisableTokenUrl,
                     dataType: 'json',
                     data: {recurringToken: me.$el.data('adyenDisablePayment')},
-                    success: function (response) {
+                    success: function () {
                         $.loadingIndicator.close();
-                        response['error'] === true ? me.appendError(response['message']) : window.location.reload();
+                        window.location.reload();
                     }
                 }).fail(function(response) {
                     $.loadingIndicator.close();

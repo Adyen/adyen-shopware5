@@ -53,7 +53,7 @@ class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Contro
                    $this->Response(),
                    JsonResponse::create(
                        ['error' => true, 'message' => $result->message()],
-                       Response::HTTP_OK
+                       Response::HTTP_BAD_REQUEST
                    )
                );
 
@@ -63,7 +63,7 @@ class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Contro
             $this->frontendJsonResponse->sendJsonResponse(
                 $this->Front(),
                 $this->Response(),
-                JsonResponse::create(null, Response::HTTP_NO_CONTENT)
+                JsonResponse::create(null, Response::HTTP_OK)
             );
         } catch (\Exception $e) {
             $this->frontendJsonResponse->sendJsonBadRequestResponse($this->Front(), $this->Response(), $e->getMessage());

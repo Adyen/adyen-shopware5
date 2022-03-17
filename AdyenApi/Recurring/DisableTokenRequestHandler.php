@@ -8,7 +8,6 @@ use AdyenPayment\AdyenApi\Model\ApiResponse;
 use AdyenPayment\AdyenApi\TransportFactoryInterface;
 use AdyenPayment\Session\CustomerNumberProviderInterface;
 use Shopware\Models\Shop\Shop;
-use Symfony\Component\HttpFoundation\Response;
 
 final class DisableTokenRequestHandler implements DisableTokenRequestHandlerInterface
 {
@@ -38,20 +37,16 @@ final class DisableTokenRequestHandler implements DisableTokenRequestHandlerInte
 
         $result = $recurringTransport->disable($payload);
 
-        $resultStatus = (int) ($result['status'] ?? 400);
+        $response = (string) ($result['response'] ?? '');
         $resultMessage = (string) ($result['message'] ?? '');
-        $isSuccessfullyDisabled = $this->isSuccessfullyDisabled($resultStatus, $resultMessage);
+        $isSuccessfullyDisabled = $this->isSuccessfullyDisabled($response);
 
-        return ApiResponse::create($resultStatus, $isSuccessfullyDisabled, $resultMessage);
+        return ApiResponse::create($isSuccessfullyDisabled, $resultMessage);
     }
 
-    private function isSuccessfullyDisabled(int $resultStatus, string $resultMessage): bool
+    private function isSuccessfullyDisabled(string $response): bool
     {
-        if (Response::HTTP_OK !== $resultStatus) {
-            return false;
-        }
-
-        if (false === mb_strpos($resultMessage, 'successfully-disabled')) {
+        if (false === mb_strpos($response, 'successfully-disabled')) {
             return false;
         }
 

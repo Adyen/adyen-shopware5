@@ -68,14 +68,13 @@ class DisableTokenRequestHandlerTest extends TestCase
         $this->customerNumberProvider->__invoke()->willReturn($customerNumber);
         $this->transportFactory->recurring($shop)->willReturn($recurringTransport);
         $recurringTransport->disable($payload)->willReturn([
-            'status' => $statusCode = 200,
+            'response' => 'successfully-disabled',
             'message' => $message = 'successfully-disabled',
         ]);
 
         $result = $this->disableTokenRequestHandler->disableToken($recurringTokenId, $shop->reveal());
 
         $this->assertInstanceOf(ApiResponse::class, $result);
-        $this->assertEquals($statusCode, $result->statusCode());
         $this->assertTrue($result->isSuccess());
         $this->assertEquals($message, $result->message());
     }
@@ -92,14 +91,12 @@ class DisableTokenRequestHandlerTest extends TestCase
         $this->customerNumberProvider->__invoke()->willReturn($customerNumber);
         $this->transportFactory->recurring($shop)->willReturn($recurringTransport);
         $recurringTransport->disable($payload)->willReturn([
-            'status' => $statusCode = 422,
             'message' => $message = 'PaymentDetail not found',
         ]);
 
         $result = $this->disableTokenRequestHandler->disableToken($recurringTokenId, $shop->reveal());
 
         $this->assertInstanceOf(ApiResponse::class, $result);
-        $this->assertEquals($statusCode, $result->statusCode());
         $this->assertFalse($result->isSuccess());
         $this->assertEquals($message, $result->message());
     }

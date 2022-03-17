@@ -6,30 +6,23 @@ namespace AdyenPayment\AdyenApi\Model;
 
 final class ApiResponse
 {
-    private int $statusCode;
     private bool $success;
     private string $message;
 
-    private function __construct(int $statusCode, bool $success, string $message)
+    private function __construct(bool $success, string $message)
     {
-        $this->statusCode = $statusCode;
         $this->success = $success;
         $this->message = $message;
     }
 
-    public static function create(int $statusCode, bool $success, string $message): self
+    public static function create(bool $success, string $message): self
     {
-        return new self($statusCode, $success, $message);
+        return new self($success, $message);
     }
 
     public static function empty(): self
     {
-        return new self(400, false, 'Customer number not found.');
-    }
-
-    public function statusCode(): int
-    {
-        return $this->statusCode;
+        return new self(false, 'Customer number not found.');
     }
 
     public function isSuccess(): bool
