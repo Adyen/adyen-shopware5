@@ -305,7 +305,7 @@
             Enable Adyen's stored payment methods feature
         </changes>
     </changelog>
-    <changelog version="3.4.0">
+    <changelog version="3.5.0">
         <changes lang="en">
             USP:
                 * re-enable creation of stored payment methods (Tokenization) for Credit Cards (adyen type: scheme)
@@ -313,8 +313,8 @@
         </changes>
         <changes lang="de">
             USP:
-            * re-enable creation of stored payment methods (Tokenization) for Credit Cards (adyen type: scheme)
-            * functionality to remove stored payment methods / tokens
+              * re-enable creation of stored payment methods (Tokenization) for Credit Cards (adyen type: scheme)
+              * functionality to remove stored payment methods / tokens
         </changes>
     </changelog>
 </plugin>
