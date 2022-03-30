@@ -5,6 +5,8 @@
          * Plugin default options.
          */
         defaults: {
+            adyenDisableTokenUrl: '',
+            adyenStoredMethodId: '',
             /**
              * Selector for the stored payment "disable" button.
              *
@@ -29,24 +31,25 @@
         },
         init: function () {
             var me = this;
+            me.applyDataAttributes();
             me.$el.on('click', $.proxy(me.enableDisableButtonClick, me));
         },
         enableDisableButtonClick: function () {
             var me = this;
-            if(0 === me.$el.data('adyenDisablePayment').length){
+            if (0 === me.opts.adyenStoredMethodId.length) {
                 return;
             }
             $.loadingIndicator.open();
             $.post({
-                url: me.$el.data('adyenDisableTokenUrl'),
+                url: me.opts.adyenDisableTokenUrl,
                 dataType: 'json',
-                data: {recurringToken: me.$el.data('adyenDisablePayment')},
+                data: {recurringToken: me.opts.adyenStoredMethodId},
                 success: function () {
                     window.location.reload();
                 }
-            }).fail(function(response) {
+            }).fail(function (response) {
                 me.appendError(response.responseJSON.message);
-            }).always(function() {
+            }).always(function () {
                 $.loadingIndicator.close();
             });
         },
