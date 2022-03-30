@@ -2,34 +2,22 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Components\Adyen;
+namespace AdyenPayment\AdyenApi\HttpClient;
 
 use Adyen\AdyenException;
 use Adyen\Client;
 use Adyen\Environment;
-use AdyenPayment\Components\Configuration;
+use AdyenPayment\Components\ConfigurationInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Models\Shop\Shop;
 
-/**
- * Class ApiFactory.
- */
-class ApiFactory
+final class ClientFactory implements ClientFactoryInterface
 {
-    /**
-     * @var Configuration
-     */
-    private $configuration;
+    private ConfigurationInterface $configuration;
+    private LoggerInterface $logger;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(
-        Configuration $configuration,
-        LoggerInterface $logger
-    ) {
+    public function __construct(ConfigurationInterface $configuration, LoggerInterface $logger)
+    {
         $this->configuration = $configuration;
         $this->logger = $logger;
     }
@@ -47,8 +35,12 @@ class ApiFactory
         );
     }
 
-    private function createClient(string $merchantAccount, string $apiKey, string $environment, ?string $prefix = null): Client
-    {
+    private function createClient(
+        string $merchantAccount,
+        string $apiKey,
+        string $environment,
+        ?string $prefix = null
+    ): Client {
         $urlPrefix = Environment::LIVE === $environment ? $prefix : null;
 
         $adyenClient = new Client();

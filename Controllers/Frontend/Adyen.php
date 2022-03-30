@@ -4,9 +4,11 @@ use Adyen\AdyenException;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\BasketService;
+use AdyenPayment\Models\PaymentResultCode;
 use AdyenPayment\Components\Manager\AdyenManager;
 use AdyenPayment\Components\Payload\Chain;
 use AdyenPayment\Components\Payload\PaymentContext;
+use AdyenPayment\Components\Payload\PaymentPayloadProvider;
 use AdyenPayment\Models\PaymentInfo;
 use Shopware\Components\Logger;
 use Shopware\Models\Order\Order;
@@ -18,41 +20,22 @@ use Shopware\Models\Order\Status;
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_Payment
 {
-    /**
-     * @var AdyenManager
-     */
-    private $adyenManager;
-
-    /**
-     * @var PaymentMethodService
-     */
-    private $adyenCheckout;
-
-    /**
-     * @var BasketService
-     */
-    private $basketService;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var Chain
-     */
-    private $paymentPayloadProvider;
+    private AdyenManager $adyenManager;
+    private PaymentMethodService $adyenCheckout;
+    private Logger $logger;
+    private Chain $paymentPayloadProvider;
+    private BasketService $basketService;
 
     /**
      * @return void
      */
     public function preDispatch()
     {
-        $this->adyenManager = $this->get('AdyenPayment\Components\Manager\AdyenManager');
-        $this->adyenCheckout = $this->get('AdyenPayment\Components\Adyen\PaymentMethodService');
-        $this->basketService = $this->get('AdyenPayment\Components\BasketService');
+        $this->adyenManager = $this->get(AdyenManager::class);
+        $this->adyenCheckout = $this->get(PaymentMethodService::class);
         $this->logger = $this->get('adyen_payment.logger');
-        $this->paymentPayloadProvider = $this->get('AdyenPayment\Components\Payload\PaymentPayloadProvider');
+        $this->paymentPayloadProvider = $this->get(PaymentPayloadProvider::class);
+        $this->basketService = $this->get(BasketService::class);
     }
 
     public function ajaxDoPaymentAction(): void
@@ -71,6 +54,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                 $context->getTransaction(),
                 $paymentInfo['paymentData'] ?? ''
             );
+
             $this->handlePaymentData($paymentInfo);
 
             $this->Response()->setBody(json_encode(
@@ -127,7 +111,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $payload = array_intersect_key($this->Request()->getPost(), ['details' => true]);
         $checkout = $this->adyenCheckout->getCheckout();
         $paymentInfo = $checkout->paymentsDetails($payload);
-        $this->handlePaymentData($paymentInfo);
+        ($this->paymentResultCodeHandler)($paymentInfo);
 
         $this->Response()->setBody(json_encode($paymentInfo));
     }
@@ -235,7 +219,6 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         ];
     }
 
-
     /**
      * @param $paymentInfo
      *
@@ -247,13 +230,11 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private function handlePaymentData($paymentInfo): void
     {
-        if (!in_array(
-            $paymentInfo['resultCode'],
-            ['Authorised', 'IdentifyShopper', 'ChallengeShopper', 'RedirectShopper']
-        )
-        ) {
-            $this->handlePaymentDataError($paymentInfo);
+        if (PaymentResultCode::exists((string) ($paymentInfo['resultCode'] ?? ''))) {
+            return;
         }
+
+        $this->handlePaymentDataError($paymentInfo);
     }
 
     /**
@@ -265,10 +246,10 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    private function handlePaymentDataError($paymentInfo): void
+    private function handlePaymentDataError(array $paymentResponseInfo): void
     {
-        if ($paymentInfo['merchantReference']) {
-            $this->basketService->cancelAndRestoreByOrderNumber($paymentInfo['merchantReference']);
+        if (array_key_exists('merchantReference', $paymentResponseInfo)) {
+            $this->basketService->cancelAndRestoreByOrderNumber($paymentResponseInfo['merchantReference']);
         }
     }
 }
