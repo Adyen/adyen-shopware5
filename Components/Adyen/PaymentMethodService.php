@@ -7,42 +7,36 @@ namespace AdyenPayment\Components\Adyen;
 use Adyen\AdyenException;
 use Adyen\Service\Checkout;
 use Adyen\Util\Currency;
+use AdyenPayment\AdyenApi\HttpClient\ClientMemoise;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Models\Enum\Channel;
-use Enlight_Components_Session_Namespace;
+use AdyenPayment\Session\CustomerNumberProviderInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Components\Model\ModelManager;
-use Shopware\Models\Customer\Customer;
 
+
+/** @TODO - Cleanup the public const (unify the services) and create unit tests */
 final class PaymentMethodService implements PaymentMethodServiceInterface
 {
-    /** @todo cleanup the public const (unify the services) */
     public const IMPORT_LOCALE = 'en_GB';
-    private ApiClientMap $apiClientMap;
+    private ClientMemoise $apiClientMap;
     private Configuration $configuration;
     private array $cache;
     private LoggerInterface $logger;
-    private Enlight_Components_Session_Namespace $session;
-    private ModelManager $modelManager;
+    private CustomerNumberProviderInterface $customerNumberProvider;
 
     public function __construct(
-        ApiClientMap $apiClientMap,
+        ClientMemoise $apiClientMap,
         Configuration $configuration,
         LoggerInterface $logger,
-        Enlight_Components_Session_Namespace $session,
-        ModelManager $modelManager
+        CustomerNumberProviderInterface $customerNumberProvider
     ) {
         $this->apiClientMap = $apiClientMap;
         $this->configuration = $configuration;
         $this->logger = $logger;
-        $this->session = $session;
-        $this->modelManager = $modelManager;
+        $this->customerNumberProvider = $customerNumberProvider;
     }
 
-    /**
-     * @throws AdyenException
-     */
     public function getPaymentMethods(
         ?string $countryCode = null,
         ?string $currency = null,
@@ -70,7 +64,7 @@ final class PaymentMethodService implements PaymentMethodServiceInterface
             ],
             'channel' => Channel::WEB,
             'shopperLocale' => $locale,
-            'shopperReference' => $this->provideCustomerNumber(),
+            'shopperReference' => ($this->customerNumberProvider)(),
         ];
 
         try {
@@ -110,9 +104,6 @@ final class PaymentMethodService implements PaymentMethodServiceInterface
         return md5(implode(',', $keys));
     }
 
-    /**
-     * @throws AdyenException
-     */
     public function getCheckout(): Checkout
     {
         return new Checkout(
@@ -120,16 +111,5 @@ final class PaymentMethodService implements PaymentMethodServiceInterface
                 Shopware()->Shop()
             )
         );
-    }
-
-    private function provideCustomerNumber(): string
-    {
-        $userId = $this->session->get('sUserId');
-        if (!$userId) {
-            return '';
-        }
-        $customer = $this->modelManager->getRepository(Customer::class)->find($userId);
-
-        return $customer ? (string) $customer->getNumber() : '';
     }
 }

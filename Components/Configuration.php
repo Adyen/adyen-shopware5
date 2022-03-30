@@ -11,7 +11,7 @@ use Shopware\Components\Plugin\Configuration\ReaderInterface;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
-final class Configuration
+final class Configuration implements ConfigurationInterface
 {
     public const ENV_TEST = 'TEST';
     public const ENV_LIVE = 'LIVE';

@@ -6,8 +6,8 @@ namespace AdyenPayment\Components\Adyen\PaymentMethod;
 
 use Adyen\AdyenException;
 use Adyen\Service\Checkout;
+use AdyenPayment\AdyenApi\HttpClient\ClientFactory;
 use AdyenPayment\Collection\Payment\PaymentMethodCollection;
-use AdyenPayment\Components\Adyen\ApiFactory;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\Configuration;
 use Psr\Log\LoggerInterface;
@@ -16,12 +16,12 @@ use Shopware\Models\Shop\Shop;
 final class PaymentMethodsProvider implements PaymentMethodsProviderInterface
 {
     private Configuration $configuration;
-    private ApiFactory $adyenApiFactory;
+    private ClientFactory $adyenApiFactory;
     private LoggerInterface $logger;
 
     public function __construct(
         Configuration $configuration,
-        ApiFactory $adyenApiFactory,
+        ClientFactory $adyenApiFactory,
         LoggerInterface $logger
     ) {
         $this->configuration = $configuration;

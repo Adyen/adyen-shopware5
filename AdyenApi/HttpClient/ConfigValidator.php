@@ -2,36 +2,25 @@
 
 declare(strict_types=1);
 
-namespace AdyenPayment\Components\Adyen;
+namespace AdyenPayment\AdyenApi\HttpClient;
 
 use Adyen\AdyenException;
 use Adyen\Service\Checkout;
-use AdyenPayment\Components\Configuration;
+use AdyenPayment\Components\ConfigurationInterface;
 use AdyenPayment\Validator\ConstraintViolationFactory;
 use Doctrine\Persistence\ObjectRepository;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class ApiConfigValidator
+final class ConfigValidator implements ConfigValidatorInterface
 {
-    /**
-     * @var ApiFactory
-     */
-    private $adyenApiFactory;
-
-    /**
-     * @var Configuration
-     */
-    private $configuration;
-
-    /**
-     * @var ObjectRepository
-     */
-    private $shopRepository;
+    private ClientFactoryInterface $adyenApiFactory;
+    private ConfigurationInterface $configuration;
+    private ObjectRepository $shopRepository;
 
     public function __construct(
-        ApiFactory $adyenApiFactory,
-        Configuration $configuration,
+        ClientFactoryInterface $adyenApiFactory,
+        ConfigurationInterface $configuration,
         ObjectRepository $shopRepository
     ) {
         $this->adyenApiFactory = $adyenApiFactory;
@@ -42,7 +31,7 @@ class ApiConfigValidator
     public function validate(int $shopId): ConstraintViolationList
     {
         $shop = $this->shopRepository->find($shopId);
-        if (!$shop) {
+        if (null === $shop) {
             return new ConstraintViolationList([
                 ConstraintViolationFactory::create('Shop not found for ID "'.$shopId.'".'),
             ]);

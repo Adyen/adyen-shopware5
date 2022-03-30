@@ -18,7 +18,8 @@ interface PaymentMethodServiceInterface
     ): PaymentMethodCollection;
 
     /**
-     * @internal
+     * @deprecated
+     * @see \AdyenPayment\AdyenApi\TransportFactory::checkout()
      */
     public function getCheckout(): Checkout;
 }

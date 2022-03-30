@@ -10,6 +10,7 @@ use AdyenPayment\Components\CompilerPass\NotificationProcessorCompilerPass;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
+use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
 use AdyenPayment\Models\Refund;
 use AdyenPayment\Models\TextNotification;
 use AdyenPayment\Models\UserPreference;
@@ -171,6 +172,7 @@ final class AdyenPayment extends Plugin
             $entityManager->getClassMetadata(Refund::class),
             $entityManager->getClassMetadata(TextNotification::class),
             $entityManager->getClassMetadata(UserPreference::class),
+            $entityManager->getClassMetadata(RecurringPaymentToken::class),
         ];
     }
 
