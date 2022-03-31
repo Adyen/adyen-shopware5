@@ -6,20 +6,22 @@ namespace AdyenPayment\Components\Payload\Providers;
 
 use AdyenPayment\Components\Payload\PaymentContext;
 use AdyenPayment\Components\Payload\PaymentPayloadProvider;
+use AdyenPayment\Models\RecurringPayment\RecurringProcessingModel;
+use AdyenPayment\Models\RecurringPayment\ShopperInteraction;
 
-class RecurringPaymentProvider implements PaymentPayloadProvider
+final class RecurringPaymentProvider implements PaymentPayloadProvider
 {
     public function provide(PaymentContext $context): array
     {
         $paymentInfo = $context->getPaymentInfo();
-        $storedPaymentMethodId = $paymentInfo['storedPaymentMethodId'] ?? null;
-        if (!$storedPaymentMethodId) {
+        $storedPaymentMethodId = (string) ($paymentInfo['storedPaymentMethodId'] ?? '');
+        if ('' === $storedPaymentMethodId) {
             return [];
         }
 
         return [
-            'shopperInteraction' => 'ContAuth',
-            'recurringProcessingModel' => 'CardOnFile',
+            'shopperInteraction' => ShopperInteraction::contAuth()->shopperInteraction(),
+            'recurringProcessingModel' => RecurringProcessingModel::cardOnFile()->recurringProcessingModel(),
         ];
     }
 }

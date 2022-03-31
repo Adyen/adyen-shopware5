@@ -11,8 +11,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 interface ApiJsonResponse
 {
     public function sendJsonResponse(
-        Enlight_Controller_Front $frontController, // ideally injected
+        Enlight_Controller_Front $frontController,
         Enlight_Controller_Response_ResponseHttp $httpResponse,
         JsonResponse $response
+    ): Enlight_Controller_Response_ResponseHttp;
+
+    public function sendJsonBadRequestResponse(
+        Enlight_Controller_Front $frontController,
+        Enlight_Controller_Response_ResponseHttp $httpResponse,
+        string $message
     ): Enlight_Controller_Response_ResponseHttp;
 }

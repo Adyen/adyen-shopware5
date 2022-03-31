@@ -6,37 +6,24 @@ namespace AdyenPayment\Components\Adyen;
 
 use Adyen\AdyenException;
 use Adyen\Service\Modification;
+use AdyenPayment\AdyenApi\HttpClient\ClientMemoise;
 use AdyenPayment\Components\NotificationManager;
 use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
 use AdyenPayment\Models\Refund;
+use Doctrine\ORM\EntityRepository;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
 
 class RefundService
 {
-    /**
-     * @var ApiClientMap
-     */
-    private $apiClientMap;
-
-    /**
-     * @var ModelManager
-     */
-    private $modelManager;
-
-    /**
-     * @var NotificationManager
-     */
-    private $notificationManager;
-
-    /**
-     * @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository
-     */
-    private $paymentInfoRepository;
+    private ClientMemoise $apiClientMap;
+    private ModelManager $modelManager;
+    private NotificationManager $notificationManager;
+    private EntityRepository $paymentInfoRepository;
 
     public function __construct(
-        ApiClientMap $apiClientMap,
+        ClientMemoise $apiClientMap,
         ModelManager $modelManager,
         NotificationManager $notificationManager
     ) {

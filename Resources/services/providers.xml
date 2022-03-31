@@ -5,7 +5,7 @@
     <services>
         <service id="AdyenPayment\Components\Adyen\PaymentMethod\PaymentMethodsProvider">
             <argument type="service" id="AdyenPayment\Components\Configuration"/>
-            <argument type="service" id="AdyenPayment\Components\Adyen\ApiFactory"/>
+            <argument type="service" id="AdyenPayment\AdyenApi\HttpClient\ClientFactory"/>
             <argument type="service" id="adyen_payment.logger"/>
         </service>
         <service id="AdyenPayment\Components\Adyen\PaymentMethod\StoredPaymentMeanProvider">

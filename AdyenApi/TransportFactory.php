@@ -6,15 +6,14 @@ namespace AdyenPayment\AdyenApi;
 
 use Adyen\Service\Checkout;
 use Adyen\Service\Recurring;
-use AdyenPayment\Components\Adyen\ApiFactory;
+use AdyenPayment\AdyenApi\HttpClient\ClientFactoryInterface;
 use Shopware\Models\Shop\Shop;
 
-// TODO add a test
-final class TransportFactory
+final class TransportFactory implements TransportFactoryInterface
 {
-    private ApiFactory $apiFactory;
+    private ClientFactoryInterface $apiFactory;
 
-    public function __construct(ApiFactory $apiFactory)
+    public function __construct(ClientFactoryInterface $apiFactory)
     {
         $this->apiFactory = $apiFactory;
     }

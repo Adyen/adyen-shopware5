@@ -2,11 +2,36 @@
 
 declare(strict_types=1);
 
-namespace AdyenApi\Model;
+namespace AdyenPayment\AdyenApi\Model;
 
 final class ApiResponse
 {
-    private int $statusCode;
     private bool $success;
     private string $message;
+
+    private function __construct(bool $success, string $message)
+    {
+        $this->success = $success;
+        $this->message = $message;
+    }
+
+    public static function create(bool $success, string $message): self
+    {
+        return new self($success, $message);
+    }
+
+    public static function empty(): self
+    {
+        return new self(false, 'Customer number not found.');
+    }
+
+    public function isSuccess(): bool
+    {
+        return $this->success;
+    }
+
+    public function message(): string
+    {
+        return $this->message;
+    }
 }

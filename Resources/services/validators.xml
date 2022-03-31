@@ -1,18 +1,18 @@
 <?xml version="1.0" ?>
 <container xmlns="http://symfony.com/schema/dic/services"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <!-- Chains -->
         <service id="AdyenPayment\Http\Validator\Notification\AuthorizationValidator"
-                 class="AdyenPayment\Http\Validator\Notification\Chain" public="true">
+            class="AdyenPayment\Http\Validator\Notification\Chain" public="true">
             <argument type="service" id="AdyenPayment\Http\Validator\Notification\AuthenticationValidator"/>
             <argument type="service" id="AdyenPayment\Http\Validator\Notification\HmacValidator"/>
         </service>
         <service id="AdyenPayment\Http\Validator\Notification\LoggingAuthorizationValidatorDecorator"
-                 decorates="AdyenPayment\Http\Validator\Notification\AuthorizationValidator" public="true">
+            decorates="AdyenPayment\Http\Validator\Notification\AuthorizationValidator" public="true">
             <argument type="service"
-                      id="AdyenPayment\Http\Validator\Notification\LoggingAuthorizationValidatorDecorator.inner"/>
+                id="AdyenPayment\Http\Validator\Notification\LoggingAuthorizationValidatorDecorator.inner"/>
             <argument type="service" id="adyen_payment.logger.notifications"/>
         </service>
 
@@ -24,9 +24,8 @@
             <argument type="service" id="Adyen\Util\HmacSignature" />
             <argument type="service" id="AdyenPayment\Components\Configuration" />
         </service>
-
-        <service id="AdyenPayment\Components\Adyen\ApiConfigValidator" public="true">
-            <argument type="service" id="AdyenPayment\Components\Adyen\ApiFactory" />
+        <service id="AdyenPayment\AdyenApi\HttpClient\ConfigValidator" public="true">
+            <argument type="service" id="AdyenPayment\AdyenApi\HttpClient\ClientFactory" />
             <argument type="service" id="AdyenPayment\Components\Configuration" />
             <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
         </service>

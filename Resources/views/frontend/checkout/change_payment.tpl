@@ -2,7 +2,6 @@
 
 {block name='frontend_checkout_payment_content'}
     {include file="frontend/checkout/adyen_libaries.tpl"}
-
     {* Filter on storedPayments and default payment methods (SW 5 needs internally array<int, array> for $sPayments) *}
     {assign var="paymentMethods" value=[]}
     {assign var="storedPaymentMethods" value=[]}
