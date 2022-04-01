@@ -42,9 +42,20 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
                 PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
             );
 
-            $sBasket = $this->session->sOrderVariables['sBasket'];
+            $sBasket = $this->session->sOrderVariables['sBasket']
+                ?? $this->modules->getModule('Basket');
+
+            $orderAmount = 1.0;
+            if ($sBasket instanceof sBasket) {
+                $orderAmount = $sBasket->sGetAmount()['totalAmount'];
+            }
+
+            if (!($sBasket instanceof sBasket)) {
+                $orderAmount = $sBasket['sAmount'];
+            }
 
             $shop = Shopware()->Shop();
+            $orderCurrency = $shop->getCurrency();
 
             $adyenConfig = [
                 'status' => 'success',
@@ -52,8 +63,8 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
                 'clientKey' => $this->configuration->getClientKey($shop),
                 'environment' => $this->configuration->getEnvironment($shop),
                 'enrichedPaymentMethods' => ($this->paymentMeanCollectionSerializer)($enrichedPaymentMethods),
-                'adyenOrderTotal' => $sBasket['sAmount'],
-                'adyenOrderCurrency' => $sBasket['sCurrencyName']
+                'adyenOrderTotal' => $orderAmount,
+                'adyenOrderCurrency' => $orderCurrency->getCurrency()
             ];
 
             $this->Response()->setBody(
