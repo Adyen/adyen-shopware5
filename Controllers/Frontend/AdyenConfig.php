@@ -11,14 +11,13 @@ use AdyenPayment\Components\DataConversion;
 use AdyenPayment\Serializer\PaymentMeanCollectionSerializer;
 use AdyenPayment\Shopware\Serializer\SwPaymentMeanCollectionSerializer;
 
-class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Action
+class Shopware_Controllers_Frontend_AdyenConfig extends Shopware_Controllers_Frontend_Checkout
 {
     private DataConversion $dataConversion;
     private Configuration $configuration;
     private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
     private PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer;
     private Shopware_Components_Modules $modules;
-    private Enlight_Components_Session_Namespace $session;
 
     public function preDispatch(): void
     {
@@ -27,7 +26,6 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
         $this->enrichedPaymentMeanProvider = $this->get(EnrichedPaymentMeanProvider::class);
         $this->paymentMeanCollectionSerializer = $this->get(SwPaymentMeanCollectionSerializer::class);
         $this->modules = $this->get('modules');
-        $this->session = Shopware()->Session();
     }
 
     public function indexAction(): void
@@ -42,17 +40,7 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
                 PaymentMeanCollection::createFromShopwareArray($admin->sGetPaymentMeans())
             );
 
-            $sBasket = $this->session->sOrderVariables['sBasket']
-                ?? $this->modules->getModule('Basket');
-
-            $orderAmount = 1.0;
-            if ($sBasket instanceof sBasket) {
-                $orderAmount = $sBasket->sGetAmount()['totalAmount'];
-            }
-
-            if (!($sBasket instanceof sBasket)) {
-                $orderAmount = $sBasket['sAmount'];
-            }
+            $sBasket = $this->getBasket();
 
             $shop = Shopware()->Shop();
             $orderCurrency = $shop->getCurrency();
@@ -63,8 +51,8 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Enlight_Controller_Actio
                 'clientKey' => $this->configuration->getClientKey($shop),
                 'environment' => $this->configuration->getEnvironment($shop),
                 'enrichedPaymentMethods' => ($this->paymentMeanCollectionSerializer)($enrichedPaymentMethods),
-                'adyenOrderTotal' => $orderAmount,
-                'adyenOrderCurrency' => $orderCurrency->getCurrency()
+                'adyenOrderTotal' => round($sBasket['sAmount'], 2),
+                'adyenOrderCurrency' => $sBasket['sCurrencyName'] ?? $orderCurrency
             ];
 
             $this->Response()->setBody(
