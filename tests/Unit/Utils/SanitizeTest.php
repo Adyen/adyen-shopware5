@@ -24,12 +24,4 @@ final class SanitizeTest extends TestCase
 
         $this->assertEquals("&lt;a href='test'&gt;Test&lt;/a&gt;", $result);
     }
-
-    /** @test */
-    public function it_can_escape_with_quotes(): void
-    {
-        $result = Sanitize::escapeWithQuotes("<a href='test'>Test</a>");
-
-        $this->assertEquals('&lt;a href=&#039;test&#039;&gt;Test&lt;/a&gt;', $result);
-    }
 }

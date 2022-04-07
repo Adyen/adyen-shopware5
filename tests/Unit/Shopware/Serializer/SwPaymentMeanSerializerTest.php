@@ -57,7 +57,7 @@ final class SwPaymentMeanSerializerTest extends TestCase
                 'source' => $source,
                 'name' => '&lt;some-tag&gt; a name&lt;/some-tag&gt; "quoted"',
                 'description' => "description and&lt;a href='test'&gt;a link&lt;/a&gt;",
-                'additionaldescription' => 'additional &lt;div&gt;a div&lt;/div&gt; and &lt;a href=&#039;test&#039;&gt;link&lt;/a&gt;',
+                'additionaldescription' => "additional <div>a div</div> and <a href='test'>link</a>",
             ],
         ], $result);
     }
