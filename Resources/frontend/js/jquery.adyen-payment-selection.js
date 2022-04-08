@@ -285,6 +285,7 @@
             if (this.__isApplePayPaymentMethod(paymentMethod)) {
                 me.setConfig();
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
+                adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
             }
 
             if ('paywithgoogle' === paymentMethod.adyenType) {
