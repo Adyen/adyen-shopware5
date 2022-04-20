@@ -27,6 +27,15 @@
 
 .adyen-modal .content {
     padding: 20px;
+
+    &.disable-token-confirmation {
+        max-height: 12em;
+
+        .buttons-container {
+            display: flex;
+            justify-content: space-evenly;
+        }
+    }
 }
 
 .alert.is--adyen-error {

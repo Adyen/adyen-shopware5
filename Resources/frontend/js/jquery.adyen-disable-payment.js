@@ -24,6 +24,21 @@
              */
             errorClassSelector: '.alert.is--error.is--rounded.is--adyen-error',
             /**
+             * @var string modalSelector
+             * CSS classes selector to use as confirmation modal content.
+             */
+            modalSelector: '.adyenDisableTokenConfirmationModal',
+            /**
+             * @var string modalConfirmButtonSelector
+             * CSS classes selector for the disable-confirm button
+             */
+            modalConfirmButtonSelector: '.disableConfirm',
+            /**
+             * @var string modalCancelButtonSelector
+             * CSS classes selector for the disable-cancel button
+             */
+            modalCancelButtonSelector: '.disableCancel',
+            /**
              * @var string errorMessageClass
              * CSS classes for the error message element
              */
@@ -32,6 +47,7 @@
         init: function () {
             var me = this;
             me.applyDataAttributes();
+            me.modalContent = $(me.opts.modalSelector).html() ?? '';
             me.$el.on('click', $.proxy(me.enableDisableButtonClick, me));
         },
         enableDisableButtonClick: function () {
@@ -39,6 +55,29 @@
             if (0 === me.opts.adyenStoredMethodId.length) {
                 return;
             }
+            if('' === me.modalContent){
+                return;
+            }
+            me.modal = $.modal.open(me.modalContent, {
+                showCloseButton: false,
+                closeOnOverlay: false,
+                additionalClass: 'adyen-modal disable-token-confirmation'
+            });
+            me.buttonConfirm = $(me.opts.modalConfirmButtonSelector);
+            me.buttonConfirm.on('click', $.proxy(me.runDisableTokenCall, me));
+            me.buttonCancel = $(me.opts.modalCancelButtonSelector);
+            me.buttonCancel.on('click', $.proxy(me.closeModal, me));
+        },
+        closeModal: function () {
+            var me = this;
+            if(!me.modal){
+                return;
+            }
+            me.modal.close();
+        },
+        runDisableTokenCall: function () {
+            var me = this;
+            me.closeModal();
             $.loadingIndicator.open();
             $.post({
                 url: me.opts.adyenDisableTokenUrl,

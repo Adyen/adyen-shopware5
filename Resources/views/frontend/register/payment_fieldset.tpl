@@ -34,3 +34,20 @@
         {/if}
     {/block}
 {/block}
+
+{block name="frontend_register_payment_fieldset"}
+    {$smarty.block.parent}
+    <div class="adyenDisableTokenConfirmationModal adyen-hidden--all">
+        <div class="block is--align-center">
+            <h2>{s name='adyenDisableTokenConfirmationMessage'}Are you sure to remove the stored payment method?{/s}</h2>
+            <div class="buttons-container">
+                <button type="button" class="disableConfirm btn is--primary left">
+                    {s name='adyenDisableTokenConfirmationButtonConfirm'}Confirm{/s}
+                </button>
+                <button type="button" class="disableCancel btn is--secondary right">
+                    {s name='adyenDisableTokenConfirmationButtonCancel'}Cancel{/s}
+                </button>
+            </div>
+        </div>
+    </div>
+{/block}
