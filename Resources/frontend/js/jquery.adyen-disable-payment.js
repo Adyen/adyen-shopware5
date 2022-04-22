@@ -42,7 +42,12 @@
              * @var string errorMessageClass
              * CSS classes for the error message element
              */
-            errorMessageClass: 'alert--content'
+            errorMessageClass: 'alert--content',
+            /**
+             * @var string modalErrorContainerSelector
+             * CSS classes for the error message container in the modal
+             */
+            modalErrorContainerSelector: '.modal-error-container',
         },
         init: function () {
             var me = this;
@@ -59,7 +64,7 @@
                 return;
             }
             me.modal = $.modal.open(me.modalContent, {
-                showCloseButton: false,
+                showCloseButton: true,
                 closeOnOverlay: false,
                 additionalClass: 'adyen-modal disable-token-confirmation'
             });
@@ -77,8 +82,8 @@
         },
         runDisableTokenCall: function () {
             var me = this;
-            me.closeModal();
             $.loadingIndicator.open();
+            $.loadingIndicator.loader.$loader.addClass('over-modal');
             $.post({
                 url: me.opts.adyenDisableTokenUrl,
                 dataType: 'json',
@@ -97,7 +102,7 @@
             $(me.opts.errorClassSelector).remove();
             var error = $('<div />').addClass(me.opts.errorClass);
             error.append($('<div />').addClass(me.opts.errorMessageClass).html(message));
-            me.$el.parent().append(error);
+            $(me.opts.modalErrorContainerSelector).append(error);
         }
     });
 })(jQuery);

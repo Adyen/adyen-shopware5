@@ -48,6 +48,7 @@
                     {s name='adyenDisableTokenConfirmationButtonCancel'}Cancel{/s}
                 </button>
             </div>
+            <div class="modal-error-container"></div>
         </div>
     </div>
 {/block}
