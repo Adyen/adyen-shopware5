@@ -112,7 +112,7 @@ class NotificationManager
             'amountCurrency' => $notification->getAmountCurrency(),
         ]);
 
-        if (!($uniqueNotification instanceof Notification)) {
+        if (!$uniqueNotification instanceof Notification) {
             throw new NoResultException();
         }
 

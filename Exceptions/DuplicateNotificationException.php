@@ -8,11 +8,13 @@ use AdyenPayment\Models\Notification;
 
 final class DuplicateNotificationException extends \RunTimeException
 {
+    public const DUPLICATE_NOTIFICATION_NOT_HANDLED = 'Duplicate notification is not handled.';
+
     public static function withNotification(Notification $notification): self
     {
         return new self(sprintf(
-            'Duplicate notification is not handled. 
-            Notification with id: "%s", orderId: "%s", pspReference: "%s", status: "%s", paymentMethod: "%s", 
+            self::DUPLICATE_NOTIFICATION_NOT_HANDLED.
+            'Notification with id: "%s", orderId: "%s", pspReference: "%s", status: "%s", paymentMethod: "%s", 
             eventCode: "%s", success: "%s", merchantAccountCode: "%s", amountValue: "%s", amountCurrency: "%s"',
             $notification->getId(),
             $notification->getOrderId(),

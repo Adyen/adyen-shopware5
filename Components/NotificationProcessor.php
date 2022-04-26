@@ -63,7 +63,8 @@ class NotificationProcessor
                 yield from $this->process($notification);
             } catch (DuplicateNotificationException $exception) {
                 $this->logger->notice(
-                    'Duplicate notification', ['message' => $exception->getMessage()]
+                    DuplicateNotificationException::DUPLICATE_NOTIFICATION_NOT_HANDLED,
+                    ['message' => $exception->getMessage()]
                 );
             } catch (NoNotificationProcessorFoundException $exception) {
                 $this->logger->notice(
