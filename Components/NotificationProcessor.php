@@ -13,7 +13,6 @@ use AdyenPayment\Models\Event;
 use AdyenPayment\Models\Feedback\NotificationProcessorFeedback;
 use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\NotificationException;
-use Doctrine\ORM\NoResultException;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Components\Model\ModelManager;
@@ -103,7 +102,7 @@ class NotificationProcessor
      */
     private function process(Notification $notification): \Generator
     {
-        if ($this->isNotificationDuplicate($notification)) {
+        if (!$this->notificationManager->notificationExists($notification)) {
             throw DuplicateNotificationException::withNotification($notification);
         }
 
@@ -182,16 +181,5 @@ class NotificationProcessor
         }
 
         return $processors;
-    }
-
-    private function isNotificationDuplicate(Notification $notification): bool
-    {
-        try {
-            $this->notificationManager->getUniqueNotification($notification);
-
-            return true;
-        } catch (NoResultException $exception) {
-            return false;
-        }
     }
 }

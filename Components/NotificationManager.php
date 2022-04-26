@@ -99,7 +99,7 @@ class NotificationManager
         }
     }
 
-    public function getUniqueNotification(Notification $notification): Notification
+    public function notificationExists(Notification $notification): bool
     {
         $uniqueNotification = $this->notificationRepository->findOneBy([
             'orderId' => $notification->getOrderId(),
@@ -113,9 +113,9 @@ class NotificationManager
         ]);
 
         if (!$uniqueNotification instanceof Notification) {
-            throw new NoResultException();
+            return false;
         }
 
-        return $uniqueNotification;
+        return true;
     }
 }
