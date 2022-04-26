@@ -98,4 +98,24 @@ class NotificationManager
             return;
         }
     }
+
+    public function getUniqueNotification(Notification $notification): Notification
+    {
+        $uniqueNotification = $this->notificationRepository->findOneBy([
+            'orderId' => $notification->getOrderId(),
+            'pspReference' => $notification->getPspReference(),
+            'paymentMethod' => $notification->getPaymentMethod(),
+            'success' => $notification->isSuccess(),
+            'eventCode' => $notification->getEventCode(),
+            'merchantAccountCode' => $notification->getMerchantAccountCode(),
+            'amountValue' => $notification->getAmountValue(),
+            'amountCurrency' => $notification->getAmountCurrency(),
+        ]);
+
+        if (!($uniqueNotification instanceof Notification)) {
+            throw new NoResultException();
+        }
+
+        return $uniqueNotification;
+    }
 }

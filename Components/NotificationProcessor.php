@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Components;
 
 use AdyenPayment\Components\NotificationProcessor\NotificationProcessorInterface;
+use AdyenPayment\Exceptions\DuplicateNotificationException;
 use AdyenPayment\Exceptions\NoNotificationProcessorFoundException;
 use AdyenPayment\Exceptions\OrderNotFoundException;
 use AdyenPayment\Models\Enum\NotificationStatus;
@@ -12,6 +13,7 @@ use AdyenPayment\Models\Event;
 use AdyenPayment\Models\Feedback\NotificationProcessorFeedback;
 use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\NotificationException;
+use Doctrine\ORM\NoResultException;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\ContainerAwareEventManager;
 use Shopware\Components\Model\ModelManager;
@@ -26,21 +28,10 @@ class NotificationProcessor
      * @var NotificationProcessorInterface[]
      */
     private $processors;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var ModelManager
-     */
-    private $modelManager;
-
-    /**
-     * @var ContainerAwareEventManager
-     */
-    private $eventManager;
+    private LoggerInterface $logger;
+    private ModelManager $modelManager;
+    private ContainerAwareEventManager $eventManager;
+    private NotificationManager $notificationManager;
 
     /**
      * NotificationProcessor constructor.
@@ -50,11 +41,13 @@ class NotificationProcessor
     public function __construct(
         LoggerInterface $logger,
         ModelManager $modelManager,
-        ContainerAwareEventManager $eventManager
+        ContainerAwareEventManager $eventManager,
+        NotificationManager $notificationManager
     ) {
         $this->logger = $logger;
         $this->modelManager = $modelManager;
         $this->eventManager = $eventManager;
+        $this->notificationManager = $notificationManager;
     }
 
     /**
@@ -68,6 +61,10 @@ class NotificationProcessor
         foreach ($notifications as $notification) {
             try {
                 yield from $this->process($notification);
+            } catch (DuplicateNotificationException $exception) {
+                $this->logger->notice(
+                    'Duplicate notification', ['message' => $exception->getMessage()]
+                );
             } catch (NoNotificationProcessorFoundException $exception) {
                 $this->logger->notice(
                     'No notification processor found',
@@ -105,6 +102,10 @@ class NotificationProcessor
      */
     private function process(Notification $notification): \Generator
     {
+        if ($this->isNotificationDuplicate($notification)) {
+            throw DuplicateNotificationException::withNotification($notification);
+        }
+
         $processors = $this->findProcessors($notification);
 
         if (empty($processors)) {
@@ -180,5 +181,16 @@ class NotificationProcessor
         }
 
         return $processors;
+    }
+
+    private function isNotificationDuplicate(Notification $notification): bool
+    {
+        try {
+            $this->notificationManager->getUniqueNotification($notification);
+
+            return true;
+        } catch (NoResultException $exception) {
+            return false;
+        }
     }
 }
