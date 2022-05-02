@@ -20,6 +20,7 @@
             <argument type="service" id="adyen_payment.logger.notifications"/>
             <argument type="service" id="AdyenPayment\Components\Builder\NotificationBuilder"/>
             <argument type="service" id="models"/>
+            <argument type="service" id="AdyenPayment\Components\NotificationManager"/>
         </service>
         <service id="AdyenPayment\Components\Manager\UserPreferenceManager">
             <argument type="service" id="models"/>

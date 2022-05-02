@@ -101,7 +101,12 @@ class NotificationManager
 
     public function notificationExists(Notification $notification): bool
     {
-        $uniqueNotification = $this->notificationRepository->findOneBy([
+        return $this->fetchNotification($notification) instanceof Notification;
+    }
+
+    public function fetchNotification(Notification $notification): ?Notification
+    {
+        return $this->notificationRepository->findOneBy([
             'orderId' => $notification->getOrderId(),
             'pspReference' => $notification->getPspReference(),
             'paymentMethod' => $notification->getPaymentMethod(),
@@ -111,11 +116,5 @@ class NotificationManager
             'amountValue' => $notification->getAmountValue(),
             'amountCurrency' => $notification->getAmountCurrency(),
         ]);
-
-        if (!$uniqueNotification instanceof Notification) {
-            return false;
-        }
-
-        return true;
     }
 }
