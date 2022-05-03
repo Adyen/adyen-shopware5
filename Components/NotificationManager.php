@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Components;
 
+use AdyenPayment\Exceptions\DuplicateNotificationException;
 use AdyenPayment\Models\Enum\NotificationStatus;
 use AdyenPayment\Models\Notification;
 use Doctrine\ORM\EntityRepository;
@@ -102,6 +103,16 @@ class NotificationManager
     public function notificationExists(Notification $notification): bool
     {
         return $this->fetchNotification($notification) instanceof Notification;
+    }
+
+    public function isDuplicate(Notification $notification): bool
+    {
+        $record = $this->fetchNotification($notification);
+        if ($record instanceof Notification) {
+            throw DuplicateNotificationException::withNotification($record);
+        }
+
+        return $record instanceof Notification;
     }
 
     public function fetchNotification(Notification $notification): ?Notification

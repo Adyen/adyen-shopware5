@@ -9,7 +9,6 @@ use AdyenPayment\Exceptions\DuplicateNotificationException;
 use AdyenPayment\Exceptions\InvalidParameterException;
 use AdyenPayment\Exceptions\OrderNotFoundException;
 use AdyenPayment\Models\Feedback\TextNotificationItemFeedback;
-use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\TextNotification;
 use Doctrine\ORM\ORMException;
 use Psr\Log\LoggerInterface;
@@ -55,10 +54,7 @@ class IncomingNotificationManager
                         json_decode($textNotificationItem->getTextNotification(), true)
                     );
 
-                    $existingNotification = $this->notificationManager->fetchNotification($notification);
-                    if ($existingNotification instanceof Notification) {
-                        throw DuplicateNotificationException::withNotification($existingNotification);
-                    }
+                    $this->notificationManager->isDuplicate($notification);
 
                     $this->entityManager->persist($notification);
                 }
@@ -72,8 +68,7 @@ class IncomingNotificationManager
                 );
             } catch (DuplicateNotificationException $exception) {
                 $this->logger->notice(
-                    DuplicateNotificationException::DUPLICATE_NOTIFICATION_NOT_HANDLED,
-                    ['message' => $exception->getMessage()]
+                    $exception->getMessage()
                 );
             }
             $this->entityManager->remove($textNotificationItem);
