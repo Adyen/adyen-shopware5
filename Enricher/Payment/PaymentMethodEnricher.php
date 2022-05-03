@@ -39,15 +39,21 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
 
     private function enrichAdditionalDescription(array $shopwareMethod, PaymentMethod $adyenMethod): string
     {
-        if (!$adyenMethod->isStoredPayment()) {
-            return $shopwareMethod['additionaldescription'] ?? '';
+        $additionalDescription = $shopwareMethod['additionaldescription'] ?? '';
+
+        if ('' === $additionalDescription) {
+            $additionalDescription = $this->snippets
+                ->getNamespace('adyen/method/description')
+                ->get($shopwareMethod['attribute']['adyen_type'] ?? '') ?? '';
         }
 
-        $description = $shopwareMethod['additionaldescription'] ?? '';
+        if (!$adyenMethod->isStoredPayment()) {
+            return $additionalDescription;
+        }
 
         return sprintf(
             '%s%s: %s',
-            ($description ? $description.' ' : ''),
+            ($additionalDescription ? $additionalDescription.' ' : ''),
             $this->snippets
                 ->getNamespace('adyen/checkout/payment')
                 ->get('CardNumberEndingOn', 'Card number ending on', true),
