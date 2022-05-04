@@ -100,24 +100,9 @@ class NotificationManager
         }
     }
 
-    public function notificationExists(Notification $notification): bool
+    public function guardDuplicate(Notification $notification): void
     {
-        return $this->fetchNotification($notification) instanceof Notification;
-    }
-
-    public function isDuplicate(Notification $notification): bool
-    {
-        $record = $this->fetchNotification($notification);
-        if ($record instanceof Notification) {
-            throw DuplicateNotificationException::withNotification($record);
-        }
-
-        return $record instanceof Notification;
-    }
-
-    public function fetchNotification(Notification $notification): ?Notification
-    {
-        return $this->notificationRepository->findOneBy([
+        $record = $this->notificationRepository->findOneBy([
             'orderId' => $notification->getOrderId(),
             'pspReference' => $notification->getPspReference(),
             'paymentMethod' => $notification->getPaymentMethod(),
@@ -127,5 +112,9 @@ class NotificationManager
             'amountValue' => $notification->getAmountValue(),
             'amountCurrency' => $notification->getAmountCurrency(),
         ]);
+
+        if ($record instanceof Notification) {
+            throw DuplicateNotificationException::withNotification($record);
+        }
     }
 }

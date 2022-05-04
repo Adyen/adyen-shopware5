@@ -101,7 +101,7 @@ class NotificationProcessor
      */
     private function process(Notification $notification): \Generator
     {
-        $this->notificationManager->isDuplicate($notification);
+        $this->notificationManager->guardDuplicate($notification);
 
         $processors = $this->findProcessors($notification);
 

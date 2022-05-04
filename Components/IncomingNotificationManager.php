@@ -54,7 +54,7 @@ class IncomingNotificationManager
                         json_decode($textNotificationItem->getTextNotification(), true)
                     );
 
-                    $this->notificationManager->isDuplicate($notification);
+                    $this->notificationManager->guardDuplicate($notification);
 
                     $this->entityManager->persist($notification);
                 }
