@@ -52,7 +52,7 @@
         init: function () {
             var me = this;
             me.applyDataAttributes();
-            me.modalContent = $(me.opts.modalSelector).html() ?? '';
+            me.modalContent = $(me.opts.modalSelector).html() || '';
             me.$el.on('click', $.proxy(me.enableDisableButtonClick, me));
         },
         enableDisableButtonClick: function () {
