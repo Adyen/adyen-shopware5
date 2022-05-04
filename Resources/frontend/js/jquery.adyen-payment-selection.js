@@ -198,26 +198,7 @@
         setConfig: function () {
             var me = this;
 
-            $.ajax({
-                method: 'GET',
-                async: false,
-                dataType: 'json',
-                url: me.opts.adyenConfigAjaxUrl,
-                success: function (response) {
-                    if (response['status'] === 'success') {
-                        me.opts.shopLocale = response['shopLocale'];
-                        me.opts.adyenClientKey = response['clientKey'];
-                        me.opts.adyenEnvironment = response['environment'];
-                        me.opts.enrichedPaymentMethods = response['enrichedPaymentMethods'];
-                        me.opts.adyenOrderTotal = response['adyenOrderTotal'];
-                        me.opts.adyenOrderCurrency = response['adyenOrderCurrency'];
-                    } else {
-                        me.addAdyenError(response['content']);
-                    }
-
-                    $.loadingIndicator.close();
-                }
-            });
+            me.fetchAdyenConfig();
 
             var adyenPaymentMethodsResponse = me.opts.enrichedPaymentMethods.reduce(
                 function (rawAdyen, enrichedPaymentMethod) {
@@ -239,6 +220,30 @@
                 onChange: $.proxy(me.handleOnChange, me)
             };
             me.saveAdyenConfigInSession(me.adyenConfiguration);
+        },
+        fetchAdyenConfig: function () {
+            var me = this;
+
+            return $.ajax({
+                method: 'GET',
+                async: false,
+                dataType: 'json',
+                url: me.opts.adyenConfigAjaxUrl,
+                success: function (response) {
+                    if (response['status'] === 'success') {
+                        me.opts.shopLocale = response['shopLocale'];
+                        me.opts.adyenClientKey = response['clientKey'];
+                        me.opts.adyenEnvironment = response['environment'];
+                        me.opts.enrichedPaymentMethods = response['enrichedPaymentMethods'];
+                        me.opts.adyenOrderTotal = response['adyenOrderTotal'];
+                        me.opts.adyenOrderCurrency = response['adyenOrderCurrency'];
+                    } else {
+                        me.addAdyenError(response['content']);
+                    }
+
+                    $.loadingIndicator.close();
+                }
+            });
         },
         getCurrentComponentId: function (selectedPaymentElementId) {
             return 'component-' + selectedPaymentElementId;
@@ -278,10 +283,13 @@
             var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
 
             if (this.__isApplePayPaymentMethod(paymentMethod)) {
+                me.setConfig();
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
+                adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
             }
 
             if ('paywithgoogle' === paymentMethod.adyenType) {
+                me.setConfig();
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
                 me.handleComponentPayWithGoogle();
                 return;

@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.5.0</version>
+    <version>3.7.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -315,6 +315,16 @@
             USP:
               * re-enable creation of stored payment methods (Tokenization) for Credit Cards (adyen type: scheme)
               * functionality to remove stored payment methods / tokens
+        </changes>
+    </changelog>
+    <changelog version="3.7.0">
+        <changes lang="en">
+            * Apple Pay amount mismatch issue is solved (issue occured on change shipping/payment where basket was being miscalculated).
+            * Removed html sanitizing on checkout (using json response instead of html data attribute), so design can be tweaked on payment method.
+        </changes>
+        <changes lang="de">
+            * Das Problem mit der Nichtübereinstimmung des Apple Pay-Betrags wurde behoben (das Problem trat bei der Änderung des Versands/der Zahlung auf, bei der der Warenkorb falsch berechnet wurde).
+            * HTML-Bereinigung beim Checkout entfernt (unter Verwendung von JSON-Antwort anstelle des HTML-Datenattributs), sodass das Design an der Zahlungsmethode angepasst werden kann.
         </changes>
     </changelog>
 </plugin>
