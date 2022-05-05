@@ -34,7 +34,6 @@
         {/if}
     {/block}
 {/block}
-
 {block name="frontend_register_payment_fieldset"}
     {$smarty.block.parent}
     <div class="adyenDisableTokenConfirmationModal adyen-hidden--all">
