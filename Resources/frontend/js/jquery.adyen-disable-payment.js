@@ -60,6 +60,7 @@
             if (0 === me.opts.adyenStoredMethodId.length) {
                 return;
             }
+
             if('' === me.modalContent){
                 return;
             }
@@ -84,6 +85,7 @@
             var me = this;
             $.loadingIndicator.open();
             $.loadingIndicator.loader.$loader.addClass('over-modal');
+
             $.post({
                 url: me.opts.adyenDisableTokenUrl,
                 dataType: 'json',
