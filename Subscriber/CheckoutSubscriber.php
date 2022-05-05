@@ -12,6 +12,7 @@ use AdyenPayment\Components\DataConversion;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMean;
 use AdyenPayment\Serializer\PaymentMeanCollectionSerializer;
+use AdyenPayment\Shopware\Provider\CheckoutBasketProviderInterface;
 use Enlight\Event\SubscriberInterface;
 
 final class CheckoutSubscriber implements SubscriberInterface
@@ -22,6 +23,7 @@ final class CheckoutSubscriber implements SubscriberInterface
     private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
     private PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder;
     private PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer;
+    private CheckoutBasketProviderInterface $checkoutBasketProvider;
 
     public function __construct(
         Configuration $configuration,
@@ -29,7 +31,8 @@ final class CheckoutSubscriber implements SubscriberInterface
         DataConversion $dataConversion,
         EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider,
         PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder,
-        PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer
+        PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer,
+        CheckoutBasketProviderInterface $checkoutBasketProvider
     ) {
         $this->configuration = $configuration;
         $this->paymentMethodService = $paymentMethodService;
@@ -37,6 +40,7 @@ final class CheckoutSubscriber implements SubscriberInterface
         $this->enrichedPaymentMeanProvider = $enrichedPaymentMeanProvider;
         $this->paymentMethodOptionsBuilder = $paymentMethodOptionsBuilder;
         $this->paymentMeanCollectionSerializer = $paymentMeanCollectionSerializer;
+        $this->checkoutBasketProvider = $checkoutBasketProvider;
     }
 
     public static function getSubscribedEvents(): array
@@ -63,7 +67,8 @@ final class CheckoutSubscriber implements SubscriberInterface
             return;
         }
 
-        $basket = $subject->View()->sBasket;
+        $basket = ($this->checkoutBasketProvider)();
+
         if (!$basket) {
             return;
         }

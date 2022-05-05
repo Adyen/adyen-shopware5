@@ -26,7 +26,7 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
     {
         return array_merge($shopwareMethod, [
             'enriched' => true,
-            'additionaldescription' => $this->enrichAdditionalDescription($paymentMethod),
+            'additionaldescription' => $this->enrichAdditionalDescription($shopwareMethod, $paymentMethod),
             'image' => $this->imageLogoProvider->provideByType($paymentMethod->adyenType()->type()),
             'isStoredPayment' => $paymentMethod->isStoredPayment(),
             'isAdyenPaymentMethod' => true,
@@ -37,19 +37,23 @@ final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
         );
     }
 
-    private function enrichAdditionalDescription(PaymentMethod $adyenMethod): string
+    private function enrichAdditionalDescription(array $shopwareMethod, PaymentMethod $adyenMethod): string
     {
-        $description = $this->snippets
-            ->getNamespace('adyen/method/description')
-            ->get($adyenMethod->adyenType()->type()) ?? '';
+        $additionalDescription = $shopwareMethod['additionaldescription'] ?? '';
+
+        if ('' === $additionalDescription) {
+            $additionalDescription = $this->snippets
+                ->getNamespace('adyen/method/description')
+                ->get($shopwareMethod['attribute']['adyen_type'] ?? '') ?? '';
+        }
 
         if (!$adyenMethod->isStoredPayment()) {
-            return $description;
+            return $additionalDescription;
         }
 
         return sprintf(
             '%s%s: %s',
-            ($description ? $description.' ' : ''),
+            ($additionalDescription ? $additionalDescription.' ' : ''),
             $this->snippets
                 ->getNamespace('adyen/checkout/payment')
                 ->get('CardNumberEndingOn', 'Card number ending on', true),

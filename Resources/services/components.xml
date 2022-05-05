@@ -10,6 +10,7 @@
             <argument type="service" id="adyen_payment.logger.notifications"/>
             <argument type="service" id="models"/>
             <argument type="service" id="events"/>
+            <argument type="service" id="AdyenPayment\Components\NotificationManager"/>
         </service>
         <service id="AdyenPayment\Components\BasketService" public="true">
             <argument type="service" id="events"/>

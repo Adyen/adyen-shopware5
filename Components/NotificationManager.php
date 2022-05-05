@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Components;
 
+use AdyenPayment\Exceptions\DuplicateNotificationException;
 use AdyenPayment\Models\Enum\NotificationStatus;
 use AdyenPayment\Models\Notification;
 use Doctrine\ORM\EntityRepository;
@@ -96,6 +97,24 @@ class NotificationManager
             return $lastNotification;
         } catch (NoResultException $ex) {
             return;
+        }
+    }
+
+    public function guardDuplicate(Notification $notification): void
+    {
+        $record = $this->notificationRepository->findOneBy([
+            'orderId' => $notification->getOrderId(),
+            'pspReference' => $notification->getPspReference(),
+            'paymentMethod' => $notification->getPaymentMethod(),
+            'success' => $notification->isSuccess(),
+            'eventCode' => $notification->getEventCode(),
+            'merchantAccountCode' => $notification->getMerchantAccountCode(),
+            'amountValue' => $notification->getAmountValue(),
+            'amountCurrency' => $notification->getAmountCurrency(),
+        ]);
+
+        if ($record instanceof Notification) {
+            throw DuplicateNotificationException::withNotification($record);
         }
     }
 }

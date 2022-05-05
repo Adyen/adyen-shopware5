@@ -10,7 +10,7 @@
             adyenOrderTotal: '',
             adyenOrderCurrency: '',
             resetSessionUrl: '',
-            adyenConfigAjaxUrl: '/frontend/adyenconfig/index',
+            adyenConfigAjaxUrl: '',
             /**
              * Fallback environment variable
              *
