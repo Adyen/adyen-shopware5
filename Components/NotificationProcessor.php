@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Components;
 
 use AdyenPayment\Components\NotificationProcessor\NotificationProcessorInterface;
+use AdyenPayment\Exceptions\DuplicateNotificationException;
 use AdyenPayment\Exceptions\NoNotificationProcessorFoundException;
 use AdyenPayment\Exceptions\OrderNotFoundException;
 use AdyenPayment\Models\Enum\NotificationStatus;
@@ -26,21 +27,10 @@ class NotificationProcessor
      * @var NotificationProcessorInterface[]
      */
     private $processors;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var ModelManager
-     */
-    private $modelManager;
-
-    /**
-     * @var ContainerAwareEventManager
-     */
-    private $eventManager;
+    private LoggerInterface $logger;
+    private ModelManager $modelManager;
+    private ContainerAwareEventManager $eventManager;
+    private NotificationManager $notificationManager;
 
     /**
      * NotificationProcessor constructor.
@@ -50,11 +40,13 @@ class NotificationProcessor
     public function __construct(
         LoggerInterface $logger,
         ModelManager $modelManager,
-        ContainerAwareEventManager $eventManager
+        ContainerAwareEventManager $eventManager,
+        NotificationManager $notificationManager
     ) {
         $this->logger = $logger;
         $this->modelManager = $modelManager;
         $this->eventManager = $eventManager;
+        $this->notificationManager = $notificationManager;
     }
 
     /**
@@ -68,6 +60,10 @@ class NotificationProcessor
         foreach ($notifications as $notification) {
             try {
                 yield from $this->process($notification);
+            } catch (DuplicateNotificationException $exception) {
+                $this->logger->notice(
+                    $exception->getMessage()
+                );
             } catch (NoNotificationProcessorFoundException $exception) {
                 $this->logger->notice(
                     'No notification processor found',
@@ -105,6 +101,8 @@ class NotificationProcessor
      */
     private function process(Notification $notification): \Generator
     {
+        $this->notificationManager->guardDuplicate($notification);
+
         $processors = $this->findProcessors($notification);
 
         if (empty($processors)) {

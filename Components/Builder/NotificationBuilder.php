@@ -68,6 +68,7 @@ class NotificationBuilder
         }
 
         $notification->setOrder($order);
+        $notification->setOrderId($order->getId());
 
         if (isset($params['pspReference'])) {
             $notification->setPspReference($params['pspReference']);

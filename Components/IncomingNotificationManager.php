@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Components;
 
 use AdyenPayment\Components\Builder\NotificationBuilder;
+use AdyenPayment\Exceptions\DuplicateNotificationException;
 use AdyenPayment\Exceptions\InvalidParameterException;
 use AdyenPayment\Exceptions\OrderNotFoundException;
 use AdyenPayment\Models\Feedback\TextNotificationItemFeedback;
@@ -18,20 +19,10 @@ use Shopware\Components\Model\ModelManager;
  */
 class IncomingNotificationManager
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var NotificationBuilder
-     */
-    private $notificationBuilder;
-
-    /**
-     * @var ModelManager
-     */
-    private $entityManager;
+    private LoggerInterface $logger;
+    private NotificationBuilder $notificationBuilder;
+    private ModelManager $entityManager;
+    private NotificationManager $notificationManager;
 
     /**
      * IncomingNotificationManager constructor.
@@ -39,11 +30,13 @@ class IncomingNotificationManager
     public function __construct(
         LoggerInterface $logger,
         NotificationBuilder $notificationBuilder,
-        ModelManager $entityManager
+        ModelManager $entityManager,
+        NotificationManager $notificationManager
     ) {
         $this->logger = $logger;
         $this->notificationBuilder = $notificationBuilder;
         $this->entityManager = $entityManager;
+        $this->notificationManager = $notificationManager;
     }
 
     /**
@@ -60,6 +53,9 @@ class IncomingNotificationManager
                     $notification = $this->notificationBuilder->fromParams(
                         json_decode($textNotificationItem->getTextNotification(), true)
                     );
+
+                    $this->notificationManager->guardDuplicate($notification);
+
                     $this->entityManager->persist($notification);
                 }
             } catch (InvalidParameterException $exception) {
@@ -70,10 +66,14 @@ class IncomingNotificationManager
                 $this->logger->warning(
                     $exception->getMessage().' '.$textNotificationItem->getTextNotification()
                 );
+            } catch (DuplicateNotificationException $exception) {
+                $this->logger->notice(
+                    $exception->getMessage()
+                );
             }
             $this->entityManager->remove($textNotificationItem);
+            $this->entityManager->flush();
         }
-        $this->entityManager->flush();
     }
 
     /**

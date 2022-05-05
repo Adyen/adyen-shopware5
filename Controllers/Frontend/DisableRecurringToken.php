@@ -15,11 +15,13 @@ class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Contro
 {
     private ApiJsonResponse $frontendJsonResponse;
     private DisableTokenRequestHandlerInterface $disableTokenRequestHandler;
+    private Shopware_Components_Snippet_Manager $snippets;
 
     public function preDispatch(): void
     {
         $this->frontendJsonResponse = $this->get(FrontendJsonResponse::class);
         $this->disableTokenRequestHandler = $this->get(DisableTokenRequestHandler::class);
+        $this->snippets = $this->get('snippets');
     }
 
     public function disabledAction(): void
@@ -29,7 +31,11 @@ class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Contro
                 $this->frontendJsonResponse->sendJsonBadRequestResponse(
                     $this->Front(),
                     $this->Response(),
-                    'Invalid method.'
+                    $this->snippets->getNamespace('adyen/checkout/error')->get(
+                        'disableTokenInvalidMethodMessage',
+                        'Invalid method.',
+                        true
+                    )
                 );
 
                 return;
@@ -40,7 +46,11 @@ class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Contro
                 $this->frontendJsonResponse->sendJsonBadRequestResponse(
                     $this->Front(),
                     $this->Response(),
-                    'Missing recurring token param.'
+                    $this->snippets->getNamespace('adyen/checkout/error')->get(
+                        'disableTokenMissingRecurringTokenMessage',
+                        'Missing recurring token param.',
+                        true
+                    )
                 );
 
                 return;
@@ -48,12 +58,11 @@ class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Contro
 
             $result = $this->disableTokenRequestHandler->disableToken($recurringToken, Shopware()->Shop());
             if (!$result->isSuccess()) {
-               $this->frontendJsonResponse->sendJsonResponse(
+               $this->frontendJsonResponse->sendJsonBadRequestResponse(
                    $this->Front(),
                    $this->Response(),
-                   JsonResponse::create(
-                       ['error' => true, 'message' => $result->message()],
-                       Response::HTTP_BAD_REQUEST
+                   $this->snippets->getNamespace('adyen/checkout/error')->get(
+                       $result->message()
                    )
                );
 

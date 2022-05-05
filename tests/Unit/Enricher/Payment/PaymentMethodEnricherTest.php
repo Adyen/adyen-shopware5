@@ -47,7 +47,7 @@ final class PaymentMethodEnricherTest extends TestCase
     {
         $shopwareMethod = [
             'id' => 'shopware-method-id',
-            'additionaldescription' => '',
+            'additionaldescription' => $description = 'Adyen Method',
             'image' => '',
         ];
         $paymentMethod = PaymentMethod::fromRaw($rawData = [
@@ -78,7 +78,10 @@ final class PaymentMethodEnricherTest extends TestCase
     /** @test */
     public function it_will_enrich_a_payment_method_with_stored_method_data(): void
     {
-        $shopwareMethod = ['id' => $shopwareMethodId = 'shopware-method-id'];
+        $shopwareMethod = [
+            'id' => $shopwareMethodId = 'shopware-method-id',
+            'additionaldescription' => $description = 'Stored Method',
+        ];
         $paymentMethod = PaymentMethod::fromRaw($rawData = [
             'id' => $storedMethodId = 'stored_method_id',
             'name' => $storedMethodName = 'stored method name',
@@ -87,7 +90,7 @@ final class PaymentMethodEnricherTest extends TestCase
             'lastFour' => $lastFour = '1234',
         ]);
         $snippetsNamespace = $this->prophesize(\Enlight_Components_Snippet_Namespace::class);
-        $snippetsNamespace->get($paymentMethod->adyenType()->type())->willReturn($description = 'Stored Method');
+        $snippetsNamespace->get($paymentMethod->adyenType()->type())->willReturn($description);
         $snippetsNamespace->get('CardNumberEndingOn', $text = 'Card number ending on', true)->willReturn($text);
         $this->snippets->getNamespace('adyen/method/description')->willReturn($snippetsNamespace);
         $this->snippets->getNamespace('adyen/checkout/payment')->willReturn($snippetsNamespace);

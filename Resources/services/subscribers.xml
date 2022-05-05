@@ -66,6 +66,7 @@
             <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider"/>
             <argument type="service" id="AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder"/>
             <argument type="service" id="AdyenPayment\Shopware\Serializer\SwPaymentMeanCollectionSerializer"/>
+            <argument type="service" id="AdyenPayment\Shopware\Provider\CheckoutBasketProvider"/>
         </service>
         <service id="AdyenPayment\Subscriber\Checkout\AddAdyenSourceTypeToViewSubscriber">
             <tag name="shopware.event_subscriber"/>
