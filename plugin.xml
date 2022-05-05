@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.7.0</version>
+    <version>3.8.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -325,6 +325,20 @@
         <changes lang="de">
             * Das Problem mit der Nichtübereinstimmung des Apple Pay-Betrags wurde behoben (das Problem trat bei der Änderung des Versands/der Zahlung auf, bei der der Warenkorb falsch berechnet wurde).
             * HTML-Bereinigung beim Checkout entfernt (unter Verwendung von JSON-Antwort anstelle des HTML-Datenattributs), sodass das Design an der Zahlungsmethode angepasst werden kann.
+        </changes>
+    </changelog>
+    <changelog version="3.8.0">
+        <changes lang="en">
+            * USP - Confirm modal
+            * Fix: Duplicate Webhook Notifications
+            * Fix: Mismatch of Basket Amount for guest and user accounts on payment
+            * Feature: Allow additional description for payment methods (with fallback to translations)
+        </changes>
+        <changes lang="de">
+            * USP - Confirm modal
+            * Fix: Duplicate Webhook Notifications
+            * Fix: Mismatch of Basket Amount for guest and user accounts on payment
+            * Feature: Allow additional description for payment methods (with fallback to translations)
         </changes>
     </changelog>
 </plugin>
