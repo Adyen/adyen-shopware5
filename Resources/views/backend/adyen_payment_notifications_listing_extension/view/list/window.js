@@ -3,7 +3,7 @@ Ext.define('Shopware.apps.AdyenPaymentNotificationsListingExtension.view.list.Wi
     extend: 'Shopware.window.Listing',
     alias: 'widget.product-list-window',
     height: 450,
-    title : '{s name=window_title}Notification listing{/s}',
+    title : '{s name="window_title"}Notification listing{/s}',
 
     configure: function () {
         return {
