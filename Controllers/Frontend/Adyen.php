@@ -111,7 +111,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $payload = array_intersect_key($this->Request()->getPost(), ['details' => true]);
         $checkout = $this->adyenCheckout->getCheckout();
         $paymentInfo = $checkout->paymentsDetails($payload);
-        ($this->paymentResultCodeHandler)($paymentInfo);
+        $this->handlePaymentData($paymentInfo);
 
         $this->Response()->setBody(json_encode($paymentInfo));
     }
