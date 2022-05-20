@@ -61,6 +61,8 @@ class NotificationProcessor
             try {
                 yield from $this->process($notification);
             } catch (DuplicateNotificationException $exception) {
+                $notification->setStatus(NotificationStatus::STATUS_HANDLED);
+                $this->modelManager->persist($notification);
                 $this->logger->notice(
                     $exception->getMessage()
                 );

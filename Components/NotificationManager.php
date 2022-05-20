@@ -102,16 +102,33 @@ class NotificationManager
 
     public function guardDuplicate(Notification $notification): void
     {
-        $record = $this->notificationRepository->findOneBy([
-            'orderId' => $notification->getOrderId(),
-            'pspReference' => $notification->getPspReference(),
-            'paymentMethod' => $notification->getPaymentMethod(),
-            'success' => $notification->isSuccess(),
-            'eventCode' => $notification->getEventCode(),
-            'merchantAccountCode' => $notification->getMerchantAccountCode(),
-            'amountValue' => $notification->getAmountValue(),
-            'amountCurrency' => $notification->getAmountCurrency(),
-        ]);
+        $builder = $this->notificationRepository->createQueryBuilder('n');
+        $builder
+            ->where('n.orderId = :orderId')
+            ->andWhere('n.pspReference = :pspReference')
+            ->andWhere('n.paymentMethod = :paymentMethod')
+            ->andWhere('n.success = :success')
+            ->andWhere('n.eventCode = :eventCode')
+            ->andWhere('n.merchantAccountCode = :merchantAccountCode')
+            ->andWhere('n.amountValue = :amountValue')
+            ->andWhere('n.amountCurrency = :amountCurrency')
+            ->setParameter('orderId', $notification->getOrderId())
+            ->setParameter('pspReference', $notification->getPspReference())
+            ->setParameter('paymentMethod', $notification->getPaymentMethod())
+            ->setParameter('success', $notification->isSuccess())
+            ->setParameter('eventCode', $notification->getEventCode())
+            ->setParameter('merchantAccountCode', $notification->getMerchantAccountCode())
+            ->setParameter('amountValue', $notification->getAmountValue())
+            ->setParameter('amountCurrency', $notification->getAmountCurrency())
+            ->setMaxResults(1);
+
+        if ($this->modelManager->contains($notification) && $notification->getId()) {
+            $builder
+                ->andWhere('n.id <> :id')
+                ->setParameter('id', $notification->getId());
+        }
+
+        $record = $builder->getQuery()->getOneOrNullResult();
 
         if ($record instanceof Notification) {
             throw DuplicateNotificationException::withNotification($record);
