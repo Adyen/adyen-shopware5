@@ -13,6 +13,7 @@ psalm.xml
 grumphp.yml
 .*.cache
 tools/vendor
+tools/AdyenPayment.zip
 !tools/composer.lock
 tests/fixtures/applepay/*
 !tests/fixtures/applepay/ZipExtractor.zip
