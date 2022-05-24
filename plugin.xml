@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.8.0</version>
+    <version>3.8.1</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -339,6 +339,18 @@
             * Fix: Duplicate Webhook Notifications
             * Fix: Mismatch of Basket Amount for guest and user accounts on payment
             * Feature: Allow additional description for payment methods (with fallback to translations)
+        </changes>
+    </changelog>
+    <changelog version="3.8.1">
+        <changes lang="en">
+            * Fix: Automatic payment status updating
+            * Fix: Checkout error upon submission of additional payment data
+            * Fix: Notifications listing under the PHP 8
+        </changes>
+        <changes lang="de">
+            * Fix: Automatic payment status updating
+            * Fix: Checkout error upon submission of additional payment data
+            * Fix: Notifications listing under the PHP 8
         </changes>
     </changelog>
 </plugin>
