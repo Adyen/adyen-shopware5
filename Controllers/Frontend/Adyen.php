@@ -77,6 +77,8 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                     'content' => $ex->getMessage(),
                 ]
             ));
+
+            $this->basketService->cancelAndRestoreByOrderNumber($context->getOrder()->getNumber());
         }
     }
 
@@ -230,11 +232,21 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private function handlePaymentData($paymentInfo): void
     {
-        if (PaymentResultCode::exists((string) ($paymentInfo['resultCode'] ?? ''))) {
+        $rawResultCode = (string) ($paymentInfo['resultCode'] ?? '');
+        if (!PaymentResultCode::exists($rawResultCode)) {
+            $this->handlePaymentDataError($paymentInfo);
             return;
         }
 
-        $this->handlePaymentDataError($paymentInfo);
+        $resultCode = PaymentResultCode::load((string) ($paymentInfo['resultCode'] ?? ''));
+        if (
+            !$resultCode->equals(PaymentResultCode::authorised()) &&
+            !$resultCode->equals(PaymentResultCode::identifyShopper()) &&
+            !$resultCode->equals(PaymentResultCode::challengeShopper()) &&
+            !$resultCode->equals(PaymentResultCode::redirectShopper())
+        ) {
+            $this->handlePaymentDataError($paymentInfo);
+        }
     }
 
     /**
