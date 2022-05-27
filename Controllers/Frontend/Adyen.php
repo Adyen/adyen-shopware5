@@ -243,6 +243,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             !$resultCode->equals(PaymentResultCode::authorised()) &&
             !$resultCode->equals(PaymentResultCode::identifyShopper()) &&
             !$resultCode->equals(PaymentResultCode::challengeShopper()) &&
+            !$resultCode->equals(PaymentResultCode::pending()) &&
             !$resultCode->equals(PaymentResultCode::redirectShopper())
         ) {
             $this->handlePaymentDataError($paymentInfo);
@@ -262,6 +263,11 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     {
         if (array_key_exists('merchantReference', $paymentResponseInfo)) {
             $this->basketService->cancelAndRestoreByOrderNumber($paymentResponseInfo['merchantReference']);
+            return;
+        }
+
+        if (isset($paymentResponseInfo['action']['merchantReference'])) {
+            $this->basketService->cancelAndRestoreByOrderNumber($paymentResponseInfo['action']['merchantReference']);
         }
     }
 }
