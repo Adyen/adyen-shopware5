@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.8.1</version>
+    <version>3.8.2</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -351,6 +351,16 @@
             * Fix: Automatic payment status updating
             * Fix: Checkout error upon submission of additional payment data
             * Fix: Notifications listing under the PHP 8
+        </changes>
+    </changelog>
+    <changelog version="3.8.2">
+        <changes lang="en">
+            * Fix: Mark order payment as canceled upon exceptional Adyen API payment response
+            * Fix: Mark order payment as canceled for unsupported Adyen API payment responses
+        </changes>
+        <changes lang="de">
+            * Fix: Mark order payment as canceled upon exceptional Adyen API payment response
+            * Fix: Mark order payment as canceled for unsupported Adyen API payment responses
         </changes>
     </changelog>
 </plugin>
