@@ -145,7 +145,7 @@
                 case 'ChallengeShopper':
                 case 'Pending':
                 case 'RedirectShopper':
-                    me.handlePaymentDataCreateFromAction(data);
+                    me.handlePaymentDataCreateFromAction(data, sUniqueID);
                     break;
                 default:
                     me.handlePaymentDataError(data);
@@ -157,7 +157,7 @@
             var input = $("<input>").attr("type", "hidden").attr("name", "sUniqueID").val(sUniqueID);
             $(me.opts.confirmFormSelector).append(input).submit();
         },
-        handlePaymentDataCreateFromAction: function (data) {
+        handlePaymentDataCreateFromAction: function (data, sUniqueID = null) {
             var me = this;
             var payload = {
                 resultCode: data.resultCode,
@@ -184,7 +184,7 @@
                                 'details': state.data.details,
                             },
                             success: function (response) {
-                                me.handlePaymentData(response);
+                                me.handlePaymentData(response, sUniqueID);
                             },
                         });
                     },

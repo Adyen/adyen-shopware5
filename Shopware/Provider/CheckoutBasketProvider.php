@@ -21,6 +21,9 @@ final class CheckoutBasketProvider extends \Shopware_Controllers_Frontend_Checko
 
     public function __invoke($mergeProportional = true): array
     {
+        // Initialize front controller to mitigate getBasket expectations
+        $this->Front();
+
         return $this->getBasket($mergeProportional);
     }
 }
