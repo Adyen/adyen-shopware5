@@ -366,9 +366,11 @@
     <changelog version="3.8.3">
         <changes lang="en">
             * Fix: Empty cart upon order confirmation
+            * Fix: Frontend cache clear upon plugin install and update
         </changes>
         <changes lang="de">
             * Fix: Empty cart upon order confirmation
+            * Fix: Frontend cache clear upon plugin install and update
         </changes>
     </changelog>
 </plugin>
