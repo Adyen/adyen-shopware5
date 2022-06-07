@@ -106,6 +106,9 @@ class Capture implements NotificationProcessorInterface
             $paymentInfo = $this->paymentInfoRepository->findOneBy([
                 'orderId' => $order->getId(),
             ]);
+            if (!$paymentInfo) {
+                return;
+            }
 
             $paymentInfo->setPspReference($notification->getPspReference());
             $this->modelManager->persist($paymentInfo);
