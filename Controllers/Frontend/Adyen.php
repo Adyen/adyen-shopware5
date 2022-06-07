@@ -171,7 +171,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
      */
     private function prepareOrder(PaymentInfo $transaction): Order
     {
-        $signature = $this->persistBasket();
+        $signature = "adyen_{$transaction->getId()}_{$this->persistBasket()}";
 
         Shopware()->Session()->offsetSet(
             AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS,
