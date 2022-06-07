@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.8.2</version>
+    <version>3.8.3</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -361,6 +361,14 @@
         <changes lang="de">
             * Fix: Mark order payment as canceled upon exceptional Adyen API payment response
             * Fix: Mark order payment as canceled for unsupported Adyen API payment responses
+        </changes>
+    </changelog>
+    <changelog version="3.8.3">
+        <changes lang="en">
+            * Fix: Empty cart upon order confirmation
+        </changes>
+        <changes lang="de">
+            * Fix: Empty cart upon order confirmation
         </changes>
     </changelog>
 </plugin>
