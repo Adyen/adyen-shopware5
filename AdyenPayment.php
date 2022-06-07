@@ -94,6 +94,8 @@ final class AdyenPayment extends Plugin
         $tool = new SchemaTool($this->container->get('models'));
         $classes = $this->getModelMetaData();
         $tool->updateSchema($classes, true);
+
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_FRONTEND);
     }
 
     public function update(UpdateContext $context): void
@@ -105,6 +107,7 @@ final class AdyenPayment extends Plugin
         $classes = $this->getModelMetaData();
         $tool->updateSchema($classes, true);
 
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_FRONTEND);
         parent::update($context);
     }
 
