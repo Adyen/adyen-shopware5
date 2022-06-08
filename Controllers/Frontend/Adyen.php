@@ -43,6 +43,11 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->Request()->setHeader('Content-Type', 'application/json');
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
+        if (!Shopware()->Modules()->Admin()->sCheckUser()) {
+            $this->Response()->setHttpResponseCode(401);
+            return;
+        }
+
         $context = $this->createPaymentContext();
 
         try {
@@ -61,6 +66,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                 [
                     'status' => 'success',
                     'content' => $paymentInfo,
+                    'adyenTransactionId' => $context->getTransaction()->getId(),
                     'sUniqueID' => $context->getOrder()->getTemporaryId(),
                 ]
             ));
@@ -103,12 +109,25 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     }
 
     /**
+     * @return void
      * @throws AdyenException
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function paymentDetailsAction(): void
     {
         $this->Request()->setHeader('Content-Type', 'application/json');
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
+        if (!Shopware()->Modules()->Admin()->sCheckUser()) {
+            $this->Response()->setHttpResponseCode(401);
+            $this->tryOrderCancelByTransactionId($this->Request()->getPost('adyenTransactionId'));
+
+            return;
+        }
 
         $payload = array_intersect_key($this->Request()->getPost(), ['details' => true]);
         $checkout = $this->adyenCheckout->getCheckout();
@@ -269,5 +288,26 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         if (isset($paymentResponseInfo['action']['merchantReference'])) {
             $this->basketService->cancelAndRestoreByOrderNumber($paymentResponseInfo['action']['merchantReference']);
         }
+    }
+
+    /**
+     * @return void
+     * @throws Enlight_Event_Exception
+     * @throws Enlight_Exception
+     * @throws Zend_Db_Adapter_Exception
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function tryOrderCancelByTransactionId($adyenTransactionId): void
+    {
+        /** @var PaymentInfo $transaction */
+        $transaction = $this->getModelManager()->getRepository(PaymentInfo::class)->findOneBy([
+            'id' => $adyenTransactionId,
+        ]);
+        if (!$transaction) {
+            return;
+        }
+
+        $this->basketService->cancelAndRestoreByOrderNumber($transaction->getOrdernumber());
     }
 }

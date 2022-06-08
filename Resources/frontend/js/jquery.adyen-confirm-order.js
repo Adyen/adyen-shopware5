@@ -30,6 +30,7 @@
             adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
             adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
             checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
+            accountLoginUrl: '/account/login/sTarget/checkout/sTargetAction/confirm/showNoAccount/true',
             adyenSnippets: {
                 errorTransactionCancelled: 'Your transaction was cancelled by the Payment Service Provider.',
                 errorTransactionProcessing: 'An error occurred while processing your payment.',
@@ -126,16 +127,17 @@
                 data: data,
                 success: function (response) {
                     if (response['status'] === 'success') {
-                        me.handlePaymentData(response['content'], response['sUniqueID']);
+                        me.handlePaymentData(response['content'], response['sUniqueID'], response['adyenTransactionId']);
                     } else {
                         me.addAdyenError(response['content']);
                     }
 
                     $.loadingIndicator.close();
-                }
+                },
+                error: me.handleAjaxRequestError.bind(me)
             });
         },
-        handlePaymentData: function (data, sUniqueID = null) {
+        handlePaymentData: function (data, sUniqueID = null, adyenTransactionId = null) {
             var me = this;
             switch (data.resultCode) {
                 case 'Authorised':
@@ -145,7 +147,7 @@
                 case 'ChallengeShopper':
                 case 'Pending':
                 case 'RedirectShopper':
-                    me.handlePaymentDataCreateFromAction(data, sUniqueID);
+                    me.handlePaymentDataCreateFromAction(data, sUniqueID, adyenTransactionId);
                     break;
                 default:
                     me.handlePaymentDataError(data);
@@ -157,7 +159,7 @@
             var input = $("<input>").attr("type", "hidden").attr("name", "sUniqueID").val(sUniqueID);
             $(me.opts.confirmFormSelector).append(input).submit();
         },
-        handlePaymentDataCreateFromAction: function (data, sUniqueID = null) {
+        handlePaymentDataCreateFromAction: function (data, sUniqueID = null, adyenTransactionId = null) {
             var me = this;
             var payload = {
                 resultCode: data.resultCode,
@@ -182,10 +184,12 @@
                             data: {
                                 'action': payload,
                                 'details': state.data.details,
+                                'adyenTransactionId': adyenTransactionId
                             },
                             success: function (response) {
-                                me.handlePaymentData(response, sUniqueID);
+                                me.handlePaymentData(response, sUniqueID, adyenTransactionId);
                             },
+                            error: me.handleAjaxRequestError.bind(me)
                         });
                     },
                     onError: function (error) {
@@ -193,6 +197,14 @@
                     }
                 })
                 .mount('#AdyenModal');
+        },
+        handleAjaxRequestError: function (xhr) {
+            if (xhr.status === 401) {
+                window.location.href = this.opts.accountLoginUrl;
+            }
+
+            this.addAdyenError(this.opts.adyenSnippets.errorTransactionProcessing);
+            $.loadingIndicator.close();
         },
         handlePaymentDataError: function (data) {
             var me = this;
