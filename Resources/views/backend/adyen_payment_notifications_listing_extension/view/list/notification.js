@@ -9,6 +9,8 @@ Ext.define('Shopware.apps.AdyenPaymentNotificationsListingExtension.view.list.No
         return {
             addButton: false,
             deleteButton: false,
+            deleteColumn: false,
+            editColumn: false,
             columns: {
                 'pspReference': { },
                 'createdAt': { },
@@ -29,7 +31,7 @@ Ext.define('Shopware.apps.AdyenPaymentNotificationsListingExtension.view.list.No
     },
 
     orderIdRenderer: function (value, styles, row) {
-        return row.raw.order.number;
+        return !Ext.isEmpty(row.raw.order) ? row.raw.order.number : '';
     },
 
 
@@ -57,15 +59,12 @@ Ext.define('Shopware.apps.AdyenPaymentNotificationsListingExtension.view.list.No
         orderDoesNotExistAnymore: '{s name="order_does_not_exist_anymore"}This order does not exist anymore{/s}',
     },
 
-    createActionColumn: function () {
-        var me = this;
+    createActionColumnItems: function() {
+        var me = this, items;
+        items = me.callParent(arguments);
+        items.push(me.createEditOrderColumn());
 
-        return Ext.create('Ext.grid.column.Action', {
-            width: 30,
-            items:[
-                me.createEditOrderColumn(),
-            ]
-        });
+        return items;
     },
 
     createEditOrderColumn: function () {
@@ -76,9 +75,18 @@ Ext.define('Shopware.apps.AdyenPaymentNotificationsListingExtension.view.list.No
             action: 'editOrder',
             tooltip: me.snippets.columns.orderDetails,
 
+            isDisabled: function (view, rowIndex, colIndex, item, record) {
+                return Ext.isEmpty(record.raw.order);
+            },
             handler: function (view, rowIndex, colIndex, item) {
                 var store = view.getStore(),
                     record = store.getAt(rowIndex);
+
+                if (Ext.isEmpty(record.raw.order)) {
+                    Shopware.Msg.createGrowlMessage(me.snippets.failureTitle, me.snippets.orderDoesNotExistAnymore);
+
+                    return;
+                }
 
                 Shopware.app.Application.addSubApplication({
                     name: 'Shopware.apps.Order',
