@@ -160,11 +160,17 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
     private function validateResponse(array $response, ?Order $order)
     {
         try {
-            $checkout = $this->adyenCheckout->getCheckout();
-            $response = $checkout->paymentsDetails([
-                'paymentData' => $this->adyenManager->fetchOrderPaymentData($order),
+            $request = [
                 'details' => RequestDataFormatter::forPaymentDetails($response),
-            ]);
+            ];
+
+            $paymentData = $this->adyenManager->fetchOrderPaymentData($order);
+            if (!empty($paymentData)) {
+                $request['paymentData'] = $paymentData;
+            }
+
+            $checkout = $this->adyenCheckout->getCheckout();
+            $response = $checkout->paymentsDetails($request);
         } catch (AdyenException $e) {
             $response['error'] = $e->getMessage();
         }
