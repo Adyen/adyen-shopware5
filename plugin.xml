@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.8.3</version>
+    <version>3.8.4</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -371,6 +371,22 @@
         <changes lang="de">
             * Fix: Empty cart upon order confirmation
             * Fix: Frontend cache clear upon plugin install and update
+        </changes>
+    </changelog>
+    <changelog version="3.8.4">
+        <changes lang="en">
+            * Fix: Notifications overview error when associated order is deleted
+            * Fix: Add customer session expiry handling during payment requests
+            * Fix: Fix notification handling error for missing payment info
+            * Optimize: Remove empty payment data from details request
+            * Optimize: Generate truly unique order temporary id
+        </changes>
+        <changes lang="de">
+            * Fix: Notifications overview error when associated order is deleted
+            * Fix: Add customer session expiry handling during payment requests
+            * Fix: Fix notification handling error for missing payment info
+            * Optimize: Remove empty payment data from details request
+            * Optimize: Generate truly unique order temporary id
         </changes>
     </changelog>
 </plugin>
