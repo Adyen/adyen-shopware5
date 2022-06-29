@@ -11,11 +11,31 @@ class OrderMailService
 {
     private ModelManager $modelManager;
     private BasketService $basketService;
+    private bool $isOrderConfirmationEmailRestricted = false;
 
     public function __construct(ModelManager $modelManager, BasketService $basketService)
     {
         $this->modelManager = $modelManager;
         $this->basketService = $basketService;
+    }
+
+    /**
+     * Executes provided callback without sending order confirmation email.
+     *
+     * @param callable $callback The callback to execute without email sending
+     * @param array    $args     The parameters to be passed to the callback, as an indexed array
+     */
+    public function doWithoutSendingOrderConfirmationMail(callable $callback, array $args = [])
+    {
+        $this->isOrderConfirmationEmailRestricted = true;
+
+        try {
+            $result = call_user_func_array($callback, $args);
+        } finally {
+            $this->isOrderConfirmationEmailRestricted = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -48,5 +68,10 @@ class OrderMailService
         $paymentInfo->setOrdermailVariables(null);
         $this->modelManager->persist($paymentInfo);
         $this->modelManager->flush($paymentInfo);
+    }
+
+    public function isOrderConfirmationEmailRestricted(): bool
+    {
+        return $this->isOrderConfirmationEmailRestricted;
     }
 }

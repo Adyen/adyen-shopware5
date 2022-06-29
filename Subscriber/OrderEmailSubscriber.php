@@ -92,8 +92,9 @@ class OrderEmailSubscriber implements SubscriberInterface
     {
         $variables = $args->get('variables');
         $paymentMean = PaymentMean::createFromShopwareArray($variables['additional']['payment'] ?? []);
-        if ($paymentMean->getSource()->equals(SourceType::adyen())
-            && true === Shopware()->Session()->get(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, true)
+        if (
+            $this->orderMailService->isOrderConfirmationEmailRestricted()
+            && $paymentMean->getSource()->equals(SourceType::adyen())
         ) {
             /** @var PaymentInfo $paymentInfo */
             $paymentInfo = $this->paymentInfoRepository->findOneBy([

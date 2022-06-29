@@ -4,6 +4,7 @@ use Adyen\AdyenException;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\BasketService;
+use AdyenPayment\Components\OrderMailService;
 use AdyenPayment\Models\PaymentResultCode;
 use AdyenPayment\Components\Manager\AdyenManager;
 use AdyenPayment\Components\Payload\Chain;
@@ -25,6 +26,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     private Logger $logger;
     private Chain $paymentPayloadProvider;
     private BasketService $basketService;
+    private OrderMailService $orderMailService;
 
     /**
      * @return void
@@ -36,6 +38,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->logger = $this->get('adyen_payment.logger');
         $this->paymentPayloadProvider = $this->get(PaymentPayloadProvider::class);
         $this->basketService = $this->get(BasketService::class);
+        $this->orderMailService = $this->get(OrderMailService::class);
     }
 
     public function ajaxDoPaymentAction(): void
@@ -193,11 +196,6 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $signature = "adyen_{$transaction->getId()}_{$this->persistBasket()}";
 
         Shopware()->Session()->offsetSet(
-            AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS,
-            0 < $transaction->getId()
-        );
-
-        Shopware()->Session()->offsetSet(
             AdyenPayment::SESSION_ADYEN_PAYMENT_INFO_ID,
             $transaction->getId()
         );
@@ -206,14 +204,9 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
             Shopware()->Session()->offsetSet('sComment', $this->Request()->getParam('sComment'));
         }
 
-        $orderNumber = $this->saveOrder(
-            $transaction->getId(),
-            $signature,
-            Status::PAYMENT_STATE_OPEN,
-            false
+        $orderNumber = $this->orderMailService->doWithoutSendingOrderConfirmationMail(
+            [$this, 'saveOrder'], [$transaction->getId(), $signature, Status::PAYMENT_STATE_OPEN, false]
         );
-
-        Shopware()->Session()->offsetSet(AdyenPayment::SESSION_ADYEN_RESTRICT_EMAILS, false);
 
         /** @var Order $order */
         $order = $this->getModelManager()->getRepository(Order::class)->findOneBy([

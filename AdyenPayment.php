@@ -36,7 +36,6 @@ final class AdyenPayment extends Plugin
     public const NAME = 'AdyenPayment';
     public const ADYEN_CODE = 'adyen_type';
     public const ADYEN_STORED_PAYMENT_UMBRELLA_CODE = 'adyen_stored_payment_umbrella';
-    public const SESSION_ADYEN_RESTRICT_EMAILS = 'adyenRestrictEmail';
     public const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';
     public const SESSION_ADYEN_STORED_METHOD_ID = 'adyenStoredMethodId';
 
