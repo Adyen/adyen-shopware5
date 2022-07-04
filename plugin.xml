@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.8.4</version>
+    <version>3.8.5</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -387,6 +387,16 @@
             * Fix: Fix notification handling error for missing payment info
             * Optimize: Remove empty payment data from details request
             * Optimize: Generate truly unique order temporary id
+        </changes>
+    </changelog>
+    <changelog version="3.8.5">
+        <changes lang="en">
+            * Fix: Order confirmation emails not sent for expired customer sessions upon payment redirects
+            * Optimize: Remove session dependency from payment redirect handler
+        </changes>
+        <changes lang="de">
+            * Fix: Order confirmation emails not sent for expired customer sessions upon payment redirects
+            * Optimize: Remove session dependency from payment redirect handler
         </changes>
     </changelog>
 </plugin>
