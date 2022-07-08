@@ -8,6 +8,7 @@ use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\Payload\PaymentContext;
 use AdyenPayment\Components\Payload\PaymentPayloadProvider;
+use AdyenPayment\Components\ShopwareVersionCheck;
 use AdyenPayment\Models\Enum\Channel;
 use Doctrine\ORM\EntityManagerInterface;
 use Shopware\Components\Routing\RouterInterface;
@@ -33,14 +34,21 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
      */
     private $router;
 
+    /**
+     * @var ShopwareVersionCheck
+     */
+    private $shopwareVersionCheck;
+
     public function __construct(
         RouterInterface $router,
         EntityManagerInterface $modelManager,
-        Configuration $configuration
+        Configuration $configuration,
+        ShopwareVersionCheck $shopwareVersionCheck
     ) {
         $this->router = $router;
         $this->modelManager = $modelManager;
         $this->configuration = $configuration;
+        $this->shopwareVersionCheck = $shopwareVersionCheck;
     }
 
     public function provide(PaymentContext $context): array
@@ -69,7 +77,7 @@ class ApplicationInfoProvider implements PaymentPayloadProvider
                 ],
                 'externalPlatform' => [
                     'name' => 'Shopware',
-                    'version' => '5.6',
+                    'version' => $this->shopwareVersionCheck->getShopwareVersion(),
                     'integrator' => $plugin->getAuthor(),
                 ],
                 'merchantApplication' => [

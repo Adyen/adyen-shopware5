@@ -37,6 +37,17 @@ class ShopwareVersionCheck
             return true;
         }
 
+        $version = $this->getShopwareVersion();
+
+        if ('v' !== $version[0]) {
+            $version = 'v'.$version;
+        }
+
+        return version_compare($shopwareVersion, $version, '<');
+    }
+
+    public function getShopwareVersion(): string
+    {
         $version = $this->container->get('shopware.release')->getVersion();
 
         if (self::SHOPWARE === $version) {
@@ -52,10 +63,6 @@ class ShopwareVersionCheck
             }
         }
 
-        if ('v' !== $version[0]) {
-            $version = 'v'.$version;
-        }
-
-        return version_compare($shopwareVersion, $version, '<');
+        return $version;
     }
 }

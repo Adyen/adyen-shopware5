@@ -33,6 +33,7 @@
             <argument type="service" id="router"/>
             <argument type="service" id="models"/>
             <argument type="service" id="AdyenPayment\Components\Configuration"/>
+            <argument type="service" id="adyen_payment.components.shopware_version_check"/>
         </service>
 
         <service id="AdyenPayment\Components\Payload\Providers\BrowserInfoProvider"/>
