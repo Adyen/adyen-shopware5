@@ -60,6 +60,10 @@ final class CheckoutSubscriber implements SubscriberInterface
 
     private function checkBasketAmount(\Enlight_Controller_Action $subject): void
     {
+        if ('finish' === $subject->Request()->getActionName()) {
+            return;
+        }
+
         $userData = $subject->View()->getAssign('sUserData');
 
         $paymentMean = PaymentMean::createFromShopwareArray($userData['additional']['payment'] ?? []);
