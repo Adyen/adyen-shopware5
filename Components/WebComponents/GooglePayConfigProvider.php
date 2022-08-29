@@ -35,7 +35,7 @@ final class GooglePayConfigProvider implements ConfigProvider
     public function __invoke(ConfigContext $context): array
     {
         return [
-            'environment' => Configuration::ENV_LIVE === $this->configuration->getEnvironment() ? 'PRODUCTION' : 'TEST',
+            'environment' => $this->configuration->isTestMode() ? 'TEST' : 'PRODUCTION',
             'countryCode' => (string) ($context->getUserData()['additional']['country']['countryiso'] ?? ''),
             'amount' => [
                 'value' => (new Currency())->sanitize(

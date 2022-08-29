@@ -9,7 +9,7 @@ use Shopware\Models\Shop\Shop;
 interface ConfigurationInterface
 {
     public function getEnvironment($shop = false): string;
-    public function isTestModus($shop = false): bool;
+    public function isTestMode($shop = false): bool;
     public function getMerchantAccount($shop = false): string;
     public function getConfig(?string $key = null, $shop = false);
     public function getApiKey($shop = false): string;

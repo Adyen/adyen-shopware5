@@ -13,8 +13,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 final class Configuration implements ConfigurationInterface
 {
-    public const ENV_TEST = 'TEST';
-    public const ENV_LIVE = 'LIVE';
+    private const ENV_LIVE = 'LIVE';
     private ReaderInterface $cachedConfigReader;
 
     /** @var Connection */
@@ -44,7 +43,7 @@ final class Configuration implements ConfigurationInterface
     /**
      * @param bool $shop
      */
-    public function isTestModus($shop = false): bool
+    public function isTestMode($shop = false): bool
     {
         return Environment::TEST === $this->getEnvironment($shop);
     }
