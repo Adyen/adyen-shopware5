@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.8.5</version>
+    <version>3.8.6</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -397,6 +397,18 @@
         <changes lang="de">
             * Fix: Order confirmation emails not sent for expired customer sessions upon payment redirects
             * Optimize: Remove session dependency from payment redirect handler
+        </changes>
+    </changelog>
+    <changelog version="3.8.6">
+        <changes lang="en">
+            * Fix: Shopware version in payments' application info section
+            * Fix: Wrong payment method name on the order finish page
+            * Fix: Invalid GooglePay token error for production environments
+        </changes>
+        <changes lang="de">
+            * Fix: Shopware version in payments' application info section
+            * Fix: Wrong payment method name on the order finish page
+            * Fix: Invalid GooglePay token error for production environments
         </changes>
     </changelog>
 </plugin>
