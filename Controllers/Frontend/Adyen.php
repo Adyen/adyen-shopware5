@@ -4,6 +4,7 @@ use Adyen\AdyenException;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\Adyen\PaymentMethodService;
 use AdyenPayment\Components\BasketService;
+use AdyenPayment\Components\Manager\OrderManagerInterface;
 use AdyenPayment\Components\OrderMailService;
 use AdyenPayment\Models\PaymentResultCode;
 use AdyenPayment\Components\Manager\AdyenManager;
@@ -27,6 +28,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
     private Chain $paymentPayloadProvider;
     private BasketService $basketService;
     private OrderMailService $orderMailService;
+    private OrderManagerInterface $orderManager;
 
     /**
      * @return void
@@ -39,6 +41,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $this->paymentPayloadProvider = $this->get(PaymentPayloadProvider::class);
         $this->basketService = $this->get(BasketService::class);
         $this->orderMailService = $this->get(OrderMailService::class);
+        $this->orderManager = $this->get(OrderManagerInterface::class);
     }
 
     public function ajaxDoPaymentAction(): void
@@ -52,6 +55,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         }
 
         $context = $this->createPaymentContext();
+        $paymentInfo = [];
 
         try {
             $payload = $this->paymentPayloadProvider->provide($context);
@@ -62,6 +66,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                 $context->getTransaction(),
                 $paymentInfo['paymentData'] ?? ''
             );
+            $this->updateOrderTransactionId($paymentInfo);
 
             $this->handlePaymentData($paymentInfo);
 
@@ -87,6 +92,7 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
                 ]
             ));
 
+            $this->updateOrderTransactionId($paymentInfo);
             $this->basketService->cancelAndRestoreByOrderNumber($context->getOrder()->getNumber());
         }
     }
@@ -135,6 +141,8 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         $payload = array_intersect_key($this->Request()->getPost(), ['details' => true]);
         $checkout = $this->adyenCheckout->getCheckout();
         $paymentInfo = $checkout->paymentsDetails($payload);
+
+        $this->updateOrderTransactionId($paymentInfo);
         $this->handlePaymentData($paymentInfo);
 
         $this->Response()->setBody(json_encode($paymentInfo));
@@ -302,5 +310,32 @@ class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_
         }
 
         $this->basketService->cancelAndRestoreByOrderNumber($transaction->getOrdernumber());
+    }
+
+    /**
+     * @param array $paymentResponseInfo
+     * @return void
+     */
+    private function updateOrderTransactionId(array $paymentResponseInfo): void
+    {
+        $pspReference = $paymentResponseInfo['pspReference'] ?? '';
+        if (empty($pspReference)) {
+            return;
+        }
+
+        $merchantReference = $paymentResponseInfo['merchantReference'] ?? null;
+        if (!$merchantReference && isset($paymentResponseInfo['action']['merchantReference'])) {
+            $merchantReference = $paymentResponseInfo['action']['merchantReference'];
+        }
+
+        if (!$merchantReference) {
+            return;
+        }
+
+        $order = $this->basketService->getOrderByOrderNumber($merchantReference);
+        if ($order) {
+            $this->orderManager->updatePspReference($order, $pspReference);
+            $this->orderManager->save($order);
+        }
     }
 }

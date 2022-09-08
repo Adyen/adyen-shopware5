@@ -12,7 +12,7 @@
         <service id="AdyenPayment\Components\Manager\OrderManager" public="true">
             <argument type="service" id="models"/>
         </service>
-        <service id="AdyenPayment\Components\Manager\OrderManagerInterface" alias="AdyenPayment\Components\Manager\OrderManager" />
+        <service id="AdyenPayment\Components\Manager\OrderManagerInterface" alias="AdyenPayment\Components\Manager\OrderManager" public="true" />
         <service id="AdyenPayment\Components\TextNotificationManager">
             <argument type="service" id="models"/>
         </service>
