@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.8.6</version>
+    <version>3.8.7</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -409,6 +409,16 @@
             * Fix: Shopware version in payments' application info section
             * Fix: Wrong payment method name on the order finish page
             * Fix: Invalid GooglePay token error for production environments
+        </changes>
+    </changelog>
+    <changelog version="3.8.7">
+        <changes lang="en">
+            * Optimize: Set PSP reference as transaction ID as soon as possible
+            * Fix: Reactivating plugin with previously deactivated umbrella payment method
+        </changes>
+        <changes lang="de">
+            * Optimize: Set PSP reference as transaction ID as soon as possible
+            * Fix: Reactivating plugin with previously deactivated umbrella payment method
         </changes>
     </changelog>
 </plugin>

@@ -19,6 +19,7 @@ use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
 use Shopware\Components\Logger;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin;
+use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
@@ -133,6 +134,12 @@ final class AdyenPayment extends Plugin
         $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
     }
 
+    public function activate(ActivateContext $context): void
+    {
+        $this->installStoredPaymentUmbrella($context);
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
+    }
+
     /**
      * @throws \Exception
      */
@@ -209,14 +216,24 @@ final class AdyenPayment extends Plugin
         $payment->setAdditionalDescription($description);
         $payment->setShops($shops);
 
-        $paymentId = $database->fetchRow(
-            'SELECT `id` FROM `s_core_paymentmeans` WHERE `name` = :name',
+        $paymentInDb = $database->fetchRow(
+            'SELECT `id`, `active` FROM `s_core_paymentmeans` WHERE `name` = :name',
             [':name' => self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE]
-            )['id'] ?? null;
+        );
+
+        $paymentId = $paymentInDb['id'] ?? null;
 
         if (null === $paymentId) {
             $modelsManager->persist($payment);
             $modelsManager->flush($payment);
+        }
+
+        if (null !== $paymentId && !$paymentInDb['active']) {
+            $database->update(
+                's_core_paymentmeans',
+                ['active' => true],
+                ['id = ?' => $paymentId]
+            );
         }
     }
 }
