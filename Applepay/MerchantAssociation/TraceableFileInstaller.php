@@ -31,7 +31,7 @@ final class TraceableFileInstaller implements AssociationFileInstaller
             }
 
             if ($installResult->exception() instanceof \Exception) {
-                $this->logger->warning($installResult->exception()->getMessage());
+                $this->logger->error($installResult->exception()->getMessage());
             }
 
             yield $installResult;
