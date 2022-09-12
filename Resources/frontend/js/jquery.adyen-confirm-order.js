@@ -70,11 +70,6 @@
                 return;
             }
 
-            if (!me.cookiesAllowed()) {
-                this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
-                return;
-            }
-
             var parsedPaymentMethodSession = JSON.parse(me.getPaymentMethod() || '{}');
             if (!$.isEmptyObject(me.opts.adyenPaymentState)
                 && 0 === Object.keys(parsedPaymentMethodSession).length) {
@@ -359,18 +354,6 @@
         },
         handleOnAdditionalDetails: function (state, component) {
             $.loadingIndicator.close();
-        },
-        cookiesAllowed: function () {
-            var cookie = window.document.cookie;
-            var cookiePreferences = JSON.parse(
-                (cookie.split('; ').filter(row => 0 === row.indexOf('cookiePreferences='))[0] || '')
-                    .split('cookiePreferences=')[1] || '{}'
-            );
-
-            var defaultPreferences = {groups:{technical:{cookies:{allowCookie:{active:false}}}}};
-            var preferences = $.extend({}, defaultPreferences, cookiePreferences);
-
-            return preferences.groups.technical.cookies.allowCookie.active;
         }
     });
 })(jQuery);

@@ -9,9 +9,7 @@ use Shopware_Components_Snippet_Manager;
 
 final class RegisterConfirmSnippetsSubscriber implements SubscriberInterface
 {
-    /**
-     * @var Shopware_Components_Snippet_Manager
-     */
+    /** @var Shopware_Components_Snippet_Manager */
     private $snippets;
 
     public function __construct(Shopware_Components_Snippet_Manager $snippets)
@@ -55,11 +53,6 @@ final class RegisterConfirmSnippetsSubscriber implements SubscriberInterface
         $snippets['errorTransactionUnknown'] = $errorSnippets->get(
             'errorTransactionUnknown',
             'Your transaction was cancelled due to an unknown reason.',
-            true
-        );
-        $snippets['errorTransactionNoSession'] = $errorSnippets->get(
-            'errorTransactionNoSession',
-            'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
             true
         );
         $snippets['errorGooglePayNotAvailable'] = $errorSnippets->get(
