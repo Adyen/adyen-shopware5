@@ -10,10 +10,8 @@ use AdyenPayment\Models\Payment\PaymentMethod;
 
 final class PaymentMethodCollection implements \Countable, \IteratorAggregate
 {
-    /**
-     * @var array<PaymentMethod>
-     */
-    private array $paymentMethods;
+    /** @var PaymentMethod[] */
+    private $paymentMethods;
 
     public function __construct(PaymentMethod ...$paymentMethods)
     {
@@ -37,11 +35,15 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     {
         return new self(
             ...array_map(
-                static fn(array $paymentMethod) => PaymentMethod::fromRaw($paymentMethod),
-                $adyenMethods['paymentMethods'] ?? []
-            ),
+            static function(array $paymentMethod) {
+                return PaymentMethod::fromRaw($paymentMethod);
+            },
+            $adyenMethods['paymentMethods'] ?? []
+        ),
             ...array_map(
-                static fn(array $paymentMethod) => PaymentMethod::fromRaw($paymentMethod),
+                static function(array $paymentMethod) {
+                    return PaymentMethod::fromRaw($paymentMethod);
+                },
                 $adyenMethods['storedPaymentMethods'] ?? []
             )
         );
@@ -74,7 +76,9 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     public function mapToRaw(): array
     {
         return array_map(
-            static fn(PaymentMethod $paymentMethod) => $paymentMethod->rawData(),
+            static function(PaymentMethod $paymentMethod) {
+                return $paymentMethod->rawData();
+            },
             $this->paymentMethods
         );
     }
@@ -120,7 +124,9 @@ final class PaymentMethodCollection implements \Countable, \IteratorAggregate
     {
         return new self(...array_filter(
             $this->paymentMethods,
-            static fn(PaymentMethod $paymentMethod) => $paymentMethod->group()->equals($group)
+            static function(PaymentMethod $paymentMethod) use ($group) {
+                return $paymentMethod->group()->equals($group);
+            }
         ));
     }
 }

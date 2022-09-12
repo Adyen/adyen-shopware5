@@ -12,8 +12,11 @@ use Shopware\Bundle\AttributeBundle\Service\TypeMappingInterface;
 
 final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
 {
-    private DataPersisterInterface $dataPersister;
-    private AttributeWriterInterface $attributeUpdater;
+    /** @var DataPersisterInterface */
+    private $dataPersister;
+
+    /** @var AttributeWriterInterface */
+    private $attributeUpdater;
 
     public function __construct(DataPersisterInterface $dataPersister, AttributeWriterInterface $attributeUpdater)
     {
@@ -29,15 +32,17 @@ final class PaymentAttributeWriter implements PaymentAttributeWriterInterface
         $this->attributeUpdater->writeReadOnlyAttributes(
             $table = 's_core_paymentmeans_attributes',
             $attributesColumns,
-            static fn() => $dataPersister->persist(
-                [
-                    '_table' => $table,
-                    '_foreignKey' => $paymentMeanId,
-                    AdyenPayment::ADYEN_CODE => $adyenPaymentMethod->code(),
-                ],
-                's_core_paymentmeans_attributes',
-                $paymentMeanId
-            )
+            static function() use ($dataPersister, $table, $paymentMeanId, $adyenPaymentMethod) {
+                return $dataPersister->persist(
+                    [
+                        '_table' => $table,
+                        '_foreignKey' => $paymentMeanId,
+                        AdyenPayment::ADYEN_CODE => $adyenPaymentMethod->code(),
+                    ],
+                    's_core_paymentmeans_attributes',
+                    $paymentMeanId
+                );
+            }
         );
     }
 }

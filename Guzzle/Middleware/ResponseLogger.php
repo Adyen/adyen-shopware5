@@ -13,8 +13,11 @@ use Psr\Log\LoggerInterface;
 
 final class ResponseLogger
 {
-    private LoggerInterface $logger;
-    private ResponseFormatter $formatter;
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var ResponseFormatter */
+    private $formatter;
 
     public function __construct(LoggerInterface $logger, ResponseFormatter $formatter)
     {
@@ -24,31 +27,33 @@ final class ResponseLogger
 
     public function __invoke(): callable
     {
-        return fn(callable $handler): callable => function(
-            RequestInterface $request,
-            array $options
-        ) use (
-            $handler
-        ): Promise {
-            return $handler($request, $options)->then(
-                function(ResponseInterface $response) use ($request): ResponseInterface {
-                    $this->logger->info(
-                        sprintf("Received response:\n%s", $this->formatter->format($response)),
-                        ['response' => $response]
-                    );
+        return function(callable $handler): callable {
+            return function(
+                RequestInterface $request,
+                array $options
+            ) use (
+                $handler
+            ): Promise {
+                return $handler($request, $options)->then(
+                    function(ResponseInterface $response) use ($request): ResponseInterface {
+                        $this->logger->info(
+                            sprintf("Received response:\n%s", $this->formatter->format($response)),
+                            ['response' => $response]
+                        );
 
-                    if ($response->getStatusCode() < 400) {
+                        if ($response->getStatusCode() < 400) {
+                            return $response;
+                        }
+
+                        $this->logger->error(RequestException::create($request, $response)->getMessage(), [
+                            'request' => $request,
+                            'response' => $response,
+                        ]);
+
                         return $response;
                     }
-
-                    $this->logger->error(RequestException::create($request, $response)->getMessage(), [
-                        'request' => $request,
-                        'response' => $response,
-                    ]);
-
-                    return $response;
-                }
-            );
+                );
+            };
         };
     }
 }

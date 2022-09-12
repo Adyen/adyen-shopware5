@@ -12,7 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 final class PaymentMeanCollectionTest extends TestCase
 {
-    private PaymentMeanCollection $collection;
+    /** @var PaymentMeanCollection */
+    private $collection;
 
     protected function setUp(): void
     {
@@ -40,7 +41,9 @@ final class PaymentMeanCollectionTest extends TestCase
             ['source' => $filteredSource->getType()],
         ]);
 
-        $result = $collection->map(static fn(PaymentMean $payment) => ['mapped']);
+        $result = $collection->map(static function(PaymentMean $payment) {
+            return ['mapped'];
+        });
 
         self::assertEquals([['mapped']], $result);
     }

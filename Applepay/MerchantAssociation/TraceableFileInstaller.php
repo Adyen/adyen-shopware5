@@ -8,8 +8,11 @@ use Psr\Log\LoggerInterface;
 
 final class TraceableFileInstaller implements AssociationFileInstaller
 {
-    private AssociationFileInstaller $installer;
-    private LoggerInterface $logger;
+    /** @var AssociationFileInstaller */
+    private $installer;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(AssociationFileInstaller $installer, LoggerInterface $logger)
     {

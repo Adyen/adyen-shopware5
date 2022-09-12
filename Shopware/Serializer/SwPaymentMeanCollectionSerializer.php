@@ -11,7 +11,8 @@ use AdyenPayment\Serializer\PaymentMeanSerializer;
 
 final class SwPaymentMeanCollectionSerializer implements PaymentMeanCollectionSerializer
 {
-    private PaymentMeanSerializer $paymentMeanSerializer;
+    /** @var PaymentMeanSerializer */
+    private $paymentMeanSerializer;
 
     public function __construct(PaymentMeanSerializer $paymentMeanSerializer)
     {
@@ -22,10 +23,12 @@ final class SwPaymentMeanCollectionSerializer implements PaymentMeanCollectionSe
     {
         return array_reduce(
             iterator_to_array($paymentMeans->getIterator()),
-            fn(array $carry, PaymentMean $paymentMean) => [
-                ...array_values($carry),
-                ...array_values(($this->paymentMeanSerializer)($paymentMean)),
-            ],
+            function(array $carry, PaymentMean $paymentMean) {
+                return [
+                    ...array_values($carry),
+                    ...array_values(($this->paymentMeanSerializer)($paymentMean)),
+                ];
+            },
             []
         );
     }

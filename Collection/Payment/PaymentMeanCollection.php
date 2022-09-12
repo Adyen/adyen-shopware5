@@ -10,10 +10,8 @@ use AdyenPayment\Models\Payment\PaymentMean;
 
 final class PaymentMeanCollection implements \IteratorAggregate, \Countable
 {
-    /**
-     * @var array<PaymentMean>
-     */
-    private array $paymentMeans;
+    /** @var PaymentMean[] */
+    private $paymentMeans;
 
     public function __construct(PaymentMean ...$paymentMeans)
     {
@@ -23,7 +21,9 @@ final class PaymentMeanCollection implements \IteratorAggregate, \Countable
     public static function createFromShopwareArray(array $paymentMeans): self
     {
         return new self(...array_map(
-            static fn(array $paymentMean): PaymentMean => PaymentMean::createFromShopwareArray($paymentMean),
+            static function(array $paymentMean): PaymentMean {
+                return PaymentMean::createFromShopwareArray($paymentMean);
+            },
             $paymentMeans
         ));
     }
@@ -73,7 +73,9 @@ final class PaymentMeanCollection implements \IteratorAggregate, \Countable
     {
         return new self(...array_filter(
             $this->paymentMeans,
-            static fn(PaymentMean $paymentMean): bool => !$paymentMean->isHidden()
+            static function(PaymentMean $paymentMean): bool {
+                return !$paymentMean->isHidden();
+            }
         ));
     }
 
