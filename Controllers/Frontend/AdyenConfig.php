@@ -10,14 +10,24 @@ use AdyenPayment\Components\Configuration;
 use AdyenPayment\Components\DataConversion;
 use AdyenPayment\Serializer\PaymentMeanCollectionSerializer;
 use AdyenPayment\Shopware\Serializer\SwPaymentMeanCollectionSerializer;
+use AdyenPayment\Utils\JsonUtil;
 
 class Shopware_Controllers_Frontend_AdyenConfig extends Shopware_Controllers_Frontend_Checkout
 {
-    private DataConversion $dataConversion;
-    private Configuration $configuration;
-    private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
-    private PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer;
-    private Shopware_Components_Modules $modules;
+    /** @var DataConversion */
+    private $dataConversion;
+
+    /** @var Configuration */
+    private $configuration;
+
+    /** @var EnrichedPaymentMeanProviderInterface */
+    private $enrichedPaymentMeanProvider;
+
+    /** @var PaymentMeanCollectionSerializer */
+    private $paymentMeanCollectionSerializer;
+
+    /** @var Shopware_Components_Modules */
+    private $modules;
 
     public function preDispatch(): void
     {
@@ -56,7 +66,7 @@ class Shopware_Controllers_Frontend_AdyenConfig extends Shopware_Controllers_Fro
             ];
 
             $this->Response()->setBody(
-                json_encode($adyenConfig, JSON_THROW_ON_ERROR)
+                JsonUtil::encode($adyenConfig)
             );
         } catch (Exception $exception) {
             $this->Response()->setBody(

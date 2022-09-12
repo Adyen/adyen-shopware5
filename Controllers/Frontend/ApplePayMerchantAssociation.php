@@ -7,15 +7,21 @@ use AdyenPayment\Applepay\Certificate\Filesystem\CertificateReaderInterface;
 use AdyenPayment\Applepay\MerchantAssociation\AssociationFileInstaller;
 use AdyenPayment\Applepay\MerchantAssociation\MerchantAssociationFileInstaller;
 use AdyenPayment\Applepay\MerchantAssociation\StorageFilesystem;
+use AdyenPayment\Utils\JsonUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Frontend_ApplePayMerchantAssociation extends Enlight_Controller_Action
 {
-    private StorageFilesystem $storageFilesystem;
-    private AssociationFileInstaller $merchantAssociationFileInstaller;
-    private LoggerInterface $logger;
+    /** @var StorageFilesystem */
+    private $storageFilesystem;
+
+    /** @var AssociationFileInstaller */
+    private $merchantAssociationFileInstaller;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function preDispatch(): void
     {
@@ -36,10 +42,10 @@ class Shopware_Controllers_Frontend_ApplePayMerchantAssociation extends Enlight_
             $this->logger->critical($message = 'Could not serve Adyen ApplePay merchant id association file.');
             $this->Response()->setHeader('Content-Type', 'application/json');
             $this->Response()->setHttpResponseCode(Response::HTTP_FAILED_DEPENDENCY);
-            $this->Response()->setBody(json_encode([
+            $this->Response()->setBody(JsonUtil::encode([
                 'success' => false,
                 'details' => $message,
-            ], JSON_THROW_ON_ERROR));
+            ]));
 
             return;
         }
