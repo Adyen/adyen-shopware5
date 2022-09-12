@@ -16,6 +16,9 @@ use AdyenPayment\Models\TextNotification;
 use AdyenPayment\Models\UserPreference;
 use Doctrine\ORM\Tools\SchemaTool;
 use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
+use Shopware\Bundle\CookieBundle\CookieCollection;
+use Shopware\Bundle\CookieBundle\Structs\CookieGroupStruct;
+use Shopware\Bundle\CookieBundle\Structs\CookieStruct;
 use Shopware\Components\Logger;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin;
@@ -133,6 +136,52 @@ final class AdyenPayment extends Plugin
     {
         $this->installStoredPaymentUmbrella($context);
         $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
+    }
+
+    /**
+     * Hook for registering Adyen cookies.
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            'CookieCollector_Collect_Cookies' => 'addAdyenCookies',
+        ];
+    }
+
+    /**
+     * Returns CookieCollection of Adyen cookies.
+     */
+    public function addAdyenCookies(): CookieCollection
+    {
+        $adyenCookieNames = [
+            '_rp_uid',
+            'JSESSIONID',
+            '_uetvid',
+            '_uetsid',
+            'datadome',
+            'rl_anonymous_id',
+            '_mkto_trk',
+            'rl_user_id',
+            '_hjid',
+            'lastUpdatedGdpr',
+            'gdpr',
+            '_fbp',
+            '_ga',
+            '_gid',
+            '_gcl_au',
+        ];
+        $collection = new CookieCollection();
+
+        foreach ($adyenCookieNames as $adyenCookieName) {
+            $collection->add(new CookieStruct(
+                $adyenCookieName,
+                '/^technical$/',
+                'Adyen '.$adyenCookieName,
+                CookieGroupStruct::TECHNICAL
+            ));
+        }
+
+        return $collection;
     }
 
     /**
