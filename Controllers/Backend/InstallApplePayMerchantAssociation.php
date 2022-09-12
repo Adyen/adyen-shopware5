@@ -41,7 +41,7 @@ class Shopware_Controllers_Backend_InstallApplePayMerchantAssociation extends Sh
             $this->response->setHttpResponseCode(Response::HTTP_SERVICE_UNAVAILABLE);
             $this->View()->assign(
                 'responseText',
-                "Could not install Adyen's ApplePay Merchant Association file (see logs for details)."
+                "Could not install Adyen's ApplePay Merchant Association file. This issue might be related to file permissions on the server. Please check logs for more details."
             );
 
         } catch (\Exception $exception) {
