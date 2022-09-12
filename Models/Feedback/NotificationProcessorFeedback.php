@@ -8,9 +8,14 @@ use AdyenPayment\Models\Notification;
 
 class NotificationProcessorFeedback
 {
-    private string $message;
-    private Notification $notification;
-    private bool $success;
+    /** @var string */
+    private $message;
+
+    /** @var Notification */
+    private $notification;
+
+    /** @var bool */
+    private $success;
 
     public function __construct(
         bool $success,

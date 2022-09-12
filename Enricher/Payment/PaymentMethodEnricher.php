@@ -11,8 +11,11 @@ use Shopware_Components_Snippet_Manager;
 
 final class PaymentMethodEnricher implements PaymentMethodEnricherInterface
 {
-    private Shopware_Components_Snippet_Manager $snippets;
-    private ImageLogoProviderInterface $imageLogoProvider;
+    /** @var Shopware_Components_Snippet_Manager */
+    private $snippets;
+
+    /** @var ImageLogoProviderInterface */
+    private $imageLogoProvider;
 
     public function __construct(
         Shopware_Components_Snippet_Manager $snippets,

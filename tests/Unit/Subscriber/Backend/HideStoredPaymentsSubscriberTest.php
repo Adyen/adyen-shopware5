@@ -12,7 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class HideStoredPaymentsSubscriberTest extends SubscriberTestCase
 {
-    private HideStoredPaymentsSubscriber $subscriber;
+    /** @var HideStoredPaymentsSubscriber */
+    private $subscriber;
 
     protected function setUp(): void
     {

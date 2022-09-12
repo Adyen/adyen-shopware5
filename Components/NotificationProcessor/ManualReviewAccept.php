@@ -15,9 +15,7 @@ class ManualReviewAccept implements NotificationProcessorInterface
 {
     public const EVENT_CODE = 'MANUAL_REVIEW_ACCEPT';
 
-    /**
-     * @var ContainerAwareEventManager
-     */
+    /** @var ContainerAwareEventManager */
     private $eventManager;
 
     /**

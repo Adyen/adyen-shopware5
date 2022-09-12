@@ -12,9 +12,7 @@ use Doctrine\ORM\NoResultException;
  */
 class FifoNotificationLoader
 {
-    /**
-     * @var NotificationManager
-     */
+    /** @var NotificationManager */
     private $notificationManager;
 
     /**

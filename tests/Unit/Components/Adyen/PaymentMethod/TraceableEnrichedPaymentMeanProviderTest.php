@@ -19,16 +19,14 @@ class TraceableEnrichedPaymentMeanProviderTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @var LoggerInterface|ObjectProphecy
-     */
+    /** @var LoggerInterface|ObjectProphecy */
     private $logger;
 
-    /**
-     * @var EnrichedPaymentMeanProviderInterface|ObjectProphecy
-     */
+    /** @var EnrichedPaymentMeanProviderInterface|ObjectProphecy */
     private $enrichedPaymentMeanProvider;
-    private TraceableEnrichedPaymentMeanProvider $provider;
+
+    /** @var TraceableEnrichedPaymentMeanProvider */
+    private $provider;
 
     protected function setUp(): void
     {

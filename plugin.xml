@@ -13,7 +13,7 @@
     <description>Official Adyen plugin</description>
     <description lang="de">Offizielles Adyen plugin</description>
 
-    <compatibility minVersion="5.7.0"/>
+    <compatibility minVersion="5.6.0"/>
 
     <changelog version="1.4.1">
         <changes lang="de">1.4.1 release</changes>

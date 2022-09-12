@@ -11,14 +11,10 @@ use AdyenPayment\Exceptions\InvalidHmacException;
 
 class HmacValidator implements NotificationValidatorInterface
 {
-    /**
-     * @var HmacSignature
-     */
+    /** @var HmacSignature */
     private $hmacSignatureService;
 
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration */
     private $configuration;
 
     public function __construct(HmacSignature $hmacSignatureService, Configuration $configuration)

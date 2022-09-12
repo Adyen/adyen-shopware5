@@ -15,11 +15,11 @@ use Prophecy\Prophecy\ObjectProphecy;
 final class UserPreferenceManagerTest extends TestCase
 {
     use ProphecyTrait;
-    private UserPreferenceManager $userPreferenceManager;
 
-    /**
-     * @var EntityManager|ObjectProphecy
-     */
+    /** @var UserPreferenceManager */
+    private $userPreferenceManager;
+
+    /** @var EntityManager|ObjectProphecy */
     private $modelManager;
 
     protected function setUp(): void

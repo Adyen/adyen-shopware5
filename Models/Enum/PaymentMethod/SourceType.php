@@ -9,7 +9,9 @@ final class SourceType
     private const DEFAULT_PAYMENT = null; // Shopware default payment mean source
     private const SELF_CREATED = 1; // User created payment mean source
     private const ADYEN = 1425514; // Adyen specific payment mean, avoid conflict with other plugins
-    private ?int $type;
+
+    /** @var int|null */
+    private $type;
 
     private function __construct(?int $sourceType)
     {

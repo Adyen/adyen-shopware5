@@ -10,8 +10,11 @@ use Shopware\Models\Customer\Customer;
 
 final class CustomerNumberProvider implements CustomerNumberProviderInterface
 {
-    private Enlight_Components_Session_Namespace $session;
-    private ModelManager $modelManager;
+    /** @var Enlight_Components_Session_Namespace */
+    private $session;
+
+    /** @var ModelManager */
+    private $modelManager;
 
     public function __construct(Enlight_Components_Session_Namespace $session, ModelManager $modelManager)
     {

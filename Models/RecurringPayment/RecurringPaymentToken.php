@@ -20,55 +20,75 @@ use Shopware\Components\Model\ModelEntity;
 class RecurringPaymentToken extends ModelEntity
 {
     /**
+     * @var string
+     *
      * @ORM\Column(name="id", type="string", nullable=false)
      * @ORM\Id
      */
-    private string $id;
+    private $id;
 
     /**
+     * @var string
+     *
      * @ORM\Column(name="customer_id", type="string", length=255, nullable=false)
      */
-    private string $customerId;
+    private $customerId;
 
     /**
+     * @var string
+     *
      * @ORM\Column(name="recurring_detail_reference", type="text", nullable=false)
      */
-    private string $recurringDetailReference;
+    private $recurringDetailReference;
 
     /**
+     * @var string
+     *
      * @ORM\Column(name="psp_reference", type="string", length=255, nullable=false)
      */
-    private string $pspReference;
+    private $pspReference;
 
     /**
+     * @var string
+     *
      * @ORM\Column(name="order_number", type="string", length=255, nullable=false)
      */
-    private string $orderNumber = '';
+    private $orderNumber = '';
 
     /**
+     * @var string
+     *
      * @ORM\Column(name="result_code", type="text", nullable=false)
      */
-    private string $resultCode;
+    private $resultCode;
 
     /**
+     * @var int
+     *
      * @ORM\Column(name="amount_value", type="integer", nullable=false)
      */
-    private int $amountValue;
+    private $amountValue;
 
     /**
+     * @var string
+     *
      * @ORM\Column(name="amount_currency", type="text", nullable=false)
      */
-    private string $amountCurrency;
+    private $amountCurrency;
 
     /**
+     * @var \DateTimeImmutable
+     *
      * @ORM\Column(name="created_at", type="datetime_immutable")
      */
-    private \DateTimeImmutable $createdAt;
+    private $createdAt;
 
     /**
+     * @var \DateTimeImmutable
+     *
      * @ORM\Column(name="updated_at", type="datetime_immutable")
      */
-    private \DateTimeImmutable $updatedAt;
+    private $updatedAt;
 
     private function __construct()
     {

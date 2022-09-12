@@ -18,19 +18,13 @@ class Refund implements NotificationProcessorInterface
 {
     public const EVENT_CODE = 'REFUND';
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var ContainerAwareEventManager
-     */
+    /** @var ContainerAwareEventManager */
     private $eventManager;
 
-    /**
-     * @var PaymentStatusUpdate
-     */
+    /** @var PaymentStatusUpdate */
     private $paymentStatusUpdate;
 
     /**

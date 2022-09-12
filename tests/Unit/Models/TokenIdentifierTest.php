@@ -9,7 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 class TokenIdentifierTest extends TestCase
 {
-    private TokenIdentifier $tokenIdentifier;
+    /** @var TokenIdentifier */
+    private $tokenIdentifier;
 
     protected function setUp(): void
     {

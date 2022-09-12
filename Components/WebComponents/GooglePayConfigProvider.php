@@ -12,7 +12,8 @@ use AdyenPayment\Components\Configuration;
  */
 final class GooglePayConfigProvider implements ConfigProvider
 {
-    private Configuration $configuration;
+    /** @var Configuration */
+    private $configuration;
 
     public function __construct(Configuration $configuration)
     {

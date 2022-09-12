@@ -9,7 +9,9 @@ final class RecurringProcessingModel
     private const CARD_ON_FILE = 'CardOnFile';
     private const SUBSCRIPTION = 'Subscription';
     private const UNSCHEDULED_CARD_ON_FILE = 'UnscheduledCardOnFile';
-    private string $recurringProcessingModel;
+
+    /** @var string */
+    private $recurringProcessingModel;
 
     private function __construct(string $recurringProcessingModel)
     {

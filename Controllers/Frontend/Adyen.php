@@ -22,13 +22,26 @@ use Shopware\Models\Order\Status;
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Frontend_Adyen extends Shopware_Controllers_Frontend_Payment
 {
-    private AdyenManager $adyenManager;
-    private PaymentMethodService $adyenCheckout;
-    private Logger $logger;
-    private Chain $paymentPayloadProvider;
-    private BasketService $basketService;
-    private OrderMailService $orderMailService;
-    private OrderManagerInterface $orderManager;
+    /** @var AdyenManager */
+    private $adyenManager;
+
+    /** @var PaymentMethodService */
+    private $adyenCheckout;
+
+    /** @var Logger */
+    private $logger;
+
+    /** @var Chain */
+    private $paymentPayloadProvider;
+
+    /** @var BasketService */
+    private $basketService;
+
+    /** @var OrderMailService */
+    private $orderMailService;
+
+    /** @var OrderManagerInterface */
+    private $orderManager;
 
     /**
      * @return void

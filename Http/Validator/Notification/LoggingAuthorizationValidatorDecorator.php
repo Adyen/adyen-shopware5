@@ -9,14 +9,10 @@ use Psr\Log\LoggerInterface;
 
 class LoggingAuthorizationValidatorDecorator implements NotificationValidatorInterface
 {
-    /**
-     * @var NotificationValidatorInterface
-     */
+    /** @var NotificationValidatorInterface */
     private $authorizationValidator;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
     public function __construct(NotificationValidatorInterface $authenticationValidator, LoggerInterface $logger)

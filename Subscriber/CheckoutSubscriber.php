@@ -17,13 +17,26 @@ use Enlight\Event\SubscriberInterface;
 
 final class CheckoutSubscriber implements SubscriberInterface
 {
-    private Configuration $configuration;
-    private PaymentMethodService $paymentMethodService;
-    private DataConversion $dataConversion;
-    private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
-    private PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder;
-    private PaymentMeanCollectionSerializer $paymentMeanCollectionSerializer;
-    private CheckoutBasketProviderInterface $checkoutBasketProvider;
+    /** @var Configuration */
+    private $configuration;
+
+    /** @var PaymentMethodService */
+    private $paymentMethodService;
+
+    /** @var DataConversion */
+    private $dataConversion;
+
+    /** @var EnrichedPaymentMeanProviderInterface */
+    private $enrichedPaymentMeanProvider;
+
+    /** @var PaymentMethodOptionsBuilderInterface */
+    private $paymentMethodOptionsBuilder;
+
+    /** @var PaymentMeanCollectionSerializer */
+    private $paymentMeanCollectionSerializer;
+
+    /** @var CheckoutBasketProviderInterface */
+    private $checkoutBasketProvider;
 
     public function __construct(
         Configuration $configuration,

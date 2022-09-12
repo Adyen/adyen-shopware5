@@ -16,7 +16,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 final class RecurringPaymentProviderTest extends TestCase
 {
     use ProphecyTrait;
-    private RecurringPaymentProvider $recurringPaymentProvider;
+
+    /** @var RecurringPaymentProvider */
+    private $recurringPaymentProvider;
 
     /** @var ObjectProphecy|PaymentContext */
     private $paymentContext;

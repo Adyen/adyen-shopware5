@@ -10,11 +10,20 @@ use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class PaymentMean
 {
-    private int $id;
-    private SourceType $source;
-    private array $raw;
-    private bool $enriched;
-    private ?PaymentType $adyenType;
+    /** @var int */
+    private $id;
+
+    /** @var SourceType */
+    private $source;
+
+    /** @var array */
+    private $raw;
+
+    /** @var bool */
+    private $enriched;
+
+    /** @var PaymentType|null */
+    private $adyenType;
 
     public static function createFromShopwareArray(array $paymentMean): self
     {

@@ -9,10 +9,8 @@ use AdyenPayment\Applepay\MerchantAssociation\Model\InstallResult;
 
 final class MerchantAssociationFileInstaller implements AssociationFileInstaller
 {
-    /**
-     * @var Installer[]
-     */
-    private array $installers;
+    /** @var Installer[] */
+    private $installers;
 
     public function __construct(Installer ...$installers)
     {

@@ -10,8 +10,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Shopware_Controllers_Backend_InstallApplePayMerchantAssociation extends Shopware_Controllers_Backend_ExtJs
 {
-    private AssociationFileInstaller $associationFileInstaller;
-    private LoggerInterface $logger;
+    /** @var AssociationFileInstaller */
+    private $associationFileInstaller;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function preDispatch(): void
     {

@@ -11,8 +11,11 @@ use Enlight_Components_Session_Namespace;
 
 final class EnrichUserPreferenceSubscriber implements SubscriberInterface
 {
-    private Enlight_Components_Session_Namespace $session;
-    private EntityRepository $userPreferenceRepository;
+    /** @var Enlight_Components_Session_Namespace */
+    private $session;
+
+    /** @var EntityRepository */
+    private $userPreferenceRepository;
 
     public function __construct(
         Enlight_Components_Session_Namespace $session,

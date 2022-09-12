@@ -6,9 +6,7 @@ namespace AdyenPayment\Rule\AdyenApi;
 
 final class UsedMainShopConfigRule implements MainShopRule
 {
-    /**
-     * @var UsedFallbackConfigRuleInterface
-     */
+    /** @var UsedFallbackConfigRuleInterface */
     private $usedFallbackConfigRule;
 
     public function __construct(

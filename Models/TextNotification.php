@@ -22,12 +22,14 @@ class TextNotification extends ModelEntity implements \JsonSerializable
 
     /**
      * @var string
+     *
      * @ORM\Column(name="text_notification", type="text")
      */
     private $textNotification;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;

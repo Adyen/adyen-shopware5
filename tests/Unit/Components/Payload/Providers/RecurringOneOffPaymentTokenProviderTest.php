@@ -16,7 +16,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 final class RecurringOneOffPaymentTokenProviderTest extends TestCase
 {
     use ProphecyTrait;
-    private RecurringOneOffPaymentTokenProvider $recurringOneOffPaymentTokenProvider;
+
+    /** @var RecurringOneOffPaymentTokenProvider */
+    private $recurringOneOffPaymentTokenProvider;
 
     /** @var ObjectProphecy|PaymentContext */
     private $paymentContext;

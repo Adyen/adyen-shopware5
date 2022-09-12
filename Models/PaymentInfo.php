@@ -25,12 +25,14 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @var int
+     *
      * @ORM\Column(name="order_id", type="integer")
      */
     private $orderId;
 
     /**
      * @var Order|null
+     *
      * @ORM\ManyToOne(targetEntity="Shopware\Models\Order\Order", cascade={"remove"})
      * @ORM\JoinColumn(name="order_id", referencedColumnName="id", nullable=true)
      */
@@ -38,24 +40,28 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @var string
+     *
      * @ORM\Column(name="psp_reference", type="text")
      */
     private $pspReference;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(name="updated_at", type="datetime")
      */
     private $updatedAt;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="result_code", type="text", nullable=true)
      */
     private $resultCode;
@@ -69,18 +75,21 @@ class PaymentInfo extends ModelEntity
 
     /**
      * @var string
+     *
      * @ORM\Column(name="ordernumber", type="string", length=255, nullable=true)
      */
     private $ordernumber;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="payment_data", type="text", nullable=true)
      */
     private $paymentData;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="stored_method_id", type="text", nullable=true)
      */
     private $storedMethodId;

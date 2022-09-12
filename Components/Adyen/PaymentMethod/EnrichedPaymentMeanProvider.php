@@ -17,9 +17,14 @@ use AdyenPayment\Models\Payment\PaymentMethod;
 
 final class EnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterface
 {
-    private PaymentMethodServiceInterface $paymentMethodService;
-    private PaymentMethodOptionsBuilderInterface $paymentMethodOptionsBuilder;
-    private PaymentMethodEnricherInterface $paymentMethodEnricher;
+    /** @var PaymentMethodServiceInterface */
+    private $paymentMethodService;
+
+    /** @var PaymentMethodOptionsBuilderInterface */
+    private $paymentMethodOptionsBuilder;
+
+    /** @var PaymentMethodEnricherInterface */
+    private $paymentMethodEnricher;
 
     public function __construct(
         PaymentMethodServiceInterface $paymentMethodService,

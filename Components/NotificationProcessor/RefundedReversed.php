@@ -18,19 +18,13 @@ class RefundedReversed implements NotificationProcessorInterface
 {
     public const EVENT_CODE = 'REFUNDED_REVERSED';
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var ContainerAwareEventManager
-     */
+    /** @var ContainerAwareEventManager */
     private $eventManager;
 
-    /**
-     * @var PaymentStatusUpdate
-     */
+    /** @var PaymentStatusUpdate */
     private $paymentStatusUpdate;
 
     /**

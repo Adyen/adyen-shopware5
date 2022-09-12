@@ -12,7 +12,8 @@ use Shopware\Components\Model\ModelEntity;
 
 class RecurringPaymentTokenTest extends TestCase
 {
-    private RecurringPaymentToken $recurringPaymentToken;
+    /** @var RecurringPaymentToken */
+    private $recurringPaymentToken;
 
     protected function setUp(): void
     {

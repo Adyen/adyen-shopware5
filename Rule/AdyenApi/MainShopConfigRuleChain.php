@@ -8,9 +8,7 @@ use Shopware\Models\Shop\Shop;
 
 final class MainShopConfigRuleChain implements MainShopConfigRule
 {
-    /**
-     * @var MainShopConfigRule[]
-     */
+    /** @var MainShopConfigRule[] */
     private $mainShopConfigRules;
 
     public function __construct(MainShopConfigRule ...$mainShopConfigRules)

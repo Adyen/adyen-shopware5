@@ -12,7 +12,8 @@ use Shopware\Bundle\StoreFrontBundle\Struct\Attribute;
 
 final class PaymentMeanTest extends TestCase
 {
-    private PaymentMean $paymentMean;
+    /** @var PaymentMean */
+    private $paymentMean;
 
     protected function setUp(): void
     {

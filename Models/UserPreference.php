@@ -24,12 +24,14 @@ class UserPreference extends ModelEntity
 
     /**
      * @var int
+     *
      * @ORM\Column(name="user_id", type="integer")
      */
     private $userId;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="stored_method_id", type="text", nullable=true)
      */
     private $storedMethodId;

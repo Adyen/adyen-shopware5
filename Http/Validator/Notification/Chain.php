@@ -6,9 +6,7 @@ namespace AdyenPayment\Http\Validator\Notification;
 
 class Chain implements NotificationValidatorInterface
 {
-    /**
-     * @var NotificationValidatorInterface[]
-     */
+    /** @var NotificationValidatorInterface[] */
     private $validators;
 
     public function __construct(NotificationValidatorInterface ...$validators)

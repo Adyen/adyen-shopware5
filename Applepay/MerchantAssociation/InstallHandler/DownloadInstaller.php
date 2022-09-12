@@ -12,8 +12,11 @@ use GuzzleHttp\Exception\GuzzleException;
 
 final class DownloadInstaller implements Installer
 {
-    private ClientInterface $client;
-    private StorageFilesystem $storageFilesystem;
+    /** @var ClientInterface */
+    private $client;
+
+    /** @var StorageFilesystem */
+    private $storageFilesystem;
 
     public function __construct(Client $client, StorageFilesystem $storageFilesystem)
     {

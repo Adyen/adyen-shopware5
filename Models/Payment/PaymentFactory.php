@@ -14,8 +14,12 @@ use Shopware\Models\Shop\Shop;
 final class PaymentFactory implements PaymentFactoryInterface
 {
     private const ADYEN_PREFIX = 'Adyen';
-    private ModelRepository $countryRepository;
-    private TraceablePluginIdProvider $pluginIdProvider;
+
+    /** @var ModelRepository */
+    private $countryRepository;
+
+    /** @var TraceablePluginIdProvider */
+    private $pluginIdProvider;
 
     public function __construct(ModelRepository $countryRepository, TraceablePluginIdProvider $pluginIdProvider)
     {

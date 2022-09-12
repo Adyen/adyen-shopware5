@@ -16,7 +16,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 final class PersistStoredMehtodIdSubscriberTest extends SubscriberTestCase
 {
     use ProphecyTrait;
-    private PersistStoredMethodIdSubscriber $subscriber;
+
+    /** @var PersistStoredMethodIdSubscriber */
+    private $subscriber;
 
     /** @var Enlight_Components_Session_Namespace|ObjectProphecy */
     private $session;

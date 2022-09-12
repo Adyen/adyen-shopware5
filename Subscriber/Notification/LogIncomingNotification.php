@@ -14,9 +14,7 @@ use Psr\Log\LoggerInterface;
  */
 class LogIncomingNotification implements SubscriberInterface
 {
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
     /**

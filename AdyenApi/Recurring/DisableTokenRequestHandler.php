@@ -11,8 +11,11 @@ use Shopware\Models\Shop\Shop;
 
 final class DisableTokenRequestHandler implements DisableTokenRequestHandlerInterface
 {
-    private TransportFactoryInterface $transportFactory;
-    private CustomerNumberProviderInterface $customerNumberProvider;
+    /** @var TransportFactoryInterface */
+    private $transportFactory;
+
+    /** @var CustomerNumberProviderInterface */
+    private $customerNumberProvider;
 
     public function __construct(
         TransportFactoryInterface $transportFactory,

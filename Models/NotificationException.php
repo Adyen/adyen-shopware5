@@ -8,9 +8,7 @@ use Throwable;
 
 class NotificationException extends \Exception
 {
-    /**
-     * @var Notification
-     */
+    /** @var Notification */
     private $notification;
 
     /**

@@ -10,8 +10,11 @@ use Enlight_Event_EventArgs;
 
 final class BackendJavascriptSubscriber implements SubscriberInterface
 {
-    private string $pluginDirectory;
-    private EntityRepository $notificationRepository;
+    /** @var string */
+    private $pluginDirectory;
+
+    /** @var EntityRepository */
+    private $notificationRepository;
 
     public function __construct(string $pluginDirectory, EntityRepository $notificationRepository)
     {

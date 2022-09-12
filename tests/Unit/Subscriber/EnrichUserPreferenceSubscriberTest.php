@@ -16,7 +16,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 final class EnrichUserPreferenceSubscriberTest extends SubscriberTestCase
 {
     use ProphecyTrait;
-    private EnrichUserPreferenceSubscriber $subscriber;
+
+    /** @var EnrichUserPreferenceSubscriber */
+    private $subscriber;
 
     /** @var Enlight_Components_Session_Namespace|ObjectProphecy */
     private $session;

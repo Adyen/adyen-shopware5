@@ -24,29 +24,19 @@ class Capture implements NotificationProcessorInterface
 {
     public const EVENT_CODE = 'CAPTURE';
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var ContainerAwareEventManager
-     */
+    /** @var ContainerAwareEventManager */
     private $eventManager;
 
-    /**
-     * @var PaymentStatusUpdate
-     */
+    /** @var PaymentStatusUpdate */
     private $paymentStatusUpdate;
 
-    /**
-     * @var ModelManager
-     */
+    /** @var ModelManager */
     private $modelManager;
 
-    /**
-     * @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository
-     */
+    /** @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository */
     private $paymentInfoRepository;
 
     /**

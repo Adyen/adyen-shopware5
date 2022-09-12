@@ -8,7 +8,9 @@ final class PaymentType
 {
     private const GOOGLE_PAY = 'paywithgoogle';
     private const APPLE_PAY = 'applepay';
-    private string $type;
+
+    /** @var string */
+    private $type;
 
     private function __construct(string $type)
     {

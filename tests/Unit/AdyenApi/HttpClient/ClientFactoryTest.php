@@ -17,7 +17,9 @@ use Shopware\Models\Shop\Shop;
 class ClientFactoryTest extends TestCase
 {
     use ProphecyTrait;
-    private ClientFactory $clientFactory;
+
+    /** @var ClientFactory */
+    private $clientFactory;
 
     /** @var ConfigurationInterface|ObjectProphecy */
     private $configuration;

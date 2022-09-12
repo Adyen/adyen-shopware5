@@ -16,7 +16,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 final class EnrichUmbrellaPaymentMeanSubscriberTest extends SubscriberTestCase
 {
     use ProphecyTrait;
-    private EnrichUmbrellaPaymentMeanSubscriber $subscriber;
+
+    /** @var EnrichUmbrellaPaymentMeanSubscriber */
+    private $subscriber;
 
     /** @var Enlight_Components_Session_Namespace|ObjectProphecy */
     private $session;

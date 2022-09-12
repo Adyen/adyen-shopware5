@@ -26,21 +26,17 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @var ObjectProphecy|PaymentMethodServiceInterface
-     */
+    /** @var ObjectProphecy|PaymentMethodServiceInterface */
     private $paymentMethodService;
 
-    /**
-     * @var ObjectProphecy|PaymentMethodOptionsBuilderInterface
-     */
+    /** @var ObjectProphecy|PaymentMethodOptionsBuilderInterface */
     private $paymentMethodOptionsBuilder;
 
-    /**
-     * @var ObjectProphecy|PaymentMethodEnricherInterface
-     */
+    /** @var ObjectProphecy|PaymentMethodEnricherInterface */
     private $paymentMethodEnricher;
-    private EnrichedPaymentMeanProvider $provider;
+
+    /** @var EnrichedPaymentMeanProvider */
+    private $provider;
 
     protected function setUp(): void
     {
@@ -72,7 +68,7 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
             PaymentMean::createFromShopwareArray([
                 'id' => 2,
                 'source' => SourceType::adyen()->getType(),
-            ]),
+            ])
         );
 
         $this->paymentMethodOptionsBuilder->__invoke()->willReturn(['value' => 0.0]);
@@ -93,12 +89,12 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
             $paymentMeanOne = PaymentMean::createFromShopwareArray([
                 'id' => 1,
                 'source' => SourceType::shopwareDefault()->getType(),
-            ]),
+            ])
         );
 
         // filled with a matching identifier, to catch if the early returns fails
         $adyenPaymentMethods = new PaymentMethodCollection(
-            PaymentMethod::fromRaw(['type' => $adyenType])->withCode($adyenName),
+            PaymentMethod::fromRaw(['type' => $adyenType])->withCode($adyenName)
         );
 
         $this->paymentMethodOptionsBuilder->__invoke()->willReturn([
@@ -127,12 +123,12 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
                 'attribute' => new Attribute([
                     'adyen_type' => $adyenIdentifier,
                 ]),
-            ]),
+            ])
         );
 
         // filled with a matching identifier, to catch if the early returns fails
         $adyenPaymentMethods = new PaymentMethodCollection(
-            PaymentMethod::fromRaw(['type' => $adyenType])->withCode($adyenName),
+            PaymentMethod::fromRaw(['type' => $adyenType])->withCode($adyenName)
         );
 
         $this->paymentMethodOptionsBuilder->__invoke()->willReturn([
@@ -162,7 +158,7 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
             $paymentMeanTwo = PaymentMean::createFromShopwareArray([
                 'id' => 21,
                 'source' => SourceType::adyen()->getType(),
-            ]),
+            ])
         );
 
         $this->paymentMethodOptionsBuilder->__invoke()->willReturn([
@@ -191,7 +187,7 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
                 'attribute' => new Attribute([
                     'adyen_type' => null,
                 ]),
-            ]),
+            ])
         );
 
         $this->paymentMethodOptionsBuilder->__invoke()->willReturn([
@@ -219,7 +215,7 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
                 'attribute' => new Attribute([
                     'adyen_type' => 'non_matching_adyen_identifier',
                 ]),
-            ]),
+            ])
         );
 
         $this->paymentMethodOptionsBuilder->__invoke()->willReturn([
@@ -252,7 +248,7 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
                 'id' => 25,
                 'source' => SourceType::adyen()->getType(),
                 'name' => AdyenPayment::ADYEN_STORED_PAYMENT_UMBRELLA_CODE,
-            ]),
+            ])
         );
 
         $adyenPaymentMethods = new PaymentMethodCollection(
@@ -262,7 +258,7 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
             $storedPaymentMethod = PaymentMethod::fromRaw($storedRaw = [
                 'id' => $storedMethodId = 'adyen-stored-payment-method-id',
                 'type' => $schemaType = 'scheme',
-            ]),
+            ])
         );
 
         $this->paymentMethodOptionsBuilder->__invoke()->willReturn([

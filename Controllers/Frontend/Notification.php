@@ -13,21 +13,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps, Generic.Files.LineLength.TooLong
 class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
-    /**
-     * @var ContainerAwareEventManager
-     */
+    /** @var ContainerAwareEventManager */
     private $events;
-    /**
-     * @var IncomingNotificationManager
-     */
+
+    /** @var IncomingNotificationManager */
     private $incomingNotificationsManager;
-    /**
-     * @var LoggerInterface
-     */
+
+    /** @var LoggerInterface */
     private $logger;
-    /**
-     * @var NotificationValidatorInterface
-     */
+
+    /** @var NotificationValidatorInterface */
     private $authorizationValidator;
 
     /**

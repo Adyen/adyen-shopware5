@@ -16,14 +16,10 @@ class CaptureFailed implements NotificationProcessorInterface
 {
     public const EVENT_CODE = 'CAPTURE_FAILED';
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var ContainerAwareEventManager
-     */
+    /** @var ContainerAwareEventManager */
     private $eventManager;
 
     /**

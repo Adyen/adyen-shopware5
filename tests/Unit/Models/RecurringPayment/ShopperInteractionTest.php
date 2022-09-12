@@ -9,7 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 class ShopperInteractionTest extends TestCase
 {
-    private ShopperInteraction $shopperInteraction;
+    /** @var ShopperInteraction */
+    private $shopperInteraction;
 
     protected function setUp(): void
     {

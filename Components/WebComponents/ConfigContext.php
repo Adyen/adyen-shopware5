@@ -6,8 +6,11 @@ namespace AdyenPayment\Components\WebComponents;
 
 final class ConfigContext
 {
-    private array $userData;
-    private array $basket;
+    /** @var array */
+    private $userData;
+
+    /** @var array */
+    private $basket;
 
     private function __construct()
     {

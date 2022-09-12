@@ -15,19 +15,13 @@ class OfferClosed implements NotificationProcessorInterface
 {
     public const EVENT_CODE = 'OFFER_CLOSED';
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var ContainerAwareEventManager
-     */
+    /** @var ContainerAwareEventManager */
     private $eventManager;
 
-    /**
-     * @var PaymentStatusUpdate
-     */
+    /** @var PaymentStatusUpdate */
     private $paymentStatusUpdate;
 
     public function __construct(

@@ -9,7 +9,8 @@ use Enlight\Event\SubscriberInterface;
 
 final class AddErrorMessageToViewSubscriber implements SubscriberInterface
 {
-    private ErrorMessageProvider $errorMessageProvider;
+    /** @var ErrorMessageProvider */
+    private $errorMessageProvider;
 
     public function __construct(ErrorMessageProvider $errorMessageProvider)
     {

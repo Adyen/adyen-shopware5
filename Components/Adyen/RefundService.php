@@ -17,10 +17,17 @@ use Shopware\Models\Order\Order;
 
 class RefundService
 {
-    private ClientMemoise $apiClientMap;
-    private ModelManager $modelManager;
-    private NotificationManager $notificationManager;
-    private EntityRepository $paymentInfoRepository;
+    /** @var ClientMemoise */
+    private $apiClientMap;
+
+    /** @var ModelManager */
+    private $modelManager;
+
+    /** @var NotificationManager */
+    private $notificationManager;
+
+    /** @var EntityRepository */
+    private $paymentInfoRepository;
 
     public function __construct(
         ClientMemoise $apiClientMap,

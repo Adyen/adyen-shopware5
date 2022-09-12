@@ -13,8 +13,11 @@ use Shopware\Models\Shop\Shop;
 
 final class ClientFactory implements ClientFactoryInterface
 {
-    private ConfigurationInterface $configuration;
-    private LoggerInterface $logger;
+    /** @var ConfigurationInterface */
+    private $configuration;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(ConfigurationInterface $configuration, LoggerInterface $logger)
     {

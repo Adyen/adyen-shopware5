@@ -19,10 +19,17 @@ use Shopware\Components\Model\ModelManager;
  */
 class IncomingNotificationManager
 {
-    private LoggerInterface $logger;
-    private NotificationBuilder $notificationBuilder;
-    private ModelManager $entityManager;
-    private NotificationManager $notificationManager;
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var NotificationBuilder */
+    private $notificationBuilder;
+
+    /** @var ModelManager */
+    private $entityManager;
+
+    /** @var NotificationManager */
+    private $notificationManager;
 
     /**
      * IncomingNotificationManager constructor.

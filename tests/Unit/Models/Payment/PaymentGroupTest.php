@@ -9,7 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 final class PaymentGroupTest extends TestCase
 {
-    private PaymentGroup $group;
+    /** @var PaymentGroup */
+    private $group;
 
     protected function setUp(): void
     {

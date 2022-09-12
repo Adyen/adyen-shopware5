@@ -13,8 +13,11 @@ use Psr\Log\LoggerInterface;
 
 final class TraceableRecurringPaymentTokenRepository implements RecurringPaymentTokenRepositoryInterface
 {
-    private RecurringPaymentTokenRepositoryInterface $recurringPaymentTokenRepository;
-    private LoggerInterface $logger;
+    /** @var RecurringPaymentTokenRepositoryInterface */
+    private $recurringPaymentTokenRepository;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(
         RecurringPaymentTokenRepositoryInterface $recurringPaymentTokenRepository,

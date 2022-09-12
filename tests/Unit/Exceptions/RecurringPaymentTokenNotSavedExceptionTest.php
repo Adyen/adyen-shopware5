@@ -10,7 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 final class RecurringPaymentTokenNotSavedExceptionTest extends TestCase
 {
-    private RecurringPaymentTokenNotSavedException $exception;
+    /** @var RecurringPaymentTokenNotSavedException */
+    private $exception;
 
     protected function setUp(): void
     {

@@ -12,7 +12,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class ImportPaymentMethodsCommand extends ShopwareCommand
 {
-    private PaymentMethodImporterInterface $importer;
+    /** @var PaymentMethodImporterInterface */
+    private $importer;
 
     public function __construct(PaymentMethodImporterInterface $importer)
     {

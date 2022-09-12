@@ -8,7 +8,8 @@ use Shopware_Components_Modules;
 
 final class SeoUrlWriter implements UrlWriter
 {
-    private Shopware_Components_Modules $modules;
+    /** @var Shopware_Components_Modules */
+    private $modules;
 
     public function __construct(Shopware_Components_Modules $modules)
     {

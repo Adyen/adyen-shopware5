@@ -6,9 +6,14 @@ namespace AdyenPayment\Applepay\MerchantAssociation\Model;
 
 final class InstallResult
 {
-    private bool $fallback;
-    private bool $success;
-    private ?\Exception $exception;
+    /** @var bool */
+    private $fallback;
+
+    /** @var bool */
+    private $success;
+
+    /** @var \Exception|null */
+    private $exception;
 
     private function __construct(bool $success)
     {

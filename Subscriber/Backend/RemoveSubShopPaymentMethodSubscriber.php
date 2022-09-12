@@ -11,7 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 final class RemoveSubShopPaymentMethodSubscriber implements SubscriberInterface
 {
     public const DELETE_VALUES_ACTION = 'deleteValues';
-    private PaymentMeanSubShopRemoverInterface $paymentMeanSubShopRemover;
+
+    /** @var PaymentMeanSubShopRemoverInterface */
+    private $paymentMeanSubShopRemover;
 
     public function __construct(PaymentMeanSubShopRemoverInterface $paymentMeanSubShopRemover)
     {

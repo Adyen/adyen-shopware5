@@ -11,7 +11,8 @@ use Shopware\Models\Shop\Shop;
 
 final class TransportFactory implements TransportFactoryInterface
 {
-    private ClientFactoryInterface $apiFactory;
+    /** @var ClientFactoryInterface */
+    private $apiFactory;
 
     public function __construct(ClientFactoryInterface $apiFactory)
     {

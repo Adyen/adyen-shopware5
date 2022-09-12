@@ -12,8 +12,11 @@ use Doctrine\ORM\EntityRepository;
 
 final class RecurringPaymentTokenRepository implements RecurringPaymentTokenRepositoryInterface
 {
-    private EntityManager $entityManager;
-    private EntityRepository $recurringPaymentTokenEntityRepository;
+    /** @var EntityManager */
+    private $entityManager;
+
+    /** @var EntityRepository */
+    private $recurringPaymentTokenEntityRepository;
 
     public function __construct(EntityManager $entityManager, EntityRepository $recurringPaymentTokenEntityRepository)
     {

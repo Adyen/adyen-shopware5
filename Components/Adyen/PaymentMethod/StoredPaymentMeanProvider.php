@@ -12,8 +12,11 @@ use Enlight_Controller_Request_Request;
 
 final class StoredPaymentMeanProvider implements StoredPaymentMeanProviderInterface
 {
-    private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
-    private Connection $connection;
+    /** @var EnrichedPaymentMeanProviderInterface */
+    private $enrichedPaymentMeanProvider;
+
+    /** @var Connection */
+    private $connection;
 
     public function __construct(
         EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider,

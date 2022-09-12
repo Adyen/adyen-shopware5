@@ -9,7 +9,8 @@ use Enlight\Event\SubscriberInterface;
 
 final class AddSeoUrlSubscriber implements SubscriberInterface
 {
-    private UrlWriter $seoUrlWriter;
+    /** @var UrlWriter */
+    private $seoUrlWriter;
 
     public function __construct(UrlWriter $seoUrlWriter)
     {

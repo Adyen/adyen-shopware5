@@ -23,14 +23,20 @@ use Traversable;
  */
 class NotificationProcessor
 {
-    /**
-     * @var NotificationProcessorInterface[]
-     */
+    /** @var NotificationProcessorInterface[] */
     private $processors;
-    private LoggerInterface $logger;
-    private ModelManager $modelManager;
-    private ContainerAwareEventManager $eventManager;
-    private NotificationManager $notificationManager;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var ModelManager */
+    private $modelManager;
+
+    /** @var ContainerAwareEventManager */
+    private $eventManager;
+
+    /** @var NotificationManager */
+    private $notificationManager;
 
     /**
      * NotificationProcessor constructor.

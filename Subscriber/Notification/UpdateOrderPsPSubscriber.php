@@ -11,7 +11,8 @@ use Enlight_Event_EventArgs;
 
 final class UpdateOrderPsPSubscriber implements SubscriberInterface
 {
-    private OrderManagerInterface $orderManager;
+    /** @var OrderManagerInterface */
+    private $orderManager;
 
     public function __construct(OrderManagerInterface $orderManager)
     {

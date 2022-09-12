@@ -20,7 +20,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 final class StoredPaymentMeanProviderTest extends TestCase
 {
     use ProphecyTrait;
-    private StoredPaymentMeanProviderInterface $storedPaymentMeanProvider;
+
+    /** @var StoredPaymentMeanProvider */
+    private $storedPaymentMeanProvider;
 
     /** @var EnrichedPaymentMeanProviderInterface|ObjectProphecy */
     private $enrichedPaymentMeanProvider;
@@ -35,7 +37,7 @@ final class StoredPaymentMeanProviderTest extends TestCase
 
         $this->storedPaymentMeanProvider = new StoredPaymentMeanProvider(
             $this->enrichedPaymentMeanProvider->reveal(),
-            $this->connection->reveal(),
+            $this->connection->reveal()
         );
     }
 

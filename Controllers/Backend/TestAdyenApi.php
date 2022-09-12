@@ -10,9 +10,14 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Backend_ExtJs
 {
-    private ConfigValidator $apiConfigValidator;
-    private UsedFallbackConfigRuleInterface $usedFallbackConfigRule;
-    private CacheManager $cacheManager;
+    /** @var ConfigValidator */
+    private $apiConfigValidator;
+
+    /** @var UsedFallbackConfigRuleInterface */
+    private $usedFallbackConfigRule;
+
+    /** @var CacheManager */
+    private $cacheManager;
 
     public function preDispatch(): void
     {

@@ -11,19 +11,13 @@ use Zend_Db_Adapter_Exception;
 
 class DetailAttributesRestorer
 {
-    /**
-     * @var BasketDetailAttributes
-     */
+    /** @var BasketDetailAttributes */
     private $basketDetailAttributes;
 
-    /**
-     * @var ModelManager
-     */
+    /** @var ModelManager */
     private $modelManager;
 
-    /**
-     * @var OrderDetailAttributes
-     */
+    /** @var OrderDetailAttributes */
     private $orderDetailAttributes;
 
     public function __construct(

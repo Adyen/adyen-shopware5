@@ -19,24 +19,16 @@ use Shopware\Models\Plugin\Plugin;
  */
 class ApplicationInfoProvider implements PaymentPayloadProvider
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $modelManager;
 
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration */
     private $configuration;
 
-    /**
-     * @var RouterInterface
-     */
+    /** @var RouterInterface */
     private $router;
 
-    /**
-     * @var ShopwareVersionCheck
-     */
+    /** @var ShopwareVersionCheck */
     private $shopwareVersionCheck;
 
     public function __construct(

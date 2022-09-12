@@ -19,7 +19,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 final class RecurringPaymentTokenRepositoryTest extends TestCase
 {
     use ProphecyTrait;
-    private RecurringPaymentTokenRepositoryInterface $recurringPaymentTokenRepository;
+
+    /** @var RecurringPaymentTokenRepositoryInterface */
+    private $recurringPaymentTokenRepository;
 
     /** @var EntityManager|ObjectProphecy */
     private $entityManager;

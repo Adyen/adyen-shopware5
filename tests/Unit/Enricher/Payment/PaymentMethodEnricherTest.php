@@ -17,7 +17,9 @@ use Shopware_Components_Snippet_Manager;
 final class PaymentMethodEnricherTest extends TestCase
 {
     use ProphecyTrait;
-    private PaymentMethodEnricher $paymentMethodEnricher;
+
+    /** @var PaymentMethodEnricher */
+    private $paymentMethodEnricher;
 
     /** @var ObjectProphecy|Shopware_Components_Snippet_Manager */
     private $snippets;

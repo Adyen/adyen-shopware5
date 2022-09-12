@@ -9,7 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 class RecurringProcessingModelTest extends TestCase
 {
-    private RecurringProcessingModel $recurringProcessingModel;
+    /** @var RecurringProcessingModel */
+    private $recurringProcessingModel;
 
     protected function setUp(): void
     {

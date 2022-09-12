@@ -8,8 +8,11 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class StorageFilesystem
 {
-    private Filesystem $filesystem;
-    private string $storagePath;
+    /** @var Filesystem */
+    private $filesystem;
+
+    /** @var string */
+    private $storagePath;
 
     public function __construct(Filesystem $filesystem, string $storagePath)
     {

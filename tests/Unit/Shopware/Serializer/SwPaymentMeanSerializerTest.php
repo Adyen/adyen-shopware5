@@ -11,7 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 final class SwPaymentMeanSerializerTest extends TestCase
 {
-    private SwPaymentMeanSerializer $serializer;
+    /** @var SwPaymentMeanSerializer */
+    private $serializer;
 
     protected function setUp(): void
     {

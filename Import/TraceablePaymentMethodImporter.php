@@ -10,8 +10,11 @@ use Shopware\Models\Shop\Shop;
 
 final class TraceablePaymentMethodImporter implements PaymentMethodImporterInterface
 {
-    private PaymentMethodImporterInterface $paymentMethodImporter;
-    private LoggerInterface $logger;
+    /** @var PaymentMethodImporterInterface */
+    private $paymentMethodImporter;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(PaymentMethodImporterInterface $paymentMethodImporter, LoggerInterface $logger)
     {
@@ -39,30 +42,27 @@ final class TraceablePaymentMethodImporter implements PaymentMethodImporterInter
 
     private function log(ImportResult $importResult): void
     {
+        $paymentMethod = $importResult->getPaymentMethod();
         if ($importResult->isSuccess()) {
             $this->logger->info('Adyen payment method imported', [
                 'shop id' => $importResult->getShop()->getId(),
                 'shop name' => $importResult->getShop()->getName(),
-                'payment method' => $importResult->getPaymentMethod()
-                    ? $importResult->getPaymentMethod()->adyenType()->type()
-                    .' '.$importResult->getPaymentMethod()->name()
-                    : 'all',
+                'payment method' => $paymentMethod ?
+                    $paymentMethod->adyenType()->type().' '.$paymentMethod->name() :
+                    'all',
             ]);
 
             return;
         }
 
+        $exception = $importResult->getException();
         $this->logger->error('Adyen payment method could not be imported', [
             'shop id' => $importResult->getShop()->getId(),
             'shop name' => $importResult->getShop()->getName(),
-            'payment type' => $importResult->getPaymentMethod()
-                ? $importResult->getPaymentMethod()->adyenType()->type()
-                : 'n/a',
-            'payment name' => $importResult->getPaymentMethod()
-                ? $importResult->getPaymentMethod()->name()
-                : 'n/a',
-            'message' => $importResult->getException() ? $importResult->getException()->getMessage() : 'n/a',
-            'exception' => $importResult->getException(),
+            'payment type' => $paymentMethod ? $paymentMethod->adyenType()->type() : 'n/a',
+            'payment name' => $paymentMethod ? $paymentMethod->name() : 'n/a',
+            'message' => $exception ? $exception->getMessage() : 'n/a',
+            'exception' => $exception,
         ]);
     }
 }

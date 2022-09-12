@@ -9,9 +9,7 @@ namespace AdyenPayment\Components\Payload;
  */
 class Chain implements PaymentPayloadProvider
 {
-    /**
-     * @var PaymentPayloadProvider[]
-     */
+    /** @var PaymentPayloadProvider[] */
     private $providers;
 
     /**

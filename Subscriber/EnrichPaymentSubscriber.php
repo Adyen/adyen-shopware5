@@ -12,8 +12,11 @@ use Enlight_Event_EventArgs;
 
 final class EnrichPaymentSubscriber implements SubscriberInterface
 {
-    private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
-    private PaymentMeanCollectionSerializer $serializer;
+    /** @var EnrichedPaymentMeanProviderInterface */
+    private $enrichedPaymentMeanProvider;
+
+    /** @var PaymentMeanCollectionSerializer */
+    private $serializer;
 
     public function __construct(
         EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider,

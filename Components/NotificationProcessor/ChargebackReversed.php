@@ -18,19 +18,13 @@ class ChargebackReversed implements NotificationProcessorInterface
 {
     public const EVENT_CODE = 'CHARGEBACK_REVERSED';
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var ContainerAwareEventManager
-     */
+    /** @var ContainerAwareEventManager */
     private $eventManager;
 
-    /**
-     * @var PaymentStatusUpdate
-     */
+    /** @var PaymentStatusUpdate */
     private $paymentStatusUpdate;
 
     /**

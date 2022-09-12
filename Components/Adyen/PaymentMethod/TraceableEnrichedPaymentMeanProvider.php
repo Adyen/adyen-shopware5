@@ -9,8 +9,11 @@ use Psr\Log\LoggerInterface;
 
 final class TraceableEnrichedPaymentMeanProvider implements EnrichedPaymentMeanProviderInterface
 {
-    private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
-    private LoggerInterface $logger;
+    /** @var EnrichedPaymentMeanProviderInterface */
+    private $enrichedPaymentMeanProvider;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(
         EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider,

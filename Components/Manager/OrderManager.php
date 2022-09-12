@@ -10,7 +10,8 @@ use Shopware\Models\Order\Status;
 
 final class OrderManager implements OrderManagerInterface
 {
-    private EntityManager $modelManager;
+    /** @var EntityManager */
+    private $modelManager;
 
     public function __construct(EntityManager $modelManager)
     {

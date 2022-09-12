@@ -10,8 +10,11 @@ use Shopware\Bundle\PluginInstallerBundle\Service\InstallerService;
 
 final class TraceablePluginIdProvider
 {
-    private InstallerService $pluginManager;
-    private LoggerInterface $logger;
+    /** @var InstallerService */
+    private $pluginManager;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(InstallerService $pluginManager, LoggerInterface $logger)
     {

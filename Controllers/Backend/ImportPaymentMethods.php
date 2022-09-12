@@ -11,9 +11,14 @@ use Symfony\Component\HttpFoundation\Response;
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps, Generic.Files.LineLength.TooLong
 class Shopware_Controllers_Backend_ImportPaymentMethods extends Shopware_Controllers_Backend_ExtJs
 {
-    private PaymentMethodImporterInterface $paymentMethodImporter;
-    private LoggerInterface $logger;
-    private CacheManager $cacheManager;
+    /** @var PaymentMethodImporterInterface */
+    private $paymentMethodImporter;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var CacheManager */
+    private $cacheManager;
 
     /**
      * @return void

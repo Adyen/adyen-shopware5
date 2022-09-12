@@ -15,9 +15,14 @@ use Shopware\Models\Shop\Shop;
 
 final class PaymentMethodsProvider implements PaymentMethodsProviderInterface
 {
-    private Configuration $configuration;
-    private ClientFactory $adyenApiFactory;
-    private LoggerInterface $logger;
+    /** @var Configuration */
+    private $configuration;
+
+    /** @var ClientFactory */
+    private $adyenApiFactory;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(
         Configuration $configuration,

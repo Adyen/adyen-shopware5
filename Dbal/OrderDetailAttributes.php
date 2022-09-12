@@ -8,9 +8,7 @@ use Enlight_Components_Db_Adapter_Pdo_Mysql;
 
 class OrderDetailAttributes
 {
-    /**
-     * @var Enlight_Components_Db_Adapter_Pdo_Mysql
-     */
+    /** @var Enlight_Components_Db_Adapter_Pdo_Mysql */
     private $db;
 
     public function __construct(Enlight_Components_Db_Adapter_Pdo_Mysql $db)

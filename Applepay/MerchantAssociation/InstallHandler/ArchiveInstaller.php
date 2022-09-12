@@ -11,8 +11,12 @@ use AdyenPayment\Applepay\MerchantAssociation\StorageFilesystem;
 final class ArchiveInstaller implements Installer
 {
     private const ARCHIVED_FILE_NAME = 'apple-developer-merchantid-domain-association';
-    private string $archivePath;
-    private StorageFilesystem $storageFilesystem;
+
+    /** @var string */
+    private $archivePath;
+
+    /** @var StorageFilesystem */
+    private $storageFilesystem;
 
     public function __construct(string $archivePath, StorageFilesystem $storageFilesystem)
     {

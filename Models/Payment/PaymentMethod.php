@@ -10,15 +10,19 @@ final class PaymentMethod
 {
     /**
      * en_GB locale used for identifying unique payment methods.
+     *
+     * @var string
      */
-    private string $code;
-    private PaymentGroup $group;
-    private PaymentType $type;
+    private $code;
 
-    /**
-     * @var array<string,mixed>
-     */
-    private array $rawData;
+    /** @var PaymentGroup */
+    private $group;
+
+    /** @var PaymentType */
+    private $type;
+
+    /** @var array<string,mixed> */
+    private $rawData;
 
     private function __construct()
     {

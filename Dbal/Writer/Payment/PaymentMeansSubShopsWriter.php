@@ -9,7 +9,8 @@ use Enlight_Components_Db_Adapter_Pdo_Mysql;
 
 final class PaymentMeansSubShopsWriter implements PaymentMeansSubShopsWriterInterface
 {
-    private Enlight_Components_Db_Adapter_Pdo_Mysql $db;
+    /** @var Enlight_Components_Db_Adapter_Pdo_Mysql */
+    private $db;
 
     public function __construct(Enlight_Components_Db_Adapter_Pdo_Mysql $db)
     {

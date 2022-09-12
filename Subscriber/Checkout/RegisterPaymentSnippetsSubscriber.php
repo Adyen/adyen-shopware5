@@ -9,9 +9,7 @@ use Shopware_Components_Snippet_Manager;
 
 final class RegisterPaymentSnippetsSubscriber implements SubscriberInterface
 {
-    /**
-     * @var Shopware_Components_Snippet_Manager
-     */
+    /** @var Shopware_Components_Snippet_Manager */
     private $snippets;
 
     public function __construct(Shopware_Components_Snippet_Manager $snippets)

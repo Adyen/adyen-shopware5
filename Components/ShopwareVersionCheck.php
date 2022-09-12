@@ -13,14 +13,10 @@ class ShopwareVersionCheck
 {
     public const SHOPWARE = '___VERSION___';
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
     public function __construct(
@@ -46,6 +42,9 @@ class ShopwareVersionCheck
         return version_compare($shopwareVersion, $version, '<');
     }
 
+    /**
+     * @psalm-suppress UndefinedClass
+     */
     public function getShopwareVersion(): string
     {
         $version = $this->container->get('shopware.release')->getVersion();

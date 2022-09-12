@@ -16,7 +16,9 @@ final class PaymentResultCode
     private const RECEIVED = 'Received';
     private const REDIRECT_SHOPPER = 'RedirectShopper';
     private const REFUSED = 'Refused';
-    private string $resultCode;
+
+    /** @var string */
+    private $resultCode;
 
     private function __construct(string $resultCode)
     {

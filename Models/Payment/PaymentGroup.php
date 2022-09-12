@@ -8,7 +8,9 @@ final class PaymentGroup
 {
     private const DEFAULT = 'payment';
     private const STORED = 'stored';
-    private string $group;
+
+    /** @var string */
+    private $group;
 
     private function __construct(string $group)
     {

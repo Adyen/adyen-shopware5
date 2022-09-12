@@ -9,7 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 class PaymentResultCodeTest extends TestCase
 {
-    private PaymentResultCode $paymentResultCode;
+    /** @var PaymentResultCode */
+    private $paymentResultCode;
 
     protected function setUp(): void
     {

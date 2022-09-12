@@ -21,7 +21,9 @@ use Psr\Log\LoggerInterface;
 final class TraceableRecurringPaymentTokenRepositoryTest extends TestCase
 {
     use ProphecyTrait;
-    private RecurringPaymentTokenRepositoryInterface $traceableRecurringPaymentTokenRepository;
+
+    /** @var RecurringPaymentTokenRepositoryInterface */
+    private $traceableRecurringPaymentTokenRepository;
 
     /** @var LoggerInterface|ObjectProphecy */
     private $logger;

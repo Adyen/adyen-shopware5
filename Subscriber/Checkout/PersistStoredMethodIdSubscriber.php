@@ -10,7 +10,8 @@ use Enlight_Components_Session_Namespace;
 
 final class PersistStoredMethodIdSubscriber implements SubscriberInterface
 {
-    private Enlight_Components_Session_Namespace $session;
+    /** @var Enlight_Components_Session_Namespace */
+    private $session;
 
     public function __construct(Enlight_Components_Session_Namespace $session)
     {

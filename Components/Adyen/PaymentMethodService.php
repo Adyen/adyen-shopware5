@@ -18,11 +18,21 @@ use Psr\Log\LoggerInterface;
 final class PaymentMethodService implements PaymentMethodServiceInterface
 {
     public const IMPORT_LOCALE = 'en_GB';
-    private ClientMemoise $apiClientMap;
-    private Configuration $configuration;
-    private array $cache;
-    private LoggerInterface $logger;
-    private CustomerNumberProviderInterface $customerNumberProvider;
+
+    /** @var ClientMemoise */
+    private $apiClientMap;
+
+    /** @var Configuration */
+    private $configuration;
+
+    /** @var array */
+    private $cache;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var CustomerNumberProviderInterface */
+    private $customerNumberProvider;
 
     public function __construct(
         ClientMemoise $apiClientMap,

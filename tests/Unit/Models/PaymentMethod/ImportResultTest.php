@@ -12,7 +12,8 @@ use Shopware\Models\Shop\Shop;
 
 final class ImportResultTest extends TestCase
 {
-    private ImportResult $importResult;
+    /** @var ImportResult */
+    private $importResult;
 
     protected function setUp(): void
     {

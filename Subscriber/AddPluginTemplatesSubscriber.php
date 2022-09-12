@@ -9,8 +9,11 @@ use Enlight_Template_Manager;
 
 final class AddPluginTemplatesSubscriber implements SubscriberInterface
 {
-    private Enlight_Template_Manager $templateManager;
-    private string $pluginDirectory;
+    /** @var Enlight_Template_Manager */
+    private $templateManager;
+
+    /** @var string */
+    private $pluginDirectory;
 
     public function __construct(string $pluginDirectory, Enlight_Template_Manager $templateManager)
     {

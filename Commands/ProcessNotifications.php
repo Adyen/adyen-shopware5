@@ -18,8 +18,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessNotifications extends ShopwareCommand
 {
-    private FifoNotificationLoader $loader;
-    private NotificationProcessor $notificationProcessor;
+    /** @var FifoNotificationLoader */
+    private $loader;
+
+    /** @var NotificationProcessor */
+    private $notificationProcessor;
 
     /**
      * ProcessNotifications constructor.

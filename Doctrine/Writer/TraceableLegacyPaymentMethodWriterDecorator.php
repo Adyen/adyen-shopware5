@@ -18,10 +18,17 @@ use Shopware\Models\Shop\Shop;
  */
 final class TraceableLegacyPaymentMethodWriterDecorator implements PaymentMethodWriterInterface
 {
-    private PaymentRepositoryInterface $paymentRepository;
-    private PaymentMethodWriterInterface $paymentMethodWriter;
-    private PaymentAttributeWriterInterface $paymentAttributeWriter;
-    private LoggerInterface $logger;
+    /** @var PaymentRepositoryInterface */
+    private $paymentRepository;
+
+    /** @var PaymentMethodWriterInterface */
+    private $paymentMethodWriter;
+
+    /** @var PaymentAttributeWriterInterface */
+    private $paymentAttributeWriter;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(
         PaymentMethodWriterInterface $paymentMethodWriter,
@@ -57,7 +64,7 @@ final class TraceableLegacyPaymentMethodWriterDecorator implements PaymentMethod
     {
         $this->logger->notice(sprintf('Updating legacy payment mean adyen "%s" to "%s"',
             $adyenPaymentMethod->adyenType()->type(),
-            $adyenPaymentMethod->code(),
+            $adyenPaymentMethod->code()
         ), [
             'shopware payment mean' => [
                 'id' => $paymentMean->getId(),

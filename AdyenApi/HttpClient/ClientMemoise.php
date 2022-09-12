@@ -9,11 +9,11 @@ use Shopware\Models\Shop\Shop;
 
 final class ClientMemoise implements ClientMemoiseInterface
 {
-    /**
-     * @var array<int|string, Client>
-     */
+    /** @var array<int|string, Client> */
     private $memoisedClients = [];
-    private ClientFactoryInterface $factory;
+
+    /** @var ClientFactoryInterface */
+    private $factory;
 
     public function __construct(ClientFactoryInterface $factory)
     {

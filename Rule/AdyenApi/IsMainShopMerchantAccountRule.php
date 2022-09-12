@@ -9,9 +9,7 @@ use Shopware\Models\Shop\Shop;
 
 final class IsMainShopMerchantAccountRule implements MainShopConfigRule
 {
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration */
     private $configuration;
 
     public function __construct(Configuration $configuration)

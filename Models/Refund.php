@@ -23,12 +23,14 @@ class Refund
 
     /**
      * @var int
+     *
      * @ORM\Column(name="order_id", type="integer")
      */
     private $orderId;
 
     /**
      * @var Order|null
+     *
      * @ORM\ManyToOne(targetEntity="Shopware\Models\Order\Order", cascade={"remove"})
      * @ORM\JoinColumn(name="order_id", referencedColumnName="id", nullable=true)
      */
@@ -36,18 +38,21 @@ class Refund
 
     /**
      * @var string
+     *
      * @ORM\Column(name="psp_reference", type="text")
      */
     private $pspReference;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(name="updated_at", type="datetime")
      */
     private $updatedAt;

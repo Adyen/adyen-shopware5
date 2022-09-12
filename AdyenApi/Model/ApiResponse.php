@@ -6,8 +6,11 @@ namespace AdyenPayment\AdyenApi\Model;
 
 final class ApiResponse
 {
-    private bool $success;
-    private string $message;
+    /** @var bool */
+    private $success;
+
+    /** @var string */
+    private $message;
 
     private function __construct(bool $success, string $message)
     {

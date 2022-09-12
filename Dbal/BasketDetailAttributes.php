@@ -9,9 +9,7 @@ use Zend_Db_Adapter_Exception;
 
 class BasketDetailAttributes
 {
-    /**
-     * @var Enlight_Components_Db_Adapter_Pdo_Mysql
-     */
+    /** @var Enlight_Components_Db_Adapter_Pdo_Mysql */
     private $db;
 
     public function __construct(Enlight_Components_Db_Adapter_Pdo_Mysql $db)

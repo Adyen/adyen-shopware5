@@ -10,9 +10,7 @@ use Enlight\Event\SubscriberInterface;
 
 final class ImportPaymentMethodSubscriber implements SubscriberInterface
 {
-    /**
-     * @var PaymentMethodImporterInterface
-     */
+    /** @var PaymentMethodImporterInterface */
     private $paymentMethodImporter;
 
     public function __construct(PaymentMethodImporterInterface $paymentMethodImporter)

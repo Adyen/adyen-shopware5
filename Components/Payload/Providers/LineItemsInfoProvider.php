@@ -15,8 +15,11 @@ use Zend_Db_Adapter_Exception;
 
 class LineItemsInfoProvider implements PaymentPayloadProvider
 {
-    private PriceCalculationService $priceCalculationService;
-    private Currency $adyenCurrency;
+    /** @var PriceCalculationService */
+    private $priceCalculationService;
+
+    /** @var Currency */
+    private $adyenCurrency;
 
     public function __construct(PriceCalculationService $priceCalculationService)
     {

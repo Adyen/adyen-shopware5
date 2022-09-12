@@ -23,7 +23,9 @@ class CustomerNumberProviderTest extends TestCase
 
     /** @var ModelManager|ObjectProphecy */
     private $modelManager;
-    private CustomerNumberProvider $customerNumberProvider;
+
+    /** @var CustomerNumberProvider */
+    private $customerNumberProvider;
 
     protected function setUp(): void
     {

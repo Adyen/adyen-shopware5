@@ -13,9 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Frontend_DisableRecurringToken extends Enlight_Controller_Action
 {
-    private ApiJsonResponse $frontendJsonResponse;
-    private DisableTokenRequestHandlerInterface $disableTokenRequestHandler;
-    private Shopware_Components_Snippet_Manager $snippets;
+    /** @var ApiJsonResponse */
+    private $frontendJsonResponse;
+
+    /** @var DisableTokenRequestHandlerInterface */
+    private $disableTokenRequestHandler;
+
+    /** @var Shopware_Components_Snippet_Manager */
+    private $snippets;
 
     public function preDispatch(): void
     {

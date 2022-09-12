@@ -9,7 +9,8 @@ use Ramsey\Uuid\UuidInterface;
 
 final class TokenIdentifier
 {
-    private UuidInterface $tokenId;
+    /** @var UuidInterface */
+    private $tokenId;
 
     private function __construct(UuidInterface $tokenId)
     {

@@ -23,12 +23,14 @@ class Notification extends ModelEntity implements \JsonSerializable
 
     /**
      * @var int
+     *
      * @ORM\Column(name="order_id", type="integer")
      */
     private $orderId;
 
     /**
      * @var Order|null
+     *
      * @ORM\ManyToOne(targetEntity="Shopware\Models\Order\Order", cascade={"remove"})
      * @ORM\JoinColumn(name="order_id", referencedColumnName="id", nullable=true)
      */
@@ -36,72 +38,84 @@ class Notification extends ModelEntity implements \JsonSerializable
 
     /**
      * @var string
+     *
      * @ORM\Column(name="psp_reference", type="text")
      */
     private $pspReference;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(name="updated_at", type="datetime")
      */
     private $updatedAt;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(name="scheduled_processing_time", type="datetime", nullable=true)
      */
     private $scheduledProcessingTime;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="status", type="text")
      */
     private $status;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="paymentMethod", type="text", nullable=true)
      */
     private $paymentMethod;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="event_code", type="text")
      */
     private $eventCode;
 
     /**
      * @var boolean
+     *
      * @ORM\Column(name="success", type="boolean")
      */
     private $success;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="merchant_account_code", type="text")
      */
     private $merchantAccountCode;
 
     /**
      * @var float
+     *
      * @ORM\Column(name="amount_value", type="decimal", precision=19, scale=4)
      */
     private $amountValue;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="amount_currency", type="text")
      */
     private $amountCurrency;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="error_details", type="text", nullable=true)
      */
     private $errorDetails;

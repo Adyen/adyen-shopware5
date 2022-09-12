@@ -17,19 +17,13 @@ use Shopware\Models\Order\Order;
  */
 class NotificationBuilder
 {
-    /**
-     * @var ModelManager
-     */
+    /** @var ModelManager */
     private $modelManager;
 
-    /**
-     * @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository|\Shopware\Models\Order\Repository
-     */
+    /** @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository|\Shopware\Models\Order\Repository */
     private $orderRepository;
 
-    /**
-     * @var Currency
-     */
+    /** @var Currency */
     private $currency;
 
     /**

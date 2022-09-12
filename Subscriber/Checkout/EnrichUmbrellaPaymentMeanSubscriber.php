@@ -12,8 +12,11 @@ use Enlight_Components_Session_Namespace;
 
 final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
 {
-    private Enlight_Components_Session_Namespace $session;
-    private PaymentMeansProviderInterface $paymentMeansProvider;
+    /** @var Enlight_Components_Session_Namespace */
+    private $session;
+
+    /** @var PaymentMeansProviderInterface */
+    private $paymentMeansProvider;
 
     public function __construct(
         Enlight_Components_Session_Namespace $session,

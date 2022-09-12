@@ -18,7 +18,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 final class EnrichUserAdditionalPaymentSubscriberTest extends SubscriberTestCase
 {
     use ProphecyTrait;
-    private EnrichUserAdditionalPaymentSubscriber $subscriber;
+
+    /** @var EnrichUserAdditionalPaymentSubscriber */
+    private $subscriber;
 
     /** @var EnrichedPaymentMeanProviderInterface|ObjectProphecy */
     private $enrichedPaymentMeanProvider;

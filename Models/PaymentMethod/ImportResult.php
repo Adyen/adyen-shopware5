@@ -10,11 +10,20 @@ use Shopware\Models\Shop\Shop;
 
 final class ImportResult
 {
-    private Shop $shop;
-    private ?PaymentMethod $paymentMethod;
-    private bool $success;
-    private ?\Exception $exception;
-    private ImportStatus $status;
+    /** @var Shop */
+    private $shop;
+
+    /** @var PaymentMethod|null */
+    private $paymentMethod;
+
+    /** @var bool */
+    private $success;
+
+    /** @var \Exception|null */
+    private $exception;
+
+    /** @var ImportStatus */
+    private $status;
 
     public static function success(Shop $shop, PaymentMethod $paymentMethod, ImportStatus $importStatus): self
     {

@@ -17,10 +17,17 @@ use Shopware\Models\Shop\Shop;
 
 final class PaymentMethodWriter implements PaymentMethodWriterInterface
 {
-    private ModelManager $entityManager;
-    private PaymentFactoryInterface $paymentFactory;
-    private PaymentAttributeWriterInterface $paymentAttributeWriter;
-    private PaymentRepositoryInterface $paymentRepository;
+    /** @var ModelManager */
+    private $entityManager;
+
+    /** @var PaymentFactoryInterface */
+    private $paymentFactory;
+
+    /** @var PaymentAttributeWriterInterface */
+    private $paymentAttributeWriter;
+
+    /** @var PaymentRepositoryInterface */
+    private $paymentRepository;
 
     public function __construct(
         ModelManager $entityManager,

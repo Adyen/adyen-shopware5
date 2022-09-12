@@ -11,8 +11,11 @@ use Psr\Log\LoggerInterface;
 
 final class RequestLogger
 {
-    private LoggerInterface $logger;
-    private RequestFormatter $formatter;
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var RequestFormatter */
+    private $formatter;
 
     public function __construct(LoggerInterface $logger, RequestFormatter $formatter)
     {

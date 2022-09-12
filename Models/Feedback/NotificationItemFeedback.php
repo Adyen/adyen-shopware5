@@ -9,14 +9,10 @@ namespace AdyenPayment\Models\Feedback;
  */
 class NotificationItemFeedback
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $message;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $notificationItem;
 
     /**

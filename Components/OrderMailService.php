@@ -9,9 +9,14 @@ use Shopware\Components\Model\ModelManager;
 
 class OrderMailService
 {
-    private ModelManager $modelManager;
-    private BasketService $basketService;
-    private bool $isOrderConfirmationEmailRestricted = false;
+    /** @var ModelManager */
+    private $modelManager;
+
+    /** @var BasketService */
+    private $basketService;
+
+    /** @var bool */
+    private $isOrderConfirmationEmailRestricted = false;
 
     public function __construct(ModelManager $modelManager, BasketService $basketService)
     {

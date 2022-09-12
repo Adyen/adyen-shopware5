@@ -13,9 +13,14 @@ use Enlight_Components_Session_Namespace;
 
 final class EnrichUserAdditionalPaymentSubscriber implements SubscriberInterface
 {
-    private EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider;
-    private PaymentMeansProviderInterface $paymentMeansProvider;
-    private Enlight_Components_Session_Namespace $session;
+    /** @var EnrichedPaymentMeanProviderInterface */
+    private $enrichedPaymentMeanProvider;
+
+    /** @var PaymentMeansProviderInterface */
+    private $paymentMeansProvider;
+
+    /** @var Enlight_Components_Session_Namespace */
+    private $session;
 
     public function __construct(
         EnrichedPaymentMeanProviderInterface $enrichedPaymentMeanProvider,

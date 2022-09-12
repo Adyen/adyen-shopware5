@@ -22,7 +22,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 final class SaveStoredMethodPreferenceSubscriberTest extends TestCase
 {
     use ProphecyTrait;
-    private SaveStoredMethodPreferenceSubscriber $subscriber;
+
+    /** @var SaveStoredMethodPreferenceSubscriber */
+    private $subscriber;
 
     /** @var Enlight_Components_Session_Namespace|ObjectProphecy */
     private $session;

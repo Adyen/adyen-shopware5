@@ -10,7 +10,8 @@ use Shopware\Models\Payment\Payment;
 
 final class PaymentRepository implements PaymentRepositoryInterface
 {
-    private ModelManager $modelManager;
+    /** @var ModelManager */
+    private $modelManager;
 
     public function __construct(ModelManager $modelManager)
     {

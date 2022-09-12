@@ -10,7 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 final class DuplicateNotificationExceptionTest extends TestCase
 {
-    private DuplicateNotificationException $exception;
+    /** @var DuplicateNotificationException */
+    private $exception;
 
     protected function setUp(): void
     {

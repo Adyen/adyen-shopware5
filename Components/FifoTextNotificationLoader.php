@@ -9,9 +9,7 @@ namespace AdyenPayment\Components;
  */
 class FifoTextNotificationLoader
 {
-    /**
-     * @var TextNotificationManager
-     */
+    /** @var TextNotificationManager */
     private $textNotificationManager;
 
     /**

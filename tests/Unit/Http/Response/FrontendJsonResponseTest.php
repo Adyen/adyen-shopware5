@@ -14,7 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 class FrontendJsonResponseTest extends TestCase
 {
     use ProphecyTrait;
-    private ApiJsonResponse $apiJsonResponse;
+
+    /** @var ApiJsonResponse */
+    private $apiJsonResponse;
 
     protected function setUp(): void
     {

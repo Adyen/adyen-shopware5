@@ -13,44 +13,28 @@ use Shopware\Models\Order\Order;
  */
 class PaymentContext
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $paymentInfo;
 
-    /**
-     * @var Order
-     */
+    /** @var Order */
     private $order;
 
-    /**
-     * @var sBasket
-     */
+    /** @var sBasket */
     private $basket;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $browserInfo;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $shopperInfo;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $origin;
 
-    /**
-     * @var PaymentInfo
-     */
+    /** @var PaymentInfo */
     private $transaction;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $storePaymentMethod;
 
     /**

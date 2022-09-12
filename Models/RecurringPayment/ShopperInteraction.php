@@ -10,7 +10,9 @@ final class ShopperInteraction
     private const ECOMMERCE = 'Ecommerce';
     private const MOTO = 'Moto';
     private const POS = 'POS';
-    private string $shopperInteraction;
+
+    /** @var string */
+    private $shopperInteraction;
 
     private function __construct(string $shopperInteraction)
     {

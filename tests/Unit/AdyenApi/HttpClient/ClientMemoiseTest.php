@@ -15,7 +15,9 @@ use Shopware\Models\Shop\Shop;
 class ClientMemoiseTest extends TestCase
 {
     use ProphecyTrait;
-    private ClientMemoise $clientMemoise;
+
+    /** @var ClientMemoise */
+    private $clientMemoise;
 
     /** @var ClientFactoryInterface|ObjectProphecy */
     private $clientFactory;

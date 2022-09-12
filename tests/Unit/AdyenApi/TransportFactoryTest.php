@@ -22,7 +22,9 @@ use Shopware\Models\Shop\Shop;
 class TransportFactoryTest extends TestCase
 {
     use ProphecyTrait;
-    private TransportFactory $transportFactory;
+
+    /** @var TransportFactory */
+    private $transportFactory;
 
     /** @var ClientFactoryInterface|ObjectProphecy */
     private $clientFactory;

@@ -9,9 +9,7 @@ use AdyenPayment\Exceptions\InvalidAuthenticationException;
 
 class AuthenticationValidator implements NotificationValidatorInterface
 {
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration */
     private $configuration;
 
     public function __construct(Configuration $configuration)

@@ -8,7 +8,8 @@ use Enlight\Event\SubscriberInterface;
 
 final class PerformanceLoaderSubscriber implements SubscriberInterface
 {
-    private string $pluginDir;
+    /** @var string */
+    private $pluginDir;
 
     public function __construct(string $pluginDir)
     {

@@ -14,7 +14,9 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 final class Configuration implements ConfigurationInterface
 {
     private const ENV_LIVE = 'LIVE';
-    private ReaderInterface $cachedConfigReader;
+
+    /** @var ReaderInterface ReaderInterface */
+    private $cachedConfigReader;
 
     /** @var Connection */
     private $connection;

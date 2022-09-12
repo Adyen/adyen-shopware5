@@ -9,8 +9,11 @@ use Shopware\Components\Model\ModelManager;
 
 final class AttributeWriter implements AttributeWriterInterface
 {
-    private CrudServiceInterface $crudService;
-    private ModelManager $entityManager;
+    /** @var CrudServiceInterface */
+    private $crudService;
+
+    /** @var ModelManager */
+    private $entityManager;
 
     public function __construct(CrudServiceInterface $crudService, ModelManager $entityManager)
     {

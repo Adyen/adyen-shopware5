@@ -13,8 +13,11 @@ use Shopware_Controllers_Backend_Order;
 
 final class BackendOrderSubscriber implements SubscriberInterface
 {
-    private EntityRepository $paymentInfoRepository;
-    private NotificationManager $notificationManager;
+    /** @var EntityRepository */
+    private $paymentInfoRepository;
+
+    /** @var NotificationManager */
+    private $notificationManager;
 
     public function __construct(EntityRepository $paymentInfoRepository, NotificationManager $notificationManager)
     {

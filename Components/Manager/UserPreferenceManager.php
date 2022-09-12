@@ -9,7 +9,8 @@ use Doctrine\ORM\EntityManager;
 
 final class UserPreferenceManager implements UserPreferenceManagerInterface
 {
-    private EntityManager $modelManager;
+    /** @var EntityManager */
+    private $modelManager;
 
     public function __construct(EntityManager $modelManager)
     {

@@ -19,14 +19,29 @@ use Shopware\Models\Order\Status;
 //phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
-    private AdyenManager $adyenManager;
-    private PaymentMethodService $adyenCheckout;
-    private BasketService $basketService;
-    private OrderMailService $orderMailService;
-    private Logger $logger;
-    private OrderManagerInterface $orderManager;
-    private Shopware_Components_Snippet_Manager $snippets;
-    private MessageProvider $errorMessageProvider;
+    /** @var AdyenManager */
+    private $adyenManager;
+
+    /** @var PaymentMethodService */
+    private $adyenCheckout;
+
+    /** @var BasketService */
+    private $basketService;
+
+    /** @var OrderMailService */
+    private $orderMailService;
+
+    /** @var Logger */
+    private $logger;
+
+    /** @var OrderManagerInterface */
+    private $orderManager;
+
+    /** @var Shopware_Components_Snippet_Manager */
+    private $snippets;
+
+    /** @var MessageProvider */
+    private $errorMessageProvider;
 
     /**
      * Whitelist notifyAction

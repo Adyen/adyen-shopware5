@@ -7,9 +7,14 @@ use AdyenPayment\Applepay\MerchantAssociation\RewriteUrl\UrlWriter;
 
 class Shopware_Controllers_Backend_RegisterApplePayAssociationUrl extends Shopware_Controllers_Backend_ExtJs
 {
-    private Shopware_Components_SeoIndex $seoIndexer;
-    private Shopware_Components_Modules $modules;
-    private UrlWriter $seoUrlWriter;
+    /** @var Shopware_Components_SeoIndex */
+    private $seoIndexer;
+
+    /** @var Shopware_Components_Modules */
+    private $modules;
+
+    /** @var UrlWriter */
+    private $seoUrlWriter;
 
     public function preDispatch(): void
     {

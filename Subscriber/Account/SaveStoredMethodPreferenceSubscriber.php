@@ -13,10 +13,17 @@ use Enlight_Components_Session_Namespace;
 
 final class SaveStoredMethodPreferenceSubscriber implements SubscriberInterface
 {
-    private Enlight_Components_Session_Namespace $session;
-    private UserPreferenceManagerInterface $userPreferenceManager;
-    private EntityRepository $userPreferenceRepository;
-    private StoredPaymentMeanProviderInterface $storedPaymentMeanProvider;
+    /** @var Enlight_Components_Session_Namespace */
+    private $session;
+
+    /** @var UserPreferenceManagerInterface */
+    private $userPreferenceManager;
+
+    /** @var EntityRepository */
+    private $userPreferenceRepository;
+
+    /** @var StoredPaymentMeanProviderInterface */
+    private $storedPaymentMeanProvider;
 
     public function __construct(
         Enlight_Components_Session_Namespace $session,
