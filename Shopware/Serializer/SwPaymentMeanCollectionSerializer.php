@@ -24,10 +24,10 @@ final class SwPaymentMeanCollectionSerializer implements PaymentMeanCollectionSe
         return array_reduce(
             iterator_to_array($paymentMeans->getIterator()),
             function(array $carry, PaymentMean $paymentMean) {
-                return [
-                    ...array_values($carry),
-                    ...array_values(($this->paymentMeanSerializer)($paymentMean)),
-                ];
+                return array_merge(
+                    array_values($carry),
+                    array_values(($this->paymentMeanSerializer)($paymentMean))
+                );
             },
             []
         );
