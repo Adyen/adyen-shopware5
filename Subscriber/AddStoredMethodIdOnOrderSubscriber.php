@@ -6,7 +6,7 @@ namespace AdyenPayment\Subscriber;
 
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Models\PaymentInfo;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
 use Enlight_Event_EventArgs;
@@ -14,9 +14,14 @@ use Shopware\Components\Model\ModelManager;
 
 final class AddStoredMethodIdOnOrderSubscriber implements SubscriberInterface
 {
-    private ModelManager $modelManager;
-    private ObjectRepository $paymentInfoRepository;
-    private Enlight_Components_Session_Namespace $session;
+    /** @var ModelManager */
+    private $modelManager;
+
+    /** @var EntityRepository */
+    private $paymentInfoRepository;
+
+    /** @var Enlight_Components_Session_Namespace */
+    private $session;
 
     public function __construct(ModelManager $modelManager, Enlight_Components_Session_Namespace $session)
     {

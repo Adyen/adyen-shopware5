@@ -10,7 +10,6 @@ use AdyenPayment\Models\Notification;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Doctrine\Persistence\ObjectRepository;
 use Shopware\Components\Model\ModelManager;
 
 /**
@@ -18,14 +17,10 @@ use Shopware\Components\Model\ModelManager;
  */
 class NotificationManager
 {
-    /**
-     * @var ModelManager
-     */
+    /** @var ModelManager */
     private $modelManager;
 
-    /**
-     * @var EntityRepository|ObjectRepository
-     */
+    /** @var EntityRepository */
     private $notificationRepository;
 
     /**

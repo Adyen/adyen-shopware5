@@ -7,7 +7,7 @@ namespace AdyenPayment\Subscriber\Backend;
 use AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubShopsWriterInterface;
 use AdyenPayment\Import\PaymentMethodImporterInterface;
 use AdyenPayment\Rule\AdyenApi\MainShopConfigRule;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Enlight\Event\SubscriberInterface;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,13 +15,21 @@ use Symfony\Component\HttpFoundation\Response;
 final class ImportSubShopPaymentMethodsSubscriber implements SubscriberInterface
 {
     private const SAVE_VALUES_ACTION = 'saveValues';
-    private ObjectRepository $shopRepository;
-    private MainShopConfigRule $mainShopConfigRuleChain;
-    private PaymentMeansSubShopsWriterInterface $paymentMeansSubShopsWriter;
-    private PaymentMethodImporterInterface $paymentMethodImporter;
+
+    /** @var EntityRepository */
+    private $shopRepository;
+
+    /** @var MainShopConfigRule */
+    private $mainShopConfigRuleChain;
+
+    /** @var PaymentMeansSubShopsWriterInterface */
+    private $paymentMeansSubShopsWriter;
+
+    /** @var PaymentMethodImporterInterface */
+    private $paymentMethodImporter;
 
     public function __construct(
-        ObjectRepository $shopRepository,
+        EntityRepository $shopRepository,
         MainShopConfigRule $mainShopConfigRule,
         PaymentMeansSubShopsWriterInterface $paymentMeansSubShopsWriter,
         PaymentMethodImporterInterface $paymentMethodImporter

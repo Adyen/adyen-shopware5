@@ -10,20 +10,29 @@ use AdyenPayment\Doctrine\Writer\PaymentMethodWriterInterface;
 use AdyenPayment\Models\Enum\PaymentMethod\ImportStatus;
 use AdyenPayment\Models\PaymentMethod\ImportResult;
 use AdyenPayment\Rule\AdyenApi\UsedFallbackConfigRuleInterface;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Shopware\Models\Shop\Shop;
 
 final class PaymentMethodImporter implements PaymentMethodImporterInterface
 {
-    private PaymentMethodsProviderInterface $paymentMethodsProvider;
-    private ObjectRepository $shopRepository;
-    private UsedFallbackConfigRuleInterface $usedFallbackConfigRule;
-    private PaymentMethodWriterInterface $paymentMethodWriter;
-    private PaymentMeansSubShopsWriterInterface $paymentMeansSubShopsWriter;
+    /** @var PaymentMethodsProviderInterface */
+    private $paymentMethodsProvider;
+
+    /** @var EntityRepository */
+    private $shopRepository;
+
+    /** @var UsedFallbackConfigRuleInterface */
+    private $usedFallbackConfigRule;
+
+    /** @var PaymentMethodWriterInterface */
+    private $paymentMethodWriter;
+
+    /** @var PaymentMeansSubShopsWriterInterface */
+    private $paymentMeansSubShopsWriter;
 
     public function __construct(
         PaymentMethodsProviderInterface $paymentMethodsProvider,
-        ObjectRepository $shopRepository,
+        EntityRepository $shopRepository,
         UsedFallbackConfigRuleInterface $usedFallbackConfigRule,
         PaymentMethodWriterInterface $paymentMethodWriter,
         PaymentMeansSubShopsWriterInterface $paymentMeansSubShopsWriter

@@ -6,7 +6,7 @@ namespace AdyenPayment\Components\Manager;
 
 use AdyenPayment\Models\PaymentInfo;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Shopware\Models\Order\Order;
 
 /**
@@ -14,9 +14,7 @@ use Shopware\Models\Order\Order;
  */
 class AdyenManager
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $modelManager;
 
     public function __construct(EntityManagerInterface $modelManager)
@@ -43,7 +41,7 @@ class AdyenManager
         return $transaction ? $transaction->getPaymentData() : '';
     }
 
-    private function getPaymentInfoRepository(): ObjectRepository
+    private function getPaymentInfoRepository(): EntityRepository
     {
         return $this->modelManager->getRepository(PaymentInfo::class);
     }

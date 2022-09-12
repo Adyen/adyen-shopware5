@@ -4,21 +4,17 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Rule\AdyenApi;
 
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 
 final class UsedFallbackConfigRule implements UsedFallbackConfigRuleInterface
 {
-    /**
-     * @var ObjectRepository
-     */
+    /** @var EntityRepository */
     private $shopRepository;
 
-    /**
-     * @var MainShopConfigRule
-     */
+    /** @var MainShopConfigRule */
     private $mainShopConfigRuleChain;
 
-    public function __construct(ObjectRepository $shopRepository, MainShopConfigRule $mainShopConfigRule)
+    public function __construct(EntityRepository $shopRepository, MainShopConfigRule $mainShopConfigRule)
     {
         $this->shopRepository = $shopRepository;
         $this->mainShopConfigRuleChain = $mainShopConfigRule;

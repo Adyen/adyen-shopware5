@@ -13,7 +13,7 @@ use AdyenPayment\AdyenApi\HttpClient\ClientFactoryInterface;
 use AdyenPayment\AdyenApi\HttpClient\ConfigValidator;
 use AdyenPayment\Components\ConfigurationInterface;
 use AdyenPayment\Validator\ConstraintViolationFactory;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -24,7 +24,9 @@ use Symfony\Component\Validator\ConstraintViolationList;
 class ConfigValidatorTest extends TestCase
 {
     use ProphecyTrait;
-    private ConfigValidator $configValidator;
+
+    /** @var ConfigValidator */
+    private $configValidator;
 
     /** @var ClientFactoryInterface|ObjectProphecy */
     private $adyenApiFactory;
@@ -32,14 +34,14 @@ class ConfigValidatorTest extends TestCase
     /** @var ConfigurationInterface|ObjectProphecy */
     private $configuration;
 
-    /** @var ObjectProphecy|ObjectRepository */
+    /** @var EntityRepository|ObjectProphecy */
     private $shopRepository;
 
     protected function setUp(): void
     {
         $this->adyenApiFactory = $this->prophesize(ClientFactoryInterface::class);
         $this->configuration = $this->prophesize(ConfigurationInterface::class);
-        $this->shopRepository = $this->prophesize(ObjectRepository::class);
+        $this->shopRepository = $this->prophesize(EntityRepository::class);
 
         $this->configValidator = new ConfigValidator(
             $this->adyenApiFactory->reveal(),

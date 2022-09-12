@@ -9,7 +9,6 @@ use AdyenPayment\Models\Event;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
-use Doctrine\Persistence\ObjectRepository;
 use Enlight_Components_Db_Adapter_Pdo_Mysql;
 use Enlight_Components_Session_Namespace;
 use Enlight_Event_Exception;
@@ -38,54 +37,34 @@ class BasketService
     public const MODE_REBATE = 3;
     public const MODE_SURCHARGE_DISCOUNT = 4;
 
-    /**
-     * @var sBasket
-     */
+    /** @var sBasket */
     private $sBasket;
 
-    /**
-     * @var ContainerAwareEventManager
-     */
+    /** @var ContainerAwareEventManager */
     private $events;
 
-    /**
-     * @var ModelManager
-     */
+    /** @var ModelManager */
     private $modelManager;
 
-    /**
-     * @var EntityRepository|ObjectRepository
-     */
+    /** @var EntityRepository */
     private $statusRepository;
 
-    /**
-     * @var EntityRepository|ObjectRepository|\Shopware\Models\Order\Repository
-     */
+    /** @var EntityRepository|\Shopware\Models\Order\Repository */
     private $orderRepository;
 
-    /**
-     * @var EntityRepository|ObjectRepository|Repository
-     */
+    /** @var EntityRepository|Repository */
     private $voucherRepository;
 
-    /**
-     * @var EntityRepository|ObjectRepository
-     */
+    /** @var EntityRepository */
     private $voucherCodeRepository;
 
-    /**
-     * @var Enlight_Components_Db_Adapter_Pdo_Mysql
-     */
+    /** @var Enlight_Components_Db_Adapter_Pdo_Mysql */
     private $db;
 
-    /**
-     * @var Enlight_Components_Session_Namespace
-     */
+    /** @var Enlight_Components_Session_Namespace */
     private $session;
 
-    /**
-     * @var DetailAttributesRestorer
-     */
+    /** @var DetailAttributesRestorer */
     private $detailAttributesRestorer;
 
     /**

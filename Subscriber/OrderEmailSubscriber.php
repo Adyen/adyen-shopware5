@@ -10,7 +10,6 @@ use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Payment\PaymentMean;
 use AdyenPayment\Models\PaymentInfo;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\Persistence\ObjectRepository;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use Shopware\Components\Model\ModelManager;
@@ -19,24 +18,16 @@ use Shopware_Controllers_Frontend_Checkout;
 
 class OrderEmailSubscriber implements SubscriberInterface
 {
-    /**
-     * @var ModelManager
-     */
+    /** @var ModelManager */
     private $modelManager;
 
-    /**
-     * @var EntityRepository|ObjectRepository
-     */
+    /** @var EntityRepository */
     private $paymentInfoRepository;
 
-    /**
-     * @var EntityRepository|ObjectRepository
-     */
+    /** @var EntityRepository */
     private $orderRepository;
 
-    /**
-     * @var OrderMailService
-     */
+    /** @var OrderMailService */
     private $orderMailService;
 
     public function __construct(

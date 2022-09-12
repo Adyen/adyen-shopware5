@@ -6,7 +6,6 @@ namespace AdyenPayment\Components;
 
 use AdyenPayment\Models\TextNotification;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\Persistence\ObjectRepository;
 use Shopware\Components\Model\ModelManager;
 
 /**
@@ -14,14 +13,10 @@ use Shopware\Components\Model\ModelManager;
  */
 class TextNotificationManager
 {
-    /**
-     * @var ModelManager
-     */
+    /** @var ModelManager */
     private $modelManager;
 
-    /**
-     * @var EntityRepository|ObjectRepository
-     */
+    /** @var EntityRepository */
     private $textNotificationRepository;
 
     /**

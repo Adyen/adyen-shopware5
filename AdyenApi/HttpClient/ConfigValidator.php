@@ -8,20 +8,25 @@ use Adyen\AdyenException;
 use Adyen\Service\Checkout;
 use AdyenPayment\Components\ConfigurationInterface;
 use AdyenPayment\Validator\ConstraintViolationFactory;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 final class ConfigValidator implements ConfigValidatorInterface
 {
-    private ClientFactoryInterface $adyenApiFactory;
-    private ConfigurationInterface $configuration;
-    private ObjectRepository $shopRepository;
+    /** @var ClientFactoryInterface */
+    private $adyenApiFactory;
+
+    /** @var ConfigurationInterface */
+    private $configuration;
+
+    /** @var EntityRepository */
+    private $shopRepository;
 
     public function __construct(
         ClientFactoryInterface $adyenApiFactory,
         ConfigurationInterface $configuration,
-        ObjectRepository $shopRepository
+        EntityRepository $shopRepository
     ) {
         $this->adyenApiFactory = $adyenApiFactory;
         $this->configuration = $configuration;
