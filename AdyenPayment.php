@@ -76,11 +76,6 @@ final class AdyenPayment extends Plugin
             $loader->load($serviceMainFile);
         }
         $loader->load(__DIR__.'/Resources/services/*.xml');
-
-        $versionCheck = $container->get('adyen_payment.components.shopware_version_check');
-        if ($versionCheck && $versionCheck->isHigherThanShopwareVersion('v5.6.2')) {
-            $loader->load(__DIR__.'/Resources/services/version/563.xml');
-        }
     }
 
     /**
