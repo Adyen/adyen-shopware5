@@ -6,22 +6,35 @@ namespace AdyenPayment\Applepay\MerchantAssociation\InstallHandler;
 
 use AdyenPayment\Applepay\Exception\FileNotDownloadedException;
 use AdyenPayment\Applepay\MerchantAssociation\StorageFilesystem;
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
+use Shopware\Components\HttpClient\HttpClientInterface;
+use Shopware\Components\HttpClient\RequestException;
+use Psr\Log\LoggerInterface;
 
 final class DownloadInstaller implements Installer
 {
-    /** @var ClientInterface */
+    /** @var string */
+    private $baseUri;
+
+    /** @var HttpClientInterface */
     private $client;
 
     /** @var StorageFilesystem */
     private $storageFilesystem;
 
-    public function __construct(Client $client, StorageFilesystem $storageFilesystem)
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        HttpClientInterface $client,
+        StorageFilesystem $storageFilesystem,
+        LoggerInterface $logger,
+        $baseUri
+    )
     {
         $this->client = $client;
         $this->storageFilesystem = $storageFilesystem;
+        $this->logger = $logger;
+        $this->baseUri = $baseUri;
     }
 
     public function isFallback(): bool
@@ -33,12 +46,24 @@ final class DownloadInstaller implements Installer
     {
         try {
             $this->storageFilesystem->resetStorage();
-            /** @psalm-suppress UndefinedInterfaceMethod (psalm does not recognize trait method) */
-            $this->client->get('/.well-known/apple-developer-merchantid-domain-association', [
-                'sink' => $this->storageFilesystem->storagePath(),
-            ]);
+
+            $url = $this->baseUri . '/.well-known/apple-developer-merchantid-domain-association';
+
+            $this->logger->info("Sending request:\n GET $url");
+            $response = $this->client->get($url);
+
+            $this->logger->info(
+                "Received response:\n".$response->getStatusCode(),
+                ['response' => $response]
+            );
+
+            if ((int)$response->getStatusCode() > 400) {
+                $this->logger->error('Error completing request', ['response' => $response]);
+            }
+
+            $this->storageFilesystem->createFile($this->storageFilesystem->storagePath(), $response->getBody());
             $this->storageFilesystem->updateFilePermissions();
-        } catch (GuzzleException $exception) {
+        } catch (RequestException $exception) {
             throw FileNotDownloadedException::fromException($exception);
         }
     }

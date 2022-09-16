@@ -56,6 +56,11 @@ final class StorageFilesystem
         $this->filesystem->chmod($directory, 0764);
     }
 
+    public function createFile($fileName, $content)
+    {
+        $this->filesystem->dumpFile($fileName, $content);
+    }
+
     private function removeFile(): void
     {
         if (!$this->filesystem->exists($this->storagePath)) {

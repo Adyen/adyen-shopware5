@@ -19,29 +19,6 @@
             <argument type="service" id="modules"/>
         </service>
 
-        <!-- Http Client -->
-        <service id="AdyenPayment\Applepay\MerchantAssociation\Client" class="GuzzleHttp\Client">
-            <argument type="collection">
-                <argument key="handler" type="service" id="AdyenPayment\Applepay\MerchantAssociation\HandlerStack"/>
-                <argument key="base_uri">%apple_pay.merchant_association.base_uri%</argument>
-            </argument>
-        </service>
-        <service id="AdyenPayment\Applepay\MerchantAssociation\HandlerStack" class="GuzzleHttp\HandlerStack">
-            <factory class="GuzzleHttp\HandlerStack" method="create"/>
-            <call method="after">
-                <argument>http_errors</argument>
-                <argument type="expression">service('AdyenPayment\\Guzzle\\Middleware\\RequestLogger').__invoke()
-                </argument>
-                <argument>RequestLoggingMiddleware</argument>
-            </call>
-            <call method="after">
-                <argument>http_errors</argument>
-                <argument type="expression">service('AdyenPayment\\Guzzle\\Middleware\\ResponseLogger').__invoke()
-                </argument>
-                <argument>ResponseLoggingMiddleware</argument>
-            </call>
-        </service>
-
         <!-- Installers -->
         <service id="AdyenPayment\Applepay\MerchantAssociation\MerchantAssociationFileInstaller" public="true">
             <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\InstallHandler\DownloadInstaller"/>
@@ -53,8 +30,10 @@
             <argument type="service" id="adyen_payment.logger"/>
         </service>
         <service id="AdyenPayment\Applepay\MerchantAssociation\InstallHandler\DownloadInstaller">
-            <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\Client"/>
+            <argument type="service" id="http_client"/>
             <argument type="service" id="AdyenPayment\Applepay\MerchantAssociation\StorageFilesystem"/>
+            <argument type="service" id="adyen_payment.logger"/>
+            <argument key="$baseUri">%apple_pay.merchant_association.base_uri%</argument>
         </service>
         <service id="AdyenPayment\Applepay\MerchantAssociation\InstallHandler\ArchiveInstaller">
             <argument>%apple_pay.merchant_association.archive_path%</argument>

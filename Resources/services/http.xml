@@ -4,26 +4,5 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="AdyenPayment\Http\Response\FrontendJsonResponse" public="true"/>
-
-        <!-- Http Message Formatters -->
-        <service id="AdyenPayment\Http\Logging\SimpleRequestFormatter"/>
-        <service id="AdyenPayment\Http\Logging\RequestFormatter"
-                 alias="AdyenPayment\Http\Logging\SimpleRequestFormatter"/>
-        <service id="AdyenPayment\Http\Logging\SimpleResponseFormatter"/>
-        <service id="AdyenPayment\Http\Logging\ResponseFormatter"
-                 alias="AdyenPayment\Http\Logging\SimpleResponseFormatter"/>
-
-        <!-- Guzzle Middleware -->
-        <service id="AdyenPayment\Guzzle\Middleware\RequestLogger">
-            <argument type="service" id="adyen_payment.logger"/>
-            <argument type="service" id="AdyenPayment\Http\Logging\RequestFormatter"/>
-        </service>
-        <service id="AdyenPayment\Guzzle\Middleware\ResponseLogger">
-            <argument type="service" id="adyen_payment.logger"/>
-            <argument type="service" id="AdyenPayment\Http\Logging\ResponseFormatter"/>
-        </service>
     </services>
 </container>
-
-
-
