@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Tests\Unit\Shopware\Controllers\Frontend;
 
-use Doctrine\DBAL\ForwardCompatibility\DriverStatement;
 use Enlight_Template_Manager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use Shopware\Components\Cart\BasketHelper;
 use Shopware\Components\Cart\BasketHelperInterface;
-use Shopware\Components\Cart\BasketQueryHelperInterface;
 use Shopware\Components\Cart\ProportionalTaxCalculatorInterface;
-use Shopware\Components\Cart\Struct\DiscountContext;
 use Shopware\Components\Cart\Struct\Price;
 use Shopware\Components\CSRFGetProtectionAware;
 use Shopware\Models\Shop\Currency;
@@ -70,7 +66,7 @@ class CheckoutTest extends TestCase
             $this->admin->reveal(),
             $this->basket->reveal(),
             $this->session->reveal(),
-            $this->container->reveal(),
+            $this->container->reveal()
 //            $this->view
         );
 

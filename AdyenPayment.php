@@ -231,9 +231,9 @@ final class AdyenPayment extends Plugin
 
     private function rebuildAttributeModels(): void
     {
-        $metaDataCache = $this->container->get('models')->getConfiguration()->getMetadataCache();
+        $metaDataCache = $this->container->get('models')->getConfiguration()->getMetadataCacheImpl();
         if ($metaDataCache) {
-            $metaDataCache->clear();
+            $metaDataCache->deleteAll();
         }
 
         $this->container->get('models')->generateAttributeModels(

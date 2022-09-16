@@ -72,7 +72,7 @@ final class EnrichedPaymentMeanProviderTest extends TestCase
         );
 
         $this->paymentMethodOptionsBuilder->__invoke()->willReturn(['value' => 0.0]);
-        $this->paymentMethodService->getPaymentMethods(Argument::cetera())->shouldNotBeCalled();
+        $this->paymentMethodService->getPaymentMethods((string)Argument::cetera())->shouldNotBeCalled();
         $this->paymentMethodEnricher->__invoke(Argument::cetera())->shouldNotBeCalled();
 
         $result = $this->provider->__invoke($paymentMeans);

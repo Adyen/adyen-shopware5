@@ -17,11 +17,11 @@ final class PluginIdProviderTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @var InstallerService|\Prophecy\Prophecy\ObjectProphecy
-     */
+    /** @var InstallerService|\Prophecy\Prophecy\ObjectProphecy */
     private $pluginManager;
-    private TraceablePluginIdProvider $provider;
+
+    /** @var TraceablePluginIdProvider */
+    private $provider;
 
     protected function setUp(): void
     {

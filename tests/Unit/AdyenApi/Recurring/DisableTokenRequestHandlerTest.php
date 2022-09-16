@@ -19,7 +19,9 @@ use Shopware\Models\Shop\Shop;
 class DisableTokenRequestHandlerTest extends TestCase
 {
     use ProphecyTrait;
-    private DisableTokenRequestHandler $disableTokenRequestHandler;
+
+    /** @var DisableTokenRequestHandler */
+    private $disableTokenRequestHandler;
 
     /** @var CustomerNumberProviderInterface|ObjectProphecy */
     private $customerNumberProvider;
