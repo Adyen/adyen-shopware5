@@ -23,7 +23,7 @@ class Shopware_Controllers_Backend_TestAdyenApi extends Shopware_Controllers_Bac
     {
         parent::preDispatch();
       
-        $this->cacheManager = $this->get(CacheManager::class);
+        $this->cacheManager = $this->get('shopware.cache_manager');
         $this->apiConfigValidator = $this->get(ConfigValidator::class);
         $this->usedFallbackConfigRule = $this->get(UsedFallbackConfigRule::class);
     }

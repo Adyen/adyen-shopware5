@@ -34,6 +34,6 @@ final class PersistStoredMethodIdSubscriber implements SubscriberInterface
         }
 
         $storedMethodId = $args->getRequest()->getParam(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID);
-        $this->session->set(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId);
+        $this->session->offsetSet(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId);
     }
 }

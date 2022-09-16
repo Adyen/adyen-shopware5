@@ -27,7 +27,7 @@ class Shopware_Controllers_Backend_ImportPaymentMethods extends Shopware_Control
     {
         parent::preDispatch();
 
-        $this->cacheManager = $this->get(CacheManager::class);
+        $this->cacheManager = $this->get('shopware.cache_manager');
         $this->paymentMethodImporter = $this->get(PaymentMethodImporter::class);
         $this->logger = $this->get('adyen_payment.logger');
     }

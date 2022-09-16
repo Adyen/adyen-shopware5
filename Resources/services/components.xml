@@ -20,7 +20,7 @@
             <argument type="service" id="AdyenPayment\Basket\Restore\DetailAttributesRestorer"/>
         </service>
         <service id="AdyenPayment\Components\Configuration" public="true">
-            <argument type="service" id="Shopware\Components\Plugin\Configuration\CachedReader"/>
+            <argument type="service" id="shopware.plugin.cached_config_reader"/>
             <argument type="service" id="dbal_connection"/>
         </service>
         <service id="AdyenPayment\Components\OrderMailService" public="true">

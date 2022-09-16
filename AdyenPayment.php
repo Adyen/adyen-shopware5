@@ -245,7 +245,7 @@ final class AdyenPayment extends Plugin
     {
         $database = $this->container->get('db');
         /** @var ModelManager $modelsManager */
-        $modelsManager = $this->container->get(ModelManager::class);
+        $modelsManager = $this->container->get('shopware.model_manager');
 
         $models = $this->container->get('models');
         $shops = $models->getRepository(Shop::class)->findAll();

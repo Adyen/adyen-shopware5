@@ -7,7 +7,7 @@ namespace AdyenPayment\Components;
 use Adyen\Environment;
 use AdyenPayment\AdyenPayment;
 use Doctrine\DBAL\Connection;
-use Shopware\Components\Plugin\Configuration\ReaderInterface;
+use Shopware\Components\Plugin\CachedConfigReader;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
@@ -15,7 +15,7 @@ final class Configuration implements ConfigurationInterface
 {
     private const ENV_LIVE = 'LIVE';
 
-    /** @var ReaderInterface ReaderInterface */
+    /** @var CachedConfigReader ReaderInterface */
     private $cachedConfigReader;
 
     /** @var Connection */
@@ -25,7 +25,7 @@ final class Configuration implements ConfigurationInterface
      * Configuration constructor.
      */
     public function __construct(
-        ReaderInterface $cachedConfigReader,
+        CachedConfigReader $cachedConfigReader,
         Connection $connection
     ) {
         $this->cachedConfigReader = $cachedConfigReader;
@@ -72,8 +72,7 @@ final class Configuration implements ConfigurationInterface
             }
         }
 
-        $shopId = $shop ? $shop->getId() : null;
-        $config = $this->cachedConfigReader->getByPluginName(AdyenPayment::NAME, $shopId);
+        $config = $this->cachedConfigReader->getByPluginName(AdyenPayment::NAME, $shop);
         if (null === $key) {
             return $config;
         }

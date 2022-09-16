@@ -18,7 +18,7 @@ final class ErrorMessageProvider implements MessageProvider
 
     public function hasMessages(): bool
     {
-        return $this->session->has(self::KEY_ERROR_MESSAGES);
+        return (bool)$this->session->get(self::KEY_ERROR_MESSAGES);
     }
 
     public function add(string ...$messages): void

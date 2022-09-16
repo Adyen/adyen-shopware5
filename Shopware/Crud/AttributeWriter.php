@@ -38,9 +38,9 @@ final class AttributeWriter implements AttributeWriterInterface
 
     private function rebuildAttributeModel(string $attributeTable): void
     {
-        $metaDataCache = $this->entityManager->getConfiguration()->getMetadataCache();
+        $metaDataCache = $this->entityManager->getConfiguration()->getMetadataCacheImpl();
         if ($metaDataCache) {
-            $metaDataCache->clear();
+            $metaDataCache->deleteAll();
         }
 
         $this->entityManager->generateAttributeModels([$attributeTable]);
