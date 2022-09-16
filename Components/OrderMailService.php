@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdyenPayment\Components;
 
 use AdyenPayment\Models\PaymentInfo;
+use Shopware\Bundle\CartBundle\CheckoutKey;
 use Shopware\Components\Model\ModelManager;
 
 class OrderMailService
@@ -61,7 +62,13 @@ class OrderMailService
         $variables = json_decode($paymentInfo->getOrdermailVariables(), true);
         if (is_array($variables)) {
             $sOrder = Shopware()->Modules()->Order();
+
             $sOrder->sUserData = $variables;
+            $sOrder->sBasketData = $sOrder->sBasketData ?? [];
+            if (!array_key_exists(CheckoutKey::CURRENCY_NAME, $sOrder->sBasketData)) {
+                $sOrder->sBasketData[CheckoutKey::CURRENCY_NAME] = $variables['adyen_currency'] ?? null;
+            }
+
             $sOrder->sendMail($variables);
         }
 

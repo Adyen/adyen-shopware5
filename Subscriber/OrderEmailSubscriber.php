@@ -102,6 +102,10 @@ class OrderEmailSubscriber implements SubscriberInterface
             ]);
 
             if ($paymentInfo && empty($paymentInfo->getOrdermailVariables())) {
+                if (($context = $args->get('context')) && array_key_exists('sCurrency', $context)) {
+                    $variables['adyen_currency'] = $context['sCurrency'];
+                }
+
                 $paymentInfo->setOrdermailVariables(json_encode($variables));
 
                 $this->modelManager->persist($paymentInfo);
