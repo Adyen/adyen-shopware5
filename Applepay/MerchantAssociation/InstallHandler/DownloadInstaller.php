@@ -59,6 +59,7 @@ final class DownloadInstaller implements Installer
 
             if ((int)$response->getStatusCode() > 400) {
                 $this->logger->error('Error completing request', ['response' => $response]);
+                throw FileNotDownloadedException::fromResponse($response);
             }
 
             $this->storageFilesystem->createFile($this->storageFilesystem->storagePath(), $response->getBody());
