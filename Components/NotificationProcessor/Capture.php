@@ -36,7 +36,7 @@ class Capture implements NotificationProcessorInterface
     /** @var ModelManager */
     private $modelManager;
 
-    /** @var \Doctrine\ORM\EntityRepository|\Doctrine\Persistence\ObjectRepository */
+    /** @var \Doctrine\ORM\EntityRepository */
     private $paymentInfoRepository;
 
     /**
