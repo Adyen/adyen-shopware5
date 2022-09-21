@@ -11,6 +11,25 @@ use Shopware\Bundle\CookieBundle\Structs\CookieStruct;
 
 final class CookieSubscriber implements SubscriberInterface
 {
+    /** @var string[] Adyen cookie names to be added to the consent manager. */
+    const ADYEN_COOKIE_NAMES = [
+        '_rp_uid',
+        'JSESSIONID',
+        '_uetvid',
+        '_uetsid',
+        'datadome',
+        'rl_anonymous_id',
+        '_mkto_trk',
+        'rl_user_id',
+        '_hjid',
+        'lastUpdatedGdpr',
+        'gdpr',
+        '_fbp',
+        '_ga',
+        '_gid',
+        '_gcl_au',
+    ];
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -18,15 +37,24 @@ final class CookieSubscriber implements SubscriberInterface
         ];
     }
 
+    /**
+     * Returns a CookieCollection object containing cookies to be added to the consent manager.
+     *
+     * @return CookieCollection
+     */
     public function addAdyenCookie(): CookieCollection
     {
-        return new CookieCollection([
-            new CookieStruct(
-                'comfort',
-                '/^adyen/',
-                'Adyen Cookies',
+        $collection = new CookieCollection();
+
+        foreach (self::ADYEN_COOKIE_NAMES as $adyenCookieName) {
+            $collection->add(new CookieStruct(
+                $adyenCookieName,
+                '/^technical$/',
+                'Adyen '.$adyenCookieName,
                 CookieGroupStruct::TECHNICAL
-            ),
-        ]);
+            ));
+        }
+
+        return $collection;
     }
 }
