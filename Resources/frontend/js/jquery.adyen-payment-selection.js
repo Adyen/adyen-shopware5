@@ -89,7 +89,7 @@
             me.applyDataAttributes();
             me.eventListeners();
             me.setConfig();
-            me.enableVisibility();
+            me.handleVisibility();
             me.setCheckout();
             me.handleSelectedMethod();
         },
@@ -100,9 +100,23 @@
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
         },
-        enableVisibility: function () {
+        handleVisibility: function () {
+            if ($.getCookie('cookieDeclined')) {
+                this.hideAllAdyenPaymentMethods();
+                $(this.opts.shippingPaymentContentSelector).removeClass('adyen-hidden--all');
+
+                return;
+            }
+
             this.handleApplePayVisibility();
             $(this.opts.shippingPaymentContentSelector).removeClass('adyen-hidden--all');
+        },
+        hideAllAdyenPaymentMethods: function() {
+            for (let i = 0; i < this.opts.enrichedPaymentMethods.length; i++) {
+                if (this.opts.enrichedPaymentMethods[i].isAdyenPaymentMethod) {
+                    $('#payment_mean' + this.opts.enrichedPaymentMethods[i].id).parents(this.opts.paymentMethodSelector).addClass('adyen-hidden--all');
+                }
+            }
         },
         handleApplePayVisibility: function () {
             var me = this;
@@ -168,7 +182,7 @@
         onPaymentChangedAfter: function () {
             var me = this;
 
-            me.enableVisibility();
+            me.handleVisibility();
 
             var payment = me.getPaymentMethodById(me.selectedPaymentId);
 
