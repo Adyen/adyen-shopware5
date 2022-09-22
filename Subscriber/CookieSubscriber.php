@@ -11,8 +11,8 @@ use Shopware\Bundle\CookieBundle\Structs\CookieStruct;
 
 final class CookieSubscriber implements SubscriberInterface
 {
-    /** @var string[] Adyen cookie names to be added to the consent manager. */
-    const ADYEN_COOKIE_NAMES = [
+    /** @var string[] */
+    private const ADYEN_COOKIE_NAMES = [
         '_rp_uid',
         'JSESSIONID',
         '_uetvid',
@@ -49,7 +49,7 @@ final class CookieSubscriber implements SubscriberInterface
         foreach (self::ADYEN_COOKIE_NAMES as $adyenCookieName) {
             $collection->add(new CookieStruct(
                 $adyenCookieName,
-                '/^technical$/',
+                "/^$adyenCookieName$/",
                 'Adyen '.$adyenCookieName,
                 CookieGroupStruct::TECHNICAL
             ));
