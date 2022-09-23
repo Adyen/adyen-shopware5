@@ -118,20 +118,24 @@
             $(this.opts.shippingPaymentContentSelector).removeClass('adyen-hidden--all');
         },
         hideAllAdyenPaymentMethods: function() {
-            let storedMethodFound = false;
-
+            this.hideStoredAdyenPaymentMethods();
+            this.hideAdyenPaymentMethods();
+        },
+        hideStoredAdyenPaymentMethods: function () {
             for (let i = 0; i < this.opts.enrichedPaymentMethods.length; i++) {
-                if (this.opts.enrichedPaymentMethods[i].isAdyenPaymentMethod) {
-                    if (!storedMethodFound && this.opts.enrichedPaymentMethods[i].isStoredPayment) {
-                        storedMethodFound = true;
-                    } else {
-                        $('#payment_mean' + this.opts.enrichedPaymentMethods[i].id)
-                            .parents(this.opts.paymentMethodSelector).addClass('adyen-hidden--all');
-                    }
+                if (this.opts.enrichedPaymentMethods[i].isAdyenPaymentMethod && this.opts.enrichedPaymentMethods[i].isStoredPayment) {
+                    $(this.opts.storedPaymentContentSelector).addClass('adyen-hidden--all');
+                    return;
                 }
             }
-
-            if (storedMethodFound) $(this.opts.storedPaymentContentSelector).addClass('adyen-hidden--all');
+        },
+        hideAdyenPaymentMethods: function () {
+            for (let i = 0; i < this.opts.enrichedPaymentMethods.length; i++) {
+                if (this.opts.enrichedPaymentMethods[i].isAdyenPaymentMethod) {
+                    $('#payment_mean' + this.opts.enrichedPaymentMethods[i].id)
+                        .parents(this.opts.paymentMethodSelector).addClass('adyen-hidden--all');
+                }
+            }
         },
         handleApplePayVisibility: function () {
             var me = this;
