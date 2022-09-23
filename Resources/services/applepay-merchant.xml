@@ -5,7 +5,7 @@
     <!-- Do NOT multiline parameter values -->
     <parameters>
         <parameter key="apple_pay.merchant_association.base_uri">https://eu.adyen.link</parameter>
-        <parameter key="apple_pay.merchant_association.storage_path">%kernel.project_dir%/.well-known/apple-developer-merchantid-domain-association</parameter>
+        <parameter key="apple_pay.merchant_association.storage_path">%kernel.root_dir%/.well-known/apple-developer-merchantid-domain-association</parameter>
         <parameter key="apple_pay.merchant_association.archive_path">%adyen_payment.plugin_dir%/storage/apple-developer-merchantid-domain-association.archive</parameter>
     </parameters>
 
