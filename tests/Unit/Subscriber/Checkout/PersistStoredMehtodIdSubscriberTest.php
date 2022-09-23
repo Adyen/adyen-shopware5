@@ -73,7 +73,7 @@ final class PersistStoredMehtodIdSubscriberTest extends SubscriberTestCase
         $eventArgs->getRequest()->setParam('isXHR', true);
         $eventArgs->getRequest()->setParam(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId = '123123');
 
-        $this->session->set(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId)->shouldBeCalled();
+        $this->session->offsetSet(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId)->shouldBeCalled();
 
         $this->subscriber->__invoke($eventArgs);
     }
@@ -85,7 +85,7 @@ final class PersistStoredMehtodIdSubscriberTest extends SubscriberTestCase
         $eventArgs->getRequest()->setParam('isXHR', false);
         $eventArgs->getRequest()->setParam(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId = '123123');
 
-        $this->session->set(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId)->shouldBeCalled();
+        $this->session->offsetSet(AdyenPayment::SESSION_ADYEN_STORED_METHOD_ID, $storedMethodId)->shouldBeCalled();
 
         $this->subscriber->__invoke($eventArgs);
     }

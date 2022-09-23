@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use AdyenPayment\Applepay\Certificate\Filesystem\CertificateReader;
-use AdyenPayment\Applepay\Certificate\Filesystem\CertificateReaderInterface;
 use AdyenPayment\Applepay\MerchantAssociation\AssociationFileInstaller;
 use AdyenPayment\Applepay\MerchantAssociation\MerchantAssociationFileInstaller;
 use AdyenPayment\Applepay\MerchantAssociation\StorageFilesystem;
