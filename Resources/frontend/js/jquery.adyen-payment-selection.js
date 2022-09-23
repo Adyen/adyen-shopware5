@@ -30,6 +30,12 @@
              */
             shippingPaymentContentSelector: '#shipping_payment_wrapper',
             /**
+             * Selector for stored payment method content.
+             *
+             * @type {String}
+             */
+            storedPaymentContentSelector: '#stored_payment_wrapper',
+            /**
              * Selector for the payment form.
              *
              * @type {String}
@@ -112,11 +118,20 @@
             $(this.opts.shippingPaymentContentSelector).removeClass('adyen-hidden--all');
         },
         hideAllAdyenPaymentMethods: function() {
+            let storedMethodFound = false;
+
             for (let i = 0; i < this.opts.enrichedPaymentMethods.length; i++) {
                 if (this.opts.enrichedPaymentMethods[i].isAdyenPaymentMethod) {
-                    $('#payment_mean' + this.opts.enrichedPaymentMethods[i].id).parents(this.opts.paymentMethodSelector).addClass('adyen-hidden--all');
+                    if (!storedMethodFound && this.opts.enrichedPaymentMethods[i].isStoredPayment) {
+                        storedMethodFound = true;
+                    } else {
+                        $('#payment_mean' + this.opts.enrichedPaymentMethods[i].id)
+                            .parents(this.opts.paymentMethodSelector).addClass('adyen-hidden--all');
+                    }
                 }
             }
+
+            if (storedMethodFound) $(this.opts.storedPaymentContentSelector).addClass('adyen-hidden--all');
         },
         handleApplePayVisibility: function () {
             var me = this;
