@@ -63,7 +63,7 @@ class ProcessNotifications extends ShopwareCommand
         $number = $input->getOption('number');
 
         $feedback = $this->notificationProcessor->processMany(
-            $this->loader->load($number)
+            $this->loader->load((int) $number)
         );
 
         $totalCount = 0;
