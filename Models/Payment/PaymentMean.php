@@ -54,7 +54,16 @@ final class PaymentMean
 
     public function getAttribute(): Attribute
     {
-        return $this->raw['attribute'] ?? new Attribute();
+        if (array_key_exists('attribute', $this->raw)) {
+            return $this->raw['attribute'];
+        }
+
+        /** For compatibility with Shopware 5.6.0 */
+        if (array_key_exists('attributes', $this->raw)) {
+            return $this->raw['attributes']['core'] ?? new Attribute();
+        }
+
+        return new Attribute();
     }
 
     public function isEnriched(): bool
