@@ -107,7 +107,7 @@
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
         },
         handleVisibility: function () {
-            if ($.getCookie('cookieDeclined')) {
+            if (!window.StateManager.hasCookiesAllowed()) {
                 this.hideAllAdyenPaymentMethods();
                 $(this.opts.shippingPaymentContentSelector).removeClass('adyen-hidden--all');
 
