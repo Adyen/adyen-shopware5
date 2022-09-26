@@ -66,7 +66,15 @@ class OrderMailService
         $variables = json_decode($paymentInfo->getOrdermailVariables(), true);
         if (is_array($variables)) {
             $sOrder = Shopware()->Modules()->Order();
+
             $sOrder->sUserData = $variables;
+            $sOrder->sBasketData = $sOrder->sBasketData ?? [];
+
+            // Do not use CheckoutKey::CURRENCY_NAME constant because of the compatibility with SW 5.6.0
+            if (!array_key_exists('sCurrencyName', $sOrder->sBasketData)) {
+                $sOrder->sBasketData['sCurrencyName'] = $variables['adyen_currency'] ?? null;
+            }
+
             $sOrder->sendMail($variables);
         }
 
