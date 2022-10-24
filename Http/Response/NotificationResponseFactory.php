@@ -24,6 +24,14 @@ class NotificationResponseFactory
         ], Response::HTTP_UNAUTHORIZED);
     }
 
+    public static function badRequest(string $message): JsonResponse
+    {
+        return new JsonResponse([
+            'success' => false,
+            'message' => $message,
+        ], Response::HTTP_BAD_REQUEST);
+    }
+
     public static function fromShopwareResponse(Enlight_Controller_Request_RequestHttp $request, $data): JsonResponse
     {
         $pretty = (bool) $request->getParam('pretty', false);

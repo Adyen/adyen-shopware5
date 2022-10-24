@@ -2,6 +2,7 @@
 
 use AdyenPayment\Components\IncomingNotificationManager;
 use AdyenPayment\Exceptions\AuthorizationException;
+use AdyenPayment\Exceptions\InvalidRequestPayloadException;
 use AdyenPayment\Http\Response\NotificationResponseFactory;
 use AdyenPayment\Http\Validator\Notification\NotificationValidatorInterface;
 use AdyenPayment\Models\Event;
@@ -78,6 +79,9 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
                 'trace' => $exception->getTraceAsString(),
                 'previous' => $exception->getPrevious(),
             ]);
+
+            $this->View()->assign('responseData', NotificationResponseFactory::badRequest($exception->getMessage()));
+            return;
         }
 
         // on valid credentials, always return ACCEPTED
@@ -102,7 +106,16 @@ class Shopware_Controllers_Frontend_Notification extends Shopware_Controllers_Fr
      */
     private function getNotificationItems()
     {
-        $jsonbody = json_decode($this->Request()->getRawBody(), true);
+        $rawBody = $this->Request()->getRawBody();
+        if (empty($rawBody)) {
+            throw InvalidRequestPayloadException::missingBody();
+        }
+
+        $jsonbody = json_decode($rawBody, true);
+        if (!is_array($jsonbody)) {
+            throw InvalidRequestPayloadException::invalidBody();
+        }
+
         $notificationItems = $jsonbody['notificationItems'] ?? [];
         if (!$notificationItems) {
             return [];
