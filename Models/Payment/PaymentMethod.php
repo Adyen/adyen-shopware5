@@ -47,6 +47,11 @@ final class PaymentMethod
             Sanitize::removeNonWord($name)
         ));
 
+        // Standardize credit card code for Sweden. Adyen returns scheme_card instead of scheme_credit_card for SW
+        if ('scheme_card' === $new->code) {
+            $new->code = 'scheme_credit_card';
+        }
+
         return $new;
     }
 
