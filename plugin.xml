@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.9.0</version>
+    <version>3.9.1</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -431,6 +431,16 @@
             * Optimize: Handling of the customer cookie consent
             * Optimize: Set payment billing address state based on the customer billing address state
             * Optimize: Add plugin compatibility with Shopware 5.6.0 - 5.7.14
+        </changes>
+    </changelog>
+    <changelog version="3.9.1">
+        <changes lang="en">
+            * Fix: Missing credit card payment method for Sweden billing addresses
+            * Optimize: Handling of the invalid Webhook requests
+        </changes>
+        <changes lang="de">
+            * Fix: Missing credit card payment method for Sweden billing addresses
+            * Optimize: Handling of the invalid Webhook requests
         </changes>
     </changelog>
 </plugin>
