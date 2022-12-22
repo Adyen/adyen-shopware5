@@ -80,24 +80,34 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         $response = $this->Request()->getParams();
 
         if ($response) {
-            /** @var Order $order */
-            $order = $this->getModelManager()->getRepository(Order::class)->findOneBy([
-                'number' => $response['merchantReference'] ?? '',
-            ]);
+            $merchantReference = !empty($response['merchantReference']) ? $response['merchantReference'] : '';
+
+            $order = $this->getOrderByMerchantReference($merchantReference);
             $result = $this->validateResponse($response, $order);
+
+            // Make the best effort to obtain merchant reference
+            if (empty($merchantReference) && !empty($result['merchantReference'])) {
+                $merchantReference = $result['merchantReference'];
+            }
+
+            // Make the best effort to obtain related shop order
+            if (!$order && !empty($merchantReference)) {
+                $order = $this->getOrderByMerchantReference($merchantReference);
+            }
+
             $this->handleReturnResult($result, $order);
 
             switch(PaymentResultCode::load($result['resultCode'])) {
                 case PaymentResultCode::authorised():
                 case PaymentResultCode::pending():
                 case PaymentResultCode::received():
-                    if (!empty($result['merchantReference'])) {
-                        $this->orderMailService->sendOrderConfirmationMail($result['merchantReference']);
+                    if (!empty($merchantReference)) {
+                        $this->orderMailService->sendOrderConfirmationMail($merchantReference);
                     }
                     $this->redirect([
                         'controller' => 'checkout',
                         'action' => 'finish',
-                        'sUniqueID' => $order->getTemporaryId(),
+                        'sUniqueID' => $order ? $order->getTemporaryId() : '',
                         'sAGB' => true,
                     ]);
                     break;
@@ -110,8 +120,8 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
                             ->get('errorTransaction'.$result['resultCode'], $result['refusalReason'] ?? '')
                     );
 
-                    if (!empty($result['merchantReference'])) {
-                        $this->basketService->cancelAndRestoreByOrderNumber($result['merchantReference']);
+                    if (!empty($merchantReference)) {
+                        $this->basketService->cancelAndRestoreByOrderNumber($merchantReference);
                     }
 
                     $this->redirect([
@@ -195,5 +205,12 @@ class Shopware_Controllers_Frontend_Process extends Shopware_Controllers_Fronten
         }
 
         return $response;
+    }
+
+    private function getOrderByMerchantReference($merchantReference): ?Order
+    {
+        return $this->getModelManager()->getRepository(Order::class)->findOneBy([
+            'number' => $merchantReference,
+        ]);
     }
 }

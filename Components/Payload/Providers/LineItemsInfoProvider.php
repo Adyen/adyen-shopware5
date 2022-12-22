@@ -82,6 +82,10 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
         );
         $dispatch = $context->getOrder()->getDispatch();
 
+        if (!$dispatch || !$dispatch->getId()) {
+            return [];
+        }
+
         return [
             [
                 'quantity' => 1,
@@ -90,8 +94,8 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
                     $context->getOrder()->getInvoiceShippingTaxRate(),
                     $currencyCode
                 ),
-                'description' => $dispatch && $dispatch->getId() ? $dispatch->getName() : '',
-                'id' => $dispatch && $dispatch->getId(),
+                'description' => $dispatch->getName(),
+                'id' => $dispatch->getId(),
                 'taxAmount' => $amountIncludingTax - $amountExcludingTax,
                 'amountIncludingTax' => $amountIncludingTax,
             ],
