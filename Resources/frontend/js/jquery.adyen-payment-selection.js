@@ -250,7 +250,8 @@
                 environment: me.opts.adyenEnvironment,
                 clientKey: me.opts.adyenClientKey,
                 paymentMethodsResponse: {'paymentMethods':adyenPaymentMethodsResponse},
-                onChange: $.proxy(me.handleOnChange, me)
+                onChange: $.proxy(me.handleOnChange, me),
+                showPayButton: false
             };
             me.saveAdyenConfigInSession(me.adyenConfiguration);
         },
@@ -321,10 +322,10 @@
                 adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
             }
 
-            if ('paywithgoogle' === paymentMethod.adyenType) {
+            if (paymentMethod.adyenType === 'paywithgoogle' || paymentMethod.adyenType === 'onlineBanking_PL') {
                 me.setConfig();
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
-                me.handleComponentPayWithGoogle();
+                me.handleComponentEnableSubmit();
                 return;
             }
 
@@ -332,7 +333,7 @@
                 .create(adyenCheckoutData.cardType, adyenCheckoutData.paymentMethodData)
                 .mount('#' + me.getCurrentComponentId(me.selectedPaymentElementId));
         },
-        handleComponentPayWithGoogle: function () {
+        handleComponentEnableSubmit: function () {
             var me = this;
             $(me.opts.paymentMethodFormSubmitSelector).removeClass('is--disabled');
         },
