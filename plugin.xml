@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.9.1</version>
+    <version>3.9.2</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -441,6 +441,16 @@
         <changes lang="de">
             * Fix: Missing credit card payment method for Sweden billing addresses
             * Optimize: Handling of the invalid Webhook requests
+        </changes>
+    </changelog>
+    <changelog version="3.9.2">
+        <changes lang="en">
+            * Optimize: Add compatibility with Online Banking PL payment method
+            * Optimize: Handling of redirect payment request from Adyen
+        </changes>
+        <changes lang="de">
+            * Optimize: Add compatibility with Online Banking PL payment method
+            * Optimize: Handling of redirect payment request from Adyen
         </changes>
     </changelog>
 </plugin>
