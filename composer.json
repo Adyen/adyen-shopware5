@@ -30,8 +30,7 @@
         "php": "^7.2|^7.4|^8.0",
         "ext-json": "*",
         "ext-zip": "*",
-        "adyen/php-api-library": "^10.0",
-        "monolog/monolog": "1.25.3"
+        "adyen/php-api-library": "^10.0"
     },
     "require-dev": {
         "phpro/grumphp-shim": "^1.5"
