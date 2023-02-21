@@ -10,6 +10,7 @@ use AdyenPayment\Components\Payload\PaymentContext;
 use AdyenPayment\Components\Payload\PaymentPayloadProvider;
 use Enlight_Event_Exception;
 use Enlight_Exception;
+use Psr\Log\LoggerInterface;
 use Shopware\Models\Order\Detail;
 use Zend_Db_Adapter_Exception;
 
@@ -18,12 +19,18 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
     /** @var PriceCalculationService */
     private $priceCalculationService;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /** @var Currency */
     private $adyenCurrency;
 
-    public function __construct(PriceCalculationService $priceCalculationService)
-    {
+    public function __construct(
+        PriceCalculationService $priceCalculationService,
+        LoggerInterface $logger
+    ) {
         $this->priceCalculationService = $priceCalculationService;
+        $this->logger = $logger;
         $this->adyenCurrency = new Currency();
     }
 
@@ -49,6 +56,14 @@ class LineItemsInfoProvider implements PaymentPayloadProvider
 
         /** @var Detail $detail */
         foreach ($context->getOrder()->getDetails() as $detail) {
+            if (empty($detail->getArticleName())) {
+                $this->logger->warning(
+                    sprintf('Skipped order detail of order #%s - empty article name.', $context->getOrder()->getId())
+                );
+
+                continue;
+            }
+
             $orderLines[] = [
                 'quantity' => $detail->getQuantity(),
                 'amountExcludingTax' => $this->adyenCurrency->sanitize(

@@ -74,6 +74,7 @@
         <service id="AdyenPayment\Components\Payload\Providers\BrowserInfoProvider"/>
         <service id="AdyenPayment\Components\Payload\Providers\LineItemsInfoProvider">
             <argument type="service" id="AdyenPayment\Components\Calculator\PriceCalculationService"/>
+            <argument type="service" id="adyen_payment.logger"/>
         </service>
         <service id="AdyenPayment\Components\Payload\Providers\OrderInfoProvider"/>
         <service id="AdyenPayment\Components\Payload\Providers\PaymentMethodProvider"/>
