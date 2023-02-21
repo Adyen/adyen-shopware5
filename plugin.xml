@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.9.3</version>
+    <version>3.9.4</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -459,6 +459,14 @@
         </changes>
         <changes lang="de">
             * Optimize: Remove unnecessary third-party dependencies from plugin
+        </changes>
+    </changelog>
+    <changelog version="3.9.4">
+        <changes lang="en">
+            * Optimize: Handling empty order lines for Klarna payment requests
+        </changes>
+        <changes lang="de">
+            * Optimize: Handling empty order lines for Klarna payment requests
         </changes>
     </changelog>
 </plugin>
