@@ -76,6 +76,8 @@ final class EnrichUmbrellaPaymentMeanSubscriber implements SubscriberInterface
         $userData = $subject->View()->getAssign('sUserData');
         $userData['additional']['payment'] = $paymentMean->getRaw();
         $subject->View()->assign('sUserData', $userData);
-        $subject->View()->assign('sFormData', ['payment' => $paymentMean->getValue('stored_method_umbrella_id')]);
+        $formData = $subject->View()->getAssign('sFormData');
+        $formData['payment'] = $paymentMean->getValue('stored_method_umbrella_id');
+        $subject->View()->assign('sFormData', $formData);
     }
 }

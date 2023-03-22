@@ -16,7 +16,6 @@ final class HideStoredPaymentsSubscriber implements SubscriberInterface
     {
         return [
             'Enlight_Controller_Action_PostDispatchSecure_Backend_Payment' => '__invoke',
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_Shipping' => '__invoke',
         ];
     }
 

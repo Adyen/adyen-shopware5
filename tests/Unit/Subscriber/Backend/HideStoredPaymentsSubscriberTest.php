@@ -32,7 +32,6 @@ final class HideStoredPaymentsSubscriberTest extends SubscriberTestCase
         self::assertEquals(
             [
                 'Enlight_Controller_Action_PostDispatchSecure_Backend_Payment' => '__invoke',
-                'Enlight_Controller_Action_PostDispatchSecure_Backend_Shipping' => '__invoke',
             ],
             HideStoredPaymentsSubscriber::getSubscribedEvents()
         );

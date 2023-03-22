@@ -12,6 +12,8 @@ use Enlight_Components_Session_Namespace;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use sAdmin;
+use Shopware_Components_Modules;
 
 final class PersistStoredMehtodIdSubscriberTest extends SubscriberTestCase
 {
@@ -23,10 +25,15 @@ final class PersistStoredMehtodIdSubscriberTest extends SubscriberTestCase
     /** @var Enlight_Components_Session_Namespace|ObjectProphecy */
     private $session;
 
+    /** @var ObjectProphecy|Shopware_Components_Modules */
+    private $modules;
+
     protected function setUp(): void
     {
         $this->session = $this->prophesize(Enlight_Components_Session_Namespace::class);
-        $this->subscriber = new PersistStoredMethodIdSubscriber($this->session->reveal());
+        $this->modules = $this->prophesize(Shopware_Components_Modules::class);
+        $this->modules->Admin()->willReturn($this->prophesize(sAdmin::class));
+        $this->subscriber = new PersistStoredMethodIdSubscriber($this->session->reveal(), $this->modules->reveal());
     }
 
     /** @test */

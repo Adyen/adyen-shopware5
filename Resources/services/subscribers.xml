@@ -108,6 +108,7 @@
         </service>
         <service id="AdyenPayment\Subscriber\Checkout\PersistStoredMethodIdSubscriber">
             <argument type="service" id="session"/>
+            <argument type="service" id="modules"/>
             <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Applepay\MerchantAssociation\RegisterUrlCountSubscriber">

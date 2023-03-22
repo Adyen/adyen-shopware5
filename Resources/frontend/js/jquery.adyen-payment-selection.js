@@ -76,7 +76,10 @@
              */
             adyenSnippets: {
                 updatePaymentInformation: 'Update your payment information'
-            }
+            },
+            paymentMeanChangerSelector: 'input[type=radio][name=payment], label[for^=payment_mean]',
+            shippingChangerSelector: 'input[type=radio][name=sDispatch], label[for^=confirm_dispatch]',
+            storedPaymentMethodSelector: 'input[type=hidden][name=adyenStoredPaymentMethodId]',
         },
 
         selectedPaymentElementId: '',
@@ -103,6 +106,9 @@
             var me = this;
 
             $(document).on('submit', me.opts.formSelector, $.proxy(me.onPaymentFormSubmit, me));
+            $(document).on('mousedown', me.opts.paymentMeanChangerSelector, $.proxy(me.onPaymentMethodBeforeChange, me));
+            $(document).on('mousedown', me.opts.shippingChangerSelector, $.proxy(me.onShippingBeforeChange, me));
+
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
         },
@@ -117,7 +123,7 @@
             this.handleApplePayVisibility();
             $(this.opts.shippingPaymentContentSelector).removeClass('adyen-hidden--all');
         },
-        hideAllAdyenPaymentMethods: function() {
+        hideAllAdyenPaymentMethods: function () {
             this.hideStoredAdyenPaymentMethods();
             this.hideAdyenPaymentMethods();
         },
@@ -144,14 +150,14 @@
                 return;
             }
 
-            var applePayMethod = me.opts.enrichedPaymentMethods.filter(function(enrichedPaymentMethod) {
+            var applePayMethod = me.opts.enrichedPaymentMethods.filter(function (enrichedPaymentMethod) {
                 return enrichedPaymentMethod.adyenType === me.opts.applePayType;
             })[0] || {};
             if (!applePayMethod) {
                 return;
             }
 
-            $('#payment_mean'+applePayMethod.id).parents(this.opts.paymentMethodSelector).addClass('adyen-hidden--all');
+            $('#payment_mean' + applePayMethod.id).parents(this.opts.paymentMethodSelector).addClass('adyen-hidden--all');
         },
         onPaymentFormSubmit: function (e) {
             var me = this;
@@ -162,12 +168,40 @@
             }
             var $paymentElement = $('#' + me.selectedPaymentElementId)[0];
             var paymentMethod = this.getPaymentMethodById($paymentElement.value);
-            if(paymentMethod.isStoredPayment){
+            if (paymentMethod.isStoredPayment) {
                 $formSubmit.append(
-                    $('<input type="hidden" name="adyenStoredMethodId" value="'+paymentMethod.stored_method_id+'"/>')
+                    $('<input type="hidden" name="adyenStoredMethodId" value="' + paymentMethod.stored_method_id + '"/>')
                 );
             }
             $paymentElement.value = paymentMethod.id;
+        },
+        onPaymentMethodBeforeChange: function (event) {
+            let me = this,
+                $paymentElement = $('#' + event.target.id)[0],
+                paymentMethod = this.getPaymentMethodById($paymentElement.value);
+
+            me.updateStoredMethodId(paymentMethod);
+        },
+
+        onShippingBeforeChange: function (event) {
+            let me = this,
+                $paymentElement = $('#' + event.target.id)[0],
+                paymentMethod = this.getPaymentMethodById($paymentElement.value);
+
+            me.updateStoredMethodId(paymentMethod);
+        },
+        updateStoredMethodId: function (selectedPaymentMeanEl) {
+            let me = this,
+                $formSubmit = $(me.opts.paymentMethodFormSubmitSelector),
+                storedPaymentMethodEl = $(me.opts.storedPaymentMethodSelector);
+
+            if (storedPaymentMethodEl.data("adyen-payment-method")) {
+                storedPaymentMethodEl.val(selectedPaymentMeanEl.data('adyen-stored_payment_method_id'));
+            } else {
+                $formSubmit.append(
+                    $('<input type="hidden" name="adyenStoredMethodId" value="' + selectedPaymentMeanEl.stored_method_id + '"/>')
+                );
+            }
         },
         isPaymentElement: function (elementId) {
             return $('#' + elementId).parents(this.opts.paymentMethodSelector).length > 0;
@@ -249,7 +283,7 @@
                 locale: me.opts.shopLocale,
                 environment: me.opts.adyenEnvironment,
                 clientKey: me.opts.adyenClientKey,
-                paymentMethodsResponse: {'paymentMethods':adyenPaymentMethodsResponse},
+                paymentMethodsResponse: {'paymentMethods': adyenPaymentMethodsResponse},
                 onChange: $.proxy(me.handleOnChange, me),
                 showPayButton: false
             };
@@ -285,7 +319,7 @@
         getPaymentMethodById: function (id) {
             var me = this;
 
-            return me.opts.enrichedPaymentMethods.filter(function(paymentMethod) {
+            return me.opts.enrichedPaymentMethods.filter(function (paymentMethod) {
                 return paymentMethod.id === id || (
                     paymentMethod.isStoredPayment === true
                     && (paymentMethod.stored_method_id === id || paymentMethod.stored_method_umbrella_id === id));
@@ -541,7 +575,7 @@
         __canHandlePayment: function (paymentMethod) {
             var me = this;
 
-            if (!me.__isAdyenPaymentMethod(paymentMethod))  {
+            if (!me.__isAdyenPaymentMethod(paymentMethod)) {
                 return false;
             }
 
@@ -587,7 +621,7 @@
                 return $.extend(true, {}, defaultData, {
                     paymentMethodData: {
                         amount: {
-                            'value': (Number(me.opts.adyenOrderTotal)*100).toString(),
+                            'value': (Number(me.opts.adyenOrderTotal) * 100).toString(),
                             'currency': (me.opts.adyenOrderCurrency).toString()
                         }
                     }
