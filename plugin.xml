@@ -469,4 +469,12 @@
             * Optimize: Handling empty order lines for Klarna payment requests
         </changes>
     </changelog>
+    <changelog version="3.9.5">
+        <changes lang="en">
+            * Fix: Fix issue with shipping method selection when stored payment method is selected.
+        </changes>
+        <changes lang="de">
+            * Fix: Fix issue with shipping method selection when stored payment method is selected.
+        </changes>
+    </changelog>
 </plugin>
