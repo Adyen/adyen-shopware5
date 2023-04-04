@@ -72,6 +72,14 @@
              */
             applePayType: 'applepay',
             /**
+             * @type {string} Adyen payment method type for GooglePay
+             */
+            googlePayType: 'paywithgoogle',
+            /**
+             * @type {string} Adyen payment method type for ApplePay
+             */
+            onlineBankingPLType: 'onlineBanking_PL',
+            /**
              * @type {string} Snippets associated with the payment page
              */
             adyenSnippets: {
@@ -350,13 +358,9 @@
 
             var adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
 
-            if (this.__isApplePayPaymentMethod(paymentMethod)) {
-                me.setConfig();
-                me.setPaymentSession(me.__buildMinimalState(paymentMethod));
-                adyenCheckoutData = me.__buildCheckoutComponentData(paymentMethod);
-            }
-
-            if (paymentMethod.adyenType === 'paywithgoogle' || paymentMethod.adyenType === 'onlineBanking_PL') {
+            if (this.__isPaymentMethodType(paymentMethod, me.opts.applePayType) ||
+                this.__isPaymentMethodType(paymentMethod, me.opts.googlePayType) ||
+                this.__isPaymentMethodType(paymentMethod, me.opts.onlineBankingPLType)) {
                 me.setConfig();
                 me.setPaymentSession(me.__buildMinimalState(paymentMethod));
                 me.handleComponentEnableSubmit();
@@ -526,13 +530,12 @@
         /**
          *
          * @param {object} paymentMethod
+         * @param {string} paymentMethodType
          * @return {boolean}
          * @private
          */
-        __isApplePayPaymentMethod: function (paymentMethod) {
-            var me = this;
-
-            return me.opts.applePayType === paymentMethod.adyenType;
+        __isPaymentMethodType: function (paymentMethod, paymentMethodType) {
+            return paymentMethodType === paymentMethod.adyenType;
         },
         /**
          * @return {boolean}
@@ -615,9 +618,8 @@
                 });
             }
 
-            if (this.__isApplePayPaymentMethod(paymentMethod)) {
-                var me = this;
-
+            var me = this;
+            if (this.__isPaymentMethodType(paymentMethod, me.opts.applePayType)) {
                 return $.extend(true, {}, defaultData, {
                     paymentMethodData: {
                         amount: {

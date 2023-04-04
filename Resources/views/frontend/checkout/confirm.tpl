@@ -32,6 +32,9 @@
     {if $sAdyenGoogleConfig}
         data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
     {/if}
+    {if $sAdyenApplePayConfig}
+        data-adyenApplePayConfig='{$sAdyenApplePayConfig}'
+    {/if}
     {if $adyenPaymentState}
         data-adyenPaymentState='{$adyenPaymentState}'
     {/if}

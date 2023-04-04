@@ -75,6 +75,10 @@
             <argument type="service" id="AdyenPayment\Components\WebComponents\GooglePayConfigProvider"/>
             <tag name="shopware.event_subscriber"/>
         </service>
+        <service id="AdyenPayment\Subscriber\Checkout\AddApplePayConfigToViewSubscriber">
+            <argument type="service" id="AdyenPayment\Components\WebComponents\ApplePayConfigProvider"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
         <service id="AdyenPayment\Subscriber\Checkout\RegisterConfirmSnippetsSubscriber">
             <argument type="service" id="snippets"/>
             <tag name="shopware.event_subscriber"/>

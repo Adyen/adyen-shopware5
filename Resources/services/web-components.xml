@@ -6,5 +6,6 @@
         <service id="AdyenPayment\Components\WebComponents\GooglePayConfigProvider" public="true">
             <argument type="service" id="AdyenPayment\Components\Configuration" />
         </service>
+        <service id="AdyenPayment\Components\WebComponents\ApplePayConfigProvider" public="true"/>
     </services>
 </container>

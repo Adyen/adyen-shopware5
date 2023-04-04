@@ -24,6 +24,7 @@
             confirmFormSelector: '#confirm--form',
             adyenType: '',
             adyenGoogleConfig: {},
+            adyenApplePayConfig: {},
             adyenPaymentState: {},
             adyenIsAdyenPayment: false,
             adyenConfigAjaxUrl: '/frontend/adyenconfig/index',
@@ -38,6 +39,7 @@
                 errorTransactionUnknown: 'Your transaction was cancelled due to an unknown reason.',
                 errorTransactionNoSession: 'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
                 errorGooglePayNotAvailable: 'Google Pay is currently not available.',
+                errorApplePayNotAvailable: 'Apple Pay is currently not available.'
             },
         },
         paymentMethodSession: 'paymentMethod',
@@ -224,40 +226,53 @@
         handleCheckoutButton: function () {
             var me = this;
 
-            if (me.opts.adyenType === 'paywithgoogle') {
-                me.replaceCheckoutButtonForGooglePay();
+            var paymentMethodsConfig = {
+                'paywithgoogle': {
+                    config: me.opts.adyenGoogleConfig,
+                    errorMessage: me.opts.adyenSnippets.errorGooglePayNotAvailable
+                },
+                'applepay': {
+                    config: me.opts.adyenApplePayConfig,
+                    errorMessage: me.opts.adyenSnippets.errorApplePayNotAvailable
+                }
+            };
+
+            if (paymentMethodsConfig.hasOwnProperty(me.opts.adyenType)) {
+                var paymentMethodConfig = paymentMethodsConfig[me.opts.adyenType];
+                me.replaceCheckoutButton(me.opts.adyenType, paymentMethodConfig.config, paymentMethodConfig.errorMessage);
             }
         },
-        replaceCheckoutButtonForGooglePay: function () {
+        replaceCheckoutButton: function (paymentMethod, config, errorMessage) {
             var me = this;
 
-            if (0 === Object.keys(me.opts.adyenGoogleConfig).length) {
-                this.addAdyenError(me.opts.adyenSnippets.errorGooglePayNotAvailable);
-                console.error('Adyen: Missing google configuration');
+            if (0 === Object.keys(config).length) {
+                this.addAdyenError(errorMessage);
+                console.error('Adyen: Missing ' + paymentMethod + ' configuration');
                 return;
             }
 
+            var paymentButtonContainer = paymentMethod + '-container';
             var orderButton = $(me.opts.placeOrderSelector);
             orderButton.parent().append(
                 $('<div />')
-                    .attr('id', 'AdyenGooglePayButton')
+                    .attr('id', paymentButtonContainer)
                     .addClass('right')
             );
             orderButton.remove();
 
-            me.opts.adyenGoogleConfig.onSubmit = function (state, component) {
+            config.onSubmit = function (state, component) {
                 me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
                 me.onPlaceOrder();
             };
 
-            var googlepay = me.adyenCheckout.create("paywithgoogle", me.opts.adyenGoogleConfig);
-            googlepay
+            var component = me.adyenCheckout.create(paymentMethod, config);
+            component
                 .isAvailable()
                 .then(function () {
-                    googlepay.mount("#AdyenGooglePayButton");
+                    component.mount('#' + paymentButtonContainer);
                 })
                 .catch(function (e) {
-                    this.addAdyenError(me.opts.adyenSnippets.errorGooglePayNotAvailable);
+                    me.addAdyenError(errorMessage);
                 });
         },
         addAdyenError: function (message) {
