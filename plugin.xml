@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.9.5</version>
+    <version>3.9.6</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -475,6 +475,14 @@
         </changes>
         <changes lang="de">
             * Fix: Fix issue with shipping method selection when stored payment method is selected.
+        </changes>
+    </changelog>
+    <changelog version="3.9.6">
+        <changes lang="en">
+            * Fix: Add support for Apple Pay payment method.
+        </changes>
+        <changes lang="de">
+            * Fix: Add support for Apple Pay payment method.
         </changes>
     </changelog>
 </plugin>
