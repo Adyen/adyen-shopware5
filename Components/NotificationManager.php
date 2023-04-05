@@ -78,18 +78,20 @@ class NotificationManager
      *
      * @return mixed|null
      */
-    public function getLastNotificationForPspReference(string $pspReference)
+    public function getAuthorisationNotificationForOrderId(int $orderId)
     {
         try {
-            $lastNotification = $this->notificationRepository->createQueryBuilder('n')
-                ->where('n.pspReference = :pspReference')
+            $notification = $this->notificationRepository->createQueryBuilder('n')
+                ->where('n.orderId = :orderId')
+                ->andWhere('n.eventCode = :eventCode')
                 ->setMaxResults(1)
                 ->orderBy('n.createdAt', 'ASC')
-                ->setParameter('pspReference', $pspReference)
+                ->setParameter('orderId', $orderId)
+                ->setParameter('eventCode', 'AUTHORISATION')
                 ->getQuery()
                 ->getSingleResult();
 
-            return $lastNotification;
+            return $notification;
         } catch (NoResultException $ex) {
             return;
         }

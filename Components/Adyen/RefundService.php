@@ -12,6 +12,7 @@ use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
 use AdyenPayment\Models\Refund;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
 
@@ -75,14 +76,14 @@ class RefundService
         return $orderRefund;
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     private function provideNotification(int $orderId): Notification
     {
         /** @var PaymentInfo $paymentInfo */
         $paymentInfo = $this->paymentInfoRepository->findOneBy(['orderId' => $orderId]);
-        if ($paymentInfo && '' !== $paymentInfo->getPspReference()) {
-            return $this->notificationManager->getLastNotificationForPspReference($paymentInfo->getPspReference());
-        }
 
-        return $this->notificationManager->getLastNotificationForOrderId($orderId);
+        return $this->notificationManager->getAuthorisationNotificationForOrderId($paymentInfo->getOrderId());
     }
 }
