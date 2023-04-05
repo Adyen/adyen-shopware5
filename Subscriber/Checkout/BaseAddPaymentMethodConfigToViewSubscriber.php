@@ -22,10 +22,10 @@ abstract class BaseAddPaymentMethodConfigToViewSubscriber implements SubscriberI
     protected $paymentMethodConfigProvider;
 
     /** @var PaymentType */
-    protected PaymentType $paymentType;
+    protected $paymentType;
 
     /** @var string */
-    protected string $paymentConfigViewKey;
+    protected $paymentConfigViewKey;
 
     public function __construct(ConfigProvider $paymentMethodConfigProvider)
     {
@@ -56,7 +56,6 @@ abstract class BaseAddPaymentMethodConfigToViewSubscriber implements SubscriberI
         if (!$basket) {
             return;
         }
-
 
         $paymentType = $paymentMean->adyenType();
         if (!$paymentType || !$paymentType->equals($this->getPaymentType())) {
