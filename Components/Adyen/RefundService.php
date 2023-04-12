@@ -9,9 +9,7 @@ use Adyen\Service\Modification;
 use AdyenPayment\AdyenApi\HttpClient\ClientMemoise;
 use AdyenPayment\Components\NotificationManager;
 use AdyenPayment\Models\Notification;
-use AdyenPayment\Models\PaymentInfo;
 use AdyenPayment\Models\Refund;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
@@ -27,9 +25,6 @@ class RefundService
     /** @var NotificationManager */
     private $notificationManager;
 
-    /** @var EntityRepository */
-    private $paymentInfoRepository;
-
     public function __construct(
         ClientMemoise $apiClientMap,
         ModelManager $modelManager,
@@ -38,7 +33,6 @@ class RefundService
         $this->apiClientMap = $apiClientMap;
         $this->modelManager = $modelManager;
         $this->notificationManager = $notificationManager;
-        $this->paymentInfoRepository = $modelManager->getRepository(PaymentInfo::class);
     }
 
     /**
@@ -81,9 +75,6 @@ class RefundService
      */
     private function provideNotification(int $orderId): Notification
     {
-        /** @var PaymentInfo $paymentInfo */
-        $paymentInfo = $this->paymentInfoRepository->findOneBy(['orderId' => $orderId]);
-
-        return $this->notificationManager->getAuthorisationNotificationForOrderId($paymentInfo->getOrderId());
+        return $this->notificationManager->getAuthorisationNotificationForOrderId($orderId);
     }
 }
