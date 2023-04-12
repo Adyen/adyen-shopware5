@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.9.6</version>
+    <version>3.9.7</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -483,6 +483,14 @@
         </changes>
         <changes lang="de">
             * Fix: Add support for Apple Pay payment method.
+        </changes>
+    </changelog>
+    <changelog version="3.9.7">
+        <changes lang="en">
+            * Fix: Fix full refund not working due to wrong PSP reference being sent in refund request.
+        </changes>
+        <changes lang="de">
+            * Fix: Fix full refund not working due to wrong PSP reference being sent in refund request.
         </changes>
     </changelog>
 </plugin>
