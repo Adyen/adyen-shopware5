@@ -31,6 +31,7 @@ final class PaymentFactory implements PaymentFactoryInterface
     {
         $new = new Payment();
         $new->setActive(true);
+        $new->setEsdActive(true);
         $new->setName($paymentMethod->code());
         $new->setDescription($paymentMethod->name());
         $new->setAdditionalDescription($this->provideAdditionalDescription($paymentMethod));

@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace AdyenPayment;
 
 use AdyenPayment\Components\CompilerPass\NotificationProcessorCompilerPass;
+use AdyenPayment\Components\ShopwareVersionCheck;
 use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
 use AdyenPayment\Models\Notification;
 use AdyenPayment\Models\PaymentInfo;
@@ -73,6 +74,7 @@ final class AdyenPayment extends Plugin
 
         $loader->load(__DIR__.'/Resources/services/*.xml');
 
+        /** @var ShopwareVersionCheck $versionCheck */
         $versionCheck = $container->get('adyen_payment.components.shopware_version_check');
         if ($versionCheck && $versionCheck->isHigherThanShopwareVersion('v5.6.2')) {
             $loader->load(__DIR__.'/Resources/services/version/563/*.xml');
@@ -99,11 +101,16 @@ final class AdyenPayment extends Plugin
         $this->installAttributes();
         $this->installStoredPaymentUmbrella($context);
 
+        if (version_compare($context->getCurrentVersion(), '3.9.7', '<=')) {
+            $this->activatePaymentsForEsd();
+        }
+
         $tool = new SchemaTool($this->container->get('models'));
         $classes = $this->getModelMetaData();
         $tool->updateSchema($classes, true);
 
         $context->scheduleClearCache(InstallContext::CACHE_LIST_FRONTEND);
+
         parent::update($context);
     }
 
@@ -204,6 +211,7 @@ final class AdyenPayment extends Plugin
 
         $payment = new Payment();
         $payment->setActive(true);
+        $payment->setEsdActive(true);
         $payment->setName(self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE);
         $payment->setSource(SourceType::adyen()->getType());
         $payment->setHide(true);
@@ -227,10 +235,20 @@ final class AdyenPayment extends Plugin
         if (null !== $paymentId && !$paymentInDb['active']) {
             $database->update(
                 's_core_paymentmeans',
-                ['active' => true],
+                ['active' => true, 'esdactive' => true],
                 ['id = ?' => $paymentId]
             );
         }
+    }
+
+    private function activatePaymentsForEsd(): void
+    {
+        $database = $this->container->get('db');
+        $database->update(
+            's_core_paymentmeans',
+            ['esdactive' => true],
+            ['source = ?' => SourceType::adyen()->getType()]
+        );
     }
 }
 
