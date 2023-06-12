@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.9.7</version>
+    <version>3.9.8</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -491,6 +491,14 @@
         </changes>
         <changes lang="de">
             * Fix: Fix full refund not working due to wrong PSP reference being sent in refund request.
+        </changes>
+    </changelog>
+    <changelog version="3.9.8">
+        <changes lang="en">
+            * Fix: Add support for ESD items
+        </changes>
+        <changes lang="de">
+            * Fix: Add support for ESD items
         </changes>
     </changelog>
 </plugin>
