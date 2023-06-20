@@ -88,6 +88,7 @@
             paymentMeanChangerSelector: 'input[type=radio][name=payment], label[for^=payment_mean]',
             shippingChangerSelector: 'input[type=radio][name=sDispatch], label[for^=confirm_dispatch]',
             storedPaymentMethodSelector: 'input[type=hidden][name=adyenStoredPaymentMethodId]',
+            activePaymentMeanSelector: 'input[type=radio][name=payment][checked]',
         },
 
         selectedPaymentElementId: '',
@@ -117,7 +118,6 @@
             $(document).on('mousedown', me.opts.paymentMeanChangerSelector, $.proxy(me.onPaymentMethodBeforeChange, me));
             $(document).on('mousedown', me.opts.shippingChangerSelector, $.proxy(me.onShippingBeforeChange, me));
 
-            $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChangedBefore'), $.proxy(me.onPaymentChangedBefore, me));
             $.subscribe(me.getEventName('plugin/swShippingPayment/onInputChanged'), $.proxy(me.onPaymentChangedAfter, me));
         },
         handleVisibility: function () {
@@ -214,11 +214,12 @@
         isPaymentElement: function (elementId) {
             return $('#' + elementId).parents(this.opts.paymentMethodSelector).length > 0;
         },
-        onPaymentChangedBefore: function ($event) {
-            var me = this;
+        onPaymentChangedAfter: function () {
+            var me = this,
+                selectedPaymentMeanEl = $(me.opts.activePaymentMeanSelector).first();
 
             var previousSelectedPaymentElementId = me.selectedPaymentElementId;
-            var selectedPaymentElementId = event.target.id;
+            var selectedPaymentElementId = selectedPaymentMeanEl.attr('id');
 
             // only update when switching payment-methods (not on shipping methods)
             if (!me.isPaymentElement(selectedPaymentElementId)) {
@@ -227,21 +228,13 @@
 
             me.selectedPaymentElementId = selectedPaymentElementId;
 
-            var elementValue = $(event.target).val();
+            var elementValue = selectedPaymentMeanEl.val();
             var paymentMethod = this.getPaymentMethodById(elementValue);
             me.selectedPaymentId = paymentMethod.isStoredPayment ? paymentMethod.stored_method_id : elementValue;
-
-            var paymentMethodSession = this.getPaymentSession();
-            if (0 === Object.keys(paymentMethodSession).length) {
-                return;
-            }
 
             if (previousSelectedPaymentElementId !== me.selectedPaymentElementId) {
                 me.clearPaymentSession();
             }
-        },
-        onPaymentChangedAfter: function () {
-            var me = this;
 
             me.handleVisibility();
 
