@@ -1,6 +1,6 @@
 {
     "name": "adyen/adyen-shopware5",
-    "description": "Adyen plugin Shopware 5",
+    "description": "Adyen plugin Shopware 5", 
     "type": "shopware-plugin",
     "keywords": [
         "adyen",
