@@ -1,133 +1,93 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
     <services>
-        <!-- Backend Subscribers -->
-        <service id="AdyenPayment\Subscriber\Backend\ExtendViewTemplateSubscriber">
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Backend\BackendJavascriptSubscriber">
+        <service id="adyen_payment.subscriber.controller_path" class="AdyenPayment\Subscriber\ControllerPath">
             <argument>%adyen_payment.plugin_dir%</argument>
-            <argument type="expression">service('models').getRepository('AdyenPayment\\Models\\Notification')</argument>
-            <tag name="shopware.event_subscriber"/>
+            <tag name="shopware.event_subscriber" />
         </service>
-        <service id="AdyenPayment\Subscriber\Backend\BackendOrderSubscriber">
-            <argument type="expression">service('models').getRepository('AdyenPayment\\Models\\PaymentInfo')</argument>
-            <argument type="service" id="AdyenPayment\Components\NotificationManager"/>
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Backend\ImportSubShopPaymentMethodsSubscriber">
-            <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
-            <argument type="service" id="AdyenPayment\Rule\AdyenApi\IsMainShopConfigRule"/>
-            <argument type="service" id="AdyenPayment\Dbal\Writer\Payment\PaymentMeansSubShopsWriter"/>
-            <argument type="service" id="AdyenPayment\Import\PaymentMethodImporter" />
-            <tag name="shopware.event_subscriber"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Backend\RemoveSubShopPaymentMethodSubscriber">
-            <argument type="service" id="AdyenPayment\Dbal\Remover\PaymentMeanSubShopRemover" />
-            <tag name="shopware.event_subscriber"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Applepay\MerchantAssociation\PerformanceLoaderSubscriber">
+        <service id="adyen_payment.subscribers.template_registration" class="AdyenPayment\Subscriber\TemplateRegistration">
             <argument>%adyen_payment.plugin_dir%</argument>
+            <argument type="service" id="template"/>
+            <argument type="service" id="snippets"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="adyen_payment.subscribers.backend_index" class="AdyenPayment\Subscriber\Backend\BackendIndex">
+            <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Backend\HideStoredPaymentsSubscriber">
             <tag name="shopware.event_subscriber"/>
         </service>
-
-        <!-- Frontend Subscribers -->
-        <service id="AdyenPayment\Subscriber\AddPluginTemplatesSubscriber">
-            <argument>%adyen_payment.plugin_dir%</argument>
-            <argument type="service" id="template"/>
+        <service id="AdyenPayment\Subscriber\Backend\OrderUpdate">
+            <argument type="service" id="AdyenPayment\Repositories\Wrapper\OrderRepository"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="adyen_payment.subscribers.bootstrap_registration" class="AdyenPayment\Subscriber\BootstrapRegistration">
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\AddErrorMessageToView">
+            <argument type="service" id="AdyenPayment\Components\ErrorMessageProvider"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\AssignPaymentMethodStateDataToSession">
+            <argument type="service" id="session"/>
             <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\EnrichPaymentSubscriber">
-            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider" />
-            <argument type="service" id="AdyenPayment\Shopware\Serializer\SwPaymentMeanCollectionSerializer" />
+            <argument type="service" id="AdyenPayment\Components\PaymentMeansEnricher"/>
             <tag name="shopware.event_subscriber"/>
         </service>
-        <service id="AdyenPayment\Subscriber\OrderEmailSubscriber">
-            <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="models"/>
-            <argument type="service" id="AdyenPayment\Components\OrderMailService"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\AddStoredMethodIdOnOrderSubscriber">
-            <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="models"/>
-            <argument type="service" id="session"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\CheckoutSubscriber">
-            <tag name="shopware.event_subscriber"/>
-            <argument type="service" id="AdyenPayment\Components\Configuration"/>
-            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethodService"/>
-            <argument type="service" id="AdyenPayment\Components\DataConversion" />
-            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider"/>
-            <argument type="service" id="AdyenPayment\Components\Adyen\Builder\PaymentMethodOptionsBuilder"/>
-            <argument type="service" id="AdyenPayment\Shopware\Serializer\SwPaymentMeanCollectionSerializer"/>
-            <argument type="service" id="AdyenPayment\Shopware\Provider\CheckoutBasketProvider"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Checkout\AddAdyenSourceTypeToViewSubscriber">
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Checkout\AddGooglePayConfigToViewSubscriber">
-            <argument type="service" id="AdyenPayment\Components\WebComponents\GooglePayConfigProvider"/>
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Checkout\AddApplePayConfigToViewSubscriber">
-            <argument type="service" id="AdyenPayment\Components\WebComponents\ApplePayConfigProvider"/>
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Checkout\RegisterConfirmSnippetsSubscriber">
-            <argument type="service" id="snippets"/>
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Checkout\RegisterPaymentSnippetsSubscriber">
-            <argument type="service" id="snippets"/>
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Notification\LogIncomingNotificationSubscriber">
-            <argument type="service" id="adyen_payment.logger.notifications"/>
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Notification\UpdateOrderPsPSubscriber">
-            <argument type="service" id="AdyenPayment\Components\Manager\OrderManager"/>
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Checkout\AddErrorMessageToViewSubscriber">
-            <argument type="service" id="AdyenPayment\Session\ErrorMessageProvider"/>
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Checkout\EnrichUserAdditionalPaymentSubscriber">
-            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\EnrichedPaymentMeanProvider"/>
-            <argument type="service" id="AdyenPayment\Shopware\Provider\PaymentMeansProvider"/>
+        <service id="AdyenPayment\Subscriber\EnrichUserAdditionalPaymentSubscriber">
+            <argument type="service" id="AdyenPayment\Components\PaymentMeansEnricher"/>
             <argument type="service" id="session"/>
             <tag name="shopware.event_subscriber"/>
         </service>
-        <service id="AdyenPayment\Subscriber\Checkout\EnrichUmbrellaPaymentMeanSubscriber">
+        <service id="AdyenPayment\Subscriber\AssignStoredPaymentMethodToSession">
             <argument type="service" id="session"/>
-            <argument type="service" id="AdyenPayment\Shopware\Provider\PaymentMeansProvider"/>
             <tag name="shopware.event_subscriber"/>
         </service>
-        <service id="AdyenPayment\Subscriber\Checkout\PersistStoredMethodIdSubscriber">
-            <argument type="service" id="session"/>
-            <argument type="service" id="modules"/>
+        <service id="AdyenPayment\Subscriber\UpdateStoredPaymentMethodViewData">
             <tag name="shopware.event_subscriber"/>
         </service>
-        <service id="AdyenPayment\Subscriber\Applepay\MerchantAssociation\RegisterUrlCountSubscriber">
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\Account\SaveStoredMethodPreferenceSubscriber">
-            <argument type="service" id="session"/>
-            <argument type="service" id="AdyenPayment\Components\Manager\UserPreferenceManager"/>
-            <argument type="expression">service('models').getRepository('AdyenPayment\\Models\\UserPreference')</argument>
-            <argument type="service" id="AdyenPayment\Components\Adyen\PaymentMethod\StoredPaymentMeanProvider"/>
-            <tag name="shopware.event_subscriber"/>
-        </service>
-        <service id="AdyenPayment\Subscriber\EnrichUserPreferenceSubscriber">
+        <service id="AdyenPayment\Subscriber\AddStoredMethodUserPreferenceToView">
             <argument type="service" id="session"/>
             <argument type="expression">service('models').getRepository('AdyenPayment\\Models\\UserPreference')</argument>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\Account\SaveStoredMethodPreference">
+            <argument type="service" id="session"/>
+            <argument type="expression">service('models').getRepository('AdyenPayment\\Models\\UserPreference')</argument>
+            <argument type="service" id="models"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\LimitPercentageSurcharge">
+            <argument type="service" id="session"/>
+            <argument type="service" id="dbal_connection"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\FinishPageSubscriber">
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\OrderListHandler">
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\ExtendOrderDetailsHandler">
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\BackendOrderSubscriber">
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\AddExpressCheckoutToView">
+            <argument type="service" id="session"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\AddSeoUrlSubscriber">
+            <argument type="service" id="AdyenPayment\Components\ApplePay\SeoUrlWriter"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="AdyenPayment\Subscriber\ShopDeletedSubscriber">
             <tag name="shopware.event_subscriber"/>
         </service>
     </services>

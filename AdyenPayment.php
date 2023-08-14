@@ -1,45 +1,58 @@
 <?php
 
-declare(strict_types=1);
-
-//phpcs:disable PSR1.Files.SideEffects
-
 namespace AdyenPayment;
 
-use AdyenPayment\Components\CompilerPass\NotificationProcessorCompilerPass;
-use AdyenPayment\Components\ShopwareVersionCheck;
-use AdyenPayment\Models\Enum\PaymentMethod\SourceType;
-use AdyenPayment\Models\Notification;
-use AdyenPayment\Models\PaymentInfo;
-use AdyenPayment\Models\RecurringPayment\RecurringPaymentToken;
-use AdyenPayment\Models\Refund;
-use AdyenPayment\Models\TextNotification;
+use Adyen\Core\BusinessLogic\DataAccess\Connection\Entities\ConnectionSettings;
+use Adyen\Core\BusinessLogic\Domain\Connection\Repositories\ConnectionSettingsRepository;
+use Adyen\Core\BusinessLogic\Domain\Connection\Services\ConnectionService;
+use Adyen\Core\BusinessLogic\Domain\Integration\Order\OrderService as OrderServiceInterface;
+use Adyen\Core\BusinessLogic\Domain\Integration\Payment\ShopPaymentService;
+use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
+use Adyen\Core\BusinessLogic\Domain\Payment\Repositories\PaymentMethodConfigRepository;
+use Adyen\Core\Infrastructure\ORM\RepositoryRegistry;
+use Adyen\Core\Infrastructure\ServiceRegister;
+use Adyen\Core\Infrastructure\TaskExecution\QueueService;
+use Adyen\Core\BusinessLogic\Domain\Integration\Store\StoreService as StoreServiceInterface;
+use AdyenPayment\Bootstrap\Bootstrap;
+use AdyenPayment\Components\Integration\FileService;
+use AdyenPayment\Components\Integration\OrderService;
+use AdyenPayment\Components\Integration\PaymentMethodService;
+use AdyenPayment\Components\Integration\StoreService;
+use AdyenPayment\Components\UninstallService;
+use AdyenPayment\Models\AdyenEntity;
+use AdyenPayment\Models\NotificationsEntity;
+use AdyenPayment\Models\QueueEntity;
+use AdyenPayment\Models\TransactionLogEntity;
 use AdyenPayment\Models\UserPreference;
-use Doctrine\ORM\Tools\SchemaTool;
-use Shopware\Bundle\AttributeBundle\Service\TypeMapping;
-use Shopware\Components\Logger;
-use Shopware\Components\Model\ModelManager;
+use AdyenPayment\Repositories\Wrapper\OrderRepository;
+use AdyenPayment\Repositories\Wrapper\StoreRepository;
+use AdyenPayment\Setup\Updater;
+use Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
-use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\Context\UpdateContext;
-use Shopware\Models\Payment\Payment;
+use Shopware\Components\Plugin\PaymentInstaller;
+use Shopware\Models\Order\Order;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
-final class AdyenPayment extends Plugin
+/**
+ * Shopware-Plugin AdyenPayment.
+ */
+class AdyenPayment extends Plugin
 {
     public const NAME = 'AdyenPayment';
-    public const ADYEN_CODE = 'adyen_type';
-    public const ADYEN_STORED_PAYMENT_UMBRELLA_CODE = 'adyen_stored_payment_umbrella';
-    public const SESSION_ADYEN_PAYMENT_INFO_ID = 'adyenPaymentInfoId';
-    public const SESSION_ADYEN_STORED_METHOD_ID = 'adyenStoredMethodId';
+    public const PAYMENT_METHOD_SOURCE = 1425514;
+    public const STORED_PAYMENT_UMBRELLA_NAME = 'adyen_stored_payment_umbrella';
 
     public static function isPackage(): bool
     {
@@ -48,23 +61,131 @@ final class AdyenPayment extends Plugin
 
     public static function getPackageVendorAutoload(): string
     {
-        return __DIR__.'/vendor/autoload.php';
+        return __DIR__ . '/vendor/autoload.php';
     }
 
     /**
-     * @throws \Exception
+     * @param ContainerBuilder $container
      */
-    public function build(ContainerBuilder $container): void
+    public function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new NotificationProcessorCompilerPass());
+        $container->setParameter('adyen_payment.plugin_dir', $this->getPath());
+
         parent::build($container);
 
-        //set default logger level for 5.4
-        if (!$container->hasParameter('kernel.default_error_level')) {
-            $container->setParameter('kernel.default_error_level', Logger::ERROR);
+        $this->loadServices($container);
+    }
+
+    /**
+     * Adds the widget to the database and creates the database schema.
+     *
+     * @param Plugin\Context\InstallContext $installContext
+     */
+    public function install(Plugin\Context\InstallContext $installContext)
+    {
+        parent::install($installContext);
+
+        $this->container->get('shopware.snippet_database_handler')->loadToDatabase(
+                $this->getPath() . '/Resources/snippets/'
+        );
+
+        $this->updateSchema();
+        $this->installStoredPaymentUmbrella();
+
+        $installContext->scheduleClearCache(InstallContext::CACHE_LIST_FRONTEND);
+    }
+
+    public function update(UpdateContext $context): void
+    {
+        Bootstrap::init();
+
+        $this->container->get('shopware.snippet_database_handler')->loadToDatabase(
+                $this->getPath() . '/Resources/snippets/'
+        );
+
+        $this->updateSchema();
+
+        $updater = new Updater(
+            $context,
+            $this->container->get('shopware.plugin.cached_config_reader'),
+            ServiceRegister::getService(ConnectionService::class),
+            $this->container->get(StoreRepository::class),
+            ServiceRegister::getService(PaymentMethodConfigRepository::class),
+            $this->container->get('snippets'),
+            $this->container->get('cron'),
+            ServiceRegister::getService(QueueService::class),
+            ServiceRegister::getService(ConnectionSettingsRepository::class)
+        );
+        $updater->update();
+
+        $this->installStoredPaymentUmbrella();
+
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_FRONTEND);
+        $this->migrateLegacySchema();
+
+        parent::update($context);
+    }
+
+    public function deactivate(DeactivateContext $context): void
+    {
+        /** @var PaymentMethodService $paymentMethodService */
+        $paymentMethodService = ServiceRegister::getService(ShopPaymentService::class);
+        $paymentMethodService->deletePaymentMethodsForAllStores();
+        $this->installStoredPaymentUmbrella(false);
+
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
+    }
+
+    public function activate(ActivateContext $context): void
+    {
+        $this->initServices();
+        /** @var PaymentMethodService $paymentMethodService */
+        $paymentMethodService = ServiceRegister::getService(ShopPaymentService::class);
+        $paymentMethodService->enableAllPaymentMethods();
+        $this->installStoredPaymentUmbrella();
+
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
+    }
+
+    /**
+     * Remove widget and remove database schema.
+     *
+     * @param Plugin\Context\UninstallContext $uninstallContext
+     *
+     * @throws Exception
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     */
+    public function uninstall(Plugin\Context\UninstallContext $uninstallContext)
+    {
+        parent::uninstall($uninstallContext);
+        $this->initServices();
+
+        if ($uninstallContext->keepUserData()) {
+            /** @var PaymentMethodService $paymentService */
+            $paymentService = ServiceRegister::getService(ShopPaymentService::class);
+            $paymentService->deletePaymentMethodsForAllStores();
+            $this->installStoredPaymentUmbrella(false);
+
+            return;
         }
 
-        $this->loadServices($container);
+        $uninstallService = new UninstallService(
+            new StoreService(
+                new StoreRepository(Shopware()->Models()->getRepository(Shop::class)),
+                new OrderRepository(Shopware()->Models()->getRepository(Order::class)),
+                RepositoryRegistry::getRepository(ConnectionSettings::getClassName())
+            )
+        );
+        try {
+            $uninstallService->uninstall();
+        } catch (Exception $exception) {
+            $this->container->get('corelogger')->warning($exception->getMessage());
+        }
+
+        $this->installStoredPaymentUmbrella(false);
+
+        $this->removeSchema();
     }
 
     private function loadServices(ContainerBuilder $container): void
@@ -72,106 +193,50 @@ final class AdyenPayment extends Plugin
         $loader = new GlobFileLoader($container, $fileLocator = new FileLocator());
         $loader->setResolver(new LoaderResolver([new XmlFileLoader($container, $fileLocator)]));
 
-        $loader->load(__DIR__.'/Resources/services/*.xml');
+        $loader->load(__DIR__ . '/Resources/services/*.xml');
 
-        /** @var ShopwareVersionCheck $versionCheck */
         $versionCheck = $container->get('adyen_payment.components.shopware_version_check');
         if ($versionCheck && $versionCheck->isHigherThanShopwareVersion('v5.6.2')) {
-            $loader->load(__DIR__.'/Resources/services/version/563/*.xml');
+            $loader->load(__DIR__ . '/Resources/services/version/563/*.xml');
         }
     }
 
     /**
-     * @throws \Exception
+     * Creates/updates database tables on base of doctrine models
      */
-    public function install(InstallContext $context): void
+    private function updateSchema()
     {
-        $this->installAttributes();
-        $this->installStoredPaymentUmbrella($context);
-
         $tool = new SchemaTool($this->container->get('models'));
-        $classes = $this->getModelMetaData();
-        $tool->updateSchema($classes, true);
 
-        $context->scheduleClearCache(InstallContext::CACHE_LIST_FRONTEND);
+        $tool->updateSchema($this->getModelMetaData(), true);
     }
 
-    public function update(UpdateContext $context): void
+    private function removeSchema(): void
     {
-        $this->installAttributes();
-        $this->installStoredPaymentUmbrella($context);
-
-        if (version_compare($context->getCurrentVersion(), '3.9.7', '<=')) {
-            $this->activatePaymentsForEsd();
-        }
-
         $tool = new SchemaTool($this->container->get('models'));
-        $classes = $this->getModelMetaData();
-        $tool->updateSchema($classes, true);
 
-        $context->scheduleClearCache(InstallContext::CACHE_LIST_FRONTEND);
-
-        parent::update($context);
+        $tool->dropSchema($this->getModelMetaData());
+        $this->removeLegacySchema();
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function uninstall(UninstallContext $context): void
+    private function removeLegacySchema(): void
     {
-        if (!$context->keepUserData()) {
-            $this->uninstallAttributes($context);
+        $sql = 'DROP TABLE IF EXISTS `s_plugin_adyen_order_notification`;
+                DROP TABLE IF EXISTS `s_plugin_adyen_order_payment_info`;
+                DROP TABLE IF EXISTS `s_plugin_adyen_order_refund`;
+                DROP TABLE IF EXISTS `s_plugin_adyen_text_notification`;
+                DROP TABLE IF EXISTS `s_plugin_adyen_payment_recurring_payment_token`;';
 
-            $tool = new SchemaTool($this->container->get('models'));
-            $classes = $this->getModelMetaData();
-            $tool->dropSchema($classes);
-        }
-
-        if ($context->getPlugin()->getActive()) {
-            $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
-        }
+        $this->container->get('dbal_connection')->exec($sql);
     }
 
-    public function deactivate(DeactivateContext $context): void
+    private function migrateLegacySchema()
     {
-        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
-    }
+        $sql = 'DROP TABLE IF EXISTS `s_plugin_adyen_order_payment_info`;
+                DROP TABLE IF EXISTS `s_plugin_adyen_order_refund`;
+                DROP TABLE IF EXISTS `s_plugin_adyen_payment_recurring_payment_token`;';
 
-    public function activate(ActivateContext $context): void
-    {
-        $this->installStoredPaymentUmbrella($context);
-        $context->scheduleClearCache(InstallContext::CACHE_LIST_ALL);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function uninstallAttributes(UninstallContext $uninstallContext): void
-    {
-        $crudService = $this->container->get('shopware_attribute.crud_service');
-        $crudService->delete('s_core_paymentmeans_attributes', self::ADYEN_CODE);
-
-        $this->rebuildAttributeModels();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function installAttributes(): void
-    {
-        $crudService = $this->container->get('shopware_attribute.crud_service');
-        $crudService->update(
-            's_core_paymentmeans_attributes',
-            self::ADYEN_CODE,
-            TypeMapping::TYPE_STRING,
-            [
-                'displayInBackend' => true,
-                'readonly' => true,
-                'label' => 'Adyen payment type',
-            ]
-        );
-
-        $this->rebuildAttributeModels();
+        $this->container->get('dbal_connection')->exec($sql);
     }
 
     private function getModelMetaData(): array
@@ -179,75 +244,71 @@ final class AdyenPayment extends Plugin
         $entityManager = $this->container->get('models');
 
         return [
-            $entityManager->getClassMetadata(Notification::class),
-            $entityManager->getClassMetadata(PaymentInfo::class),
-            $entityManager->getClassMetadata(Refund::class),
-            $entityManager->getClassMetadata(TextNotification::class),
+            $entityManager->getClassMetadata(AdyenEntity::class),
+            $entityManager->getClassMetadata(NotificationsEntity::class),
+            $entityManager->getClassMetadata(QueueEntity::class),
+            $entityManager->getClassMetadata(TransactionLogEntity::class),
             $entityManager->getClassMetadata(UserPreference::class),
-            $entityManager->getClassMetadata(RecurringPaymentToken::class),
         ];
     }
 
-    private function rebuildAttributeModels(): void
+    private function installStoredPaymentUmbrella($isActive = true): void
     {
-        $metaDataCache = $this->container->get('models')->getConfiguration()->getMetadataCacheImpl();
-        if ($metaDataCache) {
-            $metaDataCache->deleteAll();
-        }
-
-        $this->container->get('models')->generateAttributeModels(
-            ['s_user_attributes', 's_core_paymentmeans_attributes']
+        /** @var PaymentInstaller $installer */
+        $installer = $this->container->get('shopware.plugin_payment_installer');
+        $installer->createOrUpdate(
+            self::NAME,
+            [
+                'name' => self::STORED_PAYMENT_UMBRELLA_NAME,
+                'description' => 'Adyen Stored Payment Method',
+                'additionalDescription' => 'Adyen Stored Payment Method',
+                'active' => $isActive,
+                'esdActive' => $isActive,
+                'hide' => true,
+                'action' => 'AdyenPaymentProcess',
+                'source' => self::PAYMENT_METHOD_SOURCE,
+            ]
         );
     }
 
-    private function installStoredPaymentUmbrella(InstallContext $context): void
+    private function initServices(): void
     {
-        $database = $this->container->get('db');
-        /** @var ModelManager $modelsManager */
-        $modelsManager = $this->container->get('shopware.model_manager');
+        Bootstrap::init();
 
-        $models = $this->container->get('models');
-        $shops = $models->getRepository(Shop::class)->findAll();
-
-        $payment = new Payment();
-        $payment->setActive(true);
-        $payment->setEsdActive(true);
-        $payment->setName(self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE);
-        $payment->setSource(SourceType::adyen()->getType());
-        $payment->setHide(true);
-        $payment->setPluginId($context->getPlugin()->getId());
-        $payment->setDescription($description = 'Adyen Stored Payment Method');
-        $payment->setAdditionalDescription($description);
-        $payment->setShops($shops);
-
-        $paymentInDb = $database->fetchRow(
-            'SELECT `id`, `active` FROM `s_core_paymentmeans` WHERE `name` = :name',
-            [':name' => self::ADYEN_STORED_PAYMENT_UMBRELLA_CODE]
+        ServiceRegister::registerService(
+            ShopPaymentService::class,
+            static function () {
+                return new PaymentMethodService(
+                    ServiceRegister::getService(StoreContext::class),
+                    Shopware()->Models(),
+                    new StoreRepository(Shopware()->Models()->getRepository(Shop::class)),
+                    Shopware()->Container()->get('shopware.plugin_payment_installer'),
+                    ServiceRegister::getService(FileService::class),
+                    ServiceRegister::getService(PaymentMethodConfigRepository::class),
+                    ServiceRegister::getService(StoreServiceInterface::class)
+                );
+            }
         );
 
-        $paymentId = $paymentInDb['id'] ?? null;
+        ServiceRegister::registerService(
+                StoreServiceInterface::class,
+                static function () {
+                    return new StoreService(
+                            new StoreRepository(Shopware()->Models()->getRepository(Shop::class)),
+                            new OrderRepository(Shopware()->Models()->getRepository(Order::class)),
+                            RepositoryRegistry::getRepository(ConnectionSettings::getClassName())
+                    );
+                }
+        );
 
-        if (null === $paymentId) {
-            $modelsManager->persist($payment);
-            $modelsManager->flush($payment);
-        }
-
-        if (null !== $paymentId && !$paymentInDb['active']) {
-            $database->update(
-                's_core_paymentmeans',
-                ['active' => true, 'esdactive' => true],
-                ['id = ?' => $paymentId]
-            );
-        }
-    }
-
-    private function activatePaymentsForEsd(): void
-    {
-        $database = $this->container->get('db');
-        $database->update(
-            's_core_paymentmeans',
-            ['esdactive' => true],
-            ['source = ?' => SourceType::adyen()->getType()]
+        ServiceRegister::registerService(
+                OrderServiceInterface::class,
+                static function () {
+                    return new OrderService(
+                            new OrderRepository(Shopware()->Models()->getRepository(Order::class)),
+                            Shopware()->Modules()
+                    );
+                }
         );
     }
 }
@@ -255,4 +316,3 @@ final class AdyenPayment extends Plugin
 if (AdyenPayment::isPackage()) {
     require_once AdyenPayment::getPackageVendorAutoload();
 }
-//phpcs:enable PSR1.Files.SideEffects

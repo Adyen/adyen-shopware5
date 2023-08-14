@@ -23,23 +23,30 @@
     "autoload-dev": {
         "psr-4": {
             "AdyenPayment\\": "./",
-            "AdyenPayment\\Tests\\": "tests/"
+            "AdyenPayment\\Tests\\": "tests/",
+            "Adyen\\Core\\Tests\\Infrastructure\\": "vendor/adyen/integration-core/tests/Infrastructure",
+            "Adyen\\Core\\Tests\\BusinessLogic\\": "vendor/adyen/integration-core/tests/BusinessLogic"
         }
     },
     "require": {
         "php": "^7.2|^7.4|^8.0",
         "ext-json": "*",
         "ext-zip": "*",
-        "adyen/php-api-library": "^10.0"
-    },
-    "require-dev": {
-        "phpro/grumphp-shim": "^1.5"
+        "adyen/integration-core": "1.0.0",
+        "ext-simplexml": "*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "config": {
-        "allow-plugins": {
-            "phpro/grumphp-shim": true
+    "repositories": [
+        {
+            "type": "vcs",
+            "no-api": true,
+            "url": "git@github.com:logeecom/adyen-php-webhook-module.git"
+        },
+        {
+            "type": "vcs",
+            "no-api": true,
+            "url": "git@github.com:logeecom/adyen-integration-core.git"
         }
-    }
+    ]
 }
