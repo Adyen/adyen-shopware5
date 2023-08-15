@@ -6,100 +6,65 @@
          * Plugin default options.
          */
         defaults: {
-            /**
-             * Default shopLocale when no locate is assigned
-             *
-             * @type {string}
-             */
-            shopLocale: 'en-US',
-            /**
-             * Fallback environment variable
-             *
-             * @type {string}
-             */
-            adyenEnvironment: 'test',
-            adyenClientKey: '',
-            enrichedPaymentMethods: {},
+            checkoutConfigUrl: '',
+            additionalDataUrl: '',
+            checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
+            adyenPaymentMethodType: '',
             placeOrderSelector: '.table--actions button[type=submit]',
             confirmFormSelector: '#confirm--form',
-            adyenType: '',
-            adyenGoogleConfig: {},
-            adyenApplePayConfig: {},
-            adyenPaymentState: {},
-            adyenIsAdyenPayment: false,
-            adyenConfigAjaxUrl: '/frontend/adyenconfig/index',
-            adyenAjaxDoPaymentUrl: '/frontend/adyen/ajaxDoPayment',
-            adyenAjaxPaymentDetails: '/frontend/adyen/paymentDetails',
-            checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
-            accountLoginUrl: '/account/login/sTarget/checkout/sTargetAction/confirm/showNoAccount/true',
-            adyenSnippets: {
-                errorTransactionCancelled: 'Your transaction was cancelled by the Payment Service Provider.',
-                errorTransactionProcessing: 'An error occurred while processing your payment.',
-                errorTransactionRefused: 'Your transaction was refused by the Payment Service Provider.',
-                errorTransactionUnknown: 'Your transaction was cancelled due to an unknown reason.',
-                errorTransactionNoSession: 'Your transaction was cancelled due to an unknown reason. Please make sure your browser allows cookies.',
-                errorGooglePayNotAvailable: 'Google Pay is currently not available.',
-                errorApplePayNotAvailable: 'Apple Pay is currently not available.'
-            },
+            stateDataInputSelector: 'input[name=adyenPaymentMethodStateData]'
         },
-        paymentMethodSession: 'paymentMethod',
-        storePaymentMethodSession: 'storePaymentMethod',
-        adyenConfiguration: {},
-        adyenCheckout: null,
+
+        submitButtonReplacingComponents: ['applepay', 'amazonpay', 'paywithgoogle', 'googlepay', 'paypal'],
+        checkoutController: null,
 
         init: function () {
-            var me = this;
-
-            me.sessionStorage = StorageManager.getStorage('session');
+            let me = this;
 
             me.applyDataAttributes();
-            me.eventListeners();
-            me.checkSetSession();
-            me.setConfig();
-            me.setCheckout();
-            me.handleCheckoutButton();
-        },
-        eventListeners: function () {
-            var me = this;
 
-            me._on(me.opts.placeOrderSelector, 'click', $.proxy(me.onPlaceOrder, me));
-        },
-        checkSetSession: function () {
-            var me = this;
-
-            if (!me.opts.adyenIsAdyenPayment) {
-                me.sessionStorage.removeItem(me.paymentMethodSession);
+            if (!me.submitButtonReplacingComponents.includes(me.opts.adyenPaymentMethodType)) {
                 return;
             }
 
-            var parsedPaymentMethodSession = JSON.parse(me.getPaymentMethod() || '{}');
-            if (!$.isEmptyObject(me.opts.adyenPaymentState)
-                && 0 === Object.keys(parsedPaymentMethodSession).length) {
-                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(me.opts.adyenPaymentState));
-                return;
-            }
+            me.checkoutController = new AdyenComponents.CheckoutController({
+                "checkoutConfigUrl": me.opts.checkoutConfigUrl,
+                "showPayButton": true,
+                "sessionStorage": StorageManager.getStorage('session'),
+                "onStateChange": $.proxy(me.submitOrder, me),
+                "onAdditionalDetails": $.proxy(me.onAdditionalDetails, me),
+                "onPayButtonClick": $.proxy(me.onPayButtonClick, me)
+            });
 
-            if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
-                window.location.href = me.opts.checkoutShippingPaymentUrl;
-            }
+            me.replacePlaceOrderButton();
         },
-        onPlaceOrder: function (event) {
-            var me = this;
 
-            if (typeof event !== 'undefined') {
-                event.preventDefault();
-            }
+        replacePlaceOrderButton: function () {
+            let me = this,
+                orderButton = $(me.opts.placeOrderSelector);
 
-            me.clearAdyenError();
+            orderButton.parent().append(
+                $('<div />')
+                    .attr('data-adyen-submit-button', 'true')
+                    .addClass('right')
+            );
+            orderButton.remove();
 
-            if (!me.sessionStorage.getItem(me.paymentMethodSession)) {
-                if (me.opts.adyenIsAdyenPayment) {
-                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionNoSession);
+            me.checkoutController.mount(me.opts.adyenPaymentMethodType, '[data-adyen-submit-button]');
+        },
 
-                    return;
-                }
+        onPayButtonClick: function (resolve, reject) {
+            let isValid = $(this.opts.confirmFormSelector)[0].checkValidity();
 
-                $(me.opts.confirmFormSelector).submit();
+            isValid ? resolve() : reject('Form validation error.');
+
+            return isValid;
+        },
+
+        submitOrder: function () {
+            let me = this;
+
+            if (!me.checkoutController.getPaymentMethodStateData()) {
                 return;
             }
 
@@ -107,268 +72,64 @@
                 return;
             }
 
-            $.loadingIndicator.open();
+            // Make sure that wallet payment state data is submitted
+            $(me.opts.stateDataInputSelector).val(me.checkoutController.getPaymentMethodStateData());
+            if (me.opts.adyenPaymentMethodType !== 'paypal') {
+                $(me.opts.confirmFormSelector).submit();
 
-            var data = {
-                'paymentMethod': me.getPaymentMethod(),
-                'storePaymentMethod': me.getStorePaymentMethod(),
-                'browserInfo': me.getBrowserInfo(),
-                'origin': window.location.origin,
-                'sComment': me.getComment()
-            };
-
-            $.ajax({
-                method: 'POST',
-                dataType: 'json',
-                url: me.opts.adyenAjaxDoPaymentUrl,
-                data: data,
-                success: function (response) {
-                    if (response['status'] === 'success') {
-                        me.handlePaymentData(response['content'], response['sUniqueID'], response['adyenTransactionId']);
-                    } else {
-                        me.addAdyenError(response['content']);
-                    }
-
-                    $.loadingIndicator.close();
-                },
-                error: me.handleAjaxRequestError.bind(me)
-            });
-        },
-        handlePaymentData: function (data, sUniqueID = null, adyenTransactionId = null) {
-            var me = this;
-            switch (data.resultCode) {
-                case 'Authorised':
-                    me.handlePaymentDataAuthorised(data, sUniqueID);
-                    break;
-                case 'IdentifyShopper':
-                case 'ChallengeShopper':
-                case 'Pending':
-                case 'RedirectShopper':
-                    me.handlePaymentDataCreateFromAction(data, sUniqueID, adyenTransactionId);
-                    break;
-                default:
-                    me.handlePaymentDataError(data);
-                    break;
-            }
-        },
-        handlePaymentDataAuthorised: function (data, sUniqueID = null) {
-            var me = this;
-            var input = $("<input>").attr("type", "hidden").attr("name", "sUniqueID").val(sUniqueID);
-            $(me.opts.confirmFormSelector).append(input).submit();
-        },
-        handlePaymentDataCreateFromAction: function (data, sUniqueID = null, adyenTransactionId = null) {
-            var me = this;
-            var payload = {
-                resultCode: data.resultCode,
-                type: data.action.type,
-                subtype: data.action.subtype
-            };
-            var modal = $.modal.open('<div id="AdyenModal"/>', {
-                showCloseButton: false,
-                closeOnOverlay: false,
-                additionalClass: 'adyen-modal'
-            });
-
-            // data.action: "redirect" errors are handled by Process::returnAction()
-            me.adyenCheckout
-                .createFromAction(data.action, {
-                    onAdditionalDetails: function (state) {
-                        modal.close();
-                        $.ajax({
-                            method: 'POST',
-                            dataType: 'json',
-                            url: me.opts.adyenAjaxPaymentDetails,
-                            data: {
-                                'action': payload,
-                                'details': state.data.details,
-                                'adyenTransactionId': adyenTransactionId
-                            },
-                            success: function (response) {
-                                me.handlePaymentData(response, sUniqueID, adyenTransactionId);
-                            },
-                            error: me.handleAjaxRequestError.bind(me)
-                        });
-                    },
-                    onError: function (error) {
-                        console.error(error);
-                    }
-                })
-                .mount('#AdyenModal');
-        },
-        handleAjaxRequestError: function (xhr) {
-            if (xhr.status === 401) {
-                window.location.href = this.opts.accountLoginUrl;
-            }
-
-            this.addAdyenError(this.opts.adyenSnippets.errorTransactionProcessing);
-            $.loadingIndicator.close();
-        },
-        handlePaymentDataError: function (data) {
-            var me = this;
-
-            $.loadingIndicator.close();
-
-            switch (data.resultCode) {
-                case 'Cancelled':
-                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionCancelled);
-                    break;
-                case 'Error':
-                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionProcessing);
-                    break;
-                case 'Refused':
-                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionRefused);
-                    break;
-                default:
-                    this.addAdyenError(me.opts.adyenSnippets.errorTransactionUnknown);
-                    break;
-            }
-        },
-        handleCheckoutButton: function () {
-            var me = this;
-
-            var paymentMethodsConfig = {
-                'paywithgoogle': {
-                    config: me.opts.adyenGoogleConfig,
-                    errorMessage: me.opts.adyenSnippets.errorGooglePayNotAvailable
-                },
-                'applepay': {
-                    config: me.opts.adyenApplePayConfig,
-                    errorMessage: me.opts.adyenSnippets.errorApplePayNotAvailable
-                }
-            };
-
-            if (paymentMethodsConfig.hasOwnProperty(me.opts.adyenType)) {
-                var paymentMethodConfig = paymentMethodsConfig[me.opts.adyenType];
-                me.replaceCheckoutButton(me.opts.adyenType, paymentMethodConfig.config, paymentMethodConfig.errorMessage);
-            }
-        },
-        replaceCheckoutButton: function (paymentMethod, config, errorMessage) {
-            var me = this;
-
-            if (0 === Object.keys(config).length) {
-                this.addAdyenError(errorMessage);
-                console.error('Adyen: Missing ' + paymentMethod + ' configuration');
                 return;
             }
 
-            var paymentButtonContainer = paymentMethod + '-container';
-            var orderButton = $(me.opts.placeOrderSelector);
-            orderButton.parent().append(
-                $('<div />')
-                    .attr('id', paymentButtonContainer)
-                    .addClass('right')
-            );
-            orderButton.remove();
-
-            config.onSubmit = function (state, component) {
-                me.sessionStorage.setItem(me.paymentMethodSession, JSON.stringify(state.data.paymentMethod));
-                me.onPlaceOrder();
-            };
-
-            var component = me.adyenCheckout.create(paymentMethod, config);
-            component
-                .isAvailable()
-                .then(function () {
-                    component.mount('#' + paymentButtonContainer);
-                })
-                .catch(function (e) {
-                    me.addAdyenError(errorMessage);
-                });
-        },
-        addAdyenError: function (message) {
-            var me = this;
-            $.publish('plugin/AdyenPaymentCheckoutError/addError', message);
-            $.publish('plugin/AdyenPaymentCheckoutError/scrollToErrors');
-
-            $(me.opts.placeOrderSelector)
-                .removeAttr('disabled')
-                .removeClass('disabled')
-                .find('.js--loading')
-                .remove();
-        },
-        clearAdyenError: function () {
-            $.publish('plugin/AdyenPaymentCheckoutError/cleanErrors');
-        },
-        setConfig: function () {
-            var me = this;
-
-            var adyenConfigSession = JSON.parse(me.getAdyenConfigSession());
-
+            var form = $(me.opts.confirmFormSelector);
+            var url = form.attr('action');
             $.ajax({
-                method: 'GET',
-                async: false,
-                dataType: 'json',
-                url: me.opts.adyenConfigAjaxUrl,
-                success: function (response) {
-                    if (response['status'] === 'success') {
-                        me.opts.shopLocale = response['shopLocale'];
-                        me.opts.adyenClientKey = response['clientKey'];
-                        me.opts.adyenEnvironment = response['environment'];
-                        me.opts.enrichedPaymentMethods = response['enrichedPaymentMethods'];
-                    } else {
-                        me.addAdyenError(response['content']);
+                type: "POST",
+                url: url+'/isXHR/1',
+                data: form.serialize(),
+                success: function(data) {
+                    if (data.nextStepUrl) {
+                        window.location.href = data.nextStepUrl;
+                        return;
                     }
 
-                    $.loadingIndicator.close();
+                    if (!data.action) {
+                        window.location.href = me.opts.checkoutShippingPaymentUrl;
+                        return;
+                    }
+
+                    me.signature = data.signature;
+                    me.reference = data.reference;
+                    me.paymentData = null;
+                    if (data.action.paymentData) {
+                        me.paymentData = data.action.paymentData
+                    }
+
+                    me.checkoutController.handleAction(data.action);
+                },
+                error: function(data) {
+                    window.location.href = me.opts.checkoutShippingPaymentUrl;
                 }
             });
+        },
 
-            var adyenPaymentMethodsResponseConfig = me.opts.enrichedPaymentMethods.reduce(
-                function (rawAdyen, enrichedPaymentMethod) {
-                    var isAdyenPaymentMethod = enrichedPaymentMethod.isAdyenPaymentMethod || false;
-                    if (true === isAdyenPaymentMethod) {
-                        rawAdyen.push(enrichedPaymentMethod.metadata);
-                    }
+        onAdditionalDetails: function (additionalData) {
+            let me = this;
 
-                    return rawAdyen;
+            if (me.paymentData) {
+                additionalData.paymentData = me.paymentData
+            }
+            $.ajax({
+                method: 'POST',
+                dataType: 'json',
+                url: me.opts.additionalDataUrl + "/signature/" + me.signature + "/reference/" + me.reference + '/isXHR/1',
+                data: additionalData,
+                success: function (response) {
+                    window.location.href = response.nextStepUrl;
                 },
-                []
-            );
-
-            me.adyenConfiguration = {
-                locale: adyenConfigSession ? adyenConfigSession.locale : me.opts.shoplocale,
-                environment: adyenConfigSession ? adyenConfigSession.environment : me.opts.adyenenvironment,
-                clientKey: adyenConfigSession ? adyenConfigSession.clientKey : me.opts.adyenclientkey,
-                paymentMethodsResponse: Object.assign({}, adyenPaymentMethodsResponseConfig),
-                onAdditionalDetails: me.handleOnAdditionalDetails.bind(me)
-            };
-        },
-        setCheckout: function () {
-            var me = this;
-
-            me.adyenCheckout = new AdyenCheckout(me.adyenConfiguration);
-        },
-        getComment: function() {
-            return $('[data-storagekeyname="sComment"]').val();
-        },
-        getPaymentMethod: function () {
-            var me = this;
-
-            return me.sessionStorage.getItem(me.paymentMethodSession);
-        },
-        getStorePaymentMethod: function () {
-            var me = this;
-
-            return me.sessionStorage.getItem(me.storePaymentMethodSession);
-        },
-        getAdyenConfigSession: function () {
-            var me = this;
-
-            return me.sessionStorage.getItem('adyenConfig');
-        },
-        getBrowserInfo: function () {
-            return {
-                'language': navigator.language,
-                'userAgent': navigator.userAgent,
-                'colorDepth': window.screen.colorDepth,
-                'screenHeight': window.screen.height,
-                'screenWidth': window.screen.width,
-                'timeZoneOffset': new Date().getTimezoneOffset(),
-                'javaEnabled': navigator.javaEnabled()
-            };
-        },
-        handleOnAdditionalDetails: function (state, component) {
-            $.loadingIndicator.close();
+                error: function () {
+                    window.location.href = me.opts.checkoutShippingPaymentUrl;
+                }
+            });
         }
     });
 })(jQuery);

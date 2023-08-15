@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>3.9.9</version>
+    <version>4.0.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -443,70 +443,30 @@
             * Optimize: Handling of the invalid Webhook requests
         </changes>
     </changelog>
-    <changelog version="3.9.2">
+    <changelog version="4.0.0">
         <changes lang="en">
-            * Optimize: Add compatibility with Online Banking PL payment method
-            * Optimize: Handling of redirect payment request from Adyen
+            * New admin user interface and experience - Navigate effortlessly through an enhanced interface designed for simplicity and seamless plugin configuration.
+            * Expanded payment method options - Introducing new supported payment methods, giving customers more choices and convenience during checkout.
+            * Payment methods as a full express option - Offer customers more options with new supported payment methods, including the checkout express lineup: Apple Pay, Google Pay, Amazon Pay, and Paypal.
+            * Revamped checkout - Benefit from the latest version of Adyen's Checkout API, but also with the new implementation of the checkout and payment process that meets Shopware 5 best practices.
+            * Partial refunds - Easily process partial refunds, providing greater flexibility in handling customer returns.
+            * Partial capture - Seamlessly capture funds partially, granting you flexibility in managing complex orders.
+            * Capture control - Choose between manual and auto-capture of funds, tailoring the payment process to your business needs.
+            * Advanced data sending - Send L2 and L3 data for enhanced transaction insights, facilitating smoother business operations.
+            * Risk score visibility - View risk scores in order payment details, assisting in informed decision-making and fraud prevention.
+            * Adyen Giving - Enable charitable donations through Adyen Giving, allowing your customers to contribute effortlessly during transactions.
         </changes>
         <changes lang="de">
-            * Optimize: Add compatibility with Online Banking PL payment method
-            * Optimize: Handling of redirect payment request from Adyen
-        </changes>
-    </changelog>
-    <changelog version="3.9.3">
-        <changes lang="en">
-            * Optimize: Remove unnecessary third-party dependencies from plugin
-        </changes>
-        <changes lang="de">
-            * Optimize: Remove unnecessary third-party dependencies from plugin
-        </changes>
-    </changelog>
-    <changelog version="3.9.4">
-        <changes lang="en">
-            * Optimize: Handling empty order lines for Klarna payment requests
-        </changes>
-        <changes lang="de">
-            * Optimize: Handling empty order lines for Klarna payment requests
-        </changes>
-    </changelog>
-    <changelog version="3.9.5">
-        <changes lang="en">
-            * Fix: Fix issue with shipping method selection when stored payment method is selected.
-        </changes>
-        <changes lang="de">
-            * Fix: Fix issue with shipping method selection when stored payment method is selected.
-        </changes>
-    </changelog>
-    <changelog version="3.9.6">
-        <changes lang="en">
-            * Fix: Add support for Apple Pay payment method.
-        </changes>
-        <changes lang="de">
-            * Fix: Add support for Apple Pay payment method.
-        </changes>
-    </changelog>
-    <changelog version="3.9.7">
-        <changes lang="en">
-            * Fix: Fix full refund not working due to wrong PSP reference being sent in refund request.
-        </changes>
-        <changes lang="de">
-            * Fix: Fix full refund not working due to wrong PSP reference being sent in refund request.
-        </changes>
-    </changelog>
-    <changelog version="3.9.8">
-        <changes lang="en">
-            * Fix: Add support for ESD items
-        </changes>
-        <changes lang="de">
-            * Fix: Add support for ESD items
-        </changes>
-    </changelog>
-    <changelog version="3.9.9">
-        <changes lang="en">
-            * Fix: Fix bug when payment method is switched on payment selection page.
-        </changes>
-        <changes lang="de">
-            * Fix: Fix bug when payment method is switched on payment selection page.
+            * New admin user interface and experience - Navigate effortlessly through an enhanced interface designed for simplicity and seamless plugin configuration.
+            * Expanded payment method options - Introducing new supported payment methods, giving customers more choices and convenience during checkout.
+            * Payment methods as a full express option - Offer customers more options with new supported payment methods, including the checkout express lineup: Apple Pay, Google Pay, Amazon Pay, and Paypal.
+            * Revamped checkout - Benefit from the latest version of Adyen's Checkout API, but also with the new implementation of the checkout and payment process that meets Shopware 5 best practices.
+            * Partial refunds - Easily process partial refunds, providing greater flexibility in handling customer returns.
+            * Partial capture - Seamlessly capture funds partially, granting you flexibility in managing complex orders.
+            * Capture control - Choose between manual and auto-capture of funds, tailoring the payment process to your business needs.
+            * Advanced data sending - Send L2 and L3 data for enhanced transaction insights, facilitating smoother business operations.
+            * Risk score visibility - View risk scores in order payment details, assisting in informed decision-making and fraud prevention.
+            * Adyen Giving - Enable charitable donations through Adyen Giving, allowing your customers to contribute effortlessly during transactions.
         </changes>
     </changelog>
 </plugin>

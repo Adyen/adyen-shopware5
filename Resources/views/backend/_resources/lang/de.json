@@ -1,0 +1,60 @@
+{
+  "general": {
+    "basicSettings": "Einstellungen",
+    "systemInfo": "Systeminformationen",
+    "help": "Hilfe",
+    "loading": "Lädt...",
+    "save": "Speichern",
+    "saveChanges": "Speichern",
+    "accept": "Akzeptieren",
+    "cancel": "Abbrechen",
+    "continue": "Weiter",
+    "add": "Hinzufügen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "discard": "Verwerfen"
+  },
+  "validation": {
+    "requiredField": "Dies ist ein Pflichtfeld.",
+    "invalidField": "This field is invalid.",
+    "invalidEmail": "Das Feld muss eine gültige E-Mail-Adresse sein.",
+    "maxLength": "Dieses Feld darf maximal %s Zeichen enthalten.",
+    "numeric": "Bitte geben Sie einen numerischen Wert ein.",
+    "greaterThanZero": "Der Wert muss größer als 0 sein.",
+    "nonNegative": "Das Feld darf keine negativen Werte enthalten.",
+    "numberOfDecimalPlaces": "Das Feld muss 2 Dezimalstellen haben.",
+    "integer": "Das Feld muss eine ganze Zahl sein.",
+    "invalidUrl": "Dieses Feld muss eine gültige URL enthalten.",
+    "invalidFieldValue": "Dieses Feld muss auf „%s“ gesetzt werden.",
+    "invalidMaxValue": "Der maximale Wert beträgt %s."
+  },
+  "login": {
+    "apiKey": "API-Schlüssel",
+    "apiKeyIncorrect": "Falscher API-Schlüssel",
+    "validateApiKey": "API-Schlüssel bestätigen"
+  },
+  "countries": {
+    "ES": "Spanien",
+    "DE": "Deutschland",
+    "FR": "Frankreich",
+    "IT": "Italien",
+    "AT": "Österreich",
+    "NL": "Niederlande",
+    "BE": "Belgien",
+    "PT": "Portugal",
+    "TR": "Türkei",
+    "IE": "Irland",
+    "GB": "Vereinigtes Königreich",
+    "HU": "Ungarn",
+    "PL": "Polen",
+    "CH": "Schweiz",
+    "LU": "Luxemburg",
+    "AR": "Argentinien",
+    "US": "Vereinigte Staaten",
+    "BO": "Bolivien",
+    "MX": "Mexiko",
+    "CL": "Chile",
+    "CZ": "Tschechien",
+    "SE": "Schweden"
+  }
+}

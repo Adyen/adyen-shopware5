@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber\Backend;
 
-use AdyenPayment\Collection\Payment\PaymentMeanCollection;
+use AdyenPayment\Utilities\Plugin;
 use Enlight\Event\SubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -30,11 +30,7 @@ final class HideStoredPaymentsSubscriber implements SubscriberInterface
             return;
         }
 
-        $data = PaymentMeanCollection::createFromShopwareArray($data)
-            ->filterExcludeHidden()
-            ->toShopwareArray();
-
-        $args->getSubject()->View()->assign('data', array_values($data));
+        $args->getSubject()->View()->assign('data', $this->filterHiddenPaymentMeans($data));
     }
 
     private function isSuccessGetPaymentAction(\Enlight_Controller_ActionEventArgs $args): bool
@@ -48,5 +44,18 @@ final class HideStoredPaymentsSubscriber implements SubscriberInterface
         }
 
         return true;
+    }
+
+    private function filterHiddenPaymentMeans(array $paymentMeans): array
+    {
+        return array_values(array_filter(
+            array_map(static function (array $paymentMean) {
+                if (!Plugin::isAdyenPaymentMean($paymentMean['name'])) {
+                    return $paymentMean;
+                }
+
+                return !$paymentMean['hide'] ? $paymentMean : null;
+            }, $paymentMeans)
+        ));
     }
 }

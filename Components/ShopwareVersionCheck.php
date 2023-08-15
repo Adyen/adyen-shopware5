@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace AdyenPayment\Components;
 
 use OutOfBoundsException;
-use PackageVersions\Versions;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ShopwareVersionCheck
@@ -16,15 +14,9 @@ class ShopwareVersionCheck
     /** @var ContainerInterface */
     private $container;
 
-    /** @var LoggerInterface */
-    private $logger;
-
-    public function __construct(
-        ContainerInterface $container,
-        LoggerInterface $logger
-    ) {
+    public function __construct(ContainerInterface $container)
+    {
         $this->container = $container;
-        $this->logger = $logger;
     }
 
     public function isHigherThanShopwareVersion(string $shopwareVersion): bool
@@ -42,23 +34,16 @@ class ShopwareVersionCheck
         return version_compare($shopwareVersion, $version, '<');
     }
 
-    /**
-     * @psalm-suppress UndefinedClass
-     */
     public function getShopwareVersion(): string
     {
         $version = $this->container->get('shopware.release')->getVersion();
 
-        if (self::SHOPWARE === $version) {
+        if (self::SHOPWARE === $version && class_exists('\PackageVersions\Versions')) {
             try {
-                [$composerVersion, $sha] = explode('@', Versions::getVersion('shopware/shopware'));
+                [$composerVersion, $sha] = explode('@', \PackageVersions\Versions::getVersion('shopware/shopware'));
                 $version = $composerVersion;
             } catch (OutOfBoundsException $ex) {
-                $this->logger->error('OutOfBoundsException', [
-                    'message' => $ex->getMessage(),
-                    'file' => $ex->getFile(),
-                    'line' => $ex->getLine(),
-                ]);
+                /* Intentionally left empty */
             }
         }
 

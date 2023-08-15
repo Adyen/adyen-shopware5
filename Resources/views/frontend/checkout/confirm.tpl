@@ -1,8 +1,9 @@
 {extends file="parent:frontend/checkout/confirm.tpl"}
 
-{block name='frontend_checkout_confirm_form'}
-    {include file="frontend/checkout/adyen_libaries.tpl"}
-
+{block name='frontend_checkout_confirm_error_messages'}
+    <div data-adyen-checkout-error="true">
+        {if $sErrorMessages}{include file="frontend/register/error_message.tpl" error_messages=$sErrorMessages}{/if}
+    </div>
     {$smarty.block.parent}
 {/block}
 
@@ -16,42 +17,40 @@
     {$smarty.block.parent}
 {/block}
 
-{block name='frontend_index_body_attributes'}
-    {if $mAdyenSnippets}data-adyensnippets="{$mAdyenSnippets}"{/if}
-    {$adyenType=$sUserData.additional.payment['adyenType']|default:''}
+{block name='frontend_checkout_confirm_information_wrapper'}
     {$smarty.block.parent}
-    data-adyenConfigAjaxUrl="{url module='frontend' controller='adyenconfig' action='index'}"
-    data-adyenAjaxDoPaymentUrl="{url module='frontend' controller='adyen' action='ajaxDoPayment'}"
-    data-adyenAjaxPaymentDetails="{url module='frontend' controller='adyen' action='paymentDetails'}"
-    data-checkoutShippingPaymentUrl="{url controller='checkout' action='shippingPayment' sTarget='checkout'}"
-    data-adyenAjaxThreeDsUrl="{url module='frontend' controller='adyen' action='ajaxThreeDs'}"
-    {if $mAdyenSnippets}
-        data-adyenSnippets="{$mAdyenSnippets}"
-    {/if}
-    {if $adyenType}data-adyenType="{$adyenType}"{/if}
-    {if $sAdyenGoogleConfig}
-        data-adyenGoogleConfig='{$sAdyenGoogleConfig}'
-    {/if}
-    {if $sAdyenApplePayConfig}
-        data-adyenApplePayConfig='{$sAdyenApplePayConfig}'
-    {/if}
-    {if $adyenPaymentState}
-        data-adyenPaymentState='{$adyenPaymentState}'
-    {/if}
-    {if $sUserData.additional.payment.source == $adyenSourceType}
-        data-adyenIsAdyenPayment='true'
+
+    {if $sPayment.isAdyenPaymentMethod}
+        <input
+            type="hidden"
+            name="adyenPaymentMethodStateData"
+            data-checkoutConfigUrl="{url module='frontend' controller='AdyenPaymentProcess' action='getCheckoutConfig'}"
+            data-checkoutShippingPaymentUrl="{url controller='checkout' action='shippingPayment' sTarget='checkout'}"
+        >
     {/if}
 {/block}
 
-{block name='frontend_checkout_confirm_payment_method_panel'}
+{block name="frontend_index_after_body"}
     {$smarty.block.parent}
-    {include file="frontend/checkout/adyen_configuration.tpl"}
+
+    {if $sPayment.isAdyenPaymentMethod}
+        {include file="frontend/checkout/adyen_libaries.tpl"}
+
+        <div
+                data-adyenPaymentMethodType="{$sPayment.adyenPaymentType}"
+                data-checkoutConfigUrl="{url module='frontend' controller='AdyenPaymentProcess' action='getCheckoutConfig'}"
+                data-additionalDataUrl="{url module='frontend' controller='AdyenPaymentProcess' action='handleAdditionalData'}"
+                data-adyen-confirm-order>
+        </div>
+    {/if}
+
 {/block}
 
-
-{block name='frontend_checkout_confirm_error_messages'}
-    <div data-adyen-checkout-error="true">
-        {if $sErrorMessages}{include file="frontend/register/error_message.tpl" error_messages=$sErrorMessages}{/if}
-    </div>
+{block name="frontend_index_after_body"}
     {$smarty.block.parent}
+
+    {if $sPayment.adyenPaymentType == 'googlepay' || $sPayment.adyenPaymentType == 'paywithgoogle'}
+        <script src="https://pay.google.com/gp/p/js/pay.js"></script>
+    {/if}
+
 {/block}

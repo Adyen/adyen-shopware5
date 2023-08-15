@@ -4,273 +4,97 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e50ffb80a77ed45f404f60301a058b10",
+    "content-hash": "dc1b8ee2ff63499fb373da3ef858d9e5",
     "packages": [
         {
-            "name": "adyen/php-api-library",
-            "version": "10.1.0",
+            "name": "adyen/integration-core",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Adyen/adyen-php-api-library.git",
-                "reference": "91917518e17595a91a3cc5887dd95e7d76767276"
+                "url": "git@github.com:logeecom/adyen-integration-core.git",
+                "reference": "41d8f36801829d6152fe52e585c6ad1b1853f85b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Adyen/adyen-php-api-library/zipball/91917518e17595a91a3cc5887dd95e7d76767276",
-                "reference": "91917518e17595a91a3cc5887dd95e7d76767276",
+                "url": "https://api.github.com/repos/logeecom/adyen-integration-core/zipball/41d8f36801829d6152fe52e585c6ad1b1853f85b",
+                "reference": "41d8f36801829d6152fe52e585c6ad1b1853f85b",
                 "shasum": ""
             },
             "require": {
+                "adyen/php-webhook-module": "0.1.0",
                 "ext-ctype": "*",
-                "ext-curl": "*",
                 "ext-json": "*",
-                "ext-mbstring": "*",
-                "ext-openssl": "*",
-                "monolog/monolog": ">=1.16",
-                "php": ">=5.6"
+                "php": ">=7.2"
             },
             "require-dev": {
-                "dms/phpunit-arraysubset-asserts": "0.2.1",
-                "friendsofphp/php-cs-fixer": "*",
-                "php-coveralls/php-coveralls": "2.4.3",
-                "phpunit/phpunit": "9.5.4",
-                "squizlabs/php_codesniffer": "3.6.0"
+                "phpunit/phpunit": "^8.5",
+                "symfony/console": "^4.4"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Adyen\\": "src/Adyen/"
+                    "Adyen\\Core\\Infrastructure\\": "src/Infrastructure",
+                    "Adyen\\Core\\BusinessLogic\\": "src/BusinessLogic"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "description": "A PHP client library for accessing Adyen APIs",
-            "homepage": "https://github.com/Adyen/adyen-php-api-library",
-            "keywords": [
-                "adyen"
-            ],
-            "support": {
-                "issues": "https://github.com/Adyen/adyen-php-api-library/issues",
-                "source": "https://github.com/Adyen/adyen-php-api-library/tree/10.1.0"
+            "autoload-dev": {
+                "psr-4": {
+                    "Adyen\\Core\\Tests\\Infrastructure\\": "tests/Infrastructure",
+                    "Adyen\\Core\\Tests\\BusinessLogic\\": "tests/BusinessLogic",
+                    "Adyen\\Core\\Console\\": "console"
+                }
             },
-            "time": "2021-04-30T14:03:59+00:00"
+            "license": [
+                "proprietary"
+            ],
+            "description": "Core Adyen integration library",
+            "time": "2023-08-14T13:11:58+00:00"
         },
         {
-            "name": "monolog/monolog",
-            "version": "2.9.1",
+            "name": "adyen/php-webhook-module",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "f259e2b15fb95494c83f52d3caad003bbf5ffaa1"
+                "url": "git@github.com:logeecom/adyen-php-webhook-module.git",
+                "reference": "0ab11cbccbd0ee187fb6f4f643e4cf8747f938ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/f259e2b15fb95494c83f52d3caad003bbf5ffaa1",
-                "reference": "f259e2b15fb95494c83f52d3caad003bbf5ffaa1",
+                "url": "https://api.github.com/repos/logeecom/adyen-php-webhook-module/zipball/0ab11cbccbd0ee187fb6f4f643e4cf8747f938ac",
+                "reference": "0ab11cbccbd0ee187fb6f4f643e4cf8747f938ac",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2",
-                "psr/log": "^1.0.1 || ^2.0 || ^3.0"
-            },
-            "provide": {
-                "psr/log-implementation": "1.0.0 || 2.0.0 || 3.0.0"
+                "php": ">=7.2"
             },
             "require-dev": {
-                "aws/aws-sdk-php": "^2.4.9 || ^3.0",
-                "doctrine/couchdb": "~1.0@dev",
-                "elasticsearch/elasticsearch": "^7 || ^8",
-                "ext-json": "*",
-                "graylog2/gelf-php": "^1.4.2 || ^2@dev",
-                "guzzlehttp/guzzle": "^7.4",
-                "guzzlehttp/psr7": "^2.2",
-                "mongodb/mongodb": "^1.8",
-                "php-amqplib/php-amqplib": "~2.4 || ^3",
-                "phpspec/prophecy": "^1.15",
-                "phpstan/phpstan": "^0.12.91",
-                "phpunit/phpunit": "^8.5.14",
-                "predis/predis": "^1.1 || ^2.0",
-                "rollbar/rollbar": "^1.3 || ^2 || ^3",
-                "ruflin/elastica": "^7",
-                "swiftmailer/swiftmailer": "^5.3|^6.0",
-                "symfony/mailer": "^5.4 || ^6",
-                "symfony/mime": "^5.4 || ^6"
-            },
-            "suggest": {
-                "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
-                "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
-                "elasticsearch/elasticsearch": "Allow sending log messages to an Elasticsearch server via official client",
-                "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
-                "ext-curl": "Required to send log messages using the IFTTTHandler, the LogglyHandler, the SendGridHandler, the SlackWebhookHandler or the TelegramBotHandler",
-                "ext-mbstring": "Allow to work properly with unicode symbols",
-                "ext-mongodb": "Allow sending log messages to a MongoDB server (via driver)",
-                "ext-openssl": "Required to send log messages using SSL",
-                "ext-sockets": "Allow sending log messages to a Syslog server (via UDP driver)",
-                "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
-                "mongodb/mongodb": "Allow sending log messages to a MongoDB server (via library)",
-                "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
-                "rollbar/rollbar": "Allow sending log messages to Rollbar",
-                "ruflin/elastica": "Allow sending log messages to an Elastic Search server"
+                "phpunit/phpunit": "^9.5.0",
+                "squizlabs/php_codesniffer": "^3.5"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "2.x-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
-                    "Monolog\\": "src/Monolog"
+                    "Adyen\\Webhook\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Adyen\\Webhook\\Test\\": "tests/"
+                }
+            },
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "Jordi Boggiano",
-                    "email": "j.boggiano@seld.be",
-                    "homepage": "https://seld.be"
+                    "name": "Adyen"
                 }
             ],
-            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
-            "homepage": "https://github.com/Seldaek/monolog",
-            "keywords": [
-                "log",
-                "logging",
-                "psr-3"
-            ],
-            "support": {
-                "issues": "https://github.com/Seldaek/monolog/issues",
-                "source": "https://github.com/Seldaek/monolog/tree/2.9.1"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/Seldaek",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/monolog/monolog",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2023-02-06T13:44:46+00:00"
-        },
-        {
-            "name": "psr/log",
-            "version": "1.1.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/log.git",
-                "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
-                "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\Log\\": "Psr/Log/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "https://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for logging libraries",
-            "homepage": "https://github.com/php-fig/log",
-            "keywords": [
-                "log",
-                "psr",
-                "psr-3"
-            ],
-            "support": {
-                "source": "https://github.com/php-fig/log/tree/1.1.4"
-            },
-            "time": "2021-05-03T11:20:27+00:00"
+            "description": "Webhook module for Adyen Payment Integrations",
+            "time": "2023-01-23T12:47:14+00:00"
         }
     ],
-    "packages-dev": [
-        {
-            "name": "phpro/grumphp-shim",
-            "version": "v1.13.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpro/grumphp-shim.git",
-                "reference": "973a933d176be41f1196d8db7851e32f985dd798"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpro/grumphp-shim/zipball/973a933d176be41f1196d8db7851e32f985dd798",
-                "reference": "973a933d176be41f1196d8db7851e32f985dd798",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "~2.0",
-                "ext-json": "*",
-                "php": "^7.4 || ^8.0"
-            },
-            "replace": {
-                "phpro/grumphp": "self.version"
-            },
-            "require-dev": {
-                "humbug/box": "^3.16"
-            },
-            "bin": [
-                "grumphp",
-                "grumphp.phar"
-            ],
-            "type": "composer-plugin",
-            "extra": {
-                "class": "GrumPHP\\Composer\\GrumPHPPlugin"
-            },
-            "autoload": {
-                "psr-4": {
-                    "GrumPHP\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Toon Verwerft",
-                    "email": "toon.verwerft@phpro.be"
-                },
-                {
-                    "name": "Community",
-                    "homepage": "https://github.com/phpro/grumphp/graphs/contributors"
-                }
-            ],
-            "description": "GrumPHP Phar distribution",
-            "support": {
-                "issues": "https://github.com/phpro/grumphp-shim/issues",
-                "source": "https://github.com/phpro/grumphp-shim/tree/v1.13.0"
-            },
-            "time": "2022-06-24T08:34:50+00:00"
-        }
-    ],
+    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": [],
@@ -279,7 +103,8 @@
     "platform": {
         "php": "^7.2|^7.4|^8.0",
         "ext-json": "*",
-        "ext-zip": "*"
+        "ext-zip": "*",
+        "ext-simplexml": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"

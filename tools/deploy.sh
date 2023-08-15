@@ -19,8 +19,6 @@ echo "Removing unnecessary files from final release archive..."
 rm -fR /tmp/Adyen/deploy/AdyenPayment/tests
 rm -fR /tmp/Adyen/deploy/AdyenPayment/tools
 rm -fR /tmp/Adyen/deploy/AdyenPayment/PluginInstallation
-rm -fR /tmp/Adyen/deploy/AdyenPayment/vendor/monolog
-rm -fR /tmp/Adyen/deploy/AdyenPayment/vendor/psr
 rm -fR /tmp/Adyen/deploy/AdyenPayment/.git
 rm -fR /tmp/Adyen/deploy/AdyenPayment/.idea
 rm -fR /tmp/Adyen/deploy/AdyenPayment/.github
