@@ -469,4 +469,14 @@
             * Adyen Giving - Enable charitable donations through Adyen Giving, allowing your customers to contribute effortlessly during transactions.
         </changes>
     </changelog>
+    <changelog version="4.0.1">
+        <changes lang="en">
+            * Implement Application info logic for payment requests
+            * Update core version to 1.0.1
+        </changes>
+        <changes lang="de">
+            * Implement Application info logic for payment requests
+            * Update core version to 1.0.1
+        </changes>
+    </changelog>
 </plugin>
