@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.0.1</version>
+    <version>4.0.2</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -477,6 +477,14 @@
         <changes lang="de">
             * Implement Application info logic for payment requests
             * Update core version to 1.0.1
+        </changes>
+    </changelog>
+    <changelog version="4.0.2">
+        <changes lang="en">
+            * Update core, fixed credit card mapping
+        </changes>
+        <changes lang="de">
+            * Update core, fixed credit card mapping
         </changes>
     </changelog>
 </plugin>
