@@ -65,9 +65,6 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{inputs.NODE}}
-    - name: Install Node dependencies
-      run: npm ci
-      shell: bash
     - name: Install Playwright Browsers
       shell: bash
       run: npx playwright install --with-deps
