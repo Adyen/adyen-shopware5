@@ -58,21 +58,22 @@ runs:
         repository: nikola-buzej/AutomatedTestPlayground
         path: tests
         token: ${{ inputs.GH_PAT }}
-    - name: Navigate to tests
-      shell: bash
-      run: cd ./tests
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
         node-version: ${{inputs.NODE}}
     - name: Install Node dependencies
-      run: npm install
+      working-directory: ./tests
+      run: 
+        npm install
       shell: bash
     - name: Install Playwright Browsers
+      working-directory: ./tests
       shell: bash
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       shell: bash
+      working-directory: ./tests
       run: npx playwright test
       env:
         PLAYWRIGHT_TEST_BASE_URL: ${{ inputs._SHOP_DOMAIN }}
