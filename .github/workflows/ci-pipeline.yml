@@ -1,0 +1,38 @@
+﻿name: CI Pipeline Shopware 5
+on:
+  push:
+    branches:
+      - feature/ci-pipeline
+jobs:
+  e2e:
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    name: End to End Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shopware: '5.7.18'
+            php: '7.4'     
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v3
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      - name: Create Cache Directories
+        run: | 
+          mkdir -p ~/.build
+      - name: Mount Build Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin-${{ github.run_id }}
+          path: ~/.build
+      - name: Build Plugin
+        uses: ./.github/actions/build_plugin
+        

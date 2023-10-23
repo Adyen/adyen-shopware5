@@ -1,4 +1,4 @@
-#!/bin/bash
+
 
 # Cleanup any leftovers
 rm -f ./tools/AdyenPayment.zip
