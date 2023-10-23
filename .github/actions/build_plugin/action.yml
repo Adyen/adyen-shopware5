@@ -1,10 +1,5 @@
 ﻿name: 'Build Plugin'
 description: "Builds the Plugin"
-
-inputs:
-  shopware:
-    description: "The Shopware version that is used to build the plugin"
-    required: true
 runs:
   using: "composite"
   steps:
@@ -16,10 +11,10 @@ runs:
       run: ./tools/deploy.sh
     - name: Copy to build cache
       shell: bash
-      run: cp -R ./tools ~/.build
+      run: cp -R ./tools/AdyenPayment.zip ~/.build
     - name: Store ZIP file in Github
       uses: actions/upload-artifact@v2
       with:
-        name: AdyenPayment-Shopware-${{ inputs.shopware }}
+        name: AdyenPayment-Shopware
         retention-days: 4
         path: ~/.build
