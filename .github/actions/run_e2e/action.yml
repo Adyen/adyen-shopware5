@@ -60,7 +60,7 @@ runs:
         token: ${{ inputs.GH_PAT }}
     - name: Navigate to tests
       shell: bash
-      run: cd tests
+      run: cd ./tests
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
