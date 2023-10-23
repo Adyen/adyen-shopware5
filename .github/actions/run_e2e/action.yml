@@ -9,11 +9,9 @@ inputs:
   PHP:
     description: "The PHP Version that is used for the Shopware container."
     required: true
-  MOLLIE_APIKEY_TEST:
-    description: "The Mollie Test API key. Required for the installation."
-    default: ''
+  NODE:
+    description: "The Node Version that is used for the E2E Tests."
     required: true
-
   _SHOP_DOMAIN:
     description: 'This domain will be used in Playwright as BASE_URL'
     default: 'adyen.shopware'
@@ -50,5 +48,25 @@ runs:
         docker exec shop bash -c 'php bin/console sw:plugin:refresh'
         docker exec shop bash -c 'php bin/console sw:plugin:install --activate AdyenPayment'
         docker exec shop bash -c 'php bin/console sw:cache:clear'
-        
-      
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{inputs.NODE}}
+    - name: Install Node dependencies
+      run: npm ci
+      shell: bash
+    - name: Install Playwright Browsers
+      shell: bash
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      shell: bash
+      run: npx playwright test
+      env:
+        PLAYWRIGHT_TEST_BASE_URL: ${{ _SHOP_DOMAIN }}
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30  
