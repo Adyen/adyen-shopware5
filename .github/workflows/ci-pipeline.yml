@@ -44,8 +44,9 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v3
         with:
-          repository: tamaralogeecom/test_automation
+          repository: nikola-buzej/AutomatedTestPlayground
           path: tests
+          token: ${{ secrets.GH_PAT }}
 
       - name: Mount Build Cache
         uses: actions/cache@v3
