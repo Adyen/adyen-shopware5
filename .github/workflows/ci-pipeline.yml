@@ -57,5 +57,6 @@ jobs:
           SHOPWARE: ${{ matrix.shopware }}
           PHP: ${{ matrix.php }}
           NODE: 18
+          GH_PAT: ${{ secrets.GH_PAT }}
 
           

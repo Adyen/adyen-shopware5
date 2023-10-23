@@ -3,6 +3,9 @@ description: "Runs Adyen Shopware E2E Tests"
 
 
 inputs:
+  GH_PAT:
+    description: "Personal access token for the repository"
+    required: true
   SHOPWARE:
     description: "The Shopware version that is used to run the tests."
     required: true
@@ -54,7 +57,7 @@ runs:
       with:
         repository: nikola-buzej/AutomatedTestPlayground
         path: tests
-        token: ${{ secrets.GH_PAT }}
+        token: ${{ inputs.GH_PAT }}
     - name: Navigate to tests
       shell: bash
       run: cd tests
@@ -72,7 +75,7 @@ runs:
       shell: bash
       run: npx playwright test
       env:
-        PLAYWRIGHT_TEST_BASE_URL: ${{ _SHOP_DOMAIN }}
+        PLAYWRIGHT_TEST_BASE_URL: ${{ inputs._SHOP_DOMAIN }}
     - uses: actions/upload-artifact@v3
       if: always()
       with:
