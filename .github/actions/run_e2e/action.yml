@@ -48,7 +48,16 @@ runs:
         docker exec shop bash -c 'php bin/console sw:plugin:refresh'
         docker exec shop bash -c 'php bin/console sw:plugin:install --activate AdyenPayment'
         docker exec shop bash -c 'php bin/console sw:cache:clear'
-
+    
+    - name: Clone Code
+      uses: actions/checkout@v3
+      with:
+        repository: nikola-buzej/AutomatedTestPlayground
+        path: tests
+        token: ${{ secrets.GH_PAT }}
+    - name: Navigate to tests
+      shell: bash
+      run: cd tests
     - name: Setup Node
       uses: actions/setup-node@v3
       with:

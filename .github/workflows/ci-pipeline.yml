@@ -44,9 +44,7 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v3
         with:
-          repository: nikola-buzej/AutomatedTestPlayground
-          path: tests
-          token: ${{ secrets.GH_PAT }}
+          path: main
 
       - name: Mount Build Cache
         uses: actions/cache@v3
@@ -54,7 +52,7 @@ jobs:
           key: cache-plugin-${{ github.run_id }}
           path: ~/.build
       - name: E2E Tests, Shopware ${{ matrix.shopware }}
-        uses: ./.github/actions/run_e2e
+        uses: ./main/.github/actions/run_e2e
         with:
           SHOPWARE: ${{ matrix.shopware }}
           PHP: ${{ matrix.php }}
