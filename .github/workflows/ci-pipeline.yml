@@ -4,12 +4,12 @@ on:
     branches:
       - feature/ci-pipeline
 jobs:
-  setup:
+  build:
     permissions:
       contents: read
       pages: write
       id-token: write
-    name: Setup environment
+    name: Build environment
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
