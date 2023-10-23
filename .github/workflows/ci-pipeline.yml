@@ -44,7 +44,7 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v3
         with:
-          repository: logeecom-dev/adyen-shopware-e2e
+          repository: tamaralogeecom/test_automation
           path: tests
 
       - name: Mount Build Cache
