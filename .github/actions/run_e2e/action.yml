@@ -12,13 +12,18 @@ inputs:
   PHP:
     description: "The PHP Version that is used for the Shopware container."
     required: true
+  BASE_URL:
+    description: "The base url of the shop."
+    required: true
+  SUBDOMAIN:
+    description: "The subdomain url of the shop."
+    required: true
+  PORT:
+    description: "The port of the shop."
+    required: true  
   NODE:
     description: "The Node Version that is used for the E2E Tests."
     required: true
-  _SHOP_DOMAIN:
-    description: 'This domain will be used in Playwright as BASE_URL'
-    default: 'adyen.shopware'
-    required: false
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
     default: '~/.build/AdyenPayment.zip'
@@ -34,10 +39,10 @@ runs:
     - name: Start Docker
       shell: bash
       run: |
-        docker run -p 80:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
+        docker run -p ${{inputs.PORT}}:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 30
-        sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = '${{ inputs._SHOP_DOMAIN }}', hosts = '', secure = 0;\""
+      ## sudo echo "127.0.0.1 ${{ inputs.BASE_URL }}" | sudo tee -a /etc/hosts
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = '${{ inputs.SUBDOMAIN }}', hosts = '', secure = 0;\""
 
     - name: Upload ZIP File to Docker
       shell: bash
@@ -76,10 +81,10 @@ runs:
       working-directory: ./tests
       run: npx playwright test
       env:
-        PLAYWRIGHT_TEST_BASE_URL: ${{ inputs._SHOP_DOMAIN }}
+        PLAYWRIGHT_TEST_BASE_URL: ${{ inputs.BASE_URL }}
     - uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: playwright-report
+        name: playwright-report-Shopware-${{inputs.SHOPWARE}}-PHP-${{$inputs.PHP}}
         path: ./tests/playwright-report/
         retention-days: 30  
