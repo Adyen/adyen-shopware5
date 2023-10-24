@@ -41,7 +41,6 @@ runs:
       run: |
         docker run -p ${{inputs.PORT}}:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 30
-      ## sudo echo "127.0.0.1 ${{ inputs.BASE_URL }}" | sudo tee -a /etc/hosts
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = '${{ inputs.SUBDOMAIN }}', hosts = '', secure = 0;\""
 
     - name: Upload ZIP File to Docker
