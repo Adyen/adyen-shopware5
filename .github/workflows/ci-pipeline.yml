@@ -42,7 +42,7 @@ jobs:
             php: '7.4'
             url: 'https://adyenpayment5610.ngrok.io'
             subdomain: 'adyenpayment5610'
-            port: 5001
+            port: 8001
     steps:
       - name: Clone Code
         uses: actions/checkout@v3

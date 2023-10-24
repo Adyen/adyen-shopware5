@@ -39,7 +39,7 @@ runs:
     - name: Start Docker
       shell: bash
       run: |
-        docker run -p ${{ inputs.PORT }}:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
+        docker run -p ${{ inputs.PORT }}:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 30
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = '${{ inputs.SUBDOMAIN }}', hosts = '', secure = 0;\""
 
