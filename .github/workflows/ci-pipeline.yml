@@ -42,7 +42,7 @@ jobs:
             php: '7.4'
             url: 'https://adyenpayment5610.ngrok.io'
             subdomain: 'adyenpayment5610'
-            port: 443
+            port: 8001
     steps:
       - name: Clone Code
         uses: actions/checkout@v3
@@ -55,33 +55,6 @@ jobs:
           key: cache-plugin-${{ github.run_id }}
           path: ~/.build
 
-      - name: Download Ngrok
-        run: wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-        shell: bash
-      - name: Unzip Ngrok
-        run: unzip -qq -o ngrok-stable-linux-amd64.zip
-        shell: bash
-      - name: Authenticate Ngrok
-        run: ./ngrok authtoken ${{ secrets.NGROK_TOKEN }}
-        shell: bash
-      - name: Run Ngrok
-        run: ./ngrok http -region=us -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
-        shell: bash
-      - name: Waiting for Ngrok tunnel
-        run: |
-          URL="${{ matrix.url }}"
-          
-          while true; do
-            response=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
-            if [ "$response" = "302" ]; then
-              echo "URL is returning 302 HTTP status code, Ngrok tunnel is reached, good to go!"
-              break  # Exit the loop if the response is 302
-            else
-              echo "URL is not ready yet, because Ngrok sessions are all in use at the moment, please wait. Retrying to build the Ngrok tunnel again in 5 seconds..."
-              sleep 5  # Wait for 5 seconds before retrying
-              ./ngrok http -region=us -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
-            fi
-          done  
 
       - name: E2E Tests, Shopware ${{ matrix.shopware }}
         uses: ./main/.github/actions/run_e2e
