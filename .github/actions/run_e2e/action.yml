@@ -41,7 +41,7 @@ runs:
     - name: Start Docker
       shell: bash
       run: |
-        docker run -p ${{ inputs.PORT }}:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
+        docker run -p ${{ inputs.PORT }}:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 30
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = '${{ inputs.SUBDOMAIN }}', hosts = '', secure = 0;\""
 
@@ -68,7 +68,7 @@ runs:
       run: ./ngrok authtoken ${{ inputs.NGROK_TOKEN }}
       shell: bash
     - name: Run Ngrok
-      run: ./ngrok http -region=us -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
+      run: ./ngrok http --domain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
       shell: bash
     - name: Waiting for Ngrok tunnel
       shell: bash
@@ -83,7 +83,7 @@ runs:
           else
             echo "URL is not ready yet, because Ngrok sessions are all in use at the moment, please wait. Retrying to build the Ngrok tunnel again in 5 seconds..."
             sleep 5  # Wait for 5 seconds before retrying
-            ./ngrok http -region=us -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
+            ./ngrok http -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
           fi
         done      
 
