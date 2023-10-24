@@ -1,7 +1,6 @@
 ﻿name: 'Run E2E Tests'
 description: "Runs Adyen Shopware E2E Tests"
 
-
 inputs:
   GH_PAT:
     description: "Personal access token for the repository"
@@ -23,6 +22,9 @@ inputs:
     required: true
   NODE:
     description: "The Node Version that is used for the E2E Tests."
+    required: true
+  NGROK_TOKEN:
+    description: "The Ngrok authentication token"
     required: true
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
@@ -63,7 +65,7 @@ runs:
       run: unzip -qq -o ngrok-stable-linux-amd64.zip
       shell: bash
     - name: Authenticate Ngrok
-      run: ./ngrok authtoken ${{ secrets.NGROK_TOKEN }}
+      run: ./ngrok authtoken ${{ inputs.NGROK_TOKEN }}
       shell: bash
     - name: Run Ngrok
       run: ./ngrok http -region=us -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &

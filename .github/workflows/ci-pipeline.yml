@@ -66,5 +66,6 @@ jobs:
           PORT: ${{ matrix.port }}
           SUBDOMAIN: ${{ matrix.subdomain }}
           GH_PAT: ${{ secrets.GH_PAT }}
+          NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
 
           
