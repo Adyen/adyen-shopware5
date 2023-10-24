@@ -40,8 +40,8 @@ jobs:
         include:
           - shopware: '5.6.10'
             php: '7.4'
-            url: 'https://adyenpayment5610.ngrok.io'
-            subdomain: 'adyenpayment5610'
+            url: 'https://adyen.composed-coyote-enabled.ngrok-free.app'
+            subdomain: 'adyen.composed-coyote-enabled.ngrok-free.app'
             port: 8001
     steps:
       - name: Clone Code
