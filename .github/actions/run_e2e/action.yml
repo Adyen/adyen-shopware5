@@ -68,7 +68,7 @@ runs:
       run: ./ngrok authtoken ${{ inputs.NGROK_TOKEN }}
       shell: bash
     - name: Run Ngrok
-      run: ./ngrok http -hostname ${{ matrix.domain }} ${{ matrix.port }}
+      run: ./ngrok http -hostname ${{ matrix.domain }} ${{ matrix.port }} > ngrok.log &
       shell: bash
     - name: Waiting for Ngrok tunnel
       shell: bash
