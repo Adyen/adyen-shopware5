@@ -111,7 +111,7 @@ runs:
       working-directory: ./tests
       run: npx playwright test
       env:
-        PLAYWRIGHT_TEST_BASE_URL: ${{ inputs.BASE_URL }}
+        BASE_URL: ${{ inputs.BASE_URL }}
     - uses: actions/upload-artifact@v3
       if: always()
       with:
