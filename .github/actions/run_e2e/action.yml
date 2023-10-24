@@ -77,9 +77,9 @@ runs:
         
         while true; do
           response=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
-          if [ "$response" = "302" ]; then
-            echo "URL is returning 302 HTTP status code, Ngrok tunnel is reached, good to go!"
-            break  # Exit the loop if the response is 302
+          if [ "$response" = "200" ]; then
+            echo "URL is returning 200 HTTP status code, Ngrok tunnel is reached, good to go!"
+            break  # Exit the loop if the response is 200
           else
             echo "URL is not ready yet, because Ngrok sessions are all in use at the moment, please wait. Retrying to build the Ngrok tunnel again in 5 seconds..."
             sleep 5  # Wait for 5 seconds before retrying
