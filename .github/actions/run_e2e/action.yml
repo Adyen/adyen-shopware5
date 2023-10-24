@@ -14,7 +14,7 @@ inputs:
   BASE_URL:
     description: "The base url of the shop."
     required: true
-  SUBDOMAIN:
+  DOMAIN:
     description: "The subdomain url of the shop."
     required: true
   PORT:
@@ -43,7 +43,7 @@ runs:
       run: |
         docker run -p ${{ inputs.PORT }}:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 30
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = '${{ inputs.SUBDOMAIN }}', hosts = '', secure = 0;\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = '${{ inputs.DOMAIN }}', hosts = '', secure = 0;\""
 
     - name: Upload ZIP File to Docker
       shell: bash
@@ -68,7 +68,7 @@ runs:
       run: ./ngrok authtoken ${{ inputs.NGROK_TOKEN }}
       shell: bash
     - name: Run Ngrok
-      run: ./ngrok http -subdomain ${{ matrix.subdomain }} ${{ matrix.port }}
+      run: ./ngrok http -domain ${{ matrix.domain }} ${{ matrix.port }}
       shell: bash
     - name: Waiting for Ngrok tunnel
       shell: bash
@@ -83,7 +83,7 @@ runs:
           else
             echo "URL is not ready yet, because Ngrok sessions are all in use at the moment, please wait. Retrying to build the Ngrok tunnel again in 5 seconds..."
             sleep 5  # Wait for 5 seconds before retrying
-            ./ngrok http -subdomain ${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
+            ./ngrok http -domain ${{ matrix.domain }} ${{ matrix.port }} > ngrok.log &
           fi
         done      
 

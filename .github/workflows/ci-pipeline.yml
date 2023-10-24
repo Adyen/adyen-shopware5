@@ -40,8 +40,8 @@ jobs:
         include:
           - shopware: '5.6.10'
             php: '7.4'
-            url: 'https://5610.shopware5-e2e-test-env.ngrok.app'
-            subdomain: '5610.shopware5-e2e-test-env.ngrok.app'
+            url: 'https://5610-74-shopware5-e2e-test-env.ngrok.app'
+            domain: '5610-74-shopware5-e2e-test-env.ngrok.app'
             port: 8001
     steps:
       - name: Clone Code
@@ -64,7 +64,7 @@ jobs:
           NODE: 18
           BASE_URL: ${{ matrix.url }}
           PORT: ${{ matrix.port }}
-          SUBDOMAIN: ${{ matrix.subdomain }}
+          DOMAIN: ${{ matrix.domain }}
           GH_PAT: ${{ secrets.GH_PAT }}
           NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
 
