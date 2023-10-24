@@ -13,7 +13,7 @@ runs:
       shell: bash
       run: cp -R ./tools/AdyenPayment.zip ~/.build
     - name: Store ZIP file in Github
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: AdyenPayment-Shopware
         retention-days: 4
