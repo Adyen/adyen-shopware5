@@ -68,7 +68,7 @@ runs:
       run: ./ngrok authtoken ${{ inputs.NGROK_TOKEN }}
       shell: bash
     - name: Run Ngrok
-      run: ./ngrok http --domain ${{ matrix.subdomain }} ${{ matrix.port }}
+      run: ./ngrok http -subdomain ${{ matrix.subdomain }} ${{ matrix.port }}
       shell: bash
     - name: Waiting for Ngrok tunnel
       shell: bash
@@ -83,7 +83,7 @@ runs:
           else
             echo "URL is not ready yet, because Ngrok sessions are all in use at the moment, please wait. Retrying to build the Ngrok tunnel again in 5 seconds..."
             sleep 5  # Wait for 5 seconds before retrying
-            ./ngrok http --domain ${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
+            ./ngrok http -subdomain ${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
           fi
         done      
 

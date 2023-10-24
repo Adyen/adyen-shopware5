@@ -40,8 +40,8 @@ jobs:
         include:
           - shopware: '5.6.10'
             php: '7.4'
-            url: 'https://shopware5-e2e-test-env.ngrok.app'
-            subdomain: 'shopware5-e2e-test-env.ngrok.app'
+            url: 'https://5610.shopware5-e2e-test-env.ngrok.app'
+            subdomain: '5610.shopware5-e2e-test-env.ngrok.app'
             port: 8001
     steps:
       - name: Clone Code
