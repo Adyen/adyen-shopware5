@@ -62,7 +62,7 @@ jobs:
         run: unzip -qq -o ngrok-stable-linux-amd64.zip
         shell: bash
       - name: Run Ngrok
-        run: ./ngrok http -region=eu -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
+        run: ./ngrok http -region=us -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
         shell: bash
       - name: Waiting for Ngrok tunnel
         run: |
@@ -76,7 +76,7 @@ jobs:
             else
               echo "URL is not ready yet, because Ngrok sessions are all in use at the moment, please wait. Retrying to build the Ngrok tunnel again in 5 seconds..."
               sleep 5  # Wait for 5 seconds before retrying
-              ./ngrok http -region=eu -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
+              ./ngrok http -region=us -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
             fi
           done  
 
