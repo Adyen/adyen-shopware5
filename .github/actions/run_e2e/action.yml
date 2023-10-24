@@ -20,7 +20,7 @@ inputs:
     required: true
   PORT:
     description: "The port of the shop."
-    required: true  
+    required: true
   NODE:
     description: "The Node Version that is used for the E2E Tests."
     required: true
@@ -39,7 +39,7 @@ runs:
     - name: Start Docker
       shell: bash
       run: |
-        docker run -p ${{inputs.PORT}}:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
+        docker run -p ${{ inputs.PORT }}:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 30
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = '${{ inputs.SUBDOMAIN }}', hosts = '', secure = 0;\""
 
@@ -55,7 +55,7 @@ runs:
         docker exec shop bash -c 'php bin/console sw:plugin:refresh'
         docker exec shop bash -c 'php bin/console sw:plugin:install --activate AdyenPayment'
         docker exec shop bash -c 'php bin/console sw:cache:clear'
-    
+
     - name: Clone Code
       uses: actions/checkout@v3
       with:
@@ -65,10 +65,10 @@ runs:
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
-        node-version: ${{inputs.NODE}}
+        node-version: ${{ inputs.NODE }}
     - name: Install Node dependencies
       working-directory: ./tests
-      run: 
+      run:
         npm install
       shell: bash
     - name: Install Playwright Browsers
@@ -84,6 +84,6 @@ runs:
     - uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: playwright-report-Shopware-${{inputs.SHOPWARE}}-PHP-${{$inputs.PHP}}
+        name: playwright-report-Shopware-${{ inputs.SHOPWARE }}-PHP-${{ $inputs.PHP }}
         path: ./tests/playwright-report/
         retention-days: 30  
