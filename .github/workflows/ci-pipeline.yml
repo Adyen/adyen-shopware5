@@ -43,6 +43,11 @@ jobs:
             url: 'https://5610-74-shopware5-e2e-test-env.ngrok.app'
             domain: '5610-74-shopware5-e2e-test-env.ngrok.app'
             port: 8001
+          - shopware: '5.7.18'
+            php: '7.4'
+            url: 'https://5718-74-shopware5-e2e-test-env.ngrok.app'
+            domain: '5718-74-shopware5-e2e-test-env.ngrok.app'
+            port: 8001
     steps:
       - name: Clone Code
         uses: actions/checkout@v3
