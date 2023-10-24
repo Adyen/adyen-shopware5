@@ -61,6 +61,9 @@ jobs:
       - name: Unzip Ngrok
         run: unzip -qq -o ngrok-stable-linux-amd64.zip
         shell: bash
+      - name: Authenticate Ngrok
+        run: ./ngrok authtoken ${{ secrets.NGROK_TOKEN }}
+        shell: bash
       - name: Run Ngrok
         run: ./ngrok http -region=us -subdomain=${{ matrix.subdomain }} ${{ matrix.port }} > ngrok.log &
         shell: bash
