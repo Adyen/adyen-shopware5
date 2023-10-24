@@ -40,8 +40,8 @@ jobs:
         include:
           - shopware: '5.6.10'
             php: '7.4'
-            url: 'https://composed-coyote-enabled.ngrok-free.app'
-            subdomain: 'composed-coyote-enabled.ngrok-free.app'
+            url: 'https://shopware5-e2e-test-env.ngrok.app'
+            subdomain: 'shopware5-e2e-test-env.ngrok.app'
             port: 8001
     steps:
       - name: Clone Code
