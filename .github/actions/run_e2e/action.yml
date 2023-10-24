@@ -84,6 +84,6 @@ runs:
     - uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: playwright-report-Shopware-${{ inputs.SHOPWARE }}-PHP-${{ $inputs.PHP }}
+        name: playwright-report-Shopware-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
         path: ./tests/playwright-report/
         retention-days: 30  
