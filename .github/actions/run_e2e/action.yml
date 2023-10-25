@@ -27,8 +27,11 @@ inputs:
     description: "The password for the backoffice."
     required: true
   DOMAIN:
-    description: "The subdomain url of the shop."
+    description: "The domain url of the shop."
     required: true
+  SUBDOMAIN:
+    description: "The subdomain url of the shop."
+    required: true  
   PORT:
     description: "The port of the shop."
     required: true
@@ -70,36 +73,7 @@ runs:
         docker exec shop bash -c 'php bin/console sw:plugin:refresh'
         docker exec shop bash -c 'php bin/console sw:plugin:install --activate AdyenPayment'
         docker exec shop bash -c 'php bin/console sw:cache:clear'
-
-    - name: Download Ngrok
-      run: wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-      shell: bash
-    - name: Unzip Ngrok
-      run: unzip -qq -o ngrok-stable-linux-amd64.zip
-      shell: bash
-    - name: Authenticate Ngrok
-      run: ./ngrok authtoken ${{ inputs.NGROK_TOKEN }}
-      shell: bash
-    - name: Run Ngrok
-      run: ./ngrok http -hostname ${{ matrix.domain }} ${{ matrix.port }} > ngrok.log &
-      shell: bash
-    - name: Waiting for Ngrok tunnel
-      shell: bash
-      run: |
-        URL="${{ matrix.url }}"
         
-        while true; do
-          response=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
-          if [ "$response" = "200" ]; then
-            echo "URL is returning 200 HTTP status code, Ngrok tunnel is reached, good to go!"
-            break  # Exit the loop if the response is 200
-          else
-            echo "URL is not ready yet, because Ngrok sessions are all in use at the moment, please wait. Retrying to build the Ngrok tunnel again in 5 seconds..."
-            sleep 5  # Wait for 5 seconds before retrying
-            ./ngrok http -hostname ${{ matrix.domain }} ${{ matrix.port }} > ngrok.log &
-          fi
-        done      
-
     - name: Clone Code
       uses: actions/checkout@v3
       with:
@@ -111,6 +85,17 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.NODE }}
+        
+    - name: Install Local Tunnel
+      working-directory: ./tests
+      shell: bash
+      run: npm install -g localtunnel
+      
+    - name: Run Local Tunnel
+      working-directory: ./tests
+      shell: bash
+      run: lt --port ${{ inputs.PORT }} --subdomain '${{inputs.SUBDOMAIN}}' > localtunnel.log 
+      
     - name: Install Node dependencies
       working-directory: ./tests
       run:
