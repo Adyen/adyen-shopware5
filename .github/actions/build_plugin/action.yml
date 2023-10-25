@@ -5,7 +5,7 @@ runs:
   steps:
     - name: Change access rights
       shell: bash
-      run: sudo chmod 777 -R ./tools
+      run: sudo chmod 755 -R ./tools
     - name: Build plugin
       shell: bash
       run: ./tools/deploy.sh
