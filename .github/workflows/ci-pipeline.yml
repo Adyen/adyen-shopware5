@@ -40,12 +40,12 @@ jobs:
         include:
           - shopware: '5.6.10'
             php: '7.4'
-            url: 'https://5610-74-shopware5-e2e-test-env.ngrok.app'
+            url: 'https://5610-74-shopware5-e2e-test-env.ngrok.app/backend'
             domain: '5610-74-shopware5-e2e-test-env.ngrok.app'
             port: 8001
           - shopware: '5.7.18'
             php: '7.4'
-            url: 'https://5718-74-shopware5-e2e-test-env.ngrok.app'
+            url: 'https://5718-74-shopware5-e2e-test-env.ngrok.app/backend'
             domain: '5718-74-shopware5-e2e-test-env.ngrok.app'
             port: 8001
     steps:
@@ -72,5 +72,8 @@ jobs:
           DOMAIN: ${{ matrix.domain }}
           GH_PAT: ${{ secrets.GH_PAT }}
           NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
-
+          API_KEY_TEST: ${{ secrets.API_KEY_TEST }}
+          API_KEY_LIVE: ${{ secrets.API_KEY_LIVE }}
+          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           

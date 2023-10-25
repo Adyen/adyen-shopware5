@@ -14,6 +14,18 @@ inputs:
   BASE_URL:
     description: "The base url of the shop."
     required: true
+  API_KEY_TEST:
+    description: "The test api key for adyen."
+    required: true
+  API_KEY_LIVE:
+    description: "The live api key for adyen."
+    required: true
+  ADMIN_USERNAME:
+    description: "The username for the backoffice."
+    required: true
+  ADMIN_PASSWORD:
+    description: "The password for the backoffice."
+    required: true
   DOMAIN:
     description: "The subdomain url of the shop."
     required: true
@@ -90,7 +102,8 @@ runs:
     - name: Clone Code
       uses: actions/checkout@v3
       with:
-        repository: nikola-buzej/AutomatedTestPlayground
+        repository: logeecom-dev/adyen-common-e2e-tests
+        ref: feature/shopware5_first_milestone
         path: tests
         token: ${{ inputs.GH_PAT }}
     - name: Setup Node
@@ -108,10 +121,14 @@ runs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       shell: bash
-      working-directory: ./tests
+      working-directory: ./tests/shopware5
       run: npx playwright test
       env:
-        BASE_URL: ${{ inputs.BASE_URL }}
+        API_KEY_TEST: ${{ inputs.API_KEY_TEST }}
+        API_KEY_LIVE: ${{ inputs.API_KEY_LIVE }}
+        BACKEND_SHOP_URL: ${{ inputs.BASE_URL }}
+        ADMIN_USERNAME: ${{ inputs.ADMIN_USERNAME }}
+        ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
     - uses: actions/upload-artifact@v3
       if: always()
       with:
