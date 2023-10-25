@@ -94,7 +94,7 @@ runs:
     - name: Run Local Tunnel
       working-directory: ./tests
       shell: bash
-      run: lt -port ${{ inputs.PORT }} -subdomain ${{inputs.SUBDOMAIN}} 
+      run: lt -p ${{ inputs.PORT }} -s ${{inputs.SUBDOMAIN}} 
       
     - name: Install Node dependencies
       working-directory: ./tests
