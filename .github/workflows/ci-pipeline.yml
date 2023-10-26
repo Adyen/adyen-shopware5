@@ -40,15 +40,9 @@ jobs:
         include:
           - shopware: '5.6.10'
             php: '7.4'
-            url: 'https://5610-74-shopware5-5610-74.loca.lt'
-            domain: 'shopware5-5610-74.loca.lt'
-            subdomain: 'shopware5-5610-74'
             port: 8001
           - shopware: '5.7.18'
             php: '7.4'
-            url: 'https://shopware5-5718-74.loca.lt'
-            domain: 'shopware5-5718-74.loca.lt'
-            subdomain: 'shopware5-5718-74'
             port: 8001
     steps:
       - name: Clone Code
@@ -69,10 +63,7 @@ jobs:
           SHOPWARE: ${{ matrix.shopware }}
           PHP: ${{ matrix.php }}
           NODE: 18
-          BASE_URL: ${{ matrix.url }}
           PORT: ${{ matrix.port }}
-          DOMAIN: ${{ matrix.domain }}
-          SUBDOMAIN: ${{ matrix.subdomain }}
           GH_PAT: ${{ secrets.GH_PAT }}
           NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
           API_KEY_TEST: ${{ secrets.API_KEY_TEST }}

@@ -11,9 +11,6 @@ inputs:
   PHP:
     description: "The PHP Version that is used for the Shopware container."
     required: true
-  BASE_URL:
-    description: "The base url of the shop."
-    required: true
   API_KEY_TEST:
     description: "The test api key for adyen."
     required: true
@@ -26,12 +23,6 @@ inputs:
   ADMIN_PASSWORD:
     description: "The password for the backoffice."
     required: true
-  DOMAIN:
-    description: "The domain url of the shop."
-    required: true
-  SUBDOMAIN:
-    description: "The subdomain url of the shop."
-    required: true  
   PORT:
     description: "The port of the shop."
     required: true
@@ -58,7 +49,6 @@ runs:
       run: |
         docker run -p ${{ inputs.PORT }}:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 30
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = '${{ inputs.DOMAIN }}', hosts = '', secure = 0;\""
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_auth SET localeID = (SELECT id FROM s_core_locales WHERE locale = 'en_GB');\""
 
     - name: Upload ZIP File to Docker
@@ -73,7 +63,7 @@ runs:
         docker exec shop bash -c 'php bin/console sw:plugin:refresh'
         docker exec shop bash -c 'php bin/console sw:plugin:install --activate AdyenPayment'
         docker exec shop bash -c 'php bin/console sw:cache:clear'
-        
+
     - name: Clone Code
       uses: actions/checkout@v3
       with:
@@ -85,17 +75,17 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.NODE }}
-        
+
     - name: Install Local Tunnel
       working-directory: ./tests
       shell: bash
       run: npm install -g localtunnel
-      
+
     - name: Run Local Tunnel
       working-directory: ./tests
       shell: bash
-      run: lt -p ${{ inputs.PORT }} -s ${{inputs.SUBDOMAIN}} 
-      
+      run: lt -p ${{ inputs.PORT }} -s ${{inputs.SUBDOMAIN}}
+
     - name: Install Node dependencies
       working-directory: ./tests
       run:
@@ -112,7 +102,7 @@ runs:
       env:
         API_KEY_TEST: ${{ inputs.API_KEY_TEST }}
         API_KEY_LIVE: ${{ inputs.API_KEY_LIVE }}
-        BACKEND_SHOP_URL: ${{ inputs.BASE_URL }}
+        PORT: ${{ inputs.PORT }}
         ADMIN_USERNAME: ${{ inputs.ADMIN_USERNAME }}
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
     - uses: actions/upload-artifact@v3
