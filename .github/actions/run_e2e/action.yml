@@ -75,17 +75,6 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.NODE }}
-
-    - name: Install Local Tunnel
-      working-directory: ./tests
-      shell: bash
-      run: npm install -g localtunnel
-
-    - name: Run Local Tunnel
-      working-directory: ./tests
-      shell: bash
-      run: lt -p ${{ inputs.PORT }} -s ${{inputs.SUBDOMAIN}}
-
     - name: Install Node dependencies
       working-directory: ./tests
       run:
