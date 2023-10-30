@@ -1,5 +1,6 @@
 # Adyen Payment plugin for Shopware 5
 Use Adyen's plugin for Shopware 5 to offer frictionless payments online, in-app, and in-store.
+**Note**: if you are still using an **older** version of the **integration** (**below v4.0**) please refer to [this documentation](https://github.com/Adyen/adyen-shopware5/wiki).
 
 ## Contributing
 We strongly encourage you to join us in contributing to this repository so everyone can benefit from:
