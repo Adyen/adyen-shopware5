@@ -7,7 +7,7 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\AdditionalDat
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\AdditionalData\EnhancedSchemeData;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\AdditionalData\ItemDetailLine;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\StartTransactionRequestContext;
-use Adyen\Core\BusinessLogic\Domain\Integration\Processors\L2L3DataProcessor as BaseL2L3DataProcessor;
+use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\L2L3DataProcessor as BaseL2L3DataProcessor;
 use Adyen\Core\BusinessLogic\Domain\Payment\Services\PaymentService;
 use Exception;
 use Shopware\Models\Country\Country;

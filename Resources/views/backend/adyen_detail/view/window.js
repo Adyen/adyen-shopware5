@@ -12,7 +12,7 @@ Ext.define('Shopware.apps.AdyenTransaction.Window', {
         let me = this,
             result = me.callParent();
 
-        result.add(me.createAdyenTab(!!me.record.raw.adyenTransaction));
+        result.add(me.createAdyenTab(!(!me.record.raw.adyenTransaction) || me.record.raw.adyenDisplayPaymentLink));
 
         return result;
     },
@@ -24,22 +24,37 @@ Ext.define('Shopware.apps.AdyenTransaction.Window', {
 
         let items = [];
         if (enableTab) {
-            items.push(
-                Ext.create('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
-                    store: transactionStore,
-                    layout: {
-                        type: 'vbox',
-                        align: 'stretch'
-                    },
-                    region: 'north'
-                }),
-                Ext.create('Shopware.apps.AdyenTransaction.AdyenOrderDetailList', {
-                    region: 'center',
-                    store: transactionStore,
-                    record: me.record
-                })
-            );
+            if (!me.record.raw.adyenDisplayPaymentLink) {
+                items.push(
+                    Ext.create('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
+                        store: transactionStore,
+                        layout: {
+                            type: 'vbox',
+                            align: 'stretch'
+                        },
+                        region: 'north'
+                    }),
+                    Ext.create('Shopware.apps.AdyenTransaction.AdyenOrderDetailList', {
+                        region: 'center',
+                        store: transactionStore,
+                        record: me.record
+                    })
+                );
+            } else {
+                items.push(
+                    Ext.create('Shopware.apps.AdyenTransaction.AdyenOrderPaymentLink', {
+                            store: transactionStore,
+                            layout: {
+                                type: 'vbox',
+                                align: 'stretch'
+                            },
+                            region: 'north'
+                        }
+                    ));
+            }
+
         }
+
 
         me.adyenTransactionTab = Ext.create('Ext.container.Container', {
             title: 'Adyen',
@@ -61,6 +76,9 @@ Ext.define('Shopware.apps.AdyenTransaction.Window', {
                 },
                 success: function (response) {
                     transactionStore.loadData(JSON.parse(response.responseText));
+                    if (me.query('#adyenOrderId')[0] !== undefined) {
+                        me.query('#adyenOrderId')[0].setValue(me.record.get('id'));
+                    }
                     me.loadingMask.hide();
                 }
             });
@@ -68,5 +86,6 @@ Ext.define('Shopware.apps.AdyenTransaction.Window', {
 
         return me.adyenTransactionTab;
     }
-});
+})
+;
 //{/block}

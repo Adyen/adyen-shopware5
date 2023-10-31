@@ -8,8 +8,7 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\AdditionalDat
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\AdditionalData\RiskData;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\StartTransactionRequestContext;
 use Adyen\Core\BusinessLogic\Domain\GeneralSettings\Services\GeneralSettingsService;
-use Adyen\Core\BusinessLogic\Domain\Integration\Processors\BasketItemsProcessor as BaseBasketItemsProcessor;
-use Adyen\Core\BusinessLogic\Domain\Translations\Model\RepositoryOperationFailedException;
+use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\BasketItemsProcessor as BaseBasketItemsProcessor;
 use Shopware\Models\Article\Article;
 use Shopware\Models\Article\Repository as ArticleRepository;
 
@@ -40,7 +39,10 @@ class BasketItemsProcessor implements BaseBasketItemsProcessor
     }
 
     /**
-     * @throws RepositoryOperationFailedException
+     * @param PaymentRequestBuilder $builder
+     * @param StartTransactionRequestContext $context
+     *
+     * @return void
      */
     public function process(PaymentRequestBuilder $builder, StartTransactionRequestContext $context): void
     {

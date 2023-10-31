@@ -1,9 +1,16 @@
 <?php
 
 use Adyen\Core\BusinessLogic\AdminAPI\AdminAPI;
+use Adyen\Core\BusinessLogic\AdminAPI\PaymentLink\Request\CreatePaymentLinkRequest;
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\InvalidCurrencyCode;
 use Adyen\Core\BusinessLogic\Domain\TransactionHistory\Exceptions\InvalidMerchantReferenceException;
 use AdyenPayment\Controllers\Common\AjaxResponseSetter;
+use AdyenPayment\Repositories\Wrapper\OrderRepository;
+use Doctrine\ORM\OptimisticLockException;
 
+/**
+ * Class Shopware_Controllers_Backend_AdyenMerchantActions
+ */
 class Shopware_Controllers_Backend_AdyenMerchantActions extends Enlight_Controller_Action
 {
     use AjaxResponseSetter;
@@ -53,6 +60,12 @@ class Shopware_Controllers_Backend_AdyenMerchantActions extends Enlight_Controll
         }
     }
 
+    /**
+     * @return void
+     *
+     * @throws InvalidMerchantReferenceException
+     * @throws InvalidCurrencyCode
+     */
     public function refundAction(): void
     {
         $storeId = $this->Request()->get('storeId');
@@ -71,5 +84,78 @@ class Shopware_Controllers_Backend_AdyenMerchantActions extends Enlight_Controll
             $this->Response()->setHttpResponseCode($response->getStatusCode());
             $this->Response()->setBody($translatedString . $response->toArray()['errorMessage'] ?? '');
         }
+    }
+
+    /**
+     * @return void
+     *
+     * @throws InvalidMerchantReferenceException
+     */
+    public function generatePaymentLinkAction(): void
+    {
+        $storeId = $this->Request()->get('storeId');
+        $currency = $this->Request()->get('currency');
+        $amount = $this->Request()->get('amount');
+        $merchantReference = $this->Request()->get('merchantReference');
+
+        $response = AdminAPI::get()->paymentLink($storeId)->createPaymentLink(
+            new CreatePaymentLinkRequest($amount, $currency, $merchantReference)
+        );
+
+        if (!$response->isSuccessful()) {
+            $namespace = Shopware()->Snippets()->getNamespace('backend/adyen/configuration');
+            $translatedString = $namespace->get(
+                'payment/adyen/paymentlinkrequestfail',
+                'Payment link generation failed. Reason: '
+            );
+            $this->Response()->setHttpResponseCode($response->getStatusCode());
+            $this->Response()->setBody($translatedString . $response->toArray()['errorMessage'] ?? '');
+        }
+    }
+
+    /**
+     * @return void
+     *
+     * @throws InvalidCurrencyCode
+     * @throws InvalidMerchantReferenceException
+     * @throws OptimisticLockException
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
+    public function generatePaymentLinkNonAdyenOrderAction(): void
+    {
+        $orderId = $this->Request()->get('orderId');
+        $order = $this->getOrderService()->getOrderById((int)$orderId);
+        $temporaryId = $order->getTemporaryId();
+
+        if (empty($temporaryId)) {
+            $order = $this->getOrderService()->setOrderTemporaryId($orderId, $order->getNumber());
+        }
+
+        $response = AdminAPI::get()->paymentLink((string)$order->getShop()->getId())->createPaymentLink(
+            new CreatePaymentLinkRequest($order->getInvoiceAmount(), $order->getCurrency(), $order->getTemporaryId())
+        );
+
+
+        if (!$response->isSuccessful()) {
+            $namespace = Shopware()->Snippets()->getNamespace('backend/adyen/configuration');
+            $translatedString = $namespace->get(
+                'payment/adyen/paymentlinkrequestfail',
+                'Payment link generation failed. Reason: '
+            );
+            $this->Response()->setHttpResponseCode($response->getStatusCode());
+            $this->Response()->setBody($translatedString . $response->toArray()['errorMessage'] ?? '');
+
+            return;
+        }
+
+        $this->returnAPIResponse($response);
+    }
+
+    /**
+     * @return OrderRepository
+     */
+    private function getOrderService(): OrderRepository
+    {
+        return Shopware()->Container()->get(OrderRepository::class);
     }
 }

@@ -26,7 +26,9 @@ Ext.define('Shopware.apps.AdyenTransaction.model.Transaction', {
         { name: 'riskScore', type: 'string'},
         { name: 'capturableAmount', type: 'string'},
         { name: 'refundableAmount', type: 'string'},
-        { name: 'cancelSupported', type: 'boolean'}
+        { name: 'cancelSupported', type: 'boolean'},
+        { name: 'paymentLink', type: 'string'},
+        { name: 'displayPaymentLink', type: 'boolean'}
     ]
 });
 //{/block}

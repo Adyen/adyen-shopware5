@@ -13,7 +13,7 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
         ];
 
         me.store.on('datachanged', function (store, records, options) {
-            me.record = store.first();
+            me.record = store.last();
             me.detailsPanel.loadRecord(me.record);
             me.query('#adyenPaymentMethod')[0].setSrc(me.record.get('paymentMethod'));
             me.query('#captureCurrency')[0].setValue(me.record.get('amountCurrency'));
@@ -54,6 +54,25 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
                 me.query('#adyenCancelBtn')[0].hide();
             } else {
                 me.query('#adyenCancelBtn')[0].show();
+            }
+
+            if (!me.record.get('displayPaymentLink')) {
+                me.query('#adyenPaymentLinkToolbar')[0].hide();
+            }
+
+            if (me.record.get('displayPaymentLink') && !me.record.get('paymentLink')) {
+                me.query('#adyenPaymentLinkField')[0].hide();
+                me.query('#adyenCopyPaymentLinkBtn')[0].hide();
+                me.query('#adyenPaymentLinkToolbar')[0].show();
+                me.query('#adyenGeneratePaymentLinkBtn')[0].show();
+            }
+
+            if (me.record.get('displayPaymentLink') && me.record.get('paymentLink')) {
+                me.query('#adyenGeneratePaymentLinkBtn')[0].hide();
+                me.query('#adyenPaymentLinkField')[0].setValue(me.record.get('paymentLink'));
+                me.query('#adyenPaymentLinkToolbar')[0].show();
+                me.query('#adyenPaymentLinkField')[0].show();
+                me.query('#adyenCopyPaymentLinkBtn')[0].show();
             }
         });
 
@@ -206,6 +225,7 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
             },
             {
                 xtype: 'toolbar',
+                itemId: 'adyenCancelToolBar',
                 style: {
                     'background-color': 'rgb(240, 242, 244)'
                 },
@@ -226,12 +246,43 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
                         text: '{s name="payment/adyen/detail/viewonadyenca"}View payment on Adyen CA{/s}',
                         margin: '10 0 0 0',
                         handler: function () {
-                            window.open(me.record.get('viewOnAdyenUrl') );
+                            window.open(me.record.get('viewOnAdyenUrl'));
                         }
                     }
                 ]
+            },
+            {
+                xtype: 'toolbar',
+                itemId: 'adyenPaymentLinkToolbar',
+                style: {
+                    'background-color': 'rgb(240, 242, 244)'
+                },
+                items: [
+                    {
+                        xtype: 'textfield',
+                        itemId: 'adyenPaymentLinkField',
+                        width: 250,
+                        disabled: true
+                    },
+                    {
+                        action: 'copyPaymentLink',
+                        xtype: 'button',
+                        itemId: 'adyenCopyPaymentLinkBtn',
+                        cls: 'primary',
+                        text: '{s name="payment/adyen/detail/copy"}Copy payment link{/s}'
+                    },
+                    {
+                        action: 'generatePaymentLink',
+                        xtype: 'button',
+                        itemId: 'adyenGeneratePaymentLinkBtn',
+                        cls: 'primary',
+                        text: '{s name="payment/adyen/detail/generatePaymentLink"}Generate a payment link{/s}',
+                        margin: '10 0 0 0'
+                    },
+                ]
             }
         ];
+
         return fields;
     },
 
@@ -288,5 +339,145 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
                 name: 'currencyIso'
             }
         ];
+    },
+});
+
+Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderPaymentLink', {
+    extend: 'Ext.container.Container',
+    record: null,
+    alias: 'widget.adyen-order-payment-link',
+    cls: 'shopware-form',
+
+    initComponent: function () {
+        var me = this;
+
+        me.items = [
+            me.createDetailsContainer()
+        ];
+
+        me.store.on('datachanged', function (store, records, options) {
+            me.record = store.first();
+            me.detailsPanel.loadRecord(me.record);
+            me.query('#adyenPaymentLinkToolbar')[0].show();
+            if (me.record !== undefined) {
+                let paymentLink = me.record.get('paymentLink');
+                me.query('#adyenPaymentLinkNonAdyenOrderField')[0].setValue(paymentLink);
+                me.query('#adyenGeneratePaymentLinkNonAdyenOrderBtn')[0].hide();
+                me.query('#adyenPaymentLinkNonAdyenOrderField')[0].show();
+                me.query('#adyenCopyPaymentLinkNonAdyenOrderBtn')[0].show();
+            } else {
+                me.query('#adyenGeneratePaymentLinkNonAdyenOrderBtn')[0].show();
+                me.query('#adyenPaymentLinkNonAdyenOrderField')[0].hide();
+                me.query('#adyenCopyPaymentLinkNonAdyenOrderBtn')[0].hide();
+            }
+        });
+
+        me.callParent(arguments);
+    },
+
+    /**
+     * Creates the container for the detail form panel.
+     * @return Ext.form.Panel
+     */
+    createDetailsContainer: function () {
+        var me = this;
+
+        me.detailsPanel = Ext.create('Ext.form.Panel', {
+            title: '{s name="payment/adyen/detail/paymentLink"}Payment Link{/s}',
+            titleAlign: 'left',
+            bodyPadding: 10,
+            layout: 'anchor',
+            defaults: {
+                anchor: '100%'
+            },
+            margin: '10 0',
+            width: '100%',
+            items: [
+                me.createInnerDetailContainer()
+            ]
+        });
+        return me.detailsPanel;
+    },
+
+    /**
+     * Creates the outer container for the detail panel which
+     * has a column layout to display the detail information in two columns.
+     *
+     * @return Ext.container.Container
+     */
+    createInnerDetailContainer: function () {
+        var me = this;
+
+        return Ext.create('Ext.container.Container', {
+            layout: 'column',
+            items: [
+                me.createDetailElementContainer(me.createLeftDetailElements()),
+            ]
+        });
+    },
+
+    /**
+     * Creates the column container for the detail elements which displayed
+     * in two columns.
+     *
+     * @param { Array } items - The container items.
+     */
+    createDetailElementContainer: function (items) {
+        return Ext.create('Ext.container.Container', {
+            columnWidth: 0.5,
+            defaults: {
+                xtype: 'displayfield',
+                labelWidth: 155
+            },
+            items: items
+        });
+    },
+
+    /**
+     * Creates the elements for the left column container which displays the
+     * fields in two columns.
+     *
+     * @return array - Contains the form fields
+     */
+    createLeftDetailElements: function () {
+        var me = this, fields;
+        fields = [
+            {
+                xtype: 'toolbar',
+                itemId: 'adyenPaymentLinkToolbar',
+                style: {
+                    'background-color': 'rgb(240, 242, 244)'
+                },
+                items: [
+                    {
+                        action: 'generatePaymentLinkNonAdyenOrder',
+                        xtype: 'button',
+                        itemId: 'adyenGeneratePaymentLinkNonAdyenOrderBtn',
+                        cls: 'primary',
+                        text: '{s name="payment/adyen/detail/generatePaymentLink"}Generate a payment link{/s}',
+                        margin: '10 0 0 0'
+                    },
+                    {
+                        xtype: 'hiddenfield',
+                        name: 'adyenOrderId',
+                        itemId: 'adyenOrderId'
+                    },
+                    {
+                        xtype: 'textfield',
+                        itemId: 'adyenPaymentLinkNonAdyenOrderField',
+                        width: 250,
+                        disabled: true
+                    },
+                    {
+                        xtype: 'button',
+                        itemId: 'adyenCopyPaymentLinkNonAdyenOrderBtn',
+                        cls: 'primary',
+                        text: '{s name="payment/adyen/detail/copy"}Copy payment link{/s}'
+                    }
+                ]
+            }
+        ];
+
+        return fields;
     },
 });

@@ -152,6 +152,96 @@ if (!window.AdyenFE) {
         'US'
     ];
 
+    const supportsPaymentLink = [
+        'ach',
+        'afterpay_default',
+        'alipay',
+        'applepay',
+        'scheme',
+        'oney',
+        'clearpay',
+        'afterpay_default',
+        'klarna',
+        'klarna_account',
+        'klarna_paynow',
+        'klarna_account',
+        'multibanco',
+        'ach',
+        'sepadirectdebit',
+        'directdebit_GB',
+        'blik',
+        'eps',
+        'giropay',
+        'ideal',
+        'mbway',
+        'mobilepay',
+        'onlineBanking_PL',
+        'billdesk_online',
+        'ebanking_FI',
+        'molpay_ebanking_TH',
+        'directEbanking',
+        'applepay',
+        'trustly',
+        'alipay',
+        'bcmc',
+        'googlepay',
+        'gcash',
+        'momo_wallet',
+        'paypal',
+        'swish',
+        'vipps',
+        'zip',
+        'wechatpayQR',
+        'paywithgoogle',
+        'giftcard',
+        'auriga',
+        'babygiftcard',
+        'bloemengiftcard',
+        'cashcomgiftcard',
+        'eagleeye_voucher',
+        'entercard',
+        'expertgiftcard',
+        'fashioncheque',
+        'fijncadeau',
+        'valuelink',
+        'fleuropbloemenbon',
+        'fonqgiftcard',
+        'gallgall',
+        'givex',
+        'hallmarkcard',
+        'igive',
+        'ikano',
+        'kadowereld',
+        'kidscadeau',
+        'kindpas',
+        'leisurecard',
+        'nationalebioscoopbon',
+        'netscard',
+        'oberthur',
+        'pathegiftcard',
+        'payex',
+        'podiumcard',
+        'resursgiftcard',
+        'rotterdampas',
+        'genericgiftcard',
+        'schoolspullenpas',
+        'sparnord',
+        'sparebank',
+        'svs',
+        'universalgiftcard',
+        'vvvcadeaubon',
+        'vvvgiftcard',
+        'webshopgiftcard',
+        'winkelcheque',
+        'winterkledingpas',
+        'xponcard',
+        'yourgift',
+        'prosodie_illicado',
+        'twint',
+        'paysafecard',
+        'bcmc_mobile'
+    ];
+
     /**
      * @typedef AdditionalDataConfig
      * @property {boolean?} showLogos
@@ -175,6 +265,7 @@ if (!window.AdyenFE) {
     /**
      * @typedef PaymentMethodConfiguration
      * @property {boolean} isNew
+     * @property {boolean} excludeFromPayByLink
      * @property {string} methodId
      * @property {string} code
      * @property {string?} name
@@ -910,6 +1001,16 @@ if (!window.AdyenFE) {
                             error: 'payments.configure.fields.surchargeLimit.error'
                         },
                         {
+                            name: 'excludeFromPayByLink',
+                            value: changedMethod.excludeFromPayByLink,
+                            type: 'checkbox',
+                            label: 'payments.configure.fields.paymentLink.label',
+                            description: 'payments.configure.fields.paymentLink.description',
+                            className: !supportsPaymentLink.some((item) => item === changedMethod.code)
+                                ? 'adls--hidden'
+                                : ''
+                        },
+                        {
                             name: 'logo',
                             value: changedMethod.logo,
                             type: 'file',
@@ -1375,7 +1476,7 @@ if (!window.AdyenFE) {
                 postData.set('logo', data.logoFile, data.logoFile.name);
             }
 
-            const method = create ? 'post' : 'post';
+            const method = create ? 'post' : 'put';
             const url = create
                 ? configuration.addMethodConfigurationUrl
                 : configuration.saveMethodConfigurationUrl.replace('{methodId}', data.methodId);
@@ -1402,12 +1503,12 @@ if (!window.AdyenFE) {
 
             if (['fixed', 'combined'].includes(changedMethod.surchargeType)) {
                 changedMethod.fixedSurcharge &&
-                    result.push(validator.validateNumber(page.querySelector('[name="fixedSurcharge"]')));
+                result.push(validator.validateNumber(page.querySelector('[name="fixedSurcharge"]')));
             }
 
             if (['percent', 'combined'].includes(changedMethod.surchargeType)) {
                 changedMethod.percentSurcharge &&
-                    result.push(validator.validateNumber(page.querySelector('[name="percentSurcharge"]')));
+                result.push(validator.validateNumber(page.querySelector('[name="percentSurcharge"]')));
                 if (changedMethod.surchargeLimit) {
                     const surchargeLimitField = page.querySelector('[name="surchargeLimit"]');
                     if (changedMethod.surchargeType === 'combined') {
@@ -1426,9 +1527,9 @@ if (!window.AdyenFE) {
                 }
 
                 changedMethod.paymentType === 'creditOrDebitCard' &&
-                    result.push(
-                        validator.validateNumberList(page.querySelector('[name="numberOfInstallments"]'), true, false)
-                    );
+                result.push(
+                    validator.validateNumberList(page.querySelector('[name="numberOfInstallments"]'), true, false)
+                );
             }
 
             if (changedMethod.paymentType === 'creditOrDebitCard') {

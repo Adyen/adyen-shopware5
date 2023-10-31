@@ -4,7 +4,9 @@ namespace AdyenPayment\Subscriber;
 
 use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
 use Adyen\Core\BusinessLogic\Domain\TransactionHistory\Services\TransactionHistoryService;
+use Adyen\Core\BusinessLogic\Webhook\Services\OrderStatusMappingService;
 use Adyen\Core\Infrastructure\ServiceRegister;
+use Adyen\Webhook\PaymentStates;
 use AdyenPayment\Utilities\Plugin;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
@@ -16,6 +18,11 @@ class BackendOrderSubscriber implements SubscriberInterface
      * @var TransactionHistoryService
      */
     private $historyService;
+
+    /**
+     * @var OrderStatusMappingService
+     */
+    private $orderStatusMappingService;
 
     /**
      * @inheritDoc
@@ -47,7 +54,16 @@ class BackendOrderSubscriber implements SubscriberInterface
         $adyenOrders = [];
 
         foreach ($data as &$order) {
+            $order['adyenDisplayPaymentLink'] = false;
             if (!isset($order['payment']['name']) || !Plugin::isAdyenPaymentMean($order['payment']['name'])) {
+                $orderStatusMapping = $this->getStatusMappingService()->getOrderStatusMappingSettings();
+                $orderStatusId = (string)$order['paymentStatus']['id'] ?? '';
+
+                if ($orderStatusId === (string)$orderStatusMapping[PaymentStates::STATE_CANCELLED] ||
+                    $orderStatusId === (string)$orderStatusMapping[PaymentStates::STATE_FAILED]) {
+                    $order['adyenDisplayPaymentLink'] = true;
+                }
+
                 continue;
             }
 
@@ -91,5 +107,17 @@ class BackendOrderSubscriber implements SubscriberInterface
         }
 
         return $this->historyService;
+    }
+
+    /**
+     * @return OrderStatusMappingService
+     */
+    private function getStatusMappingService(): OrderStatusMappingService
+    {
+        if ($this->orderStatusMappingService === null) {
+            $this->orderStatusMappingService = ServiceRegister::getService(OrderStatusMappingService::class);
+        }
+
+        return $this->orderStatusMappingService;
     }
 }

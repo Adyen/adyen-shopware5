@@ -8,7 +8,6 @@ use Adyen\Core\BusinessLogic\Domain\Stores\Exceptions\InvalidShopOrderDataExcept
 use Adyen\Core\BusinessLogic\Domain\Stores\Models\Store;
 use Adyen\Core\BusinessLogic\Domain\Stores\Models\StoreOrderStatus;
 use Adyen\Core\Infrastructure\ORM\Interfaces\RepositoryInterface;
-use Adyen\Core\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Adyen\Webhook\PaymentStates;
 use AdyenPayment\Repositories\Wrapper\OrderRepository;
 use AdyenPayment\Repositories\Wrapper\StoreRepository;

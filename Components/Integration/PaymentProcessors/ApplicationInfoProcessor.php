@@ -2,11 +2,15 @@
 
 namespace AdyenPayment\Components\Integration\PaymentProcessors;
 
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentLink\Factory\PaymentLinkRequestBuilder;
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentLink\Models\PaymentLinkRequestContext;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Factory\PaymentRequestBuilder;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\ApplicationInfo\ApplicationInfo;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\ApplicationInfo\ExternalPlatform;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\StartTransactionRequestContext;
-use Adyen\Core\BusinessLogic\Domain\Integration\Processors\ApplicationInfoProcessor as ApplicationInfoProcessorInterface;
+use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\ApplicationInfoProcessor as ApplicationInfoProcessorInterface;
+use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentLinkRequest\ApplicationInfoProcessor as PaymentLinkApplicationInfoProcessorInterface;
+use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
 use AdyenPayment\Components\ShopwareVersionCheck;
 use Exception;
 use Shopware\Models\Plugin\Plugin;
@@ -16,7 +20,7 @@ use Shopware\Models\Plugin\Plugin;
  *
  * @package AdyenPayment\Components\Integration\PaymentProcessors
  */
-class ApplicationInfoProcessor implements ApplicationInfoProcessorInterface
+class ApplicationInfoProcessor implements ApplicationInfoProcessorInterface, PaymentLinkApplicationInfoProcessorInterface
 {
     /**
      * @param PaymentRequestBuilder $builder
@@ -30,6 +34,31 @@ class ApplicationInfoProcessor implements ApplicationInfoProcessorInterface
     {
         $shopName = Shopware()->Shop()->getName();
         $shopVersion = $this->getShopVersion();
+        $pluginVersion = $this->getPluginVersion();
+
+        $shopName && $builder->setApplicationInfo(
+            new ApplicationInfo(new ExternalPlatform($shopName, $shopVersion), $pluginVersion)
+        );
+    }
+
+    /**
+     * @param PaymentLinkRequestBuilder $builder
+     * @param PaymentLinkRequestContext $context
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
+    public function processPaymentLink(PaymentLinkRequestBuilder $builder, PaymentLinkRequestContext $context): void
+    {
+        $storeId = StoreContext::getInstance()->getStoreId();
+        $container = Shopware()->Container();
+        $shopRepository = $container->get('shopware_storefront.shop_gateway_dbal');
+        $shop = $shopRepository->get($storeId);
+        $shopVersionRepository = Shopware()->Container()->get('adyen_payment.components.shopware_version_check');
+
+        $shopName = $shop->getName() ?? '';
+        $shopVersion = $shopVersionRepository->getShopwareVersion() ?? '';
         $pluginVersion = $this->getPluginVersion();
 
         $shopName && $builder->setApplicationInfo(

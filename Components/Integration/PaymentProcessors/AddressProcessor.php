@@ -2,20 +2,26 @@
 
 namespace AdyenPayment\Components\Integration\PaymentProcessors;
 
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentLink\Factory\PaymentLinkRequestBuilder;
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentLink\Models\PaymentLinkRequestContext;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Factory\PaymentRequestBuilder;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\BillingAddress;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\DeliveryAddress;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\StartTransactionRequestContext;
-use Adyen\Core\BusinessLogic\Domain\Integration\Processors\AddressProcessor as BaseAddressProcessor;
+use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\AddressProcessor as BaseAddressProcessor;
+use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentLinkRequest\AddressProcessor as PaymentLinkAddressProcessorInterface;
+use AdyenPayment\Repositories\Wrapper\OrderRepository;
 use Shopware\Models\Country\Country;
 use Shopware\Models\Country\Repository;
+use Shopware\Models\Order\Billing;
+use Shopware\Models\Order\Shipping;
 
 /**
  * Class AddressProcessor
  *
  * @package AdyenPayment\Components\Integration\PaymentProcessors
  */
-class AddressProcessor implements BaseAddressProcessor
+class AddressProcessor implements BaseAddressProcessor, PaymentLinkAddressProcessorInterface
 {
     /**
      * @var Repository
@@ -23,13 +29,26 @@ class AddressProcessor implements BaseAddressProcessor
     private $countryRepository;
 
     /**
-     * @param Repository $countryRepository
+     * @var OrderRepository
      */
-    public function __construct(Repository $countryRepository)
+    private $orderRepository;
+
+    /**
+     * @param Repository $countryRepository
+     * @param OrderRepository $orderRepository
+     */
+    public function __construct(Repository $countryRepository, OrderRepository $orderRepository)
     {
         $this->countryRepository = $countryRepository;
+        $this->orderRepository = $orderRepository;
     }
 
+    /**
+     * @param PaymentRequestBuilder $builder
+     * @param StartTransactionRequestContext $context
+     *
+     * @return void
+     */
     public function process(PaymentRequestBuilder $builder, StartTransactionRequestContext $context): void
     {
         $billingAddressRawData = $context->getStateData()->get('billingAddress');
@@ -52,11 +71,14 @@ class AddressProcessor implements BaseAddressProcessor
 
         if (!empty($userData['shippingaddress']) && empty($deliveryAddressRawData)) {
             /** @var Country[] $country */
-            $country = $this->countryRepository->getCountryQuery($userData['shippingaddress']['countryId'])->getResult();
+            $country = $this->countryRepository->getCountryQuery($userData['shippingaddress']['countryId'])->getResult(
+            );
             $state = null;
 
             if (!empty($userData['shippingaddress']['stateID'])) {
-                $state = Shopware()->Models()->getRepository('Shopware\Models\Country\State')->findOneBy(['id' => $userData['shippingaddress']['stateID']]);
+                $state = Shopware()->Models()->getRepository('Shopware\Models\Country\State')->findOneBy(
+                    ['id' => $userData['shippingaddress']['stateID']]
+                );
             }
 
             $countryIso = $country[0] ? $country[0]->getIso() : '';
@@ -74,13 +96,37 @@ class AddressProcessor implements BaseAddressProcessor
         }
     }
 
-    private function setBillingAddress(
-        ?array                $billingAddressRawData,
-        ?Country              $country,
-        array                 $userData,
-        PaymentRequestBuilder $builder
-    ): void
+    /**
+     * @param PaymentLinkRequestBuilder $builder
+     * @param PaymentLinkRequestContext $context
+     *
+     * @return void
+     */
+    public function processPaymentLink(PaymentLinkRequestBuilder $builder, PaymentLinkRequestContext $context): void
     {
+        $order = $this->orderRepository->getOrderByTemporaryId($context->getReference());
+
+        if (!$order) {
+            return;
+        }
+
+        if ($billingAddress = $order->getBilling()) {
+            $country = $billingAddress->getCountry();
+            $this->setBillingAddressForPaymentLink($billingAddress, $builder);
+            $builder->setCountryCode($country->getIso() ?? '');
+        }
+
+        if ($shippingAddress = $order->getShipping()) {
+            $this->setDeliveryAddressForPaymentLink($shippingAddress, $builder);
+        }
+    }
+
+    private function setBillingAddress(
+        ?array $billingAddressRawData,
+        ?Country $country,
+        array $userData,
+        PaymentRequestBuilder $builder
+    ): void {
         if (!empty($billingAddressRawData)) {
             return;
         }
@@ -97,6 +143,13 @@ class AddressProcessor implements BaseAddressProcessor
         $builder->setBillingAddress($billingAddress);
     }
 
+    /**
+     * @param array|null $stateDataCountry
+     * @param Country|null $country
+     * @param PaymentRequestBuilder $builder
+     *
+     * @return void
+     */
     private function setCountryCode(?array $stateDataCountry, ?Country $country, PaymentRequestBuilder $builder): void
     {
         if (!empty($stateDataCountry)) {
@@ -104,5 +157,47 @@ class AddressProcessor implements BaseAddressProcessor
         }
 
         $builder->setCountryCode($country ? $country->getIso() : '');
+    }
+
+    /**
+     * @param Billing $billingAddress
+     * @param PaymentLinkRequestBuilder $builder
+     *
+     * @return void
+     */
+    private function setBillingAddressForPaymentLink(Billing $billingAddress, PaymentLinkRequestBuilder $builder): void
+    {
+        $billingAddress = new BillingAddress(
+            $billingAddress->getCity() ?? '',
+            $billingAddress->getCountry()->getIso() ?? '',
+            '',
+            $billingAddress->getZipCode() ?? '',
+            '',
+            $billingAddress->getStreet() ?? ''
+        );
+
+        $builder->setBillingAddress($billingAddress);
+    }
+
+    /**
+     * @param Shipping $shippingAddress
+     * @param PaymentLinkRequestBuilder $builder
+     *
+     * @return void
+     */
+    private function setDeliveryAddressForPaymentLink(
+        Shipping $shippingAddress,
+        PaymentLinkRequestBuilder $builder
+    ): void {
+        $shippingAddress = new DeliveryAddress(
+            $shippingAddress->getCity() ?? '',
+            $shippingAddress->getCountry()->getIso() ?? '',
+            '',
+            $shippingAddress->getZipCode() ?? '',
+            '',
+            $shippingAddress->getStreet() ?? ''
+        );
+
+        $builder->setDeliveryAddress($shippingAddress);
     }
 }

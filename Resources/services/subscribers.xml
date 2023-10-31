@@ -90,5 +90,8 @@
         <service id="AdyenPayment\Subscriber\ShopDeletedSubscriber">
             <tag name="shopware.event_subscriber"/>
         </service>
+        <service id="AdyenPayment\Subscriber\EmailSubscriber">
+            <tag name="shopware.event_subscriber"/>
+        </service>
     </services>
 </container>
