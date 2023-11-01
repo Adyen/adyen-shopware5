@@ -1476,7 +1476,7 @@ if (!window.AdyenFE) {
                 postData.set('logo', data.logoFile, data.logoFile.name);
             }
 
-            const method = create ? 'post' : 'put';
+            const method = create ? 'post' : 'post';
             const url = create
                 ? configuration.addMethodConfigurationUrl
                 : configuration.saveMethodConfigurationUrl.replace('{methodId}', data.methodId);
