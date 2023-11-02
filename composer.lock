@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b633c1abeb07c573367663784bc4bcfb",
+    "content-hash": "934776d9856923da8805279826d34eaf",
     "packages": [
         {
             "name": "adyen/integration-core",
-            "version": "1.0.3",
+            "version": "dev-feature/test_endpoint",
             "source": {
                 "type": "git",
-                "url": "git@github.com:Adyen/adyen-php-plugin-core.git",
-                "reference": "5c7dafba811dd2d6f963aaf7f514405c4189c0b7"
+                "url": "git@github.com:logeecom-dev/adyen-php-plugin-core.git",
+                "reference": "95be8766e43a6c12df3dc9f5f594117b46fc9519"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Adyen/adyen-php-plugin-core/zipball/5c7dafba811dd2d6f963aaf7f514405c4189c0b7",
-                "reference": "5c7dafba811dd2d6f963aaf7f514405c4189c0b7",
+                "url": "https://api.github.com/repos/logeecom-dev/adyen-php-plugin-core/zipball/95be8766e43a6c12df3dc9f5f594117b46fc9519",
+                "reference": "95be8766e43a6c12df3dc9f5f594117b46fc9519",
                 "shasum": ""
             },
             "require": {
@@ -48,7 +48,7 @@
                 "proprietary"
             ],
             "description": "Core Adyen integration library",
-            "time": "2023-10-12T08:54:21+00:00"
+            "time": "2023-11-02T09:56:30+00:00"
         },
         {
             "name": "adyen/php-webhook-module",
@@ -97,7 +97,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "adyen/integration-core": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
@@ -107,5 +109,5 @@
         "ext-simplexml": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }

@@ -7,13 +7,14 @@ use AdyenPayment\E2ETest\Http\TestProxy;
 use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\E2ETest\Http\ShopsTestProxy;
+use Adyen\Core\BusinessLogic\E2ETest\Services\CreateSeedDataService as BaseCreateSeedDataService;
 
 /**
  * Class CreateSeedDataService
  *
  * @package AdyenPayment\E2ETest\Services
  */
-class CreateSeedDataService
+class CreateSeedDataService extends BaseCreateSeedDataService
 {
     /**
      * @var TestProxy
@@ -34,18 +35,6 @@ class CreateSeedDataService
     {
         $this->shopProxy = new ShopsTestProxy($this->getHttpClient(), $url, $credentials);
         $this->baseUrl = $url;
-    }
-
-    /**
-     * Creates initial data
-     *
-     * @return void
-     * @throws HttpRequestException
-     */
-    public function createInitialData(): void
-    {
-        $this->updateBaseUrl();
-        $this->createSubStores();
     }
 
     /**
@@ -75,7 +64,12 @@ class CreateSeedDataService
         }
     }
 
-    public function readFomJSONFile(): array
+    /**
+     * Reads from json file
+     *
+     * @return array
+     */
+    private function readFomJSONFile(): array
     {
         $jsonString = file_get_contents(
             './custom/plugins/AdyenPayment/E2ETest/Data/test_data.json',
