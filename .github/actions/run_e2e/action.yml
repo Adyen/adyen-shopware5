@@ -66,10 +66,10 @@ runs:
     - name: Ping shop
       shell: bash
       run: |
-        curl --location --request POST 'http:=localhost:8001/AdyenTest/index' \
+        curl --location --request POST 'http://localhost:8001/AdyenTest/index' \
             --header 'Content-Type: application/json' \
             --data-raw '{
-          "url" : "https://5-7-11.sw5.tamara.ngrok.app"
+          "url" : "https:/test.test"
           }'
     - name: Clone Code
       uses: actions/checkout@v3
