@@ -19,7 +19,6 @@ use Adyen\Core\BusinessLogic\Domain\Connection\Services\ConnectionService;
 use Adyen\Core\BusinessLogic\Domain\GeneralSettings\Services\GeneralSettingsService;
 use Adyen\Core\BusinessLogic\Domain\Integration\Order\OrderService as OrderServiceInterface;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\AddressProcessor;
-use Adyen\Core\BusinessLogic\Domain\Integration\Processors\ApplicationInfoProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\BasketItemsProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\BirthdayProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\L2L3DataProcessor;
@@ -66,7 +65,6 @@ use AdyenPayment\Components\Integration\PaymentProcessors\ShopperEmailProcessor 
 use AdyenPayment\Components\Integration\PaymentProcessors\ShopperLocaleProcessor;
 use AdyenPayment\Components\Integration\PaymentProcessors\ShopperNameProcessor as IntegrationShopperNameProcessor;
 use AdyenPayment\Components\Integration\PaymentProcessors\ShopperReferenceProcessor as IntegrationShopperReferenceProcessor;
-use AdyenPayment\Components\Integration\PaymentProcessors\ApplicationInfoProcessor as IntegrationApplicationInfoProcessor;
 use AdyenPayment\Components\Integration\StoreService;
 use AdyenPayment\Components\Integration\SystemInfoService;
 use AdyenPayment\Components\LastOpenTimeService;
@@ -298,13 +296,6 @@ class Bootstrap extends BootstrapComponent
             ShopperReferenceProcessor::class,
             static function () {
                 return new IntegrationShopperReferenceProcessor();
-            }
-        );
-
-        ServiceRegister::registerService(
-            ApplicationInfoProcessor::class,
-            static function () {
-                return new IntegrationApplicationInfoProcessor();
             }
         );
 
