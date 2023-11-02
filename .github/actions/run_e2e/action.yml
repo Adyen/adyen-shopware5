@@ -67,11 +67,7 @@ runs:
     - name: Ping shop
       shell: bash
       run: |
-        curl --location --request POST 'http://localhost:8001/AdyenTest/index' \
-            --header 'Content-Type: application/json' \
-            --data-raw '{
-          "url" : "https:/test.test"
-          }'
+        curl --location --request GET 'http://localhost:8001'
     - name: Clone Code
       uses: actions/checkout@v3
       with:
