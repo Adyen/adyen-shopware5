@@ -76,7 +76,7 @@ runs:
         node-version: ${{ inputs.NODE }}
     - name: Authenticate with GitHub using PAT
       shell: bash
-      run: npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GH_PAT }}
+      run: npm config set //npm.pkg.github.com/:_authToken=${{ inputs.GH_PAT }}
     - name: Install Node dependencies
       working-directory: ./tests
       run:
