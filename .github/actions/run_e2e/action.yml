@@ -67,8 +67,7 @@ runs:
     - name: Clone Code
       uses: actions/checkout@v3
       with:
-        repository: logeecom-dev/adyen-common-e2e-tests
-        ref: feature/shopware5_first_milestone
+        repository: logeecom-dev/adyen-shopware5-e2e-tests
         path: tests
         token: ${{ inputs.GH_PAT }}
     - name: Setup Node
