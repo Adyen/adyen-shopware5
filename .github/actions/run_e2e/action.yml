@@ -84,10 +84,13 @@ runs:
       working-directory: ./tests
       shell: bash
       run: npx playwright install --with-deps
+    - name: Install common
+      shell: bash
+      run: npm run update-lib
     - name: Run Playwright tests
       shell: bash
-      working-directory: ./tests/shopware5
-      run: npx playwright test
+      working-directory: ./tests
+      run: npm run test
       env:
         API_KEY_TEST: ${{ inputs.API_KEY_TEST }}
         API_KEY_LIVE: ${{ inputs.API_KEY_LIVE }}
