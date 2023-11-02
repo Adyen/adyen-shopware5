@@ -53,6 +53,10 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
         $url = $payload['url'] ?? '';
 
         try {
+            if($url === ''){
+                throw new RuntimeException('Url is a required field.');
+            }
+
             $authorizationService = new AuthorizationService();
             $credentials = $authorizationService->getAuthorizationCredentials();
             $createSeedDataService = new CreateSeedDataService($url, $credentials);
@@ -63,6 +67,8 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
             $this->Response()->setBody(
                 json_encode(['message' => $exception->getMessage()])
             );
+
+            return;
         }
 
         $this->Response()->setHeader('Content-Type', 'application/json');
