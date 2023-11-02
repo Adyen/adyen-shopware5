@@ -89,7 +89,7 @@ runs:
     - name: Install Playwright Browsers
       working-directory: ./tests
       shell: bash
-      run: npx playwright install --with-deps
+      run: npx playwright install --with-deps > /dev/null
       
     - name: Run Playwright tests
       shell: bash
