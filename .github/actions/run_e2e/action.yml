@@ -67,33 +67,40 @@ runs:
     - name: Clone Code
       uses: actions/checkout@v3
       with:
-        repository: logeecom-dev/adyen-common-e2e-tests
-        ref: feature/shopware5_first_milestone
+        repository: logeecom-dev/adyen-shopware5-e2e-tests
         path: tests
         token: ${{ inputs.GH_PAT }}
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.NODE }}
+        
     - name: Install Node dependencies
       working-directory: ./tests
       run:
-        npm install
+        npm install --loglevel verbose
       shell: bash
+      
+    - name: Install common
+      shell: bash
+      run: npm install https://${{inputs.GH_PAT}}@github.com/logeecom-dev/adyen-common-e2e-tests --loglevel verbose
+      
     - name: Install Playwright Browsers
       working-directory: ./tests
       shell: bash
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       shell: bash
-      working-directory: ./tests/shopware5
-      run: npx playwright test
+      working-directory: ./tests
+      run: npm run test
       env:
         API_KEY_TEST: ${{ inputs.API_KEY_TEST }}
         API_KEY_LIVE: ${{ inputs.API_KEY_LIVE }}
         PORT: ${{ inputs.PORT }}
         ADMIN_USERNAME: ${{ inputs.ADMIN_USERNAME }}
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
+        TEST_PATH: "/AdyenTest/index"
+        ADMIN_PATH: "/backend"
     - uses: actions/upload-artifact@v3
       if: always()
       with:

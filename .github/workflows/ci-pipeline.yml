@@ -2,7 +2,7 @@
 on:
   push:
     branches:
-      - feature/ci-pipeline
+      - feature/test_endpoint
 jobs:
   build:
     permissions:
@@ -62,7 +62,7 @@ jobs:
         with:
           SHOPWARE: ${{ matrix.shopware }}
           PHP: ${{ matrix.php }}
-          NODE: 18
+          NODE: 20
           PORT: ${{ matrix.port }}
           GH_PAT: ${{ secrets.GH_PAT }}
           NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
