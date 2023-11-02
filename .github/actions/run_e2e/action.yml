@@ -77,11 +77,7 @@ runs:
     - name: Install common
       shell: bash
       run: npm install https://${{inputs.GH_PAT}}@github.com/logeecom-dev/adyen-common-e2e-tests
-    - name: Install Node dependencies
-      working-directory: ./tests
-      run:
-        npm install
-      shell: bash
+    
     - name: Install Playwright Browsers
       working-directory: ./tests
       shell: bash
