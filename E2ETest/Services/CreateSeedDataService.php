@@ -7,7 +7,6 @@ use AdyenPayment\E2ETest\Http\TestProxy;
 use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\E2ETest\Http\ShopsTestProxy;
-use Adyen\Core\Infrastructure\Logger;
 
 /**
  * Class CreateSeedDataService
@@ -40,30 +39,50 @@ class CreateSeedDataService
     /**
      * Creates initial data
      *
-     * @return bool
+     * @return void
+     * @throws HttpRequestException
      */
-    public function createInitialData(): bool
+    public function createInitialData(): void
     {
-        try {
-            $this->updateBaseUrl();
-        } catch (HttpRequestException $exception) {
-            Logger::logError('Initial data creation failed. ' . $exception->getMessage());
-
-            return false;
-        }
-
-        return true;
+        $this->updateBaseUrl();
+        $this->createSubStores();
     }
 
     /**
-     * Updates baseUrl in database
+     * Updates baseUrl in database and default shop name
      *
      * @throws HttpRequestException
      */
     public function updateBaseUrl(): void
     {
         $host = parse_url($this->baseUrl)['host'];
-        $this->shopProxy->updateBaseUrl(1, $host);
+        $name = $this->readFomJSONFile()['subStores'][0]['name'];
+        $this->shopProxy->updateBaseUrlAndDefaultShopName(1, $host, $name);
+    }
+
+    /**
+     * Creates new subStores using json file data
+     *
+     * @throws HttpRequestException
+     */
+    public function createSubStores(): void
+    {
+        $subStores = $this->readFomJSONFile()['subStores'];
+        $subStoresArrayLength = count($subStores);
+        for ($i = 1; $i < $subStoresArrayLength; $i++) {
+            $subStores[$i]['host'] = parse_url($this->baseUrl)['host'];
+            $this->shopProxy->createSubStore($subStores[$i]);
+        }
+    }
+
+    public function readFomJSONFile(): array
+    {
+        $jsonString = file_get_contents(
+            './custom/plugins/AdyenPayment/E2ETest/Data/test_data.json',
+            FILE_USE_INCLUDE_PATH
+        );
+
+        return json_decode($jsonString, true);
     }
 
     /**

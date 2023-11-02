@@ -1,0 +1,19 @@
+{
+  "subStores":[
+    {
+      "name": "subStore1",
+      "categoryId": "3",
+      "localeId": "2",
+      "currencyId": "1",
+      "customerGroupId": "1"
+    },
+    {
+      "name": "subStore2",
+      "basePath": "/substore2",
+      "categoryId": "3",
+      "localeId": "2",
+      "currencyId": "1",
+      "customerGroupId": "1"
+    }
+  ]
+}
