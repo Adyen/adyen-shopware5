@@ -40,10 +40,10 @@ jobs:
         include:
           - shopware: '5.6.10'
             php: '7.4'
-            port: 8001
+            port: 80
           - shopware: '5.7.18'
             php: '7.4'
-            port: 8001
+            port: 80
     steps:
       - name: Clone Code
         uses: actions/checkout@v3
