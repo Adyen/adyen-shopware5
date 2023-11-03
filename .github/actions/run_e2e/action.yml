@@ -67,7 +67,7 @@ runs:
     - name: Ping shop
       shell: bash
       run: |
-        curl --location --request GET 'http://127.0.0.1:8001'
+        curl --location --request GET 'http://localhost'
     - name: Clone Code
       uses: actions/checkout@v3
       with:
