@@ -65,6 +65,7 @@ runs:
         docker exec shop bash -c 'php bin/console sw:plugin:deactivate SwagUpdate'
         docker exec shop bash -c 'php bin/console sw:plugin:refresh'
         docker exec shop bash -c 'php bin/console sw:plugin:install --activate AdyenPayment'
+        docker exec shop bash -c 'bin/console sw:warm:http:cache'
         docker exec shop bash -c 'php bin/console sw:cache:clear'
     
     - name: Clone Code
