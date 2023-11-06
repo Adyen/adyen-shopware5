@@ -172,6 +172,19 @@
                     return;
                 }
 
+                if (storedPaymentMethodId && paymentType !== 'scheme') {
+                    sessionStorage.setItem('adyen-payment-method-state-data', JSON.stringify({
+                        'paymentMethod': {
+                            'type': paymentType,
+                            'storedPaymentMethodId': storedPaymentMethodId
+                        },
+                    }));
+
+                    config.onStateChange();
+
+                    return;
+                }
+
                 let paymentMethodConfig = findSpecificPaymentMethodConfig(paymentType) ||
                     findStoredPaymentMethodConfig(checkoutInstance, storedPaymentMethodId);
 

@@ -26,7 +26,6 @@ use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\L2L3Da
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\LineItemsProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\ShopperEmailProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\ShopperNameProcessor;
-use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\ShopperReferenceProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\ShopperLocaleProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentLinkRequest\AddressProcessor as PaymentLinkAddressProcessorInterface;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentLinkRequest\ApplicationInfoProcessor as PaymentLinkApplicationInfoProcessorInterface;
@@ -304,13 +303,6 @@ class Bootstrap extends BootstrapComponent
             ShopperNameProcessor::class,
             static function () {
                 return new IntegrationShopperNameProcessor(Shopware()->Container()->get(OrderRepository::class));
-            }
-        );
-
-        ServiceRegister::registerService(
-            ShopperReferenceProcessor::class,
-            static function () {
-                return new IntegrationShopperReferenceProcessor(Shopware()->Container()->get(OrderRepository::class));
             }
         );
 
