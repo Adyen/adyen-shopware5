@@ -20,7 +20,7 @@ class ShopsTestProxy extends TestProxy
     public function clearCache(): void
     {
         $httpRequest = new HttpRequest(
-            "/api/caches/config"
+            "/api/caches"
         );
         $this->delete($httpRequest)->decodeBodyToArray();
     }
