@@ -33,7 +33,7 @@ class CreateSeedDataService extends BaseCreateSeedDataService
      */
     public function __construct(string $url, string $credentials)
     {
-        $this->shopProxy = new ShopsTestProxy($this->getHttpClient(), $url, $credentials);
+        $this->shopProxy = new ShopsTestProxy($this->getHttpClient(), 'localhost', $credentials);
         $this->baseUrl = $url;
     }
 
