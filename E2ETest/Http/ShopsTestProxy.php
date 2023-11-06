@@ -17,6 +17,18 @@ class ShopsTestProxy extends TestProxy
      *
      * @throws HttpRequestException
      */
+    public function clearCache(): void
+    {
+        $httpRequest = new HttpRequest(
+            "/api/caches/config"
+        );
+        $this->delete($httpRequest)->decodeBodyToArray();
+    }
+    /**
+     * Creates request to update base url and default shop name
+     *
+     * @throws HttpRequestException
+     */
     public function updateBaseUrlAndDefaultShopName(int $shopId, string $host, string $name): void
     {
         $httpRequest = new HttpRequest(

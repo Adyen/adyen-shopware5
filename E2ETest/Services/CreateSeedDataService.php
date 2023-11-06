@@ -38,6 +38,15 @@ class CreateSeedDataService extends BaseCreateSeedDataService
     }
 
     /**
+     * @throws HttpRequestException
+     */
+    public function createInitialData(): void
+    {
+        $this->shopProxy->clearCache();
+        parent::createInitialData();
+    }
+
+    /**
      * Updates baseUrl in database and default shop name
      *
      * @throws HttpRequestException
