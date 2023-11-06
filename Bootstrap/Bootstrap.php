@@ -74,7 +74,6 @@ use AdyenPayment\Components\Integration\PaymentProcessors\ShopperEmailProcessor 
 use AdyenPayment\Components\Integration\PaymentProcessors\ShopperLocaleProcessor as IntegrationShopperLocaleProcessor;
 use AdyenPayment\Components\Integration\PaymentProcessors\ShopperNameProcessor as IntegrationShopperNameProcessor;
 use AdyenPayment\Components\Integration\PaymentProcessors\ShopperReferenceProcessor as IntegrationShopperReferenceProcessor;
-use AdyenPayment\Components\Integration\PaymentProcessors\ApplicationInfoProcessor as IntegrationApplicationInfoProcessor;
 use AdyenPayment\Components\Integration\StoreService;
 use AdyenPayment\Components\Integration\SystemInfoService;
 use AdyenPayment\Components\LastOpenTimeService;
@@ -303,13 +302,6 @@ class Bootstrap extends BootstrapComponent
             ShopperNameProcessor::class,
             static function () {
                 return new IntegrationShopperNameProcessor(Shopware()->Container()->get(OrderRepository::class));
-            }
-        );
-
-        ServiceRegister::registerService(
-            ApplicationInfoProcessor::class,
-            static function () {
-                return new IntegrationApplicationInfoProcessor();
             }
         );
 
