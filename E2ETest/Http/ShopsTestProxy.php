@@ -20,10 +20,14 @@ class ShopsTestProxy extends TestProxy
     public function clearCache(): void
     {
         $httpRequest = new HttpRequest(
-            "/api/caches"
+            "/api/caches",
+            [
+                'id' => 'config',
+            ]
         );
         $this->delete($httpRequest)->decodeBodyToArray();
     }
+
     /**
      * Creates request to update base url and default shop name
      *
@@ -34,7 +38,7 @@ class ShopsTestProxy extends TestProxy
         $httpRequest = new HttpRequest(
             "/api/shops/$shopId",
             [
-                'host' => $host,
+//                'host' => $host,
                 'name' => $name
             ]
         );

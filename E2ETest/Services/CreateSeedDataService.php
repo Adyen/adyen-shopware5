@@ -44,7 +44,6 @@ class CreateSeedDataService extends BaseCreateSeedDataService
     {
         $this->shopProxy->clearCache();
         parent::createInitialData();
-        $this->shopProxy->clearCache();
     }
 
     /**
