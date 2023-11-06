@@ -66,7 +66,6 @@ runs:
         docker exec shop bash -c 'php bin/console sw:plugin:refresh'
         docker exec shop bash -c 'php bin/console sw:plugin:install --activate AdyenPayment'
         docker exec shop bash -c 'php bin/console sw:cache:clear'
-        docker exec shop bash -c 'bin/console sw:warm:http:cache'
     
     - name: Clone Code
       uses: actions/checkout@v3
