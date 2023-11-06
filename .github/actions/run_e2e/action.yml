@@ -49,9 +49,10 @@ runs:
       run: |
         docker run -p ${{ inputs.PORT }}:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 30
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = 'localhost:${{inputs.PORT}}', hosts = '', secure = 0;\""
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_auth SET localeID = (SELECT id FROM s_core_locales WHERE locale = 'en_GB');\""
-
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"update s_core_config_values set value = 'b:0;' where element_id=(SELECT id FROM s_core_config_elements WHERE name LIKE '%installationSurvey%');\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"update s_core_config_values set value = 'b:0;' where element_id=(SELECT id FROM s_core_config_elements WHERE name LIKE '%benchmarkTeaser%');\""
+        
     - name: Upload ZIP File to Docker
       shell: bash
       run: |
@@ -61,9 +62,11 @@ runs:
     - name: Install Plugin
       shell: bash
       run: |
+        docker exec shop bash -c 'php bin/console sw:plugin:deactivate SwagUpdate'
         docker exec shop bash -c 'php bin/console sw:plugin:refresh'
         docker exec shop bash -c 'php bin/console sw:plugin:install --activate AdyenPayment'
         docker exec shop bash -c 'php bin/console sw:cache:clear'
+        docker exec shop bash -c 'bin/console sw:warm:http:cache'
     
     - name: Clone Code
       uses: actions/checkout@v3
