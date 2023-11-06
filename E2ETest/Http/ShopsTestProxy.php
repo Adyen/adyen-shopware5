@@ -34,7 +34,7 @@ class ShopsTestProxy extends TestProxy
         $httpRequest = new HttpRequest(
             "/api/shops/$shopId",
             [
-//                'host' => $host,
+                'host' => $host,
                 'name' => $name
             ]
         );
