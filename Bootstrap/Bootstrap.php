@@ -19,7 +19,6 @@ use Adyen\Core\BusinessLogic\Domain\Connection\Services\ConnectionService;
 use Adyen\Core\BusinessLogic\Domain\GeneralSettings\Services\GeneralSettingsService;
 use Adyen\Core\BusinessLogic\Domain\Integration\Order\OrderService as OrderServiceInterface;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\AddressProcessor;
-use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\ApplicationInfoProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\BasketItemsProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\BirthdayProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\L2L3DataProcessor;
@@ -28,7 +27,6 @@ use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\Shoppe
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\ShopperNameProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentRequest\ShopperLocaleProcessor;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentLinkRequest\AddressProcessor as PaymentLinkAddressProcessorInterface;
-use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentLinkRequest\ApplicationInfoProcessor as PaymentLinkApplicationInfoProcessorInterface;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentLinkRequest\LineItemsProcessor as PaymentLinkLineItemsProcessorInterface;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentLinkRequest\ShopperBirthdayProcessor as PaymentLinkShopperBirthdayProcessorInterface;
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentLinkRequest\ShopperEmailProcessor as PaymentLinkShopperEmailProcessorInterface;
@@ -327,13 +325,6 @@ class Bootstrap extends BootstrapComponent
                     Shopware()->Container()->get('models')->getRepository(Country::class),
                     Shopware()->Container()->get(OrderRepository::class)
                 );
-            }
-        );
-
-        ServiceRegister::registerService(
-            PaymentLinkApplicationInfoProcessorInterface::class,
-            static function () {
-                return new IntegrationApplicationInfoProcessor();
             }
         );
 
