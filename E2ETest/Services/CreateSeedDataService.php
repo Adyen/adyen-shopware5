@@ -67,10 +67,10 @@ class CreateSeedDataService extends BaseCreateSeedDataService
     {
         $subStores = $this->readFomJSONFile()['subStores'];
         $subStoresArrayLength = count($subStores);
-//        for ($i = 1; $i < $subStoresArrayLength; $i++) {
-//            $subStores[$i]['host'] = parse_url($this->baseUrl)['host'];
-//            $this->shopProxy->createSubStore($subStores[$i]);
-//        }
+        for ($i = 1; $i < $subStoresArrayLength; $i++) {
+            $subStores[$i]['host'] = parse_url($this->baseUrl)['host'];
+            $this->shopProxy->createSubStore($subStores[$i]);
+        }
     }
 
     /**
