@@ -51,9 +51,9 @@ runs:
         sleep 30
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = 'localhost', hosts = '', secure = 0;\""
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_auth SET localeID = (SELECT id FROM s_core_locales WHERE locale = 'en_GB');\""
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"update s_core_config_values set value = 'b:0;' where element_id=(SELECT id FROM s_core_config_elements WHERE name LIKE '%installationSurvey%');\""
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"update s_core_config_values set value = 'b:0;' where element_id=(SELECT id FROM s_core_config_elements WHERE name LIKE '%benchmarkTeaser%');\""
-        
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"insert  into s_core_config_values (element_id, shop_id, value) values ((SELECT id FROM s_core_config_elements WHERE name LIKE '%installationSurvey%' ), 1, 'b:0;');\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"insert  into s_core_config_values (element_id, shop_id, value) values ((SELECT id FROM s_core_config_elements WHERE name LIKE '%benchmarkTeaser%' ), 1, 'b:0;');\""
+
     - name: Upload ZIP File to Docker
       shell: bash
       run: |
