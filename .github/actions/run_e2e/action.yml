@@ -51,14 +51,15 @@ runs:
         sleep 30
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = 'localhost', hosts = '', secure = 0;\""
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_auth SET localeID = (SELECT id FROM s_core_locales WHERE locale = 'en_GB');\""
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"insert  into s_core_config_values (element_id, shop_id, value) values ((SELECT id FROM s_core_config_elements WHERE name LIKE '%installationSurvey%' ), 1, 'b:0;');\""
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"insert  into s_core_config_values (element_id, shop_id, value) values ((SELECT id FROM s_core_config_elements WHERE name LIKE '%benchmarkTeaser%' ), 1, 'b:0;');\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO s_core_config_values (element_id, shop_id, value) SELECT id, 1, 'b:0;' FROM s_core_config_elements WHERE name LIKE '%installationSurvey%' AND (SELECT COUNT(*) FROM s_core_config_elements WHERE name LIKE '%installationSurvey%') = 1;\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO s_core_config_values (element_id, shop_id, value) SELECT id, 1, 'b:0;' FROM s_core_config_elements WHERE name LIKE '%benchmarkTeaser%' AND (SELECT COUNT(*) FROM s_core_config_elements WHERE name LIKE '%benchmarkTeaser%') = 1;\""
 
     - name: Upload ZIP File to Docker
       shell: bash
       run: |
         docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/AdyenPayment.zip
         docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o AdyenPayment.zip'
+
 
     - name: Install Plugin
       shell: bash
