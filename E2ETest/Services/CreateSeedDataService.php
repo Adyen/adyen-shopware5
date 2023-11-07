@@ -43,7 +43,8 @@ class CreateSeedDataService extends BaseCreateSeedDataService
     public function createInitialData(): void
     {
         $this->shopProxy->clearCache();
-        parent::createInitialData();
+        $this->createSubStores();
+        $this->updateBaseUrl();
     }
 
     /**
