@@ -13,7 +13,7 @@ use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 class ShopsTestProxy extends TestProxy
 {
     /**
-     * Creates request to update base url and default shop name
+     * Creates request to clear config cache
      *
      * @throws HttpRequestException
      */
