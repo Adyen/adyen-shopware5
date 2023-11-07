@@ -65,6 +65,11 @@ class CreateSeedDataService extends BaseCreateSeedDataService
      */
     public function createSubStores(): void
     {
+        $subStoresFromShop = $this->shopProxy->getSubStores();
+        if (array_key_exists('total', $subStoresFromShop) && $subStoresFromShop['total'] > 1) {
+            return;
+        }
+
         $subStores = $this->readFomJSONFile()['subStores'];
         $subStoresArrayLength = count($subStores);
         for ($i = 1; $i < $subStoresArrayLength; $i++) {
