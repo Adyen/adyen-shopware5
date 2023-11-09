@@ -4,6 +4,9 @@ namespace AdyenPayment\Components\Integration;
 
 use Adyen\Core\BusinessLogic\Domain\Integration\Webhook\WebhookUrlService as BaseWebhookUrlService;
 use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
+use Adyen\Core\Infrastructure\Configuration\ConfigurationManager;
+use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
+use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\Utilities\Url;
 
 /**
@@ -36,6 +39,7 @@ class WebhookUrlService implements BaseWebhookUrlService
 
     /**
      * @return string
+     * @throws QueryFilterInvalidParamException
      */
     public function getWebhookUrl(): string
     {
@@ -46,6 +50,20 @@ class WebhookUrlService implements BaseWebhookUrlService
             $url = str_replace(static::$callbackMap['host'], static::$callbackMap['replace'], $url);
         }
 
+        $testHostname = $this->getConfigurationManager()->getConfigValue('testHostname');
+        if($testHostname){
+            $url = str_replace('localhost', $testHostname, $url);
+        }
+
         return $url;
+    }
+
+    /**
+     * @return ConfigurationManager
+     *
+     */
+    private function getConfigurationManager(): ConfigurationManager
+    {
+        return ServiceRegister::getService(ConfigurationManager::CLASS_NAME);
     }
 }

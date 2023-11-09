@@ -2,7 +2,9 @@
 
 namespace AdyenPayment\E2ETest\Services;
 
+use Adyen\Core\Infrastructure\Configuration\ConfigurationManager;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
+use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use AdyenPayment\E2ETest\Http\TestProxy;
 use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ServiceRegister;
@@ -39,12 +41,14 @@ class CreateSeedDataService extends BaseCreateSeedDataService
 
     /**
      * @throws HttpRequestException
+     * @throws QueryFilterInvalidParamException
      */
     public function createInitialData(): void
     {
         $this->shopProxy->clearCache();
         $this->createSubStores();
         $this->updateBaseUrl();
+        $this->saveTestHostname();
     }
 
     /**
@@ -80,6 +84,16 @@ class CreateSeedDataService extends BaseCreateSeedDataService
     }
 
     /**
+     * @return void
+     * @throws QueryFilterInvalidParamException
+     */
+    private function saveTestHostname():  void
+    {
+        $host = parse_url($this->baseUrl)['host'];
+        $this->getConfigurationManager()->saveConfigValue('testHostname', $host);
+    }
+
+    /**
      * Reads from json file
      *
      * @return array
@@ -100,5 +114,13 @@ class CreateSeedDataService extends BaseCreateSeedDataService
     private function getHttpClient(): HttpClient
     {
         return ServiceRegister::getService(HttpClient::class);
+    }
+
+    /**
+     * @return ConfigurationManager
+     */
+    private function getConfigurationManager(): ConfigurationManager
+    {
+        return ServiceRegister::getService(ConfigurationManager::CLASS_NAME);
     }
 }
