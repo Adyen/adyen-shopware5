@@ -108,6 +108,7 @@ runs:
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
         TEST_PATH: "/AdyenTest/index"
         ADMIN_PATH: "/backend"
+        NGROK: ${{inputs.NGROK_TOKEN}}
     - uses: actions/upload-artifact@v3
       if: always()
       with:
