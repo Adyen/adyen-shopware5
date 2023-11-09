@@ -3,7 +3,7 @@
 namespace AdyenPayment\E2ETest\Services;
 
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
-use AdyenPayment\E2ETest\Http\CacheTestProxy;
+use AdyenPayment\E2ETest\Http\TestProxy;
 use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\E2ETest\Http\ShopsTestProxy;
@@ -17,23 +17,24 @@ use Adyen\Core\BusinessLogic\E2ETest\Services\CreateSeedDataService as BaseCreat
 class CreateSeedDataService extends BaseCreateSeedDataService
 {
     /**
-     * @var ShopsTestProxy
+     * @var TestProxy
      */
     private $shopProxy;
     /**
-     * @var CacheTestProxy
+     * @var string
      */
-    private $cacheProxy;
+    private $baseUrl;
 
     /**
      * CreateSeedDataService constructor.
      *
+     * @param string $url
      * @param string $credentials
      */
-    public function __construct(string $credentials)
+    public function __construct(string $url, string $credentials)
     {
         $this->shopProxy = new ShopsTestProxy($this->getHttpClient(), 'localhost', $credentials);
-        $this->cacheProxy = new CacheTestProxy($this->getHttpClient(), 'localhost', $credentials);
+        $this->baseUrl = $url;
     }
 
     /**
@@ -41,36 +42,21 @@ class CreateSeedDataService extends BaseCreateSeedDataService
      */
     public function createInitialData(): void
     {
-        $this->cacheProxy->clearCache();
-        parent::createInitialData();
+        $this->shopProxy->clearCache();
+        $this->createSubStores();
+        $this->updateBaseUrl();
     }
 
     /**
-     * Updates baseUrl in database
+     * Updates baseUrl in database and default shop name
      *
      * @throws HttpRequestException
      */
-    public function updateBaseUrl(string $url): void
+    public function updateBaseUrl(): void
     {
-        $subStoresDataFromShop = $this->shopProxy->getSubStores();
-        if (array_key_exists('data', $subStoresDataFromShop)) {
-            $subStores = $subStoresDataFromShop['data'];
-            $body = ['host' => parse_url($url)['host']];
-            foreach ($subStores as $subStore) {
-                $this->shopProxy->updateShop($subStore['id'], $body);
-            }
-        }
-    }
-
-    /**
-     * Updates default shop name in database
-     *
-     * @throws HttpRequestException
-     */
-    public function updateDefaultShopName(): void
-    {
-        $body = ['name' => $this->readFomJSONFile()['subStores'][0]['name']];
-        $this->shopProxy->updateShop(1, $body);
+        $host = parse_url($this->baseUrl)['host'];
+        $name = $this->readFomJSONFile()['subStores'][0]['name'];
+        $this->shopProxy->updateBaseUrlAndDefaultShopName(1, $host, $name);
     }
 
     /**
@@ -88,6 +74,7 @@ class CreateSeedDataService extends BaseCreateSeedDataService
         $subStores = $this->readFomJSONFile()['subStores'];
         $subStoresArrayLength = count($subStores);
         for ($i = 1; $i < $subStoresArrayLength; $i++) {
+            $subStores[$i]['host'] = parse_url($this->baseUrl)['host'];
             $this->shopProxy->createSubStore($subStores[$i]);
         }
     }

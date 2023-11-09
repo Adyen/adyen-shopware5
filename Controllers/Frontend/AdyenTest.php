@@ -41,9 +41,11 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
     }
 
     /**
-     * Handles request by generating data for testing purposes
+     * Handles request by generating seed data for testing purposes
      *
      * @return void
+     *
+     * @throws JsonException
      */
     public function indexAction(): void
     {
@@ -51,20 +53,13 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
         $url = $payload['url'] ?? '';
 
         try {
-            $authorizationService = new AuthorizationService();
-            $credentials = $authorizationService->getAuthorizationCredentials();
-            $createSeedDataService = new CreateSeedDataService($credentials);
-
-            if ($url !== '') {
-                $createSeedDataService->updateBaseUrl($url);
-                $this->Response()->setHeader('Content-Type', 'application/json');
-                $this->Response()->setBody(
-                    json_encode(['message' => 'Url is updated.'])
-                );
-
-                return;
+            if($url === ''){
+                throw new RuntimeException('Url is a required field.');
             }
 
+            $authorizationService = new AuthorizationService();
+            $credentials = $authorizationService->getAuthorizationCredentials();
+            $createSeedDataService = new CreateSeedDataService($url, $credentials);
             $createSeedDataService->createInitialData();
         } catch (Exception $exception) {
             $this->Response()->setStatusCode(400);

@@ -13,22 +13,41 @@ use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 class ShopsTestProxy extends TestProxy
 {
     /**
-     * Creates request to update shop in database
+     * Creates request to clear config cache
      *
      * @throws HttpRequestException
      */
-    public function updateShop(int $shopId, array $body): void
+    public function clearCache(): void
+    {
+        $httpRequest = new HttpRequest(
+            "/api/caches",
+            [
+                'id' => 'config',
+            ]
+        );
+        $this->delete($httpRequest)->decodeBodyToArray();
+    }
+
+    /**
+     * Creates request to update base url and default shop name
+     *
+     * @throws HttpRequestException
+     */
+    public function updateBaseUrlAndDefaultShopName(int $shopId, string $host, string $name): void
     {
         $httpRequest = new HttpRequest(
             "/api/shops/$shopId",
-            $body
+            [
+                'host' => $host,
+                'name' => $name
+            ]
         );
         $this->put($httpRequest)->decodeBodyToArray();
     }
 
     /**
      *
-     * Creates request to get exist subStores from database
+     * Creates request to get exist subStores from system
      *
      * @throws HttpRequestException
      */
@@ -41,7 +60,7 @@ class ShopsTestProxy extends TestProxy
 
     /**
      *
-     * Creates request to add new subStore to database
+     * Creates request to add new subStore
      *
      * @throws HttpRequestException
      */
