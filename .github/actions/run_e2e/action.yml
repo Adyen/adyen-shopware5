@@ -29,9 +29,7 @@ inputs:
   NODE:
     description: "The Node Version that is used for the E2E Tests."
     required: true
-  NGROK_TOKEN:
-    description: "The Ngrok authentication token"
-    required: true
+  
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
     default: '~/.build/AdyenPayment.zip'
@@ -108,7 +106,6 @@ runs:
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
         TEST_PATH: "/AdyenTest/index"
         ADMIN_PATH: "/backend"
-        NGROK: ${{inputs.NGROK_TOKEN}}
     - uses: actions/upload-artifact@v3
       if: always()
       with:
