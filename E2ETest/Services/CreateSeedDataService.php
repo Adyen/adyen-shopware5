@@ -46,8 +46,7 @@ class CreateSeedDataService extends BaseCreateSeedDataService
     public function createInitialData(): void
     {
         $this->shopProxy->clearCache();
-        $this->createSubStores();
-        $this->updateBaseUrl();
+        parent::createInitialData();
         $this->saveTestHostname();
     }
 
@@ -56,7 +55,7 @@ class CreateSeedDataService extends BaseCreateSeedDataService
      *
      * @throws HttpRequestException
      */
-    public function updateBaseUrl(): void
+    public function updateBaseUrlAndDefaultShopName(): void
     {
         $host = parse_url($this->baseUrl)['host'];
         $name = $this->readFomJSONFile()['subStores'][0]['name'];
@@ -84,10 +83,12 @@ class CreateSeedDataService extends BaseCreateSeedDataService
     }
 
     /**
+     * Saves ngrok hostname in database
+     *
      * @return void
      * @throws QueryFilterInvalidParamException
      */
-    private function saveTestHostname():  void
+    private function saveTestHostname(): void
     {
         $host = parse_url($this->baseUrl)['host'];
         $this->getConfigurationManager()->saveConfigValue('testHostname', $host);
