@@ -227,7 +227,7 @@ Ext.define('Shopware.apps.AdyenTransaction.controller.OrderDetailsController', {
                 orderId: orderId.getValue()
             },
             success: function (response) {
-              let responseObject =  Ext.decode(response.responseText);
+                let responseObject = Ext.decode(response.responseText);
                 Ext.WindowManager.getActive().down('#adyenGeneratePaymentLinkNonAdyenOrderBtn').hide();
                 Ext.WindowManager.getActive().down('#adyenPaymentLinkNonAdyenOrderField').show();
                 Ext.WindowManager.getActive().down('#adyenPaymentLinkNonAdyenOrderField').setValue(responseObject.paymentLink);

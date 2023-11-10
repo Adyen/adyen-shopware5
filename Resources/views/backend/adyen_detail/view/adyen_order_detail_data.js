@@ -147,10 +147,10 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
     createLeftDetailElements: function () {
         var me = this, fields;
         fields = [
-            { name: 'pspReference', fieldLabel: '{s name="payment/adyen/detail/pspreference"}PSP Reference{/s}'},
-            { name: 'date', fieldLabel: '{s name="payment/adyen/detail/date"}Date{/s}'},
-            { name: 'eventCode', fieldLabel: '{s name="payment/adyen/detail/eventcode"}Event code{/s}'},
-            { name: 'merchantAccountCode', fieldLabel: '{s name="payment/adyen/detail/merchant"}Merchant{/s}'},
+            {name: 'pspReference', fieldLabel: '{s name="payment/adyen/detail/pspreference"}PSP Reference{/s}'},
+            {name: 'date', fieldLabel: '{s name="payment/adyen/detail/date"}Date{/s}'},
+            {name: 'eventCode', fieldLabel: '{s name="payment/adyen/detail/eventcode"}Event code{/s}'},
+            {name: 'merchantAccountCode', fieldLabel: '{s name="payment/adyen/detail/merchant"}Merchant{/s}'},
             {
                 xtype: 'toolbar',
                 itemId: 'adyenCaptureToolbar',
@@ -317,12 +317,12 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
                     },
                 ]
             },
-            { name: 'amountCurrency', fieldLabel: '{s name="payment/adyen/detail/currency"}Currency{/s}'},
-            { name: 'status', fieldLabel: '{s name="payment/adyen/detail/status"}Status{/s}'},
-            { name: 'success', fieldLabel: '{s name="payment/adyen/detail/success"}Success{/s}'},
-            { name: 'riskScore', fieldLabel: '{s name="payment/adyen/detail/riskscore"}Risk score{/s}'},
-            { name: 'paidAmount', fieldLabel: '{s name="payment/adyen/detail/paidamount"}Paid amount{/s}'},
-            { name: 'refundedAmount', fieldLabel: '{s name="payment/adyen/detail/refundedamount"}Refunded amount{/s}'},
+            {name: 'amountCurrency', fieldLabel: '{s name="payment/adyen/detail/currency"}Currency{/s}'},
+            {name: 'status', fieldLabel: '{s name="payment/adyen/detail/status"}Status{/s}'},
+            {name: 'success', fieldLabel: '{s name="payment/adyen/detail/success"}Success{/s}'},
+            {name: 'riskScore', fieldLabel: '{s name="payment/adyen/detail/riskscore"}Risk score{/s}'},
+            {name: 'paidAmount', fieldLabel: '{s name="payment/adyen/detail/paidamount"}Paid amount{/s}'},
+            {name: 'refundedAmount', fieldLabel: '{s name="payment/adyen/detail/refundedamount"}Refunded amount{/s}'},
             {
                 xtype: 'hidden',
                 itemId: 'adyenMerchantReference',
@@ -356,10 +356,16 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderPaymentLink', {
         ];
 
         me.store.on('datachanged', function (store, records, options) {
-            me.record = store.first();
+            me.record = store.last();
+            if (me.record !== undefined && me.record.get('eventCode') !== 'PAYMENT LINK CREATED') {
+                me.query('#adyenPaymentLinkToolbar')[0].hide();
+
+                return
+            }
+
             me.detailsPanel.loadRecord(me.record);
             me.query('#adyenPaymentLinkToolbar')[0].show();
-            if (me.record !== undefined) {
+            if (me.record !== undefined && me.record.get('paymentLink')) {
                 let paymentLink = me.record.get('paymentLink');
                 me.query('#adyenPaymentLinkNonAdyenOrderField')[0].setValue(paymentLink);
                 me.query('#adyenGeneratePaymentLinkNonAdyenOrderBtn')[0].hide();

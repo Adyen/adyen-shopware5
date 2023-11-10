@@ -12,7 +12,7 @@ Ext.define('Shopware.apps.AdyenTransaction.Window', {
         let me = this,
             result = me.callParent();
 
-        result.add(me.createAdyenTab(!(!me.record.raw.adyenTransaction) || me.record.raw.adyenDisplayPaymentLink));
+        result.add(me.createAdyenTab(!(!me.record.raw.adyenTransaction) || (me.record.raw.adyenDisplayPaymentLink && me.record.raw.adyenPaymentLinkEnabled)));
 
         return result;
     },
@@ -52,9 +52,7 @@ Ext.define('Shopware.apps.AdyenTransaction.Window', {
                         }
                     ));
             }
-
         }
-
 
         me.adyenTransactionTab = Ext.create('Ext.container.Container', {
             title: 'Adyen',
@@ -71,7 +69,7 @@ Ext.define('Shopware.apps.AdyenTransaction.Window', {
                 method: 'GET',
                 url: '{url controller=AdyenTransaction action="get"}',
                 params: {
-                    temporaryId: me.record.get('temporaryId'),
+                    id: me.record.get('id'),
                     storeId: me.record.get('shopId')
                 },
                 success: function (response) {

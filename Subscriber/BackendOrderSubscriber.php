@@ -2,6 +2,7 @@
 
 namespace AdyenPayment\Subscriber;
 
+use Adyen\Core\BusinessLogic\Domain\GeneralSettings\Services\GeneralSettingsService;
 use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
 use Adyen\Core\BusinessLogic\Domain\TransactionHistory\Services\TransactionHistoryService;
 use Adyen\Core\BusinessLogic\Webhook\Services\OrderStatusMappingService;
@@ -10,6 +11,7 @@ use Adyen\Webhook\PaymentStates;
 use AdyenPayment\Utilities\Plugin;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
+use Exception;
 use Shopware_Controllers_Backend_Order;
 
 class BackendOrderSubscriber implements SubscriberInterface
@@ -23,6 +25,11 @@ class BackendOrderSubscriber implements SubscriberInterface
      * @var OrderStatusMappingService
      */
     private $orderStatusMappingService;
+
+    /**
+     * @var GeneralSettingsService
+     */
+    private $generalSettingsService;
 
     /**
      * @inheritDoc
@@ -48,6 +55,13 @@ class BackendOrderSubscriber implements SubscriberInterface
         $subject->View()->assign('data', $data);
     }
 
+    /**
+     * @param array $data
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
     private function addData(array &$data): void
     {
         $merchantReferences = [];
@@ -55,13 +69,19 @@ class BackendOrderSubscriber implements SubscriberInterface
 
         foreach ($data as &$order) {
             $order['adyenDisplayPaymentLink'] = false;
-            if (!isset($order['payment']['name']) || !Plugin::isAdyenPaymentMean($order['payment']['name'])) {
+            if ((!isset($order['payment']['name']) || !Plugin::isAdyenPaymentMean($order['payment']['name']))) {
                 $orderStatusMapping = $this->getStatusMappingService()->getOrderStatusMappingSettings();
                 $orderStatusId = (string)$order['paymentStatus']['id'] ?? '';
+                $generalSettings = StoreContext::doWithStore(
+                    (string)$order['shopId'],
+                    [$this->getGeneralSettingsService(), 'getGeneralSettings']
+                );
 
+                $isPaymentLinkEnabled = $generalSettings && $generalSettings->isEnablePayByLink();
                 if ($orderStatusId === (string)$orderStatusMapping[PaymentStates::STATE_CANCELLED] ||
                     $orderStatusId === (string)$orderStatusMapping[PaymentStates::STATE_FAILED]) {
                     $order['adyenDisplayPaymentLink'] = true;
+                    $order['adyenPaymentLinkEnabled'] = $isPaymentLinkEnabled;
                 }
 
                 continue;
@@ -119,5 +139,17 @@ class BackendOrderSubscriber implements SubscriberInterface
         }
 
         return $this->orderStatusMappingService;
+    }
+
+    /**
+     * @return GeneralSettingsService
+     */
+    private function getGeneralSettingsService(): GeneralSettingsService
+    {
+        if ($this->generalSettingsService === null) {
+            $this->generalSettingsService = ServiceRegister::getService(GeneralSettingsService::class);
+        }
+
+        return $this->generalSettingsService;
     }
 }
