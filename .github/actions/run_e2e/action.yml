@@ -120,5 +120,6 @@ runs:
     - name: Remove Ayden plugin
       shell: bash
       run: |
+        docker exec shop bash -c 'php bin/console sw:plugin:uninstall AdyenPayment'
         docker exec shop bash -c 'php bin/console sw:plugin:delete AdyenPayment'
         docker exec shop bash -c 'php bin/console sw:cache:clear'
