@@ -117,3 +117,8 @@ runs:
         name: playwright-report-Shopware-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
         path: ./tests/playwright-report/
         retention-days: 30  
+    - name: Remove Ayden plugin
+      shell: bash
+      run: |
+        docker exec shop bash -c 'php bin/console sw:plugin:delete AdyenPayment'
+        docker exec shop bash -c 'php bin/console sw:cache:clear'
