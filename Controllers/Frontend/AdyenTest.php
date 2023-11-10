@@ -1,6 +1,10 @@
 <?php
 
+use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
+use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use AdyenPayment\Controllers\Common\AjaxResponseSetter;
+use AdyenPayment\E2ETest\Exception\InvalidDataException;
+use AdyenPayment\E2ETest\Services\AdyenAPIService;
 use AdyenPayment\E2ETest\Services\AuthorizationService;
 use AdyenPayment\E2ETest\Services\CreateSeedDataService;
 use Shopware\Components\CSRFWhitelistAware;
@@ -46,34 +50,41 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
      * @return void
      *
      * @throws JsonException
+     * @throws QueryFilterInvalidParamException
      */
     public function indexAction(): void
     {
         $payload = $this->Request()->getParams();
         $url = $payload['url'] ?? '';
+        $testApiKey = $payload['testApiKey'] ?? '';
+        $liveApiKey = $payload['liveApiKey'] ?? '';
 
         try {
-            if($url === ''){
-                throw new RuntimeException('Url is a required field.');
+            if ($url === '' || $testApiKey === '' || $liveApiKey === '') {
+                throw new InvalidDataException('Url, test api key and live api key are required fields.');
             }
 
+            $adyenApiService = new AdyenAPIService();
+            $adyenApiService->verifyManagementAPI($testApiKey, $liveApiKey);
             $authorizationService = new AuthorizationService();
             $credentials = $authorizationService->getAuthorizationCredentials();
             $createSeedDataService = new CreateSeedDataService($url, $credentials);
             $createSeedDataService->createInitialData();
-        } catch (Exception $exception) {
+            $this->Response()->setBody(
+                json_encode(['message' => 'The initial data setup was successfully completed.'])
+            );
+        } catch (InvalidDataException $exception) {
             $this->Response()->setStatusCode(400);
-            $this->Response()->setHeader('Content-Type', 'application/json');
             $this->Response()->setBody(
                 json_encode(['message' => $exception->getMessage()])
             );
-
-            return;
+        } catch (HttpRequestException $exception) {
+            $this->Response()->setStatusCode(503);
+            $this->Response()->setBody(
+                json_encode(['message' => $exception->getMessage()])
+            );
+        } finally {
+            $this->Response()->setHeader('Content-Type', 'application/json');
         }
-
-        $this->Response()->setHeader('Content-Type', 'application/json');
-        $this->Response()->setBody(
-            json_encode(['message' => 'The initial data setup was successfully completed.'])
-        );
     }
 }
