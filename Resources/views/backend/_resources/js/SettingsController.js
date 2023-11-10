@@ -258,21 +258,6 @@ if (!window.AdyenFE) {
                                         onChange: (value) => handleChange('enablePayByLink', value)
                                     },
                                     {
-                                        name: 'payByLinkTitle',
-                                        value: settings.payByLinkTitle,
-                                        type: 'text',
-                                        dataset: {
-                                            validationRule: 'required,integer,minValue|60'
-                                        },
-                                        placeholder: translationService.translate(
-                                            `settings.general.fields.payByLinkTitle.placeholder`
-                                        ),
-                                        className: !settings.enablePayByLink ? 'adls--hidden' : '',
-                                        error: translationService.translate(
-                                            'settings.general.fields.payByLinkTitle.error'
-                                        )
-                                    },
-                                    {
                                         name: 'defaultLinkExpirationTime',
                                         value: settings.defaultLinkExpirationTime,
                                         type: 'number',
@@ -582,7 +567,6 @@ if (!window.AdyenFE) {
             }
 
             if (prop === 'enablePayByLink') {
-                handleFieldVisibility('payByLinkTitle', value);
                 handleFieldVisibility('defaultLinkExpirationTime', value);
             }
         };
@@ -877,7 +861,6 @@ if (!window.AdyenFE) {
                     data.captureDelay = null;
                 }
                 if (!changedSettings.enablePayByLink) {
-                    data.payByLinkTitle = '';
                     data.defaultLinkExpirationTime = '';
                 }
                 promise = api.post(configuration.saveSettingsUrl, data);
@@ -921,10 +904,6 @@ if (!window.AdyenFE) {
 
             if (!prop || prop === 'retentionPeriod') {
                 result.push(validator.validateNumber(form.querySelector('[name="retentionPeriod"]')));
-            }
-
-            if (changedSettings.enablePayByLink && (!prop || prop === 'payByLinkTitle')) {
-                result.push(validator.validateRequiredField(form.querySelector('[name="payByLinkTitle"]')));
             }
 
             if (!prop) {
