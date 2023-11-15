@@ -70,7 +70,10 @@ class BackendOrderSubscriber implements SubscriberInterface
         foreach ($data as &$order) {
             $order['adyenDisplayPaymentLink'] = false;
             if ((!isset($order['payment']['name']) || !Plugin::isAdyenPaymentMean($order['payment']['name']))) {
-                $orderStatusMapping = $this->getStatusMappingService()->getOrderStatusMappingSettings();
+                $orderStatusMapping = StoreContext::doWithStore(
+                    (string)$order['shopId'],
+                    [$this->getStatusMappingService(), 'getOrderStatusMappingSettings']
+                );
                 $orderStatusId = (string)$order['paymentStatus']['id'] ?? '';
                 $generalSettings = StoreContext::doWithStore(
                     (string)$order['shopId'],
