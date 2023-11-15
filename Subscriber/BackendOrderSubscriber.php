@@ -79,7 +79,8 @@ class BackendOrderSubscriber implements SubscriberInterface
 
                 $isPaymentLinkEnabled = $generalSettings && $generalSettings->isEnablePayByLink();
                 if ($orderStatusId === (string)$orderStatusMapping[PaymentStates::STATE_CANCELLED] ||
-                    $orderStatusId === (string)$orderStatusMapping[PaymentStates::STATE_FAILED]) {
+                    $orderStatusId === (string)$orderStatusMapping[PaymentStates::STATE_FAILED] ||
+                    $orderStatusId === (string)$orderStatusMapping[PaymentStates::STATE_NEW]) {
                     $order['adyenDisplayPaymentLink'] = true;
                     $order['adyenPaymentLinkEnabled'] = $isPaymentLinkEnabled;
                 }
