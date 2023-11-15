@@ -147,10 +147,10 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
     createLeftDetailElements: function () {
         var me = this, fields;
         fields = [
-            {name: 'pspReference', fieldLabel: '{s name="payment/adyen/detail/pspreference"}PSP Reference{/s}'},
-            {name: 'date', fieldLabel: '{s name="payment/adyen/detail/date"}Date{/s}'},
-            {name: 'eventCode', fieldLabel: '{s name="payment/adyen/detail/eventcode"}Event code{/s}'},
-            {name: 'merchantAccountCode', fieldLabel: '{s name="payment/adyen/detail/merchant"}Merchant{/s}'},
+            { name: 'pspReference', fieldLabel: '{s name="payment/adyen/detail/pspreference"}PSP Reference{/s}'},
+            { name: 'date', fieldLabel: '{s name="payment/adyen/detail/date"}Date{/s}'},
+            { name: 'eventCode', fieldLabel: '{s name="payment/adyen/detail/eventcode"}Event code{/s}'},
+            { name: 'merchantAccountCode', fieldLabel: '{s name="payment/adyen/detail/merchant"}Merchant{/s}'},
             {
                 xtype: 'toolbar',
                 itemId: 'adyenCaptureToolbar',
@@ -317,12 +317,12 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
                     },
                 ]
             },
-            {name: 'amountCurrency', fieldLabel: '{s name="payment/adyen/detail/currency"}Currency{/s}'},
-            {name: 'status', fieldLabel: '{s name="payment/adyen/detail/status"}Status{/s}'},
-            {name: 'success', fieldLabel: '{s name="payment/adyen/detail/success"}Success{/s}'},
-            {name: 'riskScore', fieldLabel: '{s name="payment/adyen/detail/riskscore"}Risk score{/s}'},
-            {name: 'paidAmount', fieldLabel: '{s name="payment/adyen/detail/paidamount"}Paid amount{/s}'},
-            {name: 'refundedAmount', fieldLabel: '{s name="payment/adyen/detail/refundedamount"}Refunded amount{/s}'},
+            { name: 'amountCurrency', fieldLabel: '{s name="payment/adyen/detail/currency"}Currency{/s}'},
+            { name: 'status', fieldLabel: '{s name="payment/adyen/detail/status"}Status{/s}'},
+            { name: 'success', fieldLabel: '{s name="payment/adyen/detail/success"}Success{/s}'},
+            { name: 'riskScore', fieldLabel: '{s name="payment/adyen/detail/riskscore"}Risk score{/s}'},
+            { name: 'paidAmount', fieldLabel: '{s name="payment/adyen/detail/paidamount"}Paid amount{/s}'},
+            { name: 'refundedAmount', fieldLabel: '{s name="payment/adyen/detail/refundedamount"}Refunded amount{/s}'},
             {
                 xtype: 'hidden',
                 itemId: 'adyenMerchantReference',
