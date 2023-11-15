@@ -90,6 +90,7 @@ class Shopware_Controllers_Backend_AdyenMerchantActions extends Enlight_Controll
      * @return void
      *
      * @throws InvalidMerchantReferenceException
+     * @throws InvalidCurrencyCode
      */
     public function generatePaymentLinkAction(): void
     {
@@ -97,6 +98,10 @@ class Shopware_Controllers_Backend_AdyenMerchantActions extends Enlight_Controll
         $currency = $this->Request()->get('currency');
         $amount = $this->Request()->get('amount');
         $merchantReference = $this->Request()->get('merchantReference');
+        if ((float)$amount === 0.0) {
+            $order = $this->getOrderService()->getOrderByTemporaryId((string)$merchantReference);
+            $amount = $order->getInvoiceAmount();
+        }
 
         $response = AdminAPI::get()->paymentLink($storeId)->createPaymentLink(
             new CreatePaymentLinkRequest($amount, $currency, $merchantReference)
@@ -134,7 +139,6 @@ class Shopware_Controllers_Backend_AdyenMerchantActions extends Enlight_Controll
         $response = AdminAPI::get()->paymentLink((string)$order->getShop()->getId())->createPaymentLink(
             new CreatePaymentLinkRequest($order->getInvoiceAmount(), $order->getCurrency(), $order->getTemporaryId())
         );
-
 
         if (!$response->isSuccessful()) {
             $namespace = Shopware()->Snippets()->getNamespace('backend/adyen/configuration');

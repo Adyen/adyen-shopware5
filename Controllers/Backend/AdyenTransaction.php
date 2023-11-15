@@ -35,7 +35,10 @@ class Shopware_Controllers_Backend_AdyenTransaction extends Shopware_Controllers
     public function getAction(): void
     {
         $orderId = $this->Request()->get('id');
-        $order = $this->getOrderRepository()->getOrderById($orderId);
+        $temporaryId = $this->Request()->get('temporaryId');
+        $order = $orderId ?
+            $this->getOrderRepository()->getOrderById($orderId) :
+            $this->getOrderRepository()->getOrderByTemporaryId((string)$temporaryId);
         $merchantReference = $order->getTemporaryId();
         $storeId = $this->Request()->get('storeId');
         $result = StoreContext::doWithStore(
