@@ -130,13 +130,16 @@ class AddressProcessor implements BaseAddressProcessor, PaymentLinkAddressProces
         if (!empty($billingAddressRawData)) {
             return;
         }
+        $state = Shopware()->Models()->getRepository('Shopware\Models\Country\State')->findOneBy(
+            ['id' => $userData['billingaddress']['stateID']]
+        );
 
         $billingAddress = new BillingAddress(
             $userData['billingaddress']['city'] ?? '',
             $country ? $country->getIso() : '',
             '',
             $userData['billingaddress']['zipcode'] ?? '',
-            '',
+            $state ? $state->getShortCode() : ($country ? $country->getIso() : ''),
             $userData['billingaddress']['street'] ?? ''
         );
 
