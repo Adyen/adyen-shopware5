@@ -232,7 +232,8 @@ Ext.define('Shopware.apps.AdyenTransaction.controller.OrderDetailsController', {
                 Ext.WindowManager.getActive().down('#adyenPaymentLinkNonAdyenOrderField').show();
                 Ext.WindowManager.getActive().down('#adyenPaymentLinkNonAdyenOrderField').setValue(responseObject.paymentLink);
                 Ext.WindowManager.getActive().down('#adyenCopyPaymentLinkNonAdyenOrderBtn').show();
-
+                Ext.WindowManager.getActive().record.set('temporaryId', responseObject.temporaryId);
+                Ext.WindowManager.getActive().record.set('changed', responseObject.changed);
                 me.loadingMask.hide();
             },
             failure: function (response, options) {

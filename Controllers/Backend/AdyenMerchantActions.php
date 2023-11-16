@@ -131,9 +131,12 @@ class Shopware_Controllers_Backend_AdyenMerchantActions extends Enlight_Controll
         $orderId = $this->Request()->get('orderId');
         $order = $this->getOrderService()->getOrderById((int)$orderId);
         $temporaryId = $order->getTemporaryId();
+        $changed = '';
 
         if (empty($temporaryId)) {
             $order = $this->getOrderService()->setOrderTemporaryId($orderId, $order->getNumber());
+            $temporaryId = $order->getNumber();
+            $changed = $order->getChanged()->format('Y-m-d H:i:s');
         }
 
         $response = AdminAPI::get()->paymentLink((string)$order->getShop()->getId())->createPaymentLink(
@@ -151,8 +154,14 @@ class Shopware_Controllers_Backend_AdyenMerchantActions extends Enlight_Controll
 
             return;
         }
+        $response = $response->toArray();
+        $response['temporaryId'] = $temporaryId;
+        if(!empty($changed)){
+            $response['changed'] = $changed;
+        }
 
-        $this->returnAPIResponse($response);
+        $this->Response()->setHeader('Content-Type', 'application/json');
+        $this->Response()->setBody(json_encode($response));
     }
 
     /**
