@@ -131,7 +131,7 @@ class Shopware_Controllers_Backend_AdyenMerchantActions extends Enlight_Controll
         $orderId = $this->Request()->get('orderId');
         $order = $this->getOrderService()->getOrderById((int)$orderId);
         $temporaryId = $order->getTemporaryId();
-        $changed = '';
+        $changed = $order->getChanged()->format('Y-m-d H:i:s');
 
         if (empty($temporaryId)) {
             $order = $this->getOrderService()->setOrderTemporaryId($orderId, $order->getNumber());
