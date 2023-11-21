@@ -53,12 +53,14 @@ class AuthorizationService
      */
     private function generateAPIKey(User $user): void
     {
-        $apiKey = substr(base64_encode($user->getUsername() . ':' . $user->getPassword()), 0, 40);
-        $user->setApiKey($apiKey);
-        $user->setPassword($user->getPassword());
+        if (!$user->getApiKey()) {
+            $apiKey = substr(base64_encode($user->getUsername() . ':' . $user->getPassword()), 0, 40);
+            $user->setApiKey($apiKey);
+            $user->setPassword($user->getPassword());
 
-        $manager = Shopware()->Models();
-        $manager->persist($user);
-        $manager->flush();
+            $manager = Shopware()->Models();
+            $manager->persist($user);
+            $manager->flush();
+        }
     }
 }

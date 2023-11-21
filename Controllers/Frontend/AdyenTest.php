@@ -1,12 +1,14 @@
 <?php
 
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
-use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use AdyenPayment\Controllers\Common\AjaxResponseSetter;
 use AdyenPayment\E2ETest\Exception\InvalidDataException;
 use AdyenPayment\E2ETest\Services\AdyenAPIService;
 use AdyenPayment\E2ETest\Services\AuthorizationService;
-use AdyenPayment\E2ETest\Services\CreateSeedDataService;
+use AdyenPayment\E2ETest\Services\CreateCheckoutDataService;
+use AdyenPayment\E2ETest\Services\CreateInitialDataService;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Shopware\Components\CSRFWhitelistAware;
 
 /**
@@ -48,9 +50,8 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
      * Handles request by generating seed data for testing purposes
      *
      * @return void
-     *
-     * @throws JsonException
-     * @throws QueryFilterInvalidParamException
+     * @throws ORMException
+     * @throws OptimisticLockException|HttpRequestException
      */
     public function indexAction(): void
     {
@@ -68,7 +69,7 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
             $adyenApiService->verifyManagementAPI($testApiKey, $liveApiKey);
             $authorizationService = new AuthorizationService();
             $credentials = $authorizationService->getAuthorizationCredentials();
-            $createSeedDataService = new CreateSeedDataService($url, $credentials);
+            $createSeedDataService = new CreateInitialDataService($url, $credentials);
             $createSeedDataService->createInitialData();
             $this->Response()->setBody(
                 json_encode(['message' => 'The initial data setup was successfully completed.'])
@@ -86,5 +87,24 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
         } finally {
             $this->Response()->setHeader('Content-Type', 'application/json');
         }
+    }
+
+    /**
+     * Handles request by creating checkout prerequisites data for testing purposes
+     *
+     * @return void
+     * @throws ORMException
+     * @throws OptimisticLockException|HttpRequestException
+     */
+    public function createCheckoutPrerequisitesAction(): void
+    {
+        $authorizationService = new AuthorizationService();
+        $credentials = $authorizationService->getAuthorizationCredentials();
+        $createCheckoutDataService = new CreateCheckoutDataService($credentials);
+        $createCheckoutDataService->crateCheckoutPrerequisitesData();
+        $this->Response()->setHeader('Content-Type', 'application/json');
+        $this->Response()->setBody(
+            json_encode(['message' => 'The checkout prerequisites data are sucessfully saved.'])
+        );
     }
 }

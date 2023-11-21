@@ -1,5 +1,5 @@
 {
-  "subStores":[
+  "subStores": [
     {
       "name": "subStore1",
       "categoryId": "3",
@@ -14,6 +14,67 @@
       "localeId": "2",
       "currencyId": "1",
       "customerGroupId": "1"
+    }
+  ],
+  "countries": [
+    {
+      "iso": "DE"
+    },
+    {
+      "iso": "NL"
+    },
+    {
+      "iso": "IT"
+    }
+  ],
+  "customer":     {
+    "groupKey": "EK",
+    "shopId": 1,
+    "encoderName": "bcrypt",
+    "password": "First132.",
+    "active": true,
+    "email": "testExist@de.com",
+    "languageId": "1",
+    "salutation": "ms",
+    "firstname": "test",
+    "lastname": "test",
+    "defaultShippingAddress":{
+      "street":"test 123",
+      "zipcode": "10115",
+      "city": "Berlin",
+      "country": "DE",
+      "salutation": "ms",
+      "firstname": "test",
+      "lastname": "test"
+    },
+    "defaultBillingAddress":{
+      "street":"test 123",
+      "zipcode": "10115",
+      "city": "Berlin",
+      "country": "DE",
+      "salutation": "ms",
+      "firstname": "test",
+      "lastname": "test"
+    }
+  },
+  "currencies" : [
+    {
+      "currency" : "GBP",
+      "name" : "British Pound",
+      "default" : false,
+      "factor" : 0.87,
+      "symbol" : "&gbp;",
+      "symbolPosition" : 0,
+      "position" : 0
+    },
+    {
+      "currency" : "USD",
+      "name" : "United States Dollar",
+      "default" : false,
+      "factor" : 1.09,
+      "symbol" : "&gbp;",
+      "symbolPosition" : 0,
+      "position" : 0
     }
   ]
 }
