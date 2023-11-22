@@ -63,7 +63,7 @@
       "name" : "British Pound",
       "default" : false,
       "factor" : 0.87,
-      "symbol" : "&gbp;",
+      "symbol" : "£",
       "symbolPosition" : 0,
       "position" : 0
     },
@@ -72,7 +72,7 @@
       "name" : "United States Dollar",
       "default" : false,
       "factor" : 1.09,
-      "symbol" : "&gbp;",
+      "symbol" : "$",
       "symbolPosition" : 0,
       "position" : 0
     }
