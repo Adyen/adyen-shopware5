@@ -111,6 +111,7 @@ runs:
         ADMIN_USERNAME: ${{ inputs.ADMIN_USERNAME }}
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
         TEST_PATH: "/AdyenTest/index"
+        CHECKOUT_TEST_PATH: "/AdyenTest/createCheckoutPrerequisites"
         ADMIN_PATH: "/backend"
     - uses: actions/upload-artifact@v3
       if: always()
