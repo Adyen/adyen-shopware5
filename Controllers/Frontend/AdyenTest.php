@@ -43,7 +43,7 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
      */
     public function getWhitelistedCSRFActions(): array
     {
-        return ['index'];
+        return ['index', 'createCheckoutPrerequisites'];
     }
 
     /**
