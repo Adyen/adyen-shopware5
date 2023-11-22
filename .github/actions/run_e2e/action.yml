@@ -75,9 +75,10 @@ runs:
     - name: Clone Code
       uses: actions/checkout@v3
       with:
-        repository: ${{inputs.SHOPWARE_TEST_REPO}}#feature/checkout
+        repository: ${{inputs.SHOPWARE_TEST_REPO}}
         path: tests
         token: ${{ inputs.GH_PAT }}
+        ref: feature/checkout
         
     - name: Setup Node
       uses: actions/setup-node@v3
