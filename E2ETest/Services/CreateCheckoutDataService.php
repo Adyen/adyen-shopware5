@@ -30,10 +30,6 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
      * @var CustomerTestProxy
      */
     private $customerTestProxy;
-    /**
-     * @var ShopsTestProxy
-     */
-    private $shopProxy;
 
     /**
      * CreateCheckoutDataService constructor.
@@ -44,7 +40,6 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     {
         $this->countryTestProxy = new CountryTestProxy($this->getHttpClient(), 'localhost', $credentials);
         $this->customerTestProxy = new CustomerTestProxy($this->getHttpClient(), 'localhost', $credentials);
-        $this->shopProxy = new ShopsTestProxy($this->getHttpClient(), 'localhost', $credentials);
     }
 
     /**

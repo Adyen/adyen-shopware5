@@ -2,6 +2,7 @@
   "subStores": [
     {
       "name": "subStore1",
+      "title": "subStore1",
       "categoryId": "3",
       "localeId": "2",
       "currencyId": "1",
@@ -9,7 +10,8 @@
     },
     {
       "name": "subStore2",
-      "basePath": "/substore2",
+      "title": "subStore2",
+      "baseUrl": "/substore2",
       "categoryId": "3",
       "localeId": "2",
       "currencyId": "1",
