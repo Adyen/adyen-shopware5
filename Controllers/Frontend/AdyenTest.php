@@ -7,6 +7,7 @@ use AdyenPayment\E2ETest\Services\AdyenAPIService;
 use AdyenPayment\E2ETest\Services\AuthorizationService;
 use AdyenPayment\E2ETest\Services\CreateCheckoutDataService;
 use AdyenPayment\E2ETest\Services\CreateInitialDataService;
+use AdyenPayment\E2ETest\Services\CreateOrderDataService;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Shopware\Components\CSRFWhitelistAware;
@@ -43,7 +44,7 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
      */
     public function getWhitelistedCSRFActions(): array
     {
-        return ['index', 'createCheckoutPrerequisites'];
+        return ['index', 'createCheckoutPrerequisites', 'createWebhookPrerequisites'];
     }
 
     /**
@@ -106,5 +107,27 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
         $this->Response()->setBody(
             json_encode(['message' => 'The checkout prerequisites data are sucessfully saved.'])
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function createWebhookPrerequisitesAction(): void
+    {
+        try {
+            $authorizationService = new AuthorizationService();
+            $credentials = $authorizationService->getAuthorizationCredentials();
+            $createCheckoutDataService = new CreateOrderDataService($credentials);
+            $createCheckoutDataService->crateOrderPrerequisitesData();
+            $this->Response()->setHeader('Content-Type', 'application/json');
+            $this->Response()->setBody(
+                json_encode(['message' => 'The webhook prerequisites data are sucessfully saved.'])
+            );
+        } catch (Exception $exception) {
+            $this->Response()->setHeader('Content-Type', 'application/json');
+            $this->Response()->setBody(
+                json_encode(['message' => $exception->getMessage()])
+            );
+        }
     }
 }
