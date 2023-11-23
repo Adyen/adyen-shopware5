@@ -53,11 +53,6 @@ class CreateOrderDataService extends BaseCreateSeedDataService
      */
     public function crateOrderPrerequisitesData(): void
     {
-        $result = AdminAPI::get()->connection(1)->getConnectionSettings();
-        if ($result) {
-            return;
-        }
-
         $this->createPluginConfigurations();
         $this->createOrder();
         StoreContext::doWithStore('1', function () {
