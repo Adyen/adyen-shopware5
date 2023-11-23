@@ -71,7 +71,7 @@ class CreateOrderDataService extends BaseCreateSeedDataService
             $transactionHistoryService = ServiceRegister::getService(TransactionHistoryService::class);
             $transactionHistoryService->createTransactionHistory($transactionContext->getReference(),
                 $transactionContext->getAmount()->getCurrency(),
-                CaptureType::manual());
+                CaptureType::manual()); //read from configuration
         });
     }
 
