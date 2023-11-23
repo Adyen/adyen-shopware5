@@ -117,6 +117,8 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
         try {
             $authorizationService = new AuthorizationService();
             $credentials = $authorizationService->getAuthorizationCredentials();
+            $createCheckoutDataService = new CreateCheckoutDataService($credentials);
+            $createCheckoutDataService->crateCheckoutPrerequisitesData();
             $createCheckoutDataService = new CreateOrderDataService($credentials);
             $createCheckoutDataService->crateOrderPrerequisitesData();
             $this->Response()->setHeader('Content-Type', 'application/json');
