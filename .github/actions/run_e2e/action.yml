@@ -78,8 +78,8 @@ runs:
         repository: ${{inputs.SHOPWARE_TEST_REPO}}
         path: tests
         token: ${{ inputs.GH_PAT }}
-        ref: feature/checkout
-        
+        ref: feature/analyse_iteration_3
+
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
@@ -112,6 +112,8 @@ runs:
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
         TEST_PATH: "/AdyenTest/index"
         CHECKOUT_TEST_PATH: "/AdyenTest/createCheckoutPrerequisites"
+        WEBHOOK_TEST_PATH: "/AdyenTest/createWebhookPrerequisites"
+        WEBHOOK_PATH: "/AdyenWebhook/index/storeId/1"
         ADMIN_PATH: "/backend"
     - uses: actions/upload-artifact@v3
       if: always()

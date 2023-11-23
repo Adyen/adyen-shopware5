@@ -2,7 +2,7 @@
 on:
   push:
     branches:
-      - feature/test_endpoint
+      - feature/analyse_iteration_3
 jobs:
   build:
     permissions:
