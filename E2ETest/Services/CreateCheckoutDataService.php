@@ -2,6 +2,24 @@
 
 namespace AdyenPayment\E2ETest\Services;
 
+use Adyen\Core\BusinessLogic\AdyenAPI\Exceptions\ConnectionSettingsNotFoundException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ApiCredentialsDoNotExistException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ApiKeyCompanyLevelException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\EmptyConnectionDataException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\EmptyStoreException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidAllowedOriginException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidApiKeyException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidConnectionSettingsException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidModeException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\MerchantIdChangedException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ModeChangedException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\UserDoesNotHaveNecessaryRolesException;
+use Adyen\Core\BusinessLogic\Domain\Merchant\Exceptions\ClientKeyGenerationFailedException;
+use Adyen\Core\BusinessLogic\Domain\Payment\Exceptions\PaymentMethodDataEmptyException;
+use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\FailedToGenerateHmacException;
+use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\FailedToRegisterWebhookException;
+use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\MerchantDoesNotExistException;
+use Adyen\Core\BusinessLogic\E2ETest\Services\CreateIntegrationDataService;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use AdyenPayment\E2ETest\Http\CountryTestProxy;
 use Adyen\Core\Infrastructure\Http\HttpClient;
@@ -43,17 +61,70 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     }
 
     /**
+     * @param string $testApiKey
      * @return void
+     * @throws ApiCredentialsDoNotExistException
+     * @throws ApiKeyCompanyLevelException
+     * @throws ClientKeyGenerationFailedException
+     * @throws ConnectionSettingsNotFoundException
+     * @throws EmptyConnectionDataException
+     * @throws EmptyStoreException
+     * @throws FailedToGenerateHmacException
+     * @throws FailedToRegisterWebhookException
      * @throws HttpRequestException
-     * @throws ORMException
-     * @throws OptimisticLockException
+     * @throws InvalidAllowedOriginException
+     * @throws InvalidApiKeyException
+     * @throws InvalidConnectionSettingsException
+     * @throws InvalidModeException
+     * @throws MerchantDoesNotExistException
+     * @throws MerchantIdChangedException
+     * @throws ModeChangedException
+     * @throws PaymentMethodDataEmptyException
+     * @throws UserDoesNotHaveNecessaryRolesException
      */
-    public function crateCheckoutPrerequisitesData(): void
+    public function crateCheckoutPrerequisitesData(string $testApiKey): void
     {
+        $this->createIntegrationConfigurations($testApiKey);
         $this->activateCountries();
         $this->createCustomer();
         $currencies = $this->createCurrenciesInDatabase();
         $this->addCurrenciesInSubStore($currencies);
+    }
+
+    /**
+     * Creates the integration configuration - authorization data and payment methods
+     *
+     * @throws EmptyConnectionDataException
+     * @throws ApiKeyCompanyLevelException
+     * @throws MerchantDoesNotExistException
+     * @throws InvalidModeException
+     * @throws EmptyStoreException
+     * @throws InvalidApiKeyException
+     * @throws MerchantIdChangedException
+     * @throws ClientKeyGenerationFailedException
+     * @throws FailedToGenerateHmacException
+     * @throws UserDoesNotHaveNecessaryRolesException
+     * @throws InvalidAllowedOriginException
+     * @throws ApiCredentialsDoNotExistException
+     * @throws InvalidConnectionSettingsException
+     * @throws ModeChangedException
+     * @throws ConnectionSettingsNotFoundException
+     * @throws FailedToRegisterWebhookException
+     * @throws PaymentMethodDataEmptyException
+     */
+    private function createIntegrationConfigurations(string $testApiKey):void
+    {
+        $createIntegrationDataService = new CreateIntegrationDataService();
+        $createIntegrationDataService->createConnectionAndWebhookConfiguration($testApiKey);
+        $createIntegrationDataService->createPaymentMethodConfiguration(self::CREDIT_CARD);
+        $createIntegrationDataService->createPaymentMethodConfiguration(self::IDEAL);
+        $createIntegrationDataService->createPaymentMethodConfiguration(self::KLARNA_PAY_NOW);
+        $createIntegrationDataService->createPaymentMethodConfiguration(self::KLARNA_PAY_LATER);
+        $createIntegrationDataService->createPaymentMethodConfiguration(self::KLARNA_PAY_OVERTIME);
+        $createIntegrationDataService->createPaymentMethodConfiguration(self::TWINT);
+        $createIntegrationDataService->createPaymentMethodConfiguration(self::BANCONTACT_MODILE);
+        $createIntegrationDataService->createPaymentMethodConfiguration(self::PAYPAL);
+        $createIntegrationDataService->createPaymentMethodConfiguration(self::APPLE_PAY);
     }
 
     /**

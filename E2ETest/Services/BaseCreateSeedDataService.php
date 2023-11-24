@@ -9,6 +9,16 @@ namespace AdyenPayment\E2ETest\Services;
  */
 class BaseCreateSeedDataService
 {
+    const CREDIT_CARD = 'creditCard';
+    const IDEAL = 'ideal';
+    const KLARNA_PAY_NOW = 'klarnaPayNow';
+    const KLARNA_PAY_LATER = 'klarnaPayLater';
+    const KLARNA_PAY_OVERTIME = 'klarnaPayOverTime';
+    const TWINT = 'twint';
+    const BANCONTACT_MODILE = 'bancontact';
+    const PAYPAL = 'payPal';
+    const APPLE_PAY = 'applePay';
+
     /**
      * Reads from json file
      *
