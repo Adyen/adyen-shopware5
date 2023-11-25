@@ -16,6 +16,15 @@
       "localeId": "2",
       "currencyId": "1",
       "customerGroupId": "1"
+    },
+    {
+      "name": "subStore3",
+      "title": "subStore3",
+      "baseUrl": "/substore3",
+      "categoryId": "3",
+      "localeId": "2",
+      "currencyId": "1",
+      "customerGroupId": "1"
     }
   ],
   "countries": [
