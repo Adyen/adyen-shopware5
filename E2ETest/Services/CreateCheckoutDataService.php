@@ -110,7 +110,7 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     {
         $subStores = $this->shopProxy->getSubStores()['data'] ?? [];
         foreach ($subStores as $subStore) {
-            $this->shopProxy->updateSubStore($subStore->id,
+            $this->shopProxy->updateSubStore($subStore['id'],
                 [
                     'host' => 'localhost'
                 ]
