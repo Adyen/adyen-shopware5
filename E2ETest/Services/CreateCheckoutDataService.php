@@ -108,8 +108,14 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
      */
     public function revertBaseUrl(): void
     {
-        $name = $this->readFromJSONFile()['subStores'][0]['name'];
-        $this->shopProxy->updateBaseUrlAndDefaultShopName(1, 'localhost', $name);
+        $subStores = $this->shopProxy->getSubStores()['data'] ?? [];
+        foreach ($subStores as $subStore) {
+            $this->shopProxy->updateSubStore($subStore->id,
+                [
+                    'host' => 'localhost'
+                ]
+            );
+        }
     }
 
     /**

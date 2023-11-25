@@ -58,7 +58,12 @@ class CreateInitialDataService extends BaseCreateSeedDataService
     {
         $host = parse_url($this->baseUrl)['host'];
         $name = $this->readFromJSONFile()['subStores'][0]['name'];
-        $this->shopProxy->updateBaseUrlAndDefaultShopName(1, $host, $name);
+        $this->shopProxy->updateSubStore(1,
+            [
+                'host' => $host,
+                'name' => $name
+            ]
+        );
     }
 
     /**

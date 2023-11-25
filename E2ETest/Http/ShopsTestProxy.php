@@ -33,14 +33,11 @@ class ShopsTestProxy extends TestProxy
      *
      * @throws HttpRequestException
      */
-    public function updateBaseUrlAndDefaultShopName(int $shopId, string $host, string $name): void
+    public function updateSubStore(int $shopId, array $shopData): void
     {
         $httpRequest = new HttpRequest(
             "/api/shops/$shopId",
-            [
-                'host' => $host,
-                'name' => $name
-            ]
+            $shopData
         );
         $this->put($httpRequest)->decodeBodyToArray();
     }
