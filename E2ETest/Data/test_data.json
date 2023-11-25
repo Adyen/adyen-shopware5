@@ -6,7 +6,8 @@
       "categoryId": "3",
       "localeId": "2",
       "currencyId": "1",
-      "customerGroupId": "1"
+      "customerGroupId": "1",
+      "secure": true
     },
     {
       "name": "subStore2",
@@ -15,7 +16,8 @@
       "categoryId": "3",
       "localeId": "2",
       "currencyId": "1",
-      "customerGroupId": "1"
+      "customerGroupId": "1",
+      "secure": true
     },
     {
       "name": "subStore3",
@@ -24,7 +26,8 @@
       "categoryId": "3",
       "localeId": "2",
       "currencyId": "1",
-      "customerGroupId": "1"
+      "customerGroupId": "1",
+      "secure": true
     }
   ],
   "countries": [
