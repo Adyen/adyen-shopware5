@@ -110,6 +110,7 @@ runs:
         PORT: ${{ inputs.PORT }}
         ADMIN_USERNAME: ${{ inputs.ADMIN_USERNAME }}
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
+        NGROK: "2Y7UgMv3UnzLrenV7XT3WqFb89j_62CSY2qxe4SkteKSFEQZj"
         TEST_PATH: "/AdyenTest/index"
         CHECKOUT_TEST_PATH: "/AdyenTest/createCheckoutPrerequisites"
         ADMIN_PATH: "/backend"
