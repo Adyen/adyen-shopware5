@@ -2,6 +2,7 @@
 
 namespace AdyenPayment\E2ETest\Services;
 
+use Adyen\Core\BusinessLogic\AdminAPI\AdminAPI;
 use Adyen\Core\BusinessLogic\AdyenAPI\Exceptions\ConnectionSettingsNotFoundException;
 use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ApiCredentialsDoNotExistException;
 use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ApiKeyCompanyLevelException;
@@ -84,6 +85,10 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
      */
     public function crateCheckoutPrerequisitesData(string $testApiKey): void
     {
+        if (count(AdminAPI::get()->connection(1)->getConnectionSettings()->toArray()) > 0) {
+            return;
+        }
+
         $this->createIntegrationConfigurations($testApiKey);
         $this->activateCountries();
         $this->createCustomer();
@@ -112,7 +117,7 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
      * @throws FailedToRegisterWebhookException
      * @throws PaymentMethodDataEmptyException
      */
-    private function createIntegrationConfigurations(string $testApiKey):void
+    private function createIntegrationConfigurations(string $testApiKey): void
     {
         $createIntegrationDataService = new CreateIntegrationDataService();
         $createIntegrationDataService->createConnectionAndWebhookConfiguration($testApiKey);
