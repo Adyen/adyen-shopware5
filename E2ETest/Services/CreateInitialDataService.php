@@ -61,7 +61,8 @@ class CreateInitialDataService extends BaseCreateSeedDataService
         $this->shopProxy->updateSubStore(1,
             [
                 'host' => $host,
-                'name' => $name
+                'name' => $name,
+                'secure' => true
             ]
         );
     }

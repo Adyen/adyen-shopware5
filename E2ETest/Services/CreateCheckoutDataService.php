@@ -26,7 +26,6 @@ use AdyenPayment\E2ETest\Http\CountryTestProxy;
 use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\E2ETest\Http\CustomerTestProxy;
-use AdyenPayment\E2ETest\Http\ShopsTestProxy;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Shopware\Models\Shop\Currency;
@@ -49,10 +48,6 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
      * @var CustomerTestProxy
      */
     private $customerTestProxy;
-    /**
-     * @var ShopsTestProxy
-     */
-    private $shopProxy;
 
     /**
      * CreateCheckoutDataService constructor.
@@ -63,7 +58,6 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     {
         $this->countryTestProxy = new CountryTestProxy($this->getHttpClient(), 'localhost', $credentials);
         $this->customerTestProxy = new CustomerTestProxy($this->getHttpClient(), 'localhost', $credentials);
-        $this->shopProxy = new ShopsTestProxy($this->getHttpClient(), 'localhost', $credentials);
     }
 
     /**
@@ -99,23 +93,6 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
         $this->createCustomer();
         $currencies = $this->createCurrenciesInDatabase();
         $this->addCurrenciesInSubStore($currencies);
-//        $this->revertBaseUrl();
-    }
-
-    /**
-     * @return void
-     * @throws HttpRequestException
-     */
-    public function revertBaseUrl(): void
-    {
-        $subStores = $this->shopProxy->getSubStores()['data'] ?? [];
-        foreach ($subStores as $subStore) {
-            $this->shopProxy->updateSubStore($subStore['id'],
-                [
-                    'host' => 'localhost'
-                ]
-            );
-        }
     }
 
     /**
