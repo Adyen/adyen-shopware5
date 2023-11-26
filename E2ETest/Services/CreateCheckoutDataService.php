@@ -99,7 +99,7 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
         $this->createCustomer();
         $currencies = $this->createCurrenciesInDatabase();
         $this->addCurrenciesInSubStore($currencies);
-        $this->revertBaseUrl();
+//        $this->revertBaseUrl();
     }
 
     /**
