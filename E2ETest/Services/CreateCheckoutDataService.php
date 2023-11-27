@@ -118,17 +118,9 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
      */
     private function createIntegrationConfigurations(string $testApiKey): void
     {
-        $createIntegrationDataService = new CreateIntegrationDataService();
+        $createIntegrationDataService = new CreateIntegrationDataService('./custom/plugins/AdyenPayment');
         $createIntegrationDataService->createConnectionAndWebhookConfiguration($testApiKey);
-        $createIntegrationDataService->createPaymentMethodConfiguration(self::CREDIT_CARD);
-        $createIntegrationDataService->createPaymentMethodConfiguration(self::IDEAL);
-        $createIntegrationDataService->createPaymentMethodConfiguration(self::KLARNA_PAY_NOW);
-        $createIntegrationDataService->createPaymentMethodConfiguration(self::KLARNA_PAY_LATER);
-        $createIntegrationDataService->createPaymentMethodConfiguration(self::KLARNA_PAY_OVERTIME);
-        $createIntegrationDataService->createPaymentMethodConfiguration(self::TWINT);
-        $createIntegrationDataService->createPaymentMethodConfiguration(self::BANCONTACT_MODILE);
-        $createIntegrationDataService->createPaymentMethodConfiguration(self::PAYPAL);
-        $createIntegrationDataService->createPaymentMethodConfiguration(self::APPLE_PAY);
+        $createIntegrationDataService->createAllPaymentMethodsFromTestData();
     }
 
     /**
