@@ -4,24 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "77f7b72eeb34bb9558a48200fe6e52d1",
+    "content-hash": "0dc1c93f48a65d3f6d8f1b7f333d9259",
     "packages": [
         {
             "name": "adyen/integration-core",
-            "version": "1.0.4",
+            "version": "1.0.7",
             "source": {
                 "type": "git",
                 "url": "git@github.com:Adyen/adyen-php-plugin-core.git",
-                "reference": "caf90c37d782550006cc2197c9b3151779f365ad"
+                "reference": "f1e2a776608b4ad3934645197031e2db010c5f8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Adyen/adyen-php-plugin-core/zipball/caf90c37d782550006cc2197c9b3151779f365ad",
-                "reference": "caf90c37d782550006cc2197c9b3151779f365ad",
+                "url": "https://api.github.com/repos/Adyen/adyen-php-plugin-core/zipball/f1e2a776608b4ad3934645197031e2db010c5f8a",
+                "reference": "f1e2a776608b4ad3934645197031e2db010c5f8a",
                 "shasum": ""
             },
             "require": {
-                "adyen/php-webhook-module": "0.1.0",
+                "adyen/php-webhook-module": "0.2.0",
                 "ext-ctype": "*",
                 "ext-json": "*",
                 "php": ">=7.2"
@@ -48,20 +48,20 @@
                 "proprietary"
             ],
             "description": "Core Adyen integration library",
-            "time": "2023-11-02T11:21:31+00:00"
+            "time": "2023-11-28T10:25:27+00:00"
         },
         {
             "name": "adyen/php-webhook-module",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:logeecom/adyen-php-webhook-module.git",
-                "reference": "0ab11cbccbd0ee187fb6f4f643e4cf8747f938ac"
+                "reference": "0b94d935c98b8e91a4c6f5586657ed1de71bbd9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/logeecom/adyen-php-webhook-module/zipball/0ab11cbccbd0ee187fb6f4f643e4cf8747f938ac",
-                "reference": "0ab11cbccbd0ee187fb6f4f643e4cf8747f938ac",
+                "url": "https://api.github.com/repos/logeecom/adyen-php-webhook-module/zipball/0b94d935c98b8e91a4c6f5586657ed1de71bbd9d",
+                "reference": "0b94d935c98b8e91a4c6f5586657ed1de71bbd9d",
                 "shasum": ""
             },
             "require": {
@@ -91,7 +91,7 @@
                 }
             ],
             "description": "Webhook module for Adyen Payment Integrations",
-            "time": "2023-01-23T12:47:14+00:00"
+            "time": "2023-11-27T12:06:55+00:00"
         }
     ],
     "packages-dev": [],
