@@ -26,6 +26,9 @@ inputs:
   PORT:
     description: "The port of the shop."
     required: true
+  NGROK:
+    description: "The token of the ngrok."
+    required: true
   NODE:
     description: "The Node Version that is used for the E2E Tests."
     required: true
@@ -110,7 +113,7 @@ runs:
         PORT: ${{ inputs.PORT }}
         ADMIN_USERNAME: ${{ inputs.ADMIN_USERNAME }}
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
-        NGROK: "2Y7UgMv3UnzLrenV7XT3WqFb89j_62CSY2qxe4SkteKSFEQZj"
+        NGROK: ${{ inputs.NGROK }}
         TEST_PATH: "/AdyenTest/index"
         CHECKOUT_TEST_PATH: "/AdyenTest/createCheckoutPrerequisites"
         ADMIN_PATH: "/backend"
