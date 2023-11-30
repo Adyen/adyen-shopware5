@@ -90,7 +90,7 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
 
         $this->createIntegrationConfigurations($testApiKey);
         $this->activateCountries();
-        $this->createCustomer();
+        $this->createCustomers();
         $currencies = $this->createCurrenciesInDatabase();
         $this->addCurrenciesInSubStore($currencies);
     }
@@ -144,20 +144,22 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     /**
      * @throws HttpRequestException
      */
-    private function createCustomer(): void
+    private function createCustomers(): void
     {
-        $customerTestData = $this->readFromJSONFile()['customer'];
-        $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
-        $indexInArray = array_search(
-            $customerTestData['defaultShippingAddress']['country'],
-            array_column($shopCountries, 'iso'),
-            true
-        );
-        $countryId = $shopCountries[$indexInArray]['id'];
-        $customerTestData['defaultShippingAddress']['country'] = $countryId;
-        $customerTestData['defaultBillingAddress']['country'] = $countryId;
+        $customersTestData = $this->readFromJSONFile()['customers'];
+        foreach ($customersTestData as $customerTestData) {
+            $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
+            $indexInArray = array_search(
+                $customerTestData['defaultShippingAddress']['country'],
+                array_column($shopCountries, 'iso'),
+                true
+            );
+            $countryId = $shopCountries[$indexInArray]['id'];
+            $customerTestData['defaultShippingAddress']['country'] = $countryId;
+            $customerTestData['defaultBillingAddress']['country'] = $countryId;
 
-        $this->customerTestProxy->saveCustomer($customerTestData);
+            $this->customerTestProxy->saveCustomer($customerTestData);
+        }
     }
 
     /**
