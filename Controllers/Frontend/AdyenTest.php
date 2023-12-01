@@ -1,22 +1,5 @@
 <?php
 
-use Adyen\Core\BusinessLogic\AdyenAPI\Exceptions\ConnectionSettingsNotFoundException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ApiCredentialsDoNotExistException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ApiKeyCompanyLevelException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\EmptyConnectionDataException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\EmptyStoreException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidAllowedOriginException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidApiKeyException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidConnectionSettingsException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidModeException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\MerchantIdChangedException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ModeChangedException;
-use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\UserDoesNotHaveNecessaryRolesException;
-use Adyen\Core\BusinessLogic\Domain\Merchant\Exceptions\ClientKeyGenerationFailedException;
-use Adyen\Core\BusinessLogic\Domain\Payment\Exceptions\PaymentMethodDataEmptyException;
-use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\FailedToGenerateHmacException;
-use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\FailedToRegisterWebhookException;
-use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\MerchantDoesNotExistException;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use AdyenPayment\Controllers\Common\AjaxResponseSetter;
 use AdyenPayment\E2ETest\Exception\InvalidDataException;
@@ -60,15 +43,13 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
      */
     public function getWhitelistedCSRFActions(): array
     {
-        return ['index', 'createCheckoutPrerequisites'];
+        return ['index'];
     }
 
     /**
-     * Handles request by generating seed data for testing purposes
+     * Handles request by generating initial seed data for testing purposes
      *
      * @return void
-     * @throws ORMException
-     * @throws OptimisticLockException|HttpRequestException
      */
     public function indexAction(): void
     {
@@ -88,6 +69,8 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
             $credentials = $authorizationService->getAuthorizationCredentials();
             $createSeedDataService = new CreateInitialDataService($url, $credentials);
             $createSeedDataService->createInitialData();
+            $createCheckoutDataService = new CreateCheckoutDataService($credentials);
+            $createCheckoutDataService->crateCheckoutPrerequisitesData($testApiKey);
             $this->Response()->setBody(
                 json_encode(['message' => 'The initial data setup was successfully completed.'])
             );
@@ -101,62 +84,13 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
             $this->Response()->setBody(
                 json_encode(['message' => $exception->getMessage()])
             );
-        } finally {
-            $this->Response()->setHeader('Content-Type', 'application/json');
-        }
-    }
-
-    /**
-     * @return void
-     * @throws ConnectionSettingsNotFoundException
-     * @throws ApiCredentialsDoNotExistException
-     * @throws ApiKeyCompanyLevelException
-     * @throws EmptyConnectionDataException
-     * @throws EmptyStoreException
-     * @throws InvalidAllowedOriginException
-     * @throws InvalidApiKeyException
-     * @throws InvalidConnectionSettingsException
-     * @throws InvalidModeException
-     * @throws MerchantIdChangedException
-     * @throws ModeChangedException
-     * @throws UserDoesNotHaveNecessaryRolesException
-     * @throws ClientKeyGenerationFailedException
-     * @throws PaymentMethodDataEmptyException
-     * @throws FailedToGenerateHmacException
-     * @throws FailedToRegisterWebhookException
-     * @throws MerchantDoesNotExistException
-     */
-    public function createCheckoutPrerequisitesAction(): void
-    {
-        $payload = $this->Request()->getParams();
-        $testApiKey = $payload['testApiKey'] ?? '';
-
-        try {
-            if ($testApiKey === '') {
-                throw new InvalidDataException('Test api key is required parameter.');
-            }
-
-            $authorizationService = new AuthorizationService();
-            $credentials = $authorizationService->getAuthorizationCredentials();
-            $createCheckoutDataService = new CreateCheckoutDataService($credentials);
-            $createCheckoutDataService->crateCheckoutPrerequisitesData($testApiKey);
-            $this->Response()->setHeader('Content-Type', 'application/json');
-            $this->Response()->setBody(
-                json_encode(['message' => 'The checkout prerequisites data are sucessfully saved.'])
-            );
-        }catch (InvalidDataException $exception) {
-            $this->Response()->setStatusCode(400);
+        } catch (Exception $exception) {
+            $this->Response()->setStatusCode(500);
             $this->Response()->setBody(
                 json_encode(['message' => $exception->getMessage()])
             );
-        } catch (HttpRequestException $exception) {
-            $this->Response()->setStatusCode(503);
-            $this->Response()->setBody(
-                json_encode(['message' => $exception->getMessage()])
-            );
-        } finally {
+        }  finally {
             $this->Response()->setHeader('Content-Type', 'application/json');
         }
-
     }
 }
