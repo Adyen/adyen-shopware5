@@ -71,7 +71,7 @@ class StoreService implements StoreServiceInterface
         // only for test purposes
         $testHostname = $this->getConfigurationManager()->getConfigValue('testHostname');
         if($testHostname){
-            $domain = str_replace('localhost', $testHostname, $domain);
+            $domain = str_replace(array('localhost', 'http://'), array($testHostname, 'https://'), $domain);
         }
 
         return rtrim($domain, '/');
