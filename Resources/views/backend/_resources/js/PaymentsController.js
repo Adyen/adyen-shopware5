@@ -255,11 +255,8 @@ if (!window.AdyenFE) {
         'klarna',
         'klarna_account',
         'klarna_paynow',
-        'momo_wallet',
-        'paypal',
         'sepadirectdebit',
         'directEbanking',
-        'trustly',
         'twint',
         'vipps',
         'zip'
