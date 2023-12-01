@@ -50,6 +50,7 @@ class WebhookUrlService implements BaseWebhookUrlService
             $url = str_replace(static::$callbackMap['host'], static::$callbackMap['replace'], $url);
         }
 
+        // only for test purposes
         $testHostname = $this->getConfigurationManager()->getConfigValue('testHostname');
         if($testHostname){
             $url = str_replace('localhost', $testHostname, $url);
