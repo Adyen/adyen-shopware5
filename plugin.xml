@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.0.3</version>
+    <version>4.0.4</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -495,6 +495,22 @@
         <changes lang="de">
             * Change application info values
             * Update core to version 1.0.4
+        </changes>
+    </changelog>
+    <changelog version="4.0.4">
+        <changes lang="en">
+            * Update core to version 1.0.7
+            * Add retry mechanism when checking if order exists in OrderUpdate task
+            * Fix Transaction details when payment code is invalid
+            * Refactor message when unsupported webhook event code is processed
+            * Add compatability for HTTP Authorisation with PHP in CGI-mode
+        </changes>
+        <changes lang="de">
+            * Update core to version 1.0.7
+            * Add retry mechanism when checking if order exists in OrderUpdate task
+            * Fix Transaction details when payment code is invalid
+            * Refactor message when unsupported webhook event code is processed
+            * Add compatability for HTTP Authorisation with PHP in CGI-mode
         </changes>
     </changelog>
 </plugin>
