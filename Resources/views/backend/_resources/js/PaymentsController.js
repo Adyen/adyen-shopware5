@@ -246,20 +246,14 @@ if (!window.AdyenFE) {
         'ach',
         'applepay',
         'directdebit_GB',
-        'bcmc_mobile',
-        'eps',
         'gcash',
-        'giropay',
         'paywithgoogle',
         'ideal',
         'klarna',
         'klarna_account',
         'klarna_paynow',
         'sepadirectdebit',
-        'directEbanking',
-        'twint',
-        'vipps',
-        'zip'
+        'directEbanking'
     ];
 
     /**
