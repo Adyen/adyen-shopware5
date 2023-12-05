@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.0.4</version>
+    <version>4.1.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -504,6 +504,75 @@
             * Fix Transaction details when payment code is invalid
             * Refactor message when unsupported webhook event code is processed
             * Add compatability for HTTP Authorisation with PHP in CGI-mode
+        </changes>
+        <changes lang="de">
+            * Update core to version 1.0.7
+            * Add retry mechanism when checking if order exists in OrderUpdate task
+            * Fix Transaction details when payment code is invalid
+            * Refactor message when unsupported webhook event code is processed
+            * Add compatability for HTTP Authorisation with PHP in CGI-mode
+        </changes>
+    </changelog>
+    <changelog version="4.1.0">
+        <changes lang="en">
+            * Pay by link - Offer merchant option to generate Payment link for orders whose payments did not succeed. Payment methods that support Pay by link:
+            Credit and debit cards
+            Buy Now Pay Later
+            3x 4x Oney
+            Afterpay
+            Clearpay
+            Klarna Pay Later
+            Klarna Pay over time
+            Ratepay
+            Cash and ATM payment methods
+            Multibanco
+            Direct Debit
+            ACH Direct Debit
+            SEPA Direct Debit
+            BACS Direct Debit
+            Online payments
+            BLIK
+            EPS
+            giropay
+            iDEAL
+            Klarna Pay now
+            MB WAY
+            MobilePay
+            Online banking Finland
+            Online banking India
+            Online banking Poland
+            Online banking Thailand
+            Sofort (Online bank transfer)
+            Trustly
+            Wallets
+            Apple Pay
+            Alipay
+            Bancontact mobile
+            Google Pay
+            GCash
+            MoMo
+            PayPal
+            Swish
+            Vipps
+            Zip
+            WeChat Pay
+            Prepaid and gift cards
+            Generic gift card
+            PaySafeCard
+            Mobile
+            TWINT
+            * Recurring payment - Offer customers to pay with recurring payment methods. Payment methods that support Recurring payment:
+            ACH Direct Debit
+            Apple Pay
+            BACS Direct Debit (Great Britain)
+            GCash (Philippines)
+            Google Pay
+            iDEAL (Netherlands)
+            Klarna Pay later
+            Klarna Pay over time (only in the US)
+            Klarna PayNow
+            SEPA Direct Debit
+            Sofort
         </changes>
         <changes lang="de">
             * Update core to version 1.0.7
