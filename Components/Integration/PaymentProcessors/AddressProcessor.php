@@ -71,8 +71,7 @@ class AddressProcessor implements BaseAddressProcessor, PaymentLinkAddressProces
 
         if (!empty($userData['shippingaddress']) && empty($deliveryAddressRawData)) {
             /** @var Country[] $country */
-            $country = $this->countryRepository->getCountryQuery($userData['shippingaddress']['countryId'])->getResult(
-            );
+            $country = $this->countryRepository->getCountryQuery($userData['shippingaddress']['countryId'])->getResult();
             $state = null;
 
             if (!empty($userData['shippingaddress']['stateID'])) {
@@ -170,12 +169,18 @@ class AddressProcessor implements BaseAddressProcessor, PaymentLinkAddressProces
      */
     private function setBillingAddressForPaymentLink(Billing $billingAddress, PaymentLinkRequestBuilder $builder): void
     {
+        $state = Shopware()->Models()->getRepository('Shopware\Models\Country\State')->findOneBy(
+            ['id' => $billingAddress->getState() ? $billingAddress->getState()->getId() : '']
+        );
+
         $billingAddress = new BillingAddress(
             $billingAddress->getCity() ?? '',
             $billingAddress->getCountry()->getIso() ?? '',
             '',
             $billingAddress->getZipCode() ?? '',
-            '',
+            $state ?
+                $state->getShortCode() :
+                ($billingAddress->getCountry() ? $billingAddress->getCountry()->getIso() : ''),
             $billingAddress->getStreet() ?? ''
         );
 
@@ -189,15 +194,19 @@ class AddressProcessor implements BaseAddressProcessor, PaymentLinkAddressProces
      * @return void
      */
     private function setDeliveryAddressForPaymentLink(
-        Shipping $shippingAddress,
+        Shipping                  $shippingAddress,
         PaymentLinkRequestBuilder $builder
     ): void {
+        $state = Shopware()->Models()->getRepository('Shopware\Models\Country\State')->findOneBy(
+            ['id' => $shippingAddress->getState() ? $shippingAddress->getState()->getId() : '']
+        );
+
         $shippingAddress = new DeliveryAddress(
             $shippingAddress->getCity() ?? '',
             $shippingAddress->getCountry()->getIso() ?? '',
             '',
             $shippingAddress->getZipCode() ?? '',
-            '',
+            $state ? $state->getShortCode() : ($shippingAddress->getCountry() ? $shippingAddress->getCountry()->getIso() : ''),
             $shippingAddress->getStreet() ?? ''
         );
 
