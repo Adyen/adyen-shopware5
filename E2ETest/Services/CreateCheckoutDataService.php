@@ -2,12 +2,30 @@
 
 namespace AdyenPayment\E2ETest\Services;
 
+use Adyen\Core\BusinessLogic\AdminAPI\AdminAPI;
+use Adyen\Core\BusinessLogic\AdyenAPI\Exceptions\ConnectionSettingsNotFoundException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ApiCredentialsDoNotExistException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ApiKeyCompanyLevelException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\EmptyConnectionDataException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\EmptyStoreException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidAllowedOriginException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidApiKeyException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidConnectionSettingsException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\InvalidModeException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\MerchantIdChangedException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ModeChangedException;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\UserDoesNotHaveNecessaryRolesException;
+use Adyen\Core\BusinessLogic\Domain\Merchant\Exceptions\ClientKeyGenerationFailedException;
+use Adyen\Core\BusinessLogic\Domain\Payment\Exceptions\PaymentMethodDataEmptyException;
+use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\FailedToGenerateHmacException;
+use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\FailedToRegisterWebhookException;
+use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\MerchantDoesNotExistException;
+use Adyen\Core\BusinessLogic\E2ETest\Services\CreateIntegrationDataService;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use AdyenPayment\E2ETest\Http\CountryTestProxy;
 use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\E2ETest\Http\CustomerTestProxy;
-use AdyenPayment\E2ETest\Http\ShopsTestProxy;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Shopware\Models\Shop\Currency;
@@ -43,17 +61,66 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     }
 
     /**
+     * @param string $testApiKey
      * @return void
+     * @throws ApiCredentialsDoNotExistException
+     * @throws ApiKeyCompanyLevelException
+     * @throws ClientKeyGenerationFailedException
+     * @throws ConnectionSettingsNotFoundException
+     * @throws EmptyConnectionDataException
+     * @throws EmptyStoreException
+     * @throws FailedToGenerateHmacException
+     * @throws FailedToRegisterWebhookException
      * @throws HttpRequestException
-     * @throws ORMException
-     * @throws OptimisticLockException
+     * @throws InvalidAllowedOriginException
+     * @throws InvalidApiKeyException
+     * @throws InvalidConnectionSettingsException
+     * @throws InvalidModeException
+     * @throws MerchantDoesNotExistException
+     * @throws MerchantIdChangedException
+     * @throws ModeChangedException
+     * @throws PaymentMethodDataEmptyException
+     * @throws UserDoesNotHaveNecessaryRolesException
      */
-    public function crateCheckoutPrerequisitesData(): void
+    public function crateCheckoutPrerequisitesData(string $testApiKey): void
     {
+        if (count(AdminAPI::get()->connection(1)->getConnectionSettings()->toArray()) > 0) {
+            return;
+        }
+
+        $this->createIntegrationConfigurations($testApiKey);
         $this->activateCountries();
-        $this->createCustomer();
+        $this->createCustomers();
         $currencies = $this->createCurrenciesInDatabase();
         $this->addCurrenciesInSubStore($currencies);
+    }
+
+    /**
+     * Creates the integration configuration - authorization data and payment methods
+     *
+     * @throws EmptyConnectionDataException
+     * @throws ApiKeyCompanyLevelException
+     * @throws MerchantDoesNotExistException
+     * @throws InvalidModeException
+     * @throws EmptyStoreException
+     * @throws InvalidApiKeyException
+     * @throws MerchantIdChangedException
+     * @throws ClientKeyGenerationFailedException
+     * @throws FailedToGenerateHmacException
+     * @throws UserDoesNotHaveNecessaryRolesException
+     * @throws InvalidAllowedOriginException
+     * @throws ApiCredentialsDoNotExistException
+     * @throws InvalidConnectionSettingsException
+     * @throws ModeChangedException
+     * @throws ConnectionSettingsNotFoundException
+     * @throws FailedToRegisterWebhookException
+     * @throws PaymentMethodDataEmptyException
+     */
+    private function createIntegrationConfigurations(string $testApiKey): void
+    {
+        $createIntegrationDataService = new CreateIntegrationDataService('./custom/plugins/AdyenPayment');
+        $createIntegrationDataService->createConnectionAndWebhookConfiguration($testApiKey);
+        $createIntegrationDataService->createAllPaymentMethodsFromTestData();
     }
 
     /**
@@ -77,20 +144,22 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     /**
      * @throws HttpRequestException
      */
-    private function createCustomer(): void
+    private function createCustomers(): void
     {
-        $customerTestData = $this->readFromJSONFile()['customer'];
-        $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
-        $indexInArray = array_search(
-            $customerTestData['defaultShippingAddress']['country'],
-            array_column($shopCountries, 'iso'),
-            true
-        );
-        $countryId = $shopCountries[$indexInArray]['id'];
-        $customerTestData['defaultShippingAddress']['country'] = $countryId;
-        $customerTestData['defaultBillingAddress']['country'] = $countryId;
+        $customersTestData = $this->readFromJSONFile()['customers'];
+        foreach ($customersTestData as $customerTestData) {
+            $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
+            $indexInArray = array_search(
+                $customerTestData['defaultShippingAddress']['country'],
+                array_column($shopCountries, 'iso'),
+                true
+            );
+            $countryId = $shopCountries[$indexInArray]['id'];
+            $customerTestData['defaultShippingAddress']['country'] = $countryId;
+            $customerTestData['defaultBillingAddress']['country'] = $countryId;
 
-        $this->customerTestProxy->saveCustomer($customerTestData);
+            $this->customerTestProxy->saveCustomer($customerTestData);
+        }
     }
 
     /**

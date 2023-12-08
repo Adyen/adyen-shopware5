@@ -44,11 +44,11 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
      */
     public function getWhitelistedCSRFActions(): array
     {
-        return ['index', 'createCheckoutPrerequisites', 'createWebhookPrerequisites'];
+        return ['index'];
     }
 
     /**
-     * Handles request by generating seed data for testing purposes
+     * Handles request by generating initial seed data for testing purposes
      *
      * @return void
      * @throws ORMException
@@ -63,7 +63,7 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
 
         try {
             if ($url === '' || $testApiKey === '' || $liveApiKey === '') {
-                throw new InvalidDataException('Url, test api key and live api key are required fields.');
+                throw new InvalidDataException('Url, test api key and live api key are required parameters.');
             }
 
             $adyenApiService = new AdyenAPIService();
@@ -72,6 +72,8 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
             $credentials = $authorizationService->getAuthorizationCredentials();
             $createSeedDataService = new CreateInitialDataService($url, $credentials);
             $createSeedDataService->createInitialData();
+            $createCheckoutDataService = new CreateCheckoutDataService($credentials);
+            $createCheckoutDataService->crateCheckoutPrerequisitesData($testApiKey);
             $this->Response()->setBody(
                 json_encode(['message' => 'The initial data setup was successfully completed.'])
             );
@@ -85,28 +87,14 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
             $this->Response()->setBody(
                 json_encode(['message' => $exception->getMessage()])
             );
-        } finally {
+        } catch (Exception $exception) {
+            $this->Response()->setStatusCode(500);
+            $this->Response()->setBody(
+                json_encode(['message' => $exception->getMessage()])
+            );
+        }  finally {
             $this->Response()->setHeader('Content-Type', 'application/json');
         }
-    }
-
-    /**
-     * Handles request by creating checkout prerequisites data for testing purposes
-     *
-     * @return void
-     * @throws ORMException
-     * @throws OptimisticLockException|HttpRequestException
-     */
-    public function createCheckoutPrerequisitesAction(): void
-    {
-        $authorizationService = new AuthorizationService();
-        $credentials = $authorizationService->getAuthorizationCredentials();
-        $createCheckoutDataService = new CreateCheckoutDataService($credentials);
-        $createCheckoutDataService->crateCheckoutPrerequisitesData();
-        $this->Response()->setHeader('Content-Type', 'application/json');
-        $this->Response()->setBody(
-            json_encode(['message' => 'The checkout prerequisites data are sucessfully saved.'])
-        );
     }
 
     /**

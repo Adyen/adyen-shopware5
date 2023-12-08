@@ -8,7 +8,7 @@
     "packages": [
         {
             "name": "adyen/integration-core",
-            "version": "dev-feature/analyse_iteration_3",
+            "version": "dev-feature/test_endpoint",
             "source": {
                 "type": "git",
                 "url": "git@github.com:logeecom-dev/adyen-php-plugin-core.git",

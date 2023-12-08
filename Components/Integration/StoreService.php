@@ -7,8 +7,11 @@ use Adyen\Core\BusinessLogic\Domain\Integration\Store\StoreService as StoreServi
 use Adyen\Core\BusinessLogic\Domain\Stores\Exceptions\InvalidShopOrderDataException;
 use Adyen\Core\BusinessLogic\Domain\Stores\Models\Store;
 use Adyen\Core\BusinessLogic\Domain\Stores\Models\StoreOrderStatus;
+use Adyen\Core\Infrastructure\Configuration\ConfigurationManager;
+use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Adyen\Core\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Adyen\Core\Infrastructure\ORM\QueryFilter\QueryFilter;
+use Adyen\Core\Infrastructure\ServiceRegister;
 use Adyen\Webhook\PaymentStates;
 use AdyenPayment\Repositories\Wrapper\OrderRepository;
 use AdyenPayment\Repositories\Wrapper\StoreRepository;
@@ -59,10 +62,17 @@ class StoreService implements StoreServiceInterface
      * Returns store domain. If last character is /, delete it.
      *
      * @inheritDoc
+     * @throws QueryFilterInvalidParamException
      */
     public function getStoreDomain(): string
     {
         $domain = Shopware()->Front()->Router()->assemble(['module' => 'frontend']);
+
+        // only for test purposes
+        $testHostname = $this->getConfigurationManager()->getConfigValue('testHostname');
+        if($testHostname){
+            $domain = str_replace(array('localhost', 'http://'), array($testHostname, 'https://'), $domain);
+        }
 
         return rtrim($domain, '/');
     }
@@ -208,5 +218,14 @@ class StoreService implements StoreServiceInterface
         }
 
         return $stores;
+    }
+
+    /**
+     * @return ConfigurationManager
+     *
+     */
+    private function getConfigurationManager(): ConfigurationManager
+    {
+        return ServiceRegister::getService(ConfigurationManager::CLASS_NAME);
     }
 }
