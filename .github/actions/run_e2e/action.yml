@@ -17,6 +17,12 @@ inputs:
   API_KEY_LIVE:
     description: "The live api key for adyen."
     required: true
+  PAY_PAL_EMAIL:
+    description: "The email of the payPal test account."
+    required: true
+  PAY_PAL_PASSWORD:
+    description: "The password of the payPal test account."
+    required: true
   ADMIN_USERNAME:
     description: "The username for the backoffice."
     required: true
@@ -117,6 +123,8 @@ runs:
         TEST_PATH: "/AdyenTest/index"
         CHECKOUT_TEST_PATH: "/AdyenTest/createCheckoutPrerequisites"
         ADMIN_PATH: "/backend"
+        PAY_PAL_EMAIL: ${{ inputs.PAY_PAL_EMAIL }}
+        PAY_PAL_PASSWORD: ${{ inputs.PAY_PAL_PASSWORD }}
     - uses: actions/upload-artifact@v3
       if: always()
       with:

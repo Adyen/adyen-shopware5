@@ -75,4 +75,6 @@ jobs:
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           SHOPWARE_TEST_REPO: ${{secrets.SHOPWARE_TEST_REPO}}
           COMMON_TEST_REPO: ${{secrets.COMMON_TEST_REPO}}
+          PAY_PAL_EMAIL: ${{secrets.PAY_PAL_EMAIL}}
+          PAY_PAL_PASSWORD: ${{secrets.PAY_PAL_PASSWORD}}
           
