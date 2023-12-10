@@ -39,209 +39,123 @@
       "iso": "IT"
     }
   ],
-  "customers": [
-    {
-      "groupKey": "EK",
-      "shopId": 1,
-      "encoderName": "bcrypt",
-      "password": "First132.",
-      "active": true,
-      "email": "testExist1@de.com",
-      "languageId": "1",
+  "customer": {
+    "groupKey": "EK",
+    "shopId": 1,
+    "encoderName": "bcrypt",
+    "password": "First132.",
+    "active": true,
+    "email": "testExist1@de.com",
+    "languageId": "1",
+    "salutation": "ms",
+    "firstname": "test",
+    "lastname": "test",
+    "defaultShippingAddress": {
+      "street": "test 123",
+      "zipcode": "10115",
+      "city": "Berlin",
+      "country": "DE",
       "salutation": "ms",
       "firstname": "test",
-      "lastname": "test",
-      "defaultShippingAddress": {
-        "street": "test 123",
-        "zipcode": "10115",
-        "city": "Berlin",
-        "country": "DE",
-        "salutation": "ms",
-        "firstname": "test",
-        "lastname": "test"
-      },
-      "defaultBillingAddress": {
-        "street": "test 123",
-        "zipcode": "10115",
-        "city": "Berlin",
-        "country": "DE",
-        "salutation": "ms",
-        "firstname": "test",
-        "lastname": "test"
-      }
+      "lastname": "test"
     },
-    {
-      "groupKey": "EK",
-      "shopId": 1,
-      "encoderName": "bcrypt",
-      "password": "First132.",
-      "active": true,
-      "email": "testExist2@de.com",
-      "languageId": "1",
+    "defaultBillingAddress": {
+      "street": "test 123",
+      "zipcode": "10115",
+      "city": "Berlin",
+      "country": "DE",
       "salutation": "ms",
       "firstname": "test",
-      "lastname": "test",
-      "defaultShippingAddress": {
-        "street": "test 123",
-        "zipcode": "10115",
-        "city": "Berlin",
-        "country": "DE",
-        "salutation": "ms",
-        "firstname": "test",
-        "lastname": "test"
-      },
-      "defaultBillingAddress": {
-        "street": "test 123",
-        "zipcode": "10115",
-        "city": "Berlin",
-        "country": "DE",
-        "salutation": "ms",
-        "firstname": "test",
-        "lastname": "test"
-      }
-    },
-    {
-      "groupKey": "EK",
-      "shopId": 1,
-      "encoderName": "bcrypt",
-      "password": "First132.",
-      "active": true,
-      "email": "testExist3@de.com",
-      "languageId": "1",
-      "salutation": "ms",
-      "firstname": "test",
-      "lastname": "test",
-      "defaultShippingAddress": {
-        "street": "test 123",
-        "zipcode": "10115",
-        "city": "Berlin",
-        "country": "DE",
-        "salutation": "ms",
-        "firstname": "test",
-        "lastname": "test"
-      },
-      "defaultBillingAddress": {
-        "street": "test 123",
-        "zipcode": "10115",
-        "city": "Berlin",
-        "country": "DE",
-        "salutation": "ms",
-        "firstname": "test",
-        "lastname": "test"
-      }
-    },
-    {
-      "groupKey": "EK",
-      "shopId": 1,
-      "encoderName": "bcrypt",
-      "password": "First132.",
-      "active": true,
-      "email": "testExist4@de.com",
-      "languageId": "1",
-      "salutation": "ms",
-      "firstname": "test",
-      "lastname": "test",
-      "defaultShippingAddress": {
-        "street": "test 123",
-        "zipcode": "10115",
-        "city": "Berlin",
-        "country": "DE",
-        "salutation": "ms",
-        "firstname": "test",
-        "lastname": "test"
-      },
-      "defaultBillingAddress": {
-        "street": "test 123",
-        "zipcode": "10115",
-        "city": "Berlin",
-        "country": "DE",
-        "salutation": "ms",
-        "firstname": "test",
-        "lastname": "test"
-      }
+      "lastname": "test"
     }
-  ],
+  },
   "currencies": [
     {
-      "currency" : "GBP",
-      "name" : "British Pound",
-      "default" : false,
-      "factor" : 0.87,
-      "symbol" : "£",
-      "symbolPosition" : 0,
-      "position" : 0
+      "currency": "GBP",
+      "name": "British Pound",
+      "default": false,
+      "factor": 0.87,
+      "symbol": "£",
+      "symbolPosition": 0,
+      "position": 0
     },
     {
-      "currency" : "USD",
-      "name" : "United States Dollar",
-      "default" : false,
-      "factor" : 1.09,
-      "symbol" : "$",
-      "symbolPosition" : 0,
-      "position" : 0
+      "currency": "USD",
+      "name": "United States Dollar",
+      "default": false,
+      "factor": 1.09,
+      "symbol": "$",
+      "symbolPosition": 0,
+      "position": 0
     }
   ],
-  "order": {
-    "customerId": 1,
-    "paymentId": 7,
-    "dispatchId": 9,
-    "shopId": 1,
-    "invoiceAmount": 15,
-    "invoiceAmountNet": 12.61,
-    "invoiceShipping": 0,
-    "invoiceShippingNet": 0,
-    "orderTime": "2012-11-23 08:51:46",
-    "net": 0,
-    "taxFree": 0,
-    "languageIso": "1",
-    "currency": "EUR",
-    "currencyFactor": 1,
-    "remoteAddress": "172.20.0.0",
-    "details": [
-      {
-        "articleId": 6,
-        "articleDetailId": 6,
-        "taxId": 1,
-        "taxRate": 19,
-        "statusId": 0,
-        "articleNumber": "SW10006",
-        "price": 15,
-        "quantity": 1,
-        "articleName": "Shipping free product with highlighting",
-        "shipped": 0,
-        "shippedGroup": 0,
-        "mode": 0,
-        "esdArticle": 0
-      }
-    ],
-    "documents": [],
-    "billing": {
-      "id": 2,
-      "customerId": 1,
-      "countryId": 2,
-      "salutation": "mr",
-      "firstName": "Postman",
-      "lastName": "Postman",
-      "street": "Test 123",
-      "zipCode": "10115",
-      "city": "Berlin"
-    },
-    "shipping": {
-      "id": 2,
-      "countryId": 2,
-      "customerId": 1,
-      "salutation": "mr",
-      "firstName": "Postman",
-      "lastName": "Postman",
-      "street": "Test 123",
-      "zipCode": "10115",
-      "city": "Berlin"
-    },
-    "paymentStatusId": 17,
-    "orderStatusId": 0,
-    "transactionId": "SFLGCH837NK2TEST",
-    "temporaryId": "79b8eede513674f3e4ff909ff23btest"
+  "ordersMappingConfiguration": {
+    "cancelled": "35",
+    "chargeBack": "",
+    "failed": "35",
+    "inProgress": "33",
+    "new": "17",
+    "paid": "12",
+    "partiallyRefunded": "14",
+    "pending": "17",
+    "refunded": "13"
   },
+  "orders": [
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceAmount": 15,
+      "invoiceAmountNet": 12.61,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "orderTime": "2012-11-23 08:51:46",
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "EUR",
+      "currencyFactor": 1,
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 1,
+          "articleDetailId": 1,
+          "taxId": 1,
+          "taxRate": 19,
+          "statusId": 0,
+          "articleNumber": "SW10006",
+          "price": 15,
+          "quantity": 1,
+          "articleName": "Shipping free product with highlighting",
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "billing": {
+        "street": "test 123",
+        "zipcode": "10115",
+        "city": "Berlin",
+        "country": "DE",
+        "salutation": "ms",
+        "firstname": "test",
+        "lastname": "test"
+      },
+      "shipping": {
+        "street": "test 123",
+        "zipcode": "10115",
+        "city": "Berlin",
+        "country": "DE",
+        "salutation": "ms",
+        "firstname": "test",
+        "lastname": "test"
+      },
+      "orderStatusId": 0,
+      "transactionId": "SFLGCH837NK2TEST",
+      "temporaryId": "79b8eede513674f3e4ff909ff23btest"
+    }
+  ],
   "creditCartPaymentMethod": {
     "methodId": "PM3224P22322225FNZ7B8G5D2",
     "code": "scheme",

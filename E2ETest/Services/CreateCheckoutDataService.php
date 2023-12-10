@@ -82,17 +82,14 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
      * @throws PaymentMethodDataEmptyException
      * @throws UserDoesNotHaveNecessaryRolesException
      */
-    public function crateCheckoutPrerequisitesData(string $testApiKey): void
+    public function crateCheckoutPrerequisitesData(string $testApiKey): int
     {
-        if (count(AdminAPI::get()->connection(1)->getConnectionSettings()->toArray()) > 0) {
-            return;
-        }
-
         $this->createIntegrationConfigurations($testApiKey);
         $this->activateCountries();
-        $this->createCustomers();
         $currencies = $this->createCurrenciesInDatabase();
         $this->addCurrenciesInSubStore($currencies);
+
+        return $this->createCustomer();
     }
 
     /**
@@ -144,22 +141,29 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     /**
      * @throws HttpRequestException
      */
-    private function createCustomers(): void
+    private function createCustomer(): int
     {
-        $customersTestData = $this->readFromJSONFile()['customers'];
-        foreach ($customersTestData as $customerTestData) {
-            $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
-            $indexInArray = array_search(
-                $customerTestData['defaultShippingAddress']['country'],
-                array_column($shopCountries, 'iso'),
-                true
-            );
-            $countryId = $shopCountries[$indexInArray]['id'];
-            $customerTestData['defaultShippingAddress']['country'] = $countryId;
-            $customerTestData['defaultBillingAddress']['country'] = $countryId;
+        return $this->customerTestProxy->saveCustomer($this->buildCustomerData())['id'] ?? -1;
+    }
 
-            $this->customerTestProxy->saveCustomer($customerTestData);
-        }
+    /**
+     * @return array
+     * @throws HttpRequestException
+     */
+    public function buildCustomerData(): array
+    {
+        $customerTestData = $this->readFromJSONFile()['customer'];
+        $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
+        $indexInArray = array_search(
+            $customerTestData['defaultShippingAddress']['country'],
+            array_column($shopCountries, 'iso'),
+            true
+        );
+        $countryId = $shopCountries[$indexInArray]['id'];
+        $customerTestData['defaultShippingAddress']['country'] = $countryId;
+        $customerTestData['defaultBillingAddress']['country'] = $countryId;
+
+        return $customerTestData;
     }
 
     /**
