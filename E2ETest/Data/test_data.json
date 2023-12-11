@@ -39,36 +39,128 @@
       "iso": "IT"
     }
   ],
-  "customer": {
-    "groupKey": "EK",
-    "shopId": 1,
-    "encoderName": "bcrypt",
-    "password": "First132.",
-    "active": true,
-    "email": "testExist1@de.com",
-    "languageId": "1",
-    "salutation": "ms",
-    "firstname": "test",
-    "lastname": "test",
-    "defaultShippingAddress": {
-      "street": "test 123",
-      "zipcode": "10115",
-      "city": "Berlin",
-      "country": "DE",
+  "customers": [
+    {
+      "groupKey": "EK",
+      "shopId": 1,
+      "encoderName": "bcrypt",
+      "password": "First132.",
+      "active": true,
+      "email": "testExist1@de.com",
+      "languageId": "1",
       "salutation": "ms",
       "firstname": "test",
-      "lastname": "test"
+      "lastname": "test",
+      "defaultShippingAddress": {
+        "street": "test 123",
+        "zipcode": "10115",
+        "city": "Berlin",
+        "country": "DE",
+        "salutation": "ms",
+        "firstname": "test",
+        "lastname": "test"
+      },
+      "defaultBillingAddress": {
+        "street": "test 123",
+        "zipcode": "10115",
+        "city": "Berlin",
+        "country": "DE",
+        "salutation": "ms",
+        "firstname": "test",
+        "lastname": "test"
+      }
     },
-    "defaultBillingAddress": {
-      "street": "test 123",
-      "zipcode": "10115",
-      "city": "Berlin",
-      "country": "DE",
+    {
+      "groupKey": "EK",
+      "shopId": 1,
+      "encoderName": "bcrypt",
+      "password": "First132.",
+      "active": true,
+      "email": "testExist2@de.com",
+      "languageId": "1",
       "salutation": "ms",
       "firstname": "test",
-      "lastname": "test"
+      "lastname": "test",
+      "defaultShippingAddress": {
+        "street": "test 123",
+        "zipcode": "10115",
+        "city": "Berlin",
+        "country": "DE",
+        "salutation": "ms",
+        "firstname": "test",
+        "lastname": "test"
+      },
+      "defaultBillingAddress": {
+        "street": "test 123",
+        "zipcode": "10115",
+        "city": "Berlin",
+        "country": "DE",
+        "salutation": "ms",
+        "firstname": "test",
+        "lastname": "test"
+      }
+    },
+    {
+      "groupKey": "EK",
+      "shopId": 1,
+      "encoderName": "bcrypt",
+      "password": "First132.",
+      "active": true,
+      "email": "testExist3@de.com",
+      "languageId": "1",
+      "salutation": "ms",
+      "firstname": "test",
+      "lastname": "test",
+      "defaultShippingAddress": {
+        "street": "test 123",
+        "zipcode": "10115",
+        "city": "Berlin",
+        "country": "DE",
+        "salutation": "ms",
+        "firstname": "test",
+        "lastname": "test"
+      },
+      "defaultBillingAddress": {
+        "street": "test 123",
+        "zipcode": "10115",
+        "city": "Berlin",
+        "country": "DE",
+        "salutation": "ms",
+        "firstname": "test",
+        "lastname": "test"
+      }
+    },
+    {
+      "groupKey": "EK",
+      "shopId": 1,
+      "encoderName": "bcrypt",
+      "password": "First132.",
+      "active": true,
+      "email": "testExist4@de.com",
+      "languageId": "1",
+      "salutation": "ms",
+      "firstname": "test",
+      "lastname": "test",
+      "defaultShippingAddress": {
+        "street": "test 123",
+        "zipcode": "10115",
+        "city": "Berlin",
+        "country": "DE",
+        "salutation": "ms",
+        "firstname": "test",
+        "lastname": "test"
+      },
+      "defaultBillingAddress": {
+        "street": "test 123",
+        "zipcode": "10115",
+        "city": "Berlin",
+        "country": "DE",
+        "salutation": "ms",
+        "firstname": "test",
+        "lastname": "test"
+      }
     }
-  },
+  ],
   "currencies": [
     {
       "currency": "EUR",

@@ -89,7 +89,7 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
         $currencies = $this->createCurrenciesInDatabase();
         $this->addCurrenciesInSubStore($currencies);
 
-        return $this->createCustomer();
+        return $this->createCustomers();
     }
 
     /**
@@ -139,31 +139,28 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     }
 
     /**
+     * @return int
      * @throws HttpRequestException
      */
-    private function createCustomer(): int
+    private function createCustomers(): int
     {
-        return $this->customerTestProxy->saveCustomer($this->buildCustomerData())['id'] ?? -1;
-    }
+        $customersTestData = $this->readFromJSONFile()['customers'];
+        $customerId = -1;
+        foreach ($customersTestData as $customerTestData) {
+            $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
+            $indexInArray = array_search(
+                $customerTestData['defaultShippingAddress']['country'],
+                array_column($shopCountries, 'iso'),
+                true
+            );
+            $countryId = $shopCountries[$indexInArray]['id'];
+            $customerTestData['defaultShippingAddress']['country'] = $countryId;
+            $customerTestData['defaultBillingAddress']['country'] = $countryId;
 
-    /**
-     * @return array
-     * @throws HttpRequestException
-     */
-    public function buildCustomerData(): array
-    {
-        $customerTestData = $this->readFromJSONFile()['customer'];
-        $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
-        $indexInArray = array_search(
-            $customerTestData['defaultShippingAddress']['country'],
-            array_column($shopCountries, 'iso'),
-            true
-        );
-        $countryId = $shopCountries[$indexInArray]['id'];
-        $customerTestData['defaultShippingAddress']['country'] = $countryId;
-        $customerTestData['defaultBillingAddress']['country'] = $countryId;
+            $customerId = $this->customerTestProxy->saveCustomer($customerTestData)['id'] ?? -1;
+        }
 
-        return $customerTestData;
+        return $customerId;
     }
 
     /**

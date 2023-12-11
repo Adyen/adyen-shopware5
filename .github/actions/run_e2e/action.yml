@@ -115,8 +115,6 @@ runs:
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
         NGROK: ${{ inputs.NGROK }}
         TEST_PATH: "/AdyenTest/index"
-        CHECKOUT_TEST_PATH: "/AdyenTest/createCheckoutPrerequisites"
-        WEBHOOK_TEST_PATH: "/AdyenTest/createWebhookPrerequisites"
         WEBHOOK_PATH: "/AdyenWebhook/index/storeId/1"
         ADMIN_PATH: "/backend"
     - uses: actions/upload-artifact@v3
