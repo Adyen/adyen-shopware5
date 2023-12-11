@@ -209,7 +209,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
         $this->orderTestProxy->createOrder($order);
 
 
-        return $totalAmount;
+        return $totalNetAmount;
     }
 
     /**
