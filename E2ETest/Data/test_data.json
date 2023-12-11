@@ -71,6 +71,15 @@
   },
   "currencies": [
     {
+      "currency": "EUR",
+      "name": "Euro",
+      "default": true,
+      "factor": 1,
+      "symbol": "€",
+      "symbolPosition": 0,
+      "position": 0
+    },
+    {
       "currency": "GBP",
       "name": "British Pound",
       "default": false,
@@ -104,28 +113,18 @@
     {
       "dispatchId": 9,
       "shopId": 1,
-      "invoiceAmount": 15,
-      "invoiceAmountNet": 12.61,
       "invoiceShipping": 0,
       "invoiceShippingNet": 0,
-      "orderTime": "2012-11-23 08:51:46",
       "net": 0,
       "taxFree": 0,
       "languageIso": "1",
       "currency": "EUR",
-      "currencyFactor": 1,
       "remoteAddress": "172.20.0.0",
       "details": [
         {
           "articleId": 1,
-          "articleDetailId": 1,
-          "taxId": 1,
-          "taxRate": 19,
           "statusId": 0,
-          "articleNumber": "SW10006",
-          "price": 15,
           "quantity": 1,
-          "articleName": "Shipping free product with highlighting",
           "shipped": 0,
           "shippedGroup": 0,
           "mode": 0,
@@ -133,27 +132,199 @@
         }
       ],
       "documents": [],
-      "billing": {
-        "street": "test 123",
-        "zipcode": "10115",
-        "city": "Berlin",
-        "country": "DE",
-        "salutation": "ms",
-        "firstname": "test",
-        "lastname": "test"
-      },
-      "shipping": {
-        "street": "test 123",
-        "zipcode": "10115",
-        "city": "Berlin",
-        "country": "DE",
-        "salutation": "ms",
-        "firstname": "test",
-        "lastname": "test"
-      },
       "orderStatusId": 0,
-      "transactionId": "SFLGCH837NK2TEST",
-      "temporaryId": "79b8eede513674f3e4ff909ff23btest"
+      "transactionId": "AUTH_M_CAPT_0001",
+      "temporaryId": "MERCHANT_REF_M_CAPT_0001",
+      "captureType": "manual"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "GBP",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 1,
+          "statusId": 0,
+          "quantity": 2,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        },
+        {
+          "articleId": 2,
+          "statusId": 0,
+          "quantity": 4,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_M_CAPT_0002",
+      "temporaryId": "MERCHANT_REF_M_CAPT_0002",
+      "captureType": "manual"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "USD",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 3,
+          "statusId": 0,
+          "quantity": 5,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_M_CAPT_0003",
+      "temporaryId": "MERCHANT_REF_M_CAPT_0003",
+      "captureType": "manual"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "EUR",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 3,
+          "statusId": 0,
+          "quantity": 1,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        },
+        {
+          "articleId": 4,
+          "statusId": 0,
+          "quantity": 2,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_I_CAPT_0001",
+      "temporaryId": "MERCHANT_REF_I_CAPT_0001",
+      "captureType": "immediate"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "USD",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 4,
+          "statusId": 0,
+          "quantity": 2,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        },
+        {
+          "articleId": 2,
+          "statusId": 0,
+          "quantity": 5,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_D_CAPT_0001",
+      "temporaryId": "MERCHANT_REF_D_CAPT_0001",
+      "captureType": "delayed"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "USD",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 2,
+          "statusId": 0,
+          "quantity": 1,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_D_CAPT_0002",
+      "temporaryId": "MERCHANT_REF_D_CAPT_0002",
+      "captureType": "delayed"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "GBP",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 3,
+          "statusId": 0,
+          "quantity": 5,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_D_CAPT_0003",
+      "temporaryId": "MERCHANT_REF_D_CAPT_0003",
+      "captureType": "delayed"
     }
   ],
   "creditCartPaymentMethod": {

@@ -115,9 +115,13 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
         $ordersMerchantReferenceAndAmount = [];
         $index = 1;
         $orders = $this->readFromJSONFile()['orders'] ?? [];
+        $customerData = $this->readFromJSONFile()['customer'] ?? [];
+        $currencies = $this->readFromJSONFile()['currencies'] ?? [];
         foreach ($orders as $order) {
-            $totalAmount = $this->createOrder($order, $customerId);
-            StoreContext::doWithStore('1', function () use ($totalAmount, $order) {
+            $captureType = $this->getCaptureType($order['captureType']);
+            unset($order['captureType']);
+            $totalAmount = $this->createOrder($order, $customerId, $customerData, $currencies);
+            StoreContext::doWithStore('1', static function () use ($captureType, $totalAmount, $order) {
                 $transactionContext = new StartTransactionRequestContext(
                     PaymentMethodCode::parse('scheme'),
                     Amount::fromFloat(
@@ -126,7 +130,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
                             $order['currency']
                         )
                     ),
-                    $order['transactionId'],
+                    $order['temporaryId'],
                     '',
                     new DataBag([]),
                     new DataBag([])
@@ -135,12 +139,12 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
                 $transactionHistoryService = ServiceRegister::getService(TransactionHistoryService::class);
                 $transactionHistoryService->createTransactionHistory($transactionContext->getReference(),
                     $transactionContext->getAmount()->getCurrency(),
-                    $this->getCaptureType($order['captureType'])
+                    $captureType
                 );
             });
 
             $ordersMerchantReferenceAndAmount['order_' . $index] = [
-                'merchantReference' => $order['transactionId'],
+                'merchantReference' => $order['temporaryId'],
                 'amount' => $totalAmount * 100
             ];
             $index++;
@@ -157,9 +161,11 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
      * @throws NotFoundException
      * @throws ParameterMissingException
      */
-    private function createOrder(array $order, int $customerId): float
+    private function createOrder(array $order, int $customerId, array $customerData, array $currencies): float
     {
         $order["customerId"] = $customerId;
+        $order["shipping"] = $customerData['defaultShippingAddress'];
+        $order["billing"] = $customerData['defaultBillingAddress'];
         $order["billing"]["customerId"] = $customerId;
         $order["shipping"]["customerId"] = $customerId;
         $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
@@ -173,6 +179,12 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
         $order["billing"]['countryId'] = $countryId;
         $order["paymentId"] = $this->getPaymentMethodId();
         $order["paymentStatusId"] = AdminAPI::get()->orderMappings(1)->getOrderStatusMap()->toArray()['inProgress'];
+        $indexInArray = array_search(
+            $order["currency"],
+            array_column($currencies, 'currency'),
+            true
+        );
+        $order["currencyFactor"] = $currencies[$indexInArray]['factor'];
         $totalAmount = 0;
         $totalNetAmount = 0;
         $detailsCount = count($order["details"]);
@@ -197,7 +209,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
         $this->orderTestProxy->createOrder($order);
 
 
-        return 0;
+        return $totalNetAmount;
     }
 
     /**

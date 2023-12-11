@@ -178,6 +178,10 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
         $manager = Shopware()->Models();
 
         foreach ($currenciesTestData as $currencyTestData) {
+            if ($currencyTestData['currency'] === 'EUR') {
+                continue;
+            }
+
             $currency = new Currency();
             $currency->fromArray($currencyTestData);
 
