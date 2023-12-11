@@ -1,6 +1,7 @@
 <?php
 
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
+use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use AdyenPayment\Controllers\Common\AjaxResponseSetter;
 use AdyenPayment\E2ETest\Exception\InvalidDataException;
 use AdyenPayment\E2ETest\Services\AdyenAPIService;
@@ -8,6 +9,7 @@ use AdyenPayment\E2ETest\Services\AuthorizationService;
 use AdyenPayment\E2ETest\Services\CreateCheckoutDataService;
 use AdyenPayment\E2ETest\Services\CreateInitialDataService;
 use AdyenPayment\E2ETest\Services\CreateWebhooksDataService;
+use AdyenPayment\E2ETest\Services\TransactionLogService;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Shopware\Components\CSRFWhitelistAware;
@@ -53,10 +55,18 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
      * @return void
      * @throws ORMException
      * @throws OptimisticLockException|HttpRequestException
+     * @throws QueryFilterInvalidParamException
      */
     public function indexAction(): void
     {
         $payload = $this->Request()->getParams();
+
+        if ($payload['merchantReference'] && $payload['eventCode']) {
+            $this->verifyWebhookStatus($payload['merchantReference'], $payload['eventCode']);
+
+            return;
+        }
+
         $url = $payload['url'] ?? '';
         $testApiKey = $payload['testApiKey'] ?? '';
         $liveApiKey = $payload['liveApiKey'] ?? '';
@@ -102,5 +112,17 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
         } finally {
             $this->Response()->setHeader('Content-Type', 'application/json');
         }
+    }
+
+    /**
+     * @throws QueryFilterInvalidParamException
+     */
+    private function verifyWebhookStatus($merchantReference, $eventCode): void
+    {
+        $transactionLogService = new TransactionLogService();
+
+        die(json_encode(array_merge(
+            ['finished' => $transactionLogService->findLogsByMerchantReference($merchantReference, $eventCode)]
+        )));
     }
 }
