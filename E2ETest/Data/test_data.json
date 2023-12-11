@@ -340,7 +340,7 @@
       "remoteAddress": "172.20.0.0",
       "details": [
         {
-          "articleId": 4,
+          "articleId": 1,
           "statusId": 0,
           "quantity": 2,
           "shipped": 0,
@@ -351,7 +351,7 @@
         {
           "articleId": 2,
           "statusId": 0,
-          "quantity": 5,
+          "quantity": 2,
           "shipped": 0,
           "shippedGroup": 0,
           "mode": 0,
