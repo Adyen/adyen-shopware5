@@ -12,6 +12,7 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\StartTransact
 use Adyen\Core\BusinessLogic\Domain\GeneralSettings\Models\CaptureType;
 use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
 use Adyen\Core\BusinessLogic\Domain\TransactionHistory\Services\TransactionHistoryService;
+use Adyen\Core\BusinessLogic\Domain\Webhook\Models\WebhookConfig;
 use Adyen\Core\BusinessLogic\Domain\Webhook\Repositories\WebhookConfigRepository;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use AdyenPayment\E2ETest\Http\CountryTestProxy;
@@ -72,6 +73,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
      */
     public function getWebhookAuthorizationData(): array
     {
+        /** @var WebhookConfig $webhookConfig */
         $webhookConfig = StoreContext::doWithStore(1, function () {
             return $this->getWebhookConfigRepository()->getWebhookConfig();
         });
