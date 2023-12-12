@@ -198,9 +198,9 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
             $order["details"][$i]["articleNumber"] = $mainDetail ? $mainDetail->getNumber() : -1;
             $price = $this->articleRepository->getShopwareArticleDetailsPrices($mainDetail->getId());
             $order["details"][$i]["price"] = $price->getPrice();
-            $totalAmount += round(round($order["details"][$i]["price"], 2) * $order["details"][$i]['quantity'], 2);
+            $totalAmount += round(round($order["details"][$i]["price"], 2) * $order["details"][$i]['quantity'] * $order["currencyFactor"], 2);
             $totalNetAmount += round(round($order["details"][$i]["price"], 2) * (100 + (float)$order["details"][$i]["taxRate"]) / 100
-                * $order["details"][$i]['quantity'], 2);
+                * $order["details"][$i]['quantity'] * $order["currencyFactor"], 2);
         }
 
         $order["invoiceAmount"] = $totalAmount;
