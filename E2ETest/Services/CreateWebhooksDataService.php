@@ -19,6 +19,7 @@ use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\E2ETest\Http\OrderTestProxy;
 use AdyenPayment\E2ETest\Http\PaymentMethodsTestProxy;
+use AdyenPayment\E2ETest\Http\UserTestProxy;
 use AdyenPayment\E2ETest\Repositories\ArticleRepository;
 use Exception;
 use Shopware\Components\Api\Exception\NotFoundException;
@@ -44,6 +45,10 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
      */
     private $paymentMethodsTestProxy;
     /**
+     * @var UserTestProxy
+     */
+    private $userTestProxy;
+    /**
      * @var ArticleRepository
      */
     private $articleRepository;
@@ -58,6 +63,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
         $this->orderTestProxy = new OrderTestProxy($this->getHttpClient(), 'localhost', $credentials);
         $this->countryTestProxy = new CountryTestProxy($this->getHttpClient(), 'localhost', $credentials);
         $this->paymentMethodsTestProxy = new PaymentMethodsTestProxy($this->getHttpClient(), 'localhost', $credentials);
+        $this->userTestProxy = new UserTestProxy($this->getHttpClient(), 'localhost', $credentials);
         $this->articleRepository = new ArticleRepository();
     }
 
@@ -87,8 +93,18 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
      */
     public function crateOrderPrerequisitesData(int $customerId): array
     {
+        $this->createAdminUser();
         $this->createOrdersMappingConfiguration();
         return $this->createOrders($customerId);
+    }
+
+    /**
+     * @throws HttpRequestException
+     */
+    private function createAdminUser(): void
+    {
+        $userData = $this->readFromJSONFile()['user'] ?? [];
+        $this->userTestProxy->createUser($userData);
     }
 
     private function createOrdersMappingConfiguration(): void

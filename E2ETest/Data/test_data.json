@@ -190,6 +190,17 @@
       "position": 0
     }
   ],
+  "user": {
+    "roleId": 1,
+    "localeId": 1,
+    "username": "demo2",
+    "password" : "demo",
+    "name": "Admin2",
+    "email": "demo2@etst.com",
+    "active": 1,
+    "extendedEditor": false,
+    "disabledCache": false
+  },
   "ordersMappingConfiguration": {
     "cancelled": "35",
     "chargeBack": "",
