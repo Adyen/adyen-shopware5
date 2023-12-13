@@ -497,22 +497,5 @@
       "temporaryId": "MERCHANT_REF_D_CAPT_0003",
       "captureType": "delayed"
     }
-  ],
-  "creditCartPaymentMethod": {
-    "methodId": "PM3224P22322225FNZ7B8G5D2",
-    "code": "scheme",
-    "logo": "https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/card.svg",
-    "name": "Credit Card",
-    "description": "Adyen Credit Card",
-    "surchargeType": "none",
-    "percentSurcharge": "",
-    "fixedSurcharge": "",
-    "surchargeLimit": "",
-    "additionalData": {
-      "showLogos": true,
-      "singleClickPayment": true,
-      "sendBasket": true,
-      "installments": false
-    }
-  }
+  ]
 }
