@@ -190,17 +190,85 @@
       "position": 0
     }
   ],
-  "user": {
-    "roleId": 1,
-    "localeId": 2,
-    "username": "demo2",
-    "password" : "demo",
-    "name": "Admin2",
-    "email": "demo2@etst.com",
-    "active": 1,
-    "extendedEditor": false,
-    "disabledCache": false
-  },
+  "users": [
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo2",
+      "password" : "demo",
+      "name": "Admin2",
+      "email": "demo2@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo3",
+      "password" : "demo",
+      "name": "Admin3",
+      "email": "demo3@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo4",
+      "password" : "demo",
+      "name": "Admin4",
+      "email": "demo4@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo5",
+      "password" : "demo",
+      "name": "Admin5",
+      "email": "demo5@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo6",
+      "password" : "demo",
+      "name": "Admin6",
+      "email": "demo6@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo7",
+      "password" : "demo",
+      "name": "Admin7",
+      "email": "demo7@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo8",
+      "password" : "demo",
+      "name": "Admin8",
+      "email": "demo8@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    }
+  ],
   "ordersMappingConfiguration": {
     "cancelled": "35",
     "chargeBack": "",

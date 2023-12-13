@@ -95,7 +95,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
      */
     public function crateOrderPrerequisitesData(int $customerId): array
     {
-        $this->createAdminUser();
+        $this->createAdminUsers();
         $this->createOrdersMappingConfiguration();
         return $this->createOrders($customerId);
     }
@@ -103,10 +103,12 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
     /**
      * @throws HttpRequestException
      */
-    private function createAdminUser(): void
+    private function createAdminUsers(): void
     {
-        $userData = $this->readFromJSONFile()['user'] ?? [];
-        $this->userTestProxy->createUser($userData);
+        $usersData = $this->readFromJSONFile()['users'] ?? [];
+        foreach ($usersData as $userData) {
+            $this->userTestProxy->createUser($userData);
+        }
     }
 
     private function createOrdersMappingConfiguration(): void
