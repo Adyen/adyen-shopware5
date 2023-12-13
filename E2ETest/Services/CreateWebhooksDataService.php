@@ -82,7 +82,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
         if ($webhookConfig) {
             $authData['username'] = $webhookConfig->getUsername();
             $authData['password'] = $webhookConfig->getPassword();
-            $authData['hmac'] = $webhookConfig->getHmac() ?? 'test';
+            $authData['hmac'] = $webhookConfig->getHmac();
         }
 
         return $authData;
