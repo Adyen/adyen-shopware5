@@ -2,7 +2,7 @@
 on:
   push:
     branches:
-      - feature/webhooks
+      - feature/pay-pal-env
 jobs:
   build:
     permissions:
