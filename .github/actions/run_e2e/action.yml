@@ -87,8 +87,8 @@ runs:
         repository: ${{inputs.SHOPWARE_TEST_REPO}}
         path: tests
         token: ${{ inputs.GH_PAT }}
-        ref: feature/iteration_3
-        
+        ref: feature/webhooks
+
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
@@ -102,7 +102,7 @@ runs:
       
     - name: Install common
       shell: bash
-      run: npm install https://${{inputs.GH_PAT}}@github.com/${{inputs.COMMON_TEST_REPO}}#feature/iteration_3
+      run: npm install https://${{inputs.GH_PAT}}@github.com/${{inputs.COMMON_TEST_REPO}}#feature/webhooks
       
     - name: Install Playwright Browsers
       working-directory: ./tests
@@ -121,7 +121,7 @@ runs:
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
         NGROK: ${{ inputs.NGROK }}
         TEST_PATH: "/AdyenTest/index"
-        CHECKOUT_TEST_PATH: "/AdyenTest/createCheckoutPrerequisites"
+        WEBHOOK_PATH: "/AdyenWebhook/index/storeId/1"
         ADMIN_PATH: "/backend"
         PAY_PAL_EMAIL: ${{ inputs.PAY_PAL_EMAIL }}
         PAY_PAL_PASSWORD: ${{ inputs.PAY_PAL_PASSWORD }}

@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:logeecom-dev/adyen-php-plugin-core.git",
-                "reference": "6e8a0659361343d94f603dd71aa0008638c24e95"
+                "reference": "9d275c62b0ddbc04cfb55c77fcd1f9185093254a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/logeecom-dev/adyen-php-plugin-core/zipball/6e8a0659361343d94f603dd71aa0008638c24e95",
-                "reference": "6e8a0659361343d94f603dd71aa0008638c24e95",
+                "url": "https://api.github.com/repos/logeecom-dev/adyen-php-plugin-core/zipball/9d275c62b0ddbc04cfb55c77fcd1f9185093254a",
+                "reference": "9d275c62b0ddbc04cfb55c77fcd1f9185093254a",
                 "shasum": ""
             },
             "require": {
@@ -48,7 +48,7 @@
                 "proprietary"
             ],
             "description": "Core Adyen integration library",
-            "time": "2023-11-27T10:25:55+00:00"
+            "time": "2023-12-04T09:15:33+00:00"
         },
         {
             "name": "adyen/php-webhook-module",

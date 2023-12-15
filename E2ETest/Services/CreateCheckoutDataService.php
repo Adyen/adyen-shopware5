@@ -82,17 +82,14 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
      * @throws PaymentMethodDataEmptyException
      * @throws UserDoesNotHaveNecessaryRolesException
      */
-    public function crateCheckoutPrerequisitesData(string $testApiKey): void
+    public function crateCheckoutPrerequisitesData(string $testApiKey): int
     {
-        if (count(AdminAPI::get()->connection(1)->getConnectionSettings()->toArray()) > 0) {
-            return;
-        }
-
         $this->createIntegrationConfigurations($testApiKey);
         $this->activateCountries();
-        $this->createCustomers();
         $currencies = $this->createCurrenciesInDatabase();
         $this->addCurrenciesInSubStore($currencies);
+
+        return $this->createCustomers();
     }
 
     /**
@@ -142,11 +139,13 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     }
 
     /**
+     * @return int
      * @throws HttpRequestException
      */
-    private function createCustomers(): void
+    private function createCustomers(): int
     {
         $customersTestData = $this->readFromJSONFile()['customers'];
+        $customerId = -1;
         foreach ($customersTestData as $customerTestData) {
             $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
             $indexInArray = array_search(
@@ -158,8 +157,10 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
             $customerTestData['defaultShippingAddress']['country'] = $countryId;
             $customerTestData['defaultBillingAddress']['country'] = $countryId;
 
-            $this->customerTestProxy->saveCustomer($customerTestData);
+            $customerId = $this->customerTestProxy->saveCustomer($customerTestData)['id'] ?? -1;
         }
+
+        return $customerId;
     }
 
     /**
@@ -174,6 +175,10 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
         $manager = Shopware()->Models();
 
         foreach ($currenciesTestData as $currencyTestData) {
+            if ($currencyTestData['currency'] === 'EUR') {
+                continue;
+            }
+
             $currency = new Currency();
             $currency->fromArray($currencyTestData);
 

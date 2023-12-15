@@ -163,6 +163,15 @@
   ],
   "currencies": [
     {
+      "currency": "EUR",
+      "name": "Euro",
+      "default": true,
+      "factor": 1,
+      "symbol": "€",
+      "symbolPosition": 0,
+      "position": 0
+    },
+    {
       "currency": "GBP",
       "name": "British Pound",
       "default": false,
@@ -179,6 +188,314 @@
       "symbol": "$",
       "symbolPosition": 0,
       "position": 0
+    }
+  ],
+  "users": [
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo2",
+      "password" : "demo",
+      "name": "Admin2",
+      "email": "demo2@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo3",
+      "password" : "demo",
+      "name": "Admin3",
+      "email": "demo3@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo4",
+      "password" : "demo",
+      "name": "Admin4",
+      "email": "demo4@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo5",
+      "password" : "demo",
+      "name": "Admin5",
+      "email": "demo5@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo6",
+      "password" : "demo",
+      "name": "Admin6",
+      "email": "demo6@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo7",
+      "password" : "demo",
+      "name": "Admin7",
+      "email": "demo7@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    },
+    {
+      "roleId": 1,
+      "localeId": 2,
+      "username": "demo8",
+      "password" : "demo",
+      "name": "Admin8",
+      "email": "demo8@etst.com",
+      "active": 1,
+      "extendedEditor": false,
+      "disabledCache": false
+    }
+  ],
+  "ordersMappingConfiguration": {
+    "cancelled": "35",
+    "chargeBack": "",
+    "failed": "35",
+    "inProgress": "33",
+    "new": "17",
+    "paid": "12",
+    "partiallyRefunded": "14",
+    "pending": "17",
+    "refunded": "13"
+  },
+  "orders": [
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "EUR",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 1,
+          "statusId": 0,
+          "quantity": 1,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_M_CAPT_0001",
+      "temporaryId": "MERCHANT_REF_M_CAPT_0001",
+      "captureType": "manual"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "GBP",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 1,
+          "statusId": 0,
+          "quantity": 2,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        },
+        {
+          "articleId": 2,
+          "statusId": 0,
+          "quantity": 2,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_M_CAPT_0002",
+      "temporaryId": "MERCHANT_REF_M_CAPT_0002",
+      "captureType": "manual"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "USD",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 2,
+          "statusId": 0,
+          "quantity": 2,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_M_CAPT_0003",
+      "temporaryId": "MERCHANT_REF_M_CAPT_0003",
+      "captureType": "manual"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "EUR",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 2,
+          "statusId": 0,
+          "quantity": 1,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        },
+        {
+          "articleId": 4,
+          "statusId": 0,
+          "quantity": 2,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_I_CAPT_0001",
+      "temporaryId": "MERCHANT_REF_I_CAPT_0001",
+      "captureType": "immediate"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "USD",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 1,
+          "statusId": 0,
+          "quantity": 2,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        },
+        {
+          "articleId": 2,
+          "statusId": 0,
+          "quantity": 2,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_D_CAPT_0001",
+      "temporaryId": "MERCHANT_REF_D_CAPT_0001",
+      "captureType": "delayed"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "USD",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 2,
+          "statusId": 0,
+          "quantity": 1,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_D_CAPT_0002",
+      "temporaryId": "MERCHANT_REF_D_CAPT_0002",
+      "captureType": "delayed"
+    },
+    {
+      "dispatchId": 9,
+      "shopId": 1,
+      "invoiceShipping": 0,
+      "invoiceShippingNet": 0,
+      "net": 0,
+      "taxFree": 0,
+      "languageIso": "1",
+      "currency": "GBP",
+      "remoteAddress": "172.20.0.0",
+      "details": [
+        {
+          "articleId": 1,
+          "statusId": 0,
+          "quantity": 4,
+          "shipped": 0,
+          "shippedGroup": 0,
+          "mode": 0,
+          "esdArticle": 0
+        }
+      ],
+      "documents": [],
+      "orderStatusId": 0,
+      "transactionId": "AUTH_D_CAPT_0003",
+      "temporaryId": "MERCHANT_REF_D_CAPT_0003",
+      "captureType": "delayed"
     }
   ]
 }
