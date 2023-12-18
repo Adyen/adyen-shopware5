@@ -69,7 +69,8 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
     }
 
     /**
-     * @throws Exception
+     * @return array
+     * @throws HttpRequestException
      */
     public function getWebhookAuthorizationData(): array
     {
@@ -78,12 +79,14 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
             return $this->getWebhookConfigRepository()->getWebhookConfig();
         });
 
-        $authData = [];
-        if ($webhookConfig) {
-            $authData['username'] = $webhookConfig->getUsername();
-            $authData['password'] = $webhookConfig->getPassword();
-            $authData['hmac'] = $webhookConfig->getHmac();
+        if (!$webhookConfig) {
+            throw new HttpRequestException('Hmac is undefined due to the unsuccessful creation of the 
+            webhook and hmac on the Adyen API.');
         }
+
+        $authData['username'] = $webhookConfig->getUsername();
+        $authData['password'] = $webhookConfig->getPassword();
+        $authData['hmac'] = $webhookConfig->getHmac();
 
         return $authData;
     }
