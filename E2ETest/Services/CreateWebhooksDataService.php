@@ -80,8 +80,9 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
         });
 
         if (!$webhookConfig) {
-            throw new HttpRequestException('Hmac is undefined due to the unsuccessful creation of the 
-            webhook and hmac on the Adyen API.');
+            throw new HttpRequestException(
+                'Hmac is undefined due to the unsuccessful creation of the webhook and hmac on the Adyen API.'
+            );
         }
 
         $authData['username'] = $webhookConfig->getUsername();
