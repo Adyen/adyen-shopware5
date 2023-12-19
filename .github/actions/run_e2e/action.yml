@@ -151,7 +151,7 @@ runs:
       if: always()
       with:
         name: integration-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
-        path: ./var/log/adyen_payment_production-${{ steps.date.outputs.date }}.log
+        path: var/log/adyen_payment_production-${{ steps.date.outputs.date }}.log
         retention-days: 30
     - name: Remove Ayden plugin
       shell: bash
