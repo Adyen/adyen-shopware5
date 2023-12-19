@@ -142,9 +142,10 @@ runs:
         path: ./dockerLogs.log
         retention-days: 30
     - name: Get current date
+      if: always()
       id: date
       shell: bash
-      run: docker exec shop bash -c 'echo $(date +'%Y-%m-%d')'
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
     - name: Add integration logs to file
       uses: actions/upload-artifact@v3
       if: always()
