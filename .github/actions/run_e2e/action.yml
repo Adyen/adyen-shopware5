@@ -39,11 +39,11 @@ inputs:
     description: "The Node Version that is used for the E2E Tests."
     required: true
   SHOPWARE_TEST_REPO:
-      description: "The repository housing the shopware5 e2e tests"
-      required: true
+    description: "The repository housing the shopware5 e2e tests"
+    required: true
   COMMON_TEST_REPO:
-      description: "The repository housing the common part of the e2e tests"
-      required: true
+    description: "The repository housing the common part of the e2e tests"
+    required: true
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
     default: '~/.build/AdyenPayment.zip'
@@ -80,7 +80,7 @@ runs:
         docker exec shop bash -c 'php bin/console sw:plugin:refresh'
         docker exec shop bash -c 'php bin/console sw:plugin:install --activate AdyenPayment'
         docker exec shop bash -c 'php bin/console sw:cache:clear'
-    
+
     - name: Clone Code
       uses: actions/checkout@v3
       with:
@@ -93,22 +93,22 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.NODE }}
-        
+
     - name: Install Node dependencies
       working-directory: ./tests
       run:
         npm install
       shell: bash
-      
+
     - name: Install common
       shell: bash
       run: npm install https://${{inputs.GH_PAT}}@github.com/${{inputs.COMMON_TEST_REPO}}#feature/express-checkout
-      
+
     - name: Install Playwright Browsers
       working-directory: ./tests
       shell: bash
       run: npx playwright install --with-deps > /dev/null
-      
+
     - name: Run Playwright tests
       shell: bash
       working-directory: ./tests
@@ -130,7 +130,7 @@ runs:
       with:
         name: playwright-report-Shopware-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
         path: ./tests/playwright-report/
-        retention-days: 30  
+        retention-days: 30
     - name: Add docker logs to file
       if: always()
       shell: bash
@@ -146,7 +146,7 @@ runs:
       if: always()
       with:
         name: integration-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
-        path: ./var/log/adyen_payment_production-${{ echo $(date +'%Y-%m-%d') }}.log
+        path: ./var/log/adyen_payment_production-${{ docker exec -it prestashop bash -c 'echo $(date +'%Y-%m-%d')' }}.log
         retention-days: 30
     - name: Remove Ayden plugin
       shell: bash
