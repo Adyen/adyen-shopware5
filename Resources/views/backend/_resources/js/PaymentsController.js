@@ -54,7 +54,8 @@ if (!window.AdyenFE) {
         swish: 'swish',
         trustly: 'trustly',
         twint: 'twint',
-        vipps: 'vipps'
+        vipps: 'vipps',
+        alma: 'alma'
     };
 
     const methodTypes = [
@@ -239,7 +240,8 @@ if (!window.AdyenFE) {
         'prosodie_illicado',
         'twint',
         'paysafecard',
-        'bcmc_mobile'
+        'bcmc_mobile',
+        'alma'
     ];
 
     const supportsRecurringPayments = [
