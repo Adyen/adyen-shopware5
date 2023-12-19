@@ -141,6 +141,13 @@ runs:
         name: docker-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
         path: ./dockerLogs.log
         retention-days: 30
+    - name: Add integration logs to file
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: integration-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
+        path: ./var/log/adyen_payment_production-${{ echo $(date +'%Y-%m-%d') }}.log
+        retention-days: 30
     - name: Remove Ayden plugin
       shell: bash
       if: always()
