@@ -141,12 +141,16 @@ runs:
         name: docker-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
         path: ./dockerLogs.log
         retention-days: 30
+    - name: Get current date
+      id: date
+      shell: bash
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
     - name: Add integration logs to file
       uses: actions/upload-artifact@v3
       if: always()
       with:
         name: integration-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
-        path: ./var/log/adyen_payment_production-${{ docker exec -it prestashop bash -c 'echo $(date +'%Y-%m-%d')' }}.log
+        path: ./var/log/adyen_payment_production-${{ steps.date.outputs.date }}.log
         retention-days: 30
     - name: Remove Ayden plugin
       shell: bash
