@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.1.0</version>
+    <version>4.1.1</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -633,6 +633,14 @@
             Klarna PayNow
             SEPA Direct Debit
             Sofort
+        </changes>
+    </changelog>
+    <changelog version="4.1.1">
+        <changes lang="en">
+            * Add support for Alma payment method
+        </changes>
+        <changes lang="de">
+            * Add support for Alma payment method
         </changes>
     </changelog>
 </plugin>
