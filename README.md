@@ -17,8 +17,8 @@ Note: The Adyen payment plugin is not compatible with the cookie manager plugin 
 
 ## Documentation
 Please find the relevant documentation for
- - [Get started with Adyen](https://docs.adyen.com/user-management/get-started-with-adyen)
- - [Shopware 5 plugin integration guide](https://github.com/Adyen/adyen-shopware5/wiki)
+ - [How to start with Adyen](https://docs.adyen.com/user-management/get-started-with-adyen)
+ - [Plugin documentation](https://github.com/Adyen/adyen-shopware5/wiki)
 
 ## Support
 
