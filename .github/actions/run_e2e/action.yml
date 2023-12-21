@@ -32,6 +32,12 @@ inputs:
   PORT:
     description: "The port of the shop."
     required: true
+  BROWSER:
+    description: "The browser that will be used for tests"
+    required: true
+  DEVICE:
+    description: "The device on which the tests will be run"
+    required: true
   NGROK:
     description: "The token of the ngrok."
     required: true
@@ -125,6 +131,9 @@ runs:
         ADMIN_PATH: "/backend"
         PAY_PAL_EMAIL: ${{ inputs.PAY_PAL_EMAIL }}
         PAY_PAL_PASSWORD: ${{ inputs.PAY_PAL_PASSWORD }}
+        BROWSER: ${{ inputs.BROWSER }}
+        DEVICE: ${{ inputs.DEVICE }}
+        
     - uses: actions/upload-artifact@v3
       if: always()
       with:

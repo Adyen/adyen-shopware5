@@ -31,7 +31,7 @@ jobs:
         uses: ./.github/actions/build_plugin
   
   run:
-    name: E2E | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
+    name: E2E | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}, Browser ${{matrix.browser}}
     needs: build
     runs-on: ubuntu-latest
     strategy:
@@ -41,12 +41,34 @@ jobs:
           - shopware: '5.6.10'
             php: '7.4'
             port: 80
+            browser: 'chromium'
+            device: 'Desktop Chrome'
           - shopware: '5.7.18'
             php: '7.4'
             port: 80
+            browser: 'chromium'
+            device: 'Desktop Chrome'
           - shopware: '5.7.8'
             php: '8.1'
             port: 80
+            browser: 'chromium'
+            device: 'Desktop Chrome'
+
+          - shopware: '5.6.10'
+            php: '7.4'
+            port: 80
+            browser: 'firefox'
+            device: 'Desktop Firefox'
+          - shopware: '5.7.18'
+            php: '7.4'
+            port: 80
+            browser: 'firefox'
+            device: 'Desktop Firefox'
+          - shopware: '5.7.8'
+            php: '8.1'
+            port: 80
+            browser: 'firefox'
+            device: 'Desktop Firefox'
     steps:
       - name: Clone Code
         uses: actions/checkout@v3
@@ -77,4 +99,6 @@ jobs:
           COMMON_TEST_REPO: ${{secrets.COMMON_TEST_REPO}}
           PAY_PAL_EMAIL: ${{secrets.PAY_PAL_EMAIL}}
           PAY_PAL_PASSWORD: ${{secrets.PAY_PAL_PASSWORD}}
+          BROWSER: ${{ matrix.browser }}
+          DEVICE: ${{ matrix.device }}
           
