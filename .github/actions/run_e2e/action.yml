@@ -87,7 +87,7 @@ runs:
         repository: ${{inputs.SHOPWARE_TEST_REPO}}
         path: tests
         token: ${{ inputs.GH_PAT }}
-        ref: feature/express-checkout
+        ref: master
 
     - name: Setup Node
       uses: actions/setup-node@v3
@@ -102,7 +102,7 @@ runs:
 
     - name: Install common
       shell: bash
-      run: npm install https://${{inputs.GH_PAT}}@github.com/${{inputs.COMMON_TEST_REPO}}#feature/express-checkout
+      run: npm install https://${{inputs.GH_PAT}}@github.com/${{inputs.COMMON_TEST_REPO}}#master
 
     - name: Install Playwright Browsers
       working-directory: ./tests
