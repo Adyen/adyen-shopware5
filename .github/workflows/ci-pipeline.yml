@@ -40,33 +40,33 @@ jobs:
         include:
           - shopware: '5.6.10'
             php: '7.4'
-            port: 80
+            port: 443
             browser: 'chromium'
             device: 'Desktop Chrome'
           - shopware: '5.7.18'
             php: '7.4'
-            port: 80
+            port: 443
             browser: 'chromium'
             device: 'Desktop Chrome'
           - shopware: '5.7.8'
             php: '8.1'
-            port: 80
+            port: 443
             browser: 'chromium'
             device: 'Desktop Chrome'
 
           - shopware: '5.6.10'
             php: '7.4'
-            port: 80
+            port: 443
             browser: 'firefox'
             device: 'Desktop Firefox'
           - shopware: '5.7.18'
             php: '7.4'
-            port: 80
+            port: 443
             browser: 'firefox'
             device: 'Desktop Firefox'
           - shopware: '5.7.8'
             php: '8.1'
-            port: 80
+            port: 443
             browser: 'firefox'
             device: 'Desktop Firefox'
     steps:

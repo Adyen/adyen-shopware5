@@ -122,7 +122,7 @@ runs:
       env:
         API_KEY_TEST: ${{ inputs.API_KEY_TEST }}
         API_KEY_LIVE: ${{ inputs.API_KEY_LIVE }}
-        PORT: "443"
+        PORT: ${{ inputs.PORT }}
         ADMIN_USERNAME: ${{ inputs.ADMIN_USERNAME }}
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
         NGROK: ${{ inputs.NGROK }}
