@@ -137,7 +137,7 @@ runs:
     - uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: playwright-report-Shopware-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
+        name: playwright-report-Shopware-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
         path: ./tests/playwright-report/
         retention-days: 30
     - name: Add docker logs to file
@@ -147,7 +147,7 @@ runs:
     - uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: docker-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
+        name: docker-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
         path: ./dockerLogs.log
         retention-days: 30
     - name: Get current date
@@ -163,7 +163,7 @@ runs:
       uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: integration-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}
+        name: integration-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
         path: ./integrationLogs.log
         retention-days: 30
     - name: Remove Ayden plugin
