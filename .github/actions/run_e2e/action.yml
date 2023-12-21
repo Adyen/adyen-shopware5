@@ -59,7 +59,7 @@ runs:
     - name: Start Docker
       shell: bash
       run: |
-        docker run -p ${{ inputs.PORT }}:80 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
+        docker run -p ${{ inputs.PORT }}:80 -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 30
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = 'localhost', hosts = '', secure = 0;\""
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_auth SET localeID = (SELECT id FROM s_core_locales WHERE locale = 'en_GB');\""
@@ -116,7 +116,7 @@ runs:
       env:
         API_KEY_TEST: ${{ inputs.API_KEY_TEST }}
         API_KEY_LIVE: ${{ inputs.API_KEY_LIVE }}
-        PORT: ${{ inputs.PORT }}
+        PORT: "443"
         ADMIN_USERNAME: ${{ inputs.ADMIN_USERNAME }}
         ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
         NGROK: ${{ inputs.NGROK }}
