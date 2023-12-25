@@ -211,17 +211,6 @@
       "disabledCache": false
     }
   ],
-  "ordersMappingConfiguration": {
-    "cancelled": "35",
-    "chargeBack": "",
-    "failed": "35",
-    "inProgress": "33",
-    "new": "17",
-    "paid": "12",
-    "partiallyRefunded": "14",
-    "pending": "17",
-    "refunded": "13"
-  },
   "orders": [
     {
       "dispatchId": 9,

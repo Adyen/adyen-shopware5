@@ -24,6 +24,7 @@ use AdyenPayment\E2ETest\Repositories\ArticleRepository;
 use Exception;
 use Shopware\Components\Api\Exception\NotFoundException;
 use Shopware\Components\Api\Exception\ParameterMissingException;
+use Shopware\Models\Order\Status;
 
 /**
  * Class CreateWebhooksDataService
@@ -96,7 +97,9 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
 
     private function createOrdersMappingConfiguration(): void
     {
-        $ordersMappingConfigurationData = $this->readFromJSONFile()['ordersMappingConfiguration'] ?? [];
+        $ordersMappingConfigurationData = AdminAPI::get()->orderMappings(1)->getOrderStatusMap()->toArray();
+        $ordersMappingConfigurationData[ 'refunded'] = Status::PAYMENT_STATE_1ST_REMINDER;
+        $ordersMappingConfigurationData[ 'partiallyRefunded'] = Status::PAYMENT_STATE_2ND_REMINDER;
         $orderStatusMapRequest = OrderMappingsRequest::parse($ordersMappingConfigurationData);
 
         AdminAPI::get()->orderMappings(1)->saveOrderStatusMap($orderStatusMapRequest);
