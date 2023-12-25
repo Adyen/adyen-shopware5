@@ -209,72 +209,6 @@
       "active": 1,
       "extendedEditor": false,
       "disabledCache": false
-    },
-    {
-      "roleId": 1,
-      "localeId": 2,
-      "username": "demo3",
-      "password" : "demo",
-      "name": "Admin3",
-      "email": "demo3@etst.com",
-      "active": 1,
-      "extendedEditor": false,
-      "disabledCache": false
-    },
-    {
-      "roleId": 1,
-      "localeId": 2,
-      "username": "demo4",
-      "password" : "demo",
-      "name": "Admin4",
-      "email": "demo4@etst.com",
-      "active": 1,
-      "extendedEditor": false,
-      "disabledCache": false
-    },
-    {
-      "roleId": 1,
-      "localeId": 2,
-      "username": "demo5",
-      "password" : "demo",
-      "name": "Admin5",
-      "email": "demo5@etst.com",
-      "active": 1,
-      "extendedEditor": false,
-      "disabledCache": false
-    },
-    {
-      "roleId": 1,
-      "localeId": 2,
-      "username": "demo6",
-      "password" : "demo",
-      "name": "Admin6",
-      "email": "demo6@etst.com",
-      "active": 1,
-      "extendedEditor": false,
-      "disabledCache": false
-    },
-    {
-      "roleId": 1,
-      "localeId": 2,
-      "username": "demo7",
-      "password" : "demo",
-      "name": "Admin7",
-      "email": "demo7@etst.com",
-      "active": 1,
-      "extendedEditor": false,
-      "disabledCache": false
-    },
-    {
-      "roleId": 1,
-      "localeId": 2,
-      "username": "demo8",
-      "password" : "demo",
-      "name": "Admin8",
-      "email": "demo8@etst.com",
-      "active": 1,
-      "extendedEditor": false,
-      "disabledCache": false
     }
   ],
   "ordersMappingConfiguration": {
@@ -314,7 +248,8 @@
       "orderStatusId": 0,
       "transactionId": "AUTH_M_CAPT_0001",
       "temporaryId": "MERCHANT_REF_M_CAPT_0001",
-      "captureType": "manual"
+      "captureType": "manual",
+      "name" : "orderWithCaptureTypeManual1"
     },
     {
       "dispatchId": 9,
@@ -350,7 +285,8 @@
       "orderStatusId": 0,
       "transactionId": "AUTH_M_CAPT_0002",
       "temporaryId": "MERCHANT_REF_M_CAPT_0002",
-      "captureType": "manual"
+      "captureType": "manual",
+      "name" : "orderWithCaptureTypeManual2"
     },
     {
       "dispatchId": 9,
@@ -377,7 +313,8 @@
       "orderStatusId": 0,
       "transactionId": "AUTH_M_CAPT_0003",
       "temporaryId": "MERCHANT_REF_M_CAPT_0003",
-      "captureType": "manual"
+      "captureType": "manual",
+      "name" : "orderWithCaptureTypeManual3"
     },
     {
       "dispatchId": 9,
@@ -413,7 +350,8 @@
       "orderStatusId": 0,
       "transactionId": "AUTH_I_CAPT_0001",
       "temporaryId": "MERCHANT_REF_I_CAPT_0001",
-      "captureType": "immediate"
+      "captureType": "immediate",
+      "name" : "orderWithCaptureTypeImmediate"
     },
     {
       "dispatchId": 9,
@@ -449,7 +387,8 @@
       "orderStatusId": 0,
       "transactionId": "AUTH_D_CAPT_0001",
       "temporaryId": "MERCHANT_REF_D_CAPT_0001",
-      "captureType": "delayed"
+      "captureType": "delayed",
+      "name" : "orderWithCaptureTypeDelayed1"
     },
     {
       "dispatchId": 9,
@@ -476,7 +415,8 @@
       "orderStatusId": 0,
       "transactionId": "AUTH_D_CAPT_0002",
       "temporaryId": "MERCHANT_REF_D_CAPT_0002",
-      "captureType": "delayed"
+      "captureType": "delayed",
+      "name" : "orderWithCaptureTypeDelayed2"
     },
     {
       "dispatchId": 9,
@@ -503,7 +443,8 @@
       "orderStatusId": 0,
       "transactionId": "AUTH_D_CAPT_0003",
       "temporaryId": "MERCHANT_REF_D_CAPT_0003",
-      "captureType": "delayed"
+      "captureType": "delayed",
+      "name" : "orderWithCaptureTypeDelayed3"
     }
   ]
 }

@@ -16,7 +16,6 @@ use Adyen\Core\BusinessLogic\Domain\Webhook\Models\WebhookConfig;
 use Adyen\Core\BusinessLogic\Domain\Webhook\Repositories\WebhookConfigRepository;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use AdyenPayment\E2ETest\Http\CountryTestProxy;
-use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\E2ETest\Http\OrderTestProxy;
 use AdyenPayment\E2ETest\Http\PaymentMethodsTestProxy;
@@ -34,22 +33,6 @@ use Shopware\Components\Api\Exception\ParameterMissingException;
 class CreateWebhooksDataService extends BaseCreateSeedDataService
 {
     /**
-     * @var CountryTestProxy
-     */
-    private $orderTestProxy;
-    /**
-     * @var CountryTestProxy
-     */
-    private $countryTestProxy;
-    /**
-     * @var PaymentMethodsTestProxy
-     */
-    private $paymentMethodsTestProxy;
-    /**
-     * @var UserTestProxy
-     */
-    private $userTestProxy;
-    /**
      * @var ArticleRepository
      */
     private $articleRepository;
@@ -57,20 +40,16 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
     /**
      * CreateCheckoutDataService constructor.
      *
-     * @param string $credentials
      */
-    public function __construct(string $credentials)
+    public function __construct()
     {
-        $this->orderTestProxy = new OrderTestProxy($this->getHttpClient(), 'localhost', $credentials);
-        $this->countryTestProxy = new CountryTestProxy($this->getHttpClient(), 'localhost', $credentials);
-        $this->paymentMethodsTestProxy = new PaymentMethodsTestProxy($this->getHttpClient(), 'localhost', $credentials);
-        $this->userTestProxy = new UserTestProxy($this->getHttpClient(), 'localhost', $credentials);
         $this->articleRepository = new ArticleRepository();
     }
 
     /**
      * @return array
      * @throws HttpRequestException
+     * @throws Exception
      */
     public function getWebhookAuthorizationData(): array
     {
@@ -95,7 +74,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
     /**
      * @return void
      * @throws HttpRequestException
-     * @throws \Exception
+     * @throws Exception
      */
     public function crateOrderPrerequisitesData(int $customerId): array
     {
@@ -111,7 +90,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
     {
         $usersData = $this->readFromJSONFile()['users'] ?? [];
         foreach ($usersData as $userData) {
-            $this->userTestProxy->createUser($userData);
+            $this->getUserTestProxy()->createUser($userData);
         }
     }
 
@@ -137,13 +116,14 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
     private function createOrders(int $customerId): array
     {
         $ordersMerchantReferenceAndAmount = [];
-        $index = 1;
         $orders = $this->readFromJSONFile()['orders'] ?? [];
         $customerData = $this->readFromJSONFile()['customer'] ?? [];
         $currencies = $this->readFromJSONFile()['currencies'] ?? [];
         foreach ($orders as $order) {
             $captureType = $this->getCaptureType($order['captureType']);
             unset($order['captureType']);
+            $orderName = $order['name'];
+            unset($order['name']);
             $totalAmount = $this->createOrder($order, $customerId, $customerData, $currencies);
             StoreContext::doWithStore('1', static function () use ($captureType, $totalAmount, $order) {
                 $transactionContext = new StartTransactionRequestContext(
@@ -167,11 +147,10 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
                 );
             });
 
-            $ordersMerchantReferenceAndAmount['order_' . $index] = [
+            $ordersMerchantReferenceAndAmount[$orderName] = [
                 'merchantReference' => $order['temporaryId'],
                 'amount' => $totalAmount * 100
             ];
-            $index++;
         }
 
         return $ordersMerchantReferenceAndAmount;
@@ -192,7 +171,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
         $order["billing"] = $customerData['defaultBillingAddress'];
         $order["billing"]["customerId"] = $customerId;
         $order["shipping"]["customerId"] = $customerId;
-        $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
+        $shopCountries = $this->getCountryTestProxy()->getCountries()['data'] ?? [];
         $indexInArray = array_search(
             $order["shipping"]['country'],
             array_column($shopCountries, 'iso'),
@@ -230,7 +209,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
         $order["invoiceAmount"] = $totalAmount;
         $order["invoiceAmountNet"] = $totalNetAmount;
 
-        $this->orderTestProxy->createOrder($order);
+        $this->getOrderTestProxy()->createOrder($order);
 
         return $totalAmount;
     }
@@ -241,7 +220,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
      */
     private function getPaymentMethodId(): int
     {
-        $paymentMethods = $this->paymentMethodsTestProxy->getPaymentMethods()['data'] ?? [];
+        $paymentMethods = $this->getPaymentMethodsTestProxy()->getPaymentMethods()['data'] ?? [];
         $indexInArray = array_search('adyen_scheme', array_column($paymentMethods, 'name'), true);
 
         return $paymentMethods[$indexInArray]['id'];
@@ -261,11 +240,35 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
     }
 
     /**
-     * @return HttpClient
+     * @return OrderTestProxy
      */
-    private function getHttpClient(): HttpClient
+    private function getOrderTestProxy(): OrderTestProxy
     {
-        return ServiceRegister::getService(HttpClient::class);
+        return ServiceRegister::getService(OrderTestProxy::class);
+    }
+
+    /**
+     * @return CountryTestProxy
+     */
+    private function getCountryTestProxy(): CountryTestProxy
+    {
+        return ServiceRegister::getService(CountryTestProxy::class);
+    }
+
+    /**
+     * @return PaymentMethodsTestProxy
+     */
+    private function getPaymentMethodsTestProxy(): PaymentMethodsTestProxy
+    {
+        return ServiceRegister::getService(PaymentMethodsTestProxy::class);
+    }
+
+    /**
+     * @return UserTestProxy
+     */
+    private function getUserTestProxy(): UserTestProxy
+    {
+        return ServiceRegister::getService(UserTestProxy::class);
     }
 
     /**

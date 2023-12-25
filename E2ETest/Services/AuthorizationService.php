@@ -4,6 +4,7 @@ namespace AdyenPayment\E2ETest\Services;
 
 use AdyenPayment\E2ETest\Repositories\UserRepository;
 use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Shopware\Models\User\User;
 
 /**
@@ -30,7 +31,7 @@ class AuthorizationService
      *  Returns authorization credentials for Shopware Rest API calls
      *
      * @return string
-     * @throws OptimisticLockException|\Doctrine\ORM\ORMException
+     * @throws OptimisticLockException|ORMException
      */
     public function getAuthorizationCredentials(): string
     {
@@ -49,7 +50,7 @@ class AuthorizationService
      *
      * @param User $user
      * @return void
-     * @throws OptimisticLockException|\Doctrine\ORM\ORMException
+     * @throws OptimisticLockException|ORMException
      */
     private function generateAPIKey(User $user): void
     {

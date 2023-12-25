@@ -13,18 +13,14 @@ use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 class CountryTestProxy extends TestProxy
 {
     /**
-     * Creates request to update base url and default shop name
+     * Creates request to update country
      *
      * @throws HttpRequestException
      */
-    public function activateCountry(int $countryId): void
+    public function updateCountry(int $countryId, array $countryData): void
     {
         $httpRequest = new HttpRequest(
-            "/api/countries/$countryId",
-            [
-                'active' => true
-            ]
-        );
+            "/api/countries/$countryId", $countryData);
         $this->put($httpRequest)->decodeBodyToArray();
     }
 

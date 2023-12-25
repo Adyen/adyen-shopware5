@@ -7,7 +7,7 @@ use Shopware\Models\Article\Price;
 use Shopware\Models\Article\Repository;
 
 /**
- * Class UserRepository
+ * Class ArticleRepository
  *
  * @package AdyenPayment\E2ETest\Repositories
  */
@@ -19,7 +19,7 @@ class ArticleRepository
     private $articleRepository;
 
     /**
-     * UserRepository constructor.
+     * ArticleRepository constructor.
      */
     public function __construct()
     {
@@ -27,7 +27,7 @@ class ArticleRepository
     }
 
     /**
-     * Returns array of Shopware users from database
+     * Returns Shopware article from database
      *
      * @param int $articleId
      * @return Article
@@ -38,7 +38,7 @@ class ArticleRepository
     }
 
     /**
-     * Returns array of Shopware users from database
+     * Returns Shopware price for article from database
      *
      * @param int $articleDetailId
      * @return Price

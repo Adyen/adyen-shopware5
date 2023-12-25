@@ -6,23 +6,25 @@ use Adyen\Core\BusinessLogic\AdyenAPI\Http\Requests\HttpRequest;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 
 /**
- * Class PaymentMethodsTestProxy
+ * Class CacheTestProxy
  *
  * @package AdyenPayment\E2ETest\Http
  */
-class PaymentMethodsTestProxy extends TestProxy
+class CacheTestProxy extends TestProxy
 {
     /**
-     * Creates request to get payment methods from shop
+     * Creates request to clear config cache
      *
      * @throws HttpRequestException
      */
-    public function getPaymentMethods(): array
+    public function clearCache(): void
     {
         $httpRequest = new HttpRequest(
-            "/api/paymentMethods"
+            "/api/caches",
+            [
+                'id' => 'config',
+            ]
         );
-
-        return $this->get($httpRequest)->decodeBodyToArray();
+        $this->delete($httpRequest)->decodeBodyToArray();
     }
 }

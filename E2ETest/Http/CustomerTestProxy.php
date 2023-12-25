@@ -26,18 +26,4 @@ class CustomerTestProxy extends TestProxy
 
         return $response['success'] ? $response['data'] : [];
     }
-
-    /**
-     *
-     * Creates request to get all countries from system
-     *
-     * @throws HttpRequestException
-     */
-    public function getCustomer(int $customerId): array
-    {
-        $httpRequest = new HttpRequest("/api/customers/$customerId");
-        $response = $this->get($httpRequest)->decodeBodyToArray();
-
-        return $response['success'] ? $response['data'] : [];
-    }
 }

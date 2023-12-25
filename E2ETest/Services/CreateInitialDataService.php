@@ -5,8 +5,9 @@ namespace AdyenPayment\E2ETest\Services;
 use Adyen\Core\Infrastructure\Configuration\ConfigurationManager;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
-use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ServiceRegister;
+use AdyenPayment\Classes\E2ETest\Http\AddressTestProxy;
+use AdyenPayment\E2ETest\Http\CacheTestProxy;
 use AdyenPayment\E2ETest\Http\ShopsTestProxy;
 
 /**
@@ -17,10 +18,6 @@ use AdyenPayment\E2ETest\Http\ShopsTestProxy;
 class CreateInitialDataService extends BaseCreateSeedDataService
 {
     /**
-     * @var ShopsTestProxy
-     */
-    private $shopProxy;
-    /**
      * @var string
      */
     private $baseUrl;
@@ -29,11 +26,9 @@ class CreateInitialDataService extends BaseCreateSeedDataService
      * CreateSeedDataService constructor.
      *
      * @param string $url
-     * @param string $credentials
      */
-    public function __construct(string $url, string $credentials)
+    public function __construct(string $url)
     {
-        $this->shopProxy = new ShopsTestProxy($this->getHttpClient(), 'localhost', $credentials);
         $this->baseUrl = $url;
     }
 
@@ -43,7 +38,7 @@ class CreateInitialDataService extends BaseCreateSeedDataService
      */
     public function createInitialData(): void
     {
-        $this->shopProxy->clearCache();
+        $this->getCacheTestProxy()->clearCache();
         $this->updateBaseUrlAndDefaultShopName();
         $this->createSubStores();
         $this->saveTestHostname();
@@ -58,7 +53,7 @@ class CreateInitialDataService extends BaseCreateSeedDataService
     {
         $host = parse_url($this->baseUrl)['host'];
         $name = $this->readFromJSONFile()['subStores'][0]['name'];
-        $this->shopProxy->updateSubStore(1,
+        $this->getShopsTestProxy()->updateSubStore(1,
             [
                 'host' => $host,
                 'name' => $name,
@@ -74,7 +69,7 @@ class CreateInitialDataService extends BaseCreateSeedDataService
      */
     public function createSubStores(): void
     {
-        $subStoresFromShop = $this->shopProxy->getSubStores();
+        $subStoresFromShop = $this->getShopsTestProxy()->getSubStores();
         if (array_key_exists('total', $subStoresFromShop) && $subStoresFromShop['total'] > 1) {
             return;
         }
@@ -83,7 +78,7 @@ class CreateInitialDataService extends BaseCreateSeedDataService
         $subStoresArrayLength = count($subStores);
         for ($i = 1; $i < $subStoresArrayLength; $i++) {
             $subStores[$i]['host'] = parse_url($this->baseUrl)['host'];
-            $this->shopProxy->createSubStore($subStores[$i]);
+            $this->getShopsTestProxy()->createSubStore($subStores[$i]);
         }
     }
 
@@ -100,18 +95,26 @@ class CreateInitialDataService extends BaseCreateSeedDataService
     }
 
     /**
-     * @return HttpClient
-     */
-    private function getHttpClient(): HttpClient
-    {
-        return ServiceRegister::getService(HttpClient::class);
-    }
-
-    /**
      * @return ConfigurationManager
      */
     private function getConfigurationManager(): ConfigurationManager
     {
         return ServiceRegister::getService(ConfigurationManager::CLASS_NAME);
+    }
+
+    /**
+     * @return CacheTestProxy
+     */
+    private function getCacheTestProxy(): CacheTestProxy
+    {
+        return ServiceRegister::getService(CacheTestProxy::class);
+    }
+
+    /**
+     * @return ShopsTestProxy
+     */
+    private function getShopsTestProxy(): ShopsTestProxy
+    {
+        return ServiceRegister::getService(ShopsTestProxy::class);
     }
 }

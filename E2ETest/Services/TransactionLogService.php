@@ -11,7 +11,11 @@ use Adyen\Core\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Adyen\Core\Infrastructure\ORM\RepositoryRegistry;
 use Adyen\Core\Infrastructure\TaskExecution\QueueItem;
 
-
+/**
+ * Class TransactionLogService
+ *
+ * @package AdyenPayment\E2ETest\Services
+ */
 class TransactionLogService
 {
     /**
@@ -20,6 +24,8 @@ class TransactionLogService
     private $repository;
 
     /**
+     * TransactionLogService constructor
+     *
      * @throws RepositoryNotRegisteredException
      */
     public function __construct()
@@ -28,6 +34,8 @@ class TransactionLogService
     }
 
     /**
+     * Verifies if OrderUpdate queue item is in terminal state for given merchant reference and event code
+     *
      * @param string $merchantReference
      * @param string $eventCode
      * @return bool

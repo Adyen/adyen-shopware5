@@ -99,20 +99,6 @@ class TestProxy
     }
 
     /**
-     * Performs PATCH HTTP request.
-     *
-     * @param HttpRequest $request
-     *
-     * @return HttpResponse Response instance.
-     *
-     * @throws HttpRequestException
-     */
-    protected function patch(HttpRequest $request): HttpResponse
-    {
-        return $this->call(HttpClient::HTTP_METHOD_PATCH, $request);
-    }
-
-    /**
      * Performs HTTP call.
      *
      * @param string $method Specifies which http method is utilized in call.

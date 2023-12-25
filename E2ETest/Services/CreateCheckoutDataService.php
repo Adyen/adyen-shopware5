@@ -2,7 +2,6 @@
 
 namespace AdyenPayment\E2ETest\Services;
 
-use Adyen\Core\BusinessLogic\AdminAPI\AdminAPI;
 use Adyen\Core\BusinessLogic\AdyenAPI\Exceptions\ConnectionSettingsNotFoundException;
 use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ApiCredentialsDoNotExistException;
 use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ApiKeyCompanyLevelException;
@@ -23,7 +22,6 @@ use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\MerchantDoesNotExistExcep
 use Adyen\Core\BusinessLogic\E2ETest\Services\CreateIntegrationDataService;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use AdyenPayment\E2ETest\Http\CountryTestProxy;
-use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\E2ETest\Http\CustomerTestProxy;
 use Doctrine\ORM\OptimisticLockException;
@@ -40,29 +38,10 @@ use Shopware\Models\User\User;
  */
 class CreateCheckoutDataService extends BaseCreateSeedDataService
 {
-    /**
-     * @var CountryTestProxy
-     */
-    private $countryTestProxy;
-    /**
-     * @var CustomerTestProxy
-     */
-    private $customerTestProxy;
-
-    /**
-     * CreateCheckoutDataService constructor.
-     *
-     * @param string $credentials
-     */
-    public function __construct(string $credentials)
-    {
-        $this->countryTestProxy = new CountryTestProxy($this->getHttpClient(), 'localhost', $credentials);
-        $this->customerTestProxy = new CustomerTestProxy($this->getHttpClient(), 'localhost', $credentials);
-    }
 
     /**
      * @param string $testApiKey
-     * @return void
+     * @return int
      * @throws ApiCredentialsDoNotExistException
      * @throws ApiKeyCompanyLevelException
      * @throws ClientKeyGenerationFailedException
@@ -79,6 +58,8 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
      * @throws MerchantDoesNotExistException
      * @throws MerchantIdChangedException
      * @throws ModeChangedException
+     * @throws ORMException
+     * @throws OptimisticLockException
      * @throws PaymentMethodDataEmptyException
      * @throws UserDoesNotHaveNecessaryRolesException
      */
@@ -128,13 +109,13 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     private function activateCountries(): void
     {
         $countriesTestData = array_column($this->readFromJSONFile()['countries'] ?? [], 'iso');
-        $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
+        $shopCountries = $this->getCountryTestProxy()->getCountries()['data'] ?? [];
 
         foreach ($countriesTestData as $country) {
             $indexInArray = array_search($country, array_column($shopCountries, 'iso'), true);
             $countryId = $shopCountries[$indexInArray]['id'];
 
-            $this->countryTestProxy->activateCountry($countryId);
+            $this->getCountryTestProxy()->updateCountry($countryId, ['active' => true]);
         }
     }
 
@@ -147,7 +128,7 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
         $customersTestData = $this->readFromJSONFile()['customers'];
         $customerId = -1;
         foreach ($customersTestData as $customerTestData) {
-            $shopCountries = $this->countryTestProxy->getCountries()['data'] ?? [];
+            $shopCountries = $this->getCountryTestProxy()->getCountries()['data'] ?? [];
             $indexInArray = array_search(
                 $customerTestData['defaultShippingAddress']['country'],
                 array_column($shopCountries, 'iso'),
@@ -157,7 +138,7 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
             $customerTestData['defaultShippingAddress']['country'] = $countryId;
             $customerTestData['defaultBillingAddress']['country'] = $countryId;
 
-            $customerId = $this->customerTestProxy->saveCustomer($customerTestData)['id'] ?? -1;
+            $customerId = $this->getCustomerTestProxy()->saveCustomer($customerTestData)['id'] ?? -1;
         }
 
         return $customerId;
@@ -213,10 +194,18 @@ class CreateCheckoutDataService extends BaseCreateSeedDataService
     }
 
     /**
-     * @return HttpClient
+     * @return CountryTestProxy
      */
-    private function getHttpClient(): HttpClient
+    private function getCountryTestProxy(): CountryTestProxy
     {
-        return ServiceRegister::getService(HttpClient::class);
+        return ServiceRegister::getService(CountryTestProxy::class);
+    }
+
+    /**
+     * @return CustomerTestProxy
+     */
+    private function getCustomerTestProxy(): CustomerTestProxy
+    {
+        return ServiceRegister::getService(CustomerTestProxy::class);
     }
 }
