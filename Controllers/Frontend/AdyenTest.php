@@ -17,6 +17,9 @@ use Adyen\Core\BusinessLogic\Domain\Payment\Exceptions\PaymentMethodDataEmptyExc
 use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\FailedToGenerateHmacException;
 use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\FailedToRegisterWebhookException;
 use Adyen\Core\BusinessLogic\Domain\Webhook\Exceptions\MerchantDoesNotExistException;
+use Adyen\Core\BusinessLogic\E2ETest\Services\AdyenAPIService;
+use Adyen\Core\BusinessLogic\E2ETest\Services\CreateIntegrationDataService;
+use Adyen\Core\BusinessLogic\E2ETest\Services\TransactionLogService;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
@@ -31,12 +34,10 @@ use AdyenPayment\E2ETest\Http\PaymentMethodsTestProxy;
 use AdyenPayment\E2ETest\Http\ShopsTestProxy;
 use AdyenPayment\E2ETest\Http\UserTestProxy;
 use AdyenPayment\E2ETest\Repositories\ShopRepository;
-use AdyenPayment\E2ETest\Services\AdyenAPIService;
 use AdyenPayment\E2ETest\Services\AuthorizationService;
 use AdyenPayment\E2ETest\Services\CreateCheckoutDataService;
 use AdyenPayment\E2ETest\Services\CreateInitialDataService;
 use AdyenPayment\E2ETest\Services\CreateWebhooksDataService;
-use AdyenPayment\E2ETest\Services\TransactionLogService;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Shopware\Components\CSRFWhitelistAware;
@@ -106,7 +107,7 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
             $this->verifyManagementAPI($testApiKey, $liveApiKey);
             $credentials = $this->getAuthorizationCredentials();
             $host = (new ShopRepository())->getDefaultShopHost() ?? 'localhost';
-            $this->registerProxies($credentials, $host);
+            $this->registerProxiesAndServices($credentials, $host);
             $this->createInitialSeedData($url);
             $customerId = $this->createCheckoutSeedData($testApiKey);
             $createWebhookDataService = new CreateWebhooksDataService();
@@ -154,14 +155,21 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
     }
 
     /**
-     * Registers proxies for rest api requests
+     * Registers proxies for rest api requests and core services
      *
      * @param string $credentials
      * @param string $host
      * @return void
      */
-    private function registerProxies(string $credentials, string $host): void
+    private function registerProxiesAndServices(string $credentials, string $host): void
     {
+        ServiceRegister::registerService(
+            CreateIntegrationDataService::class,
+            static function () {
+                return new CreateIntegrationDataService('./custom/plugins/AdyenPayment');
+            }
+        );
+
         ServiceRegister::registerService(
             CacheTestProxy::class,
             static function () use ($credentials, $host) {

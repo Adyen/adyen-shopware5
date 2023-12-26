@@ -4,16 +4,8 @@ namespace AdyenPayment\E2ETest\Services;
 
 use Adyen\Core\BusinessLogic\AdminAPI\AdminAPI;
 use Adyen\Core\BusinessLogic\AdminAPI\OrderMappings\Request\OrderMappingsRequest;
-use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Amount\Amount;
-use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Amount\Currency;
-use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\DataBag;
-use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethodCode;
-use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\StartTransactionRequestContext;
 use Adyen\Core\BusinessLogic\Domain\GeneralSettings\Models\CaptureType;
-use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
-use Adyen\Core\BusinessLogic\Domain\TransactionHistory\Services\TransactionHistoryService;
-use Adyen\Core\BusinessLogic\Domain\Webhook\Models\WebhookConfig;
-use Adyen\Core\BusinessLogic\Domain\Webhook\Repositories\WebhookConfigRepository;
+use Adyen\Core\BusinessLogic\E2ETest\Services\CreateIntegrationDataService;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use AdyenPayment\E2ETest\Http\CountryTestProxy;
 use Adyen\Core\Infrastructure\ServiceRegister;
@@ -54,22 +46,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
      */
     public function getWebhookAuthorizationData(): array
     {
-        /** @var WebhookConfig $webhookConfig */
-        $webhookConfig = StoreContext::doWithStore(1, function () {
-            return $this->getWebhookConfigRepository()->getWebhookConfig();
-        });
-
-        if (!$webhookConfig) {
-            throw new HttpRequestException(
-                'Hmac is undefined due to the unsuccessful creation of the webhook and hmac on the Adyen API.'
-            );
-        }
-
-        $authData['username'] = $webhookConfig->getUsername();
-        $authData['password'] = $webhookConfig->getPassword();
-        $authData['hmac'] = $webhookConfig->getHmac();
-
-        return $authData;
+        return $this->getCreateIntegrationDataService()->getWebhookAuthorizationData();
     }
 
     /**
@@ -80,6 +57,7 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
     public function crateOrderPrerequisitesData(int $customerId): array
     {
         $this->createAdminUsers();
+        $this->getCreateIntegrationDataService()->createGeneralSettingsConfiguration();
         $this->createOrdersMappingConfiguration();
         return $this->createOrders($customerId);
     }
@@ -128,28 +106,12 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
             $orderName = $order['name'];
             unset($order['name']);
             $totalAmount = $this->createOrder($order, $customerId, $customerData, $currencies);
-            StoreContext::doWithStore('1', static function () use ($captureType, $totalAmount, $order) {
-                $transactionContext = new StartTransactionRequestContext(
-                    PaymentMethodCode::parse('scheme'),
-                    Amount::fromFloat(
-                        $totalAmount,
-                        Currency::fromIsoCode(
-                            $order['currency']
-                        )
-                    ),
-                    $order['temporaryId'],
-                    '',
-                    new DataBag([]),
-                    new DataBag([])
-                );
-                /** @var TransactionHistoryService $transactionHistoryService */
-                $transactionHistoryService = ServiceRegister::getService(TransactionHistoryService::class);
-                $transactionHistoryService->createTransactionHistory($transactionContext->getReference(),
-                    $transactionContext->getAmount()->getCurrency(),
-                    $captureType
-                );
-            });
-
+            $this->getCreateIntegrationDataService()->createTransactionHistoryForOrder(
+                $order['temporaryId'],
+                $totalAmount,
+                $order['currency'],
+                $captureType
+            );
             $ordersMerchantReferenceAndAmount[$orderName] = [
                 'merchantReference' => $order['temporaryId'],
                 'amount' => $totalAmount * 100
@@ -275,12 +237,12 @@ class CreateWebhooksDataService extends BaseCreateSeedDataService
     }
 
     /**
-     * Returns WebhookConfigRepository instance
+     * Returns CreateIntegrationDataService instance
      *
-     * @return WebhookConfigRepository
+     * @return CreateIntegrationDataService
      */
-    private function getWebhookConfigRepository(): WebhookConfigRepository
+    private function getCreateIntegrationDataService(): CreateIntegrationDataService
     {
-        return ServiceRegister::getService(WebhookConfigRepository::class);
+        return ServiceRegister::getService(CreateIntegrationDataService::class);
     }
 }

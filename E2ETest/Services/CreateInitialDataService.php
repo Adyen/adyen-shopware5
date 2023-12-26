@@ -2,11 +2,10 @@
 
 namespace AdyenPayment\E2ETest\Services;
 
-use Adyen\Core\Infrastructure\Configuration\ConfigurationManager;
+use Adyen\Core\BusinessLogic\E2ETest\Services\CreateIntegrationDataService;
 use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Adyen\Core\Infrastructure\ServiceRegister;
-use AdyenPayment\Classes\E2ETest\Http\AddressTestProxy;
 use AdyenPayment\E2ETest\Http\CacheTestProxy;
 use AdyenPayment\E2ETest\Http\ShopsTestProxy;
 
@@ -41,7 +40,7 @@ class CreateInitialDataService extends BaseCreateSeedDataService
         $this->getCacheTestProxy()->clearCache();
         $this->updateBaseUrlAndDefaultShopName();
         $this->createSubStores();
-        $this->saveTestHostname();
+        $this->getCreateIntegrationDataService()->saveTestHostname($this->baseUrl);
     }
 
     /**
@@ -83,26 +82,6 @@ class CreateInitialDataService extends BaseCreateSeedDataService
     }
 
     /**
-     * Saves ngrok hostname in database
-     *
-     * @return void
-     * @throws QueryFilterInvalidParamException
-     */
-    private function saveTestHostname(): void
-    {
-        $host = parse_url($this->baseUrl)['host'];
-        $this->getConfigurationManager()->saveConfigValue('testHostname', $host);
-    }
-
-    /**
-     * @return ConfigurationManager
-     */
-    private function getConfigurationManager(): ConfigurationManager
-    {
-        return ServiceRegister::getService(ConfigurationManager::CLASS_NAME);
-    }
-
-    /**
      * @return CacheTestProxy
      */
     private function getCacheTestProxy(): CacheTestProxy
@@ -116,5 +95,15 @@ class CreateInitialDataService extends BaseCreateSeedDataService
     private function getShopsTestProxy(): ShopsTestProxy
     {
         return ServiceRegister::getService(ShopsTestProxy::class);
+    }
+
+    /**
+     * Returns CreateIntegrationDataService instance
+     *
+     * @return CreateIntegrationDataService
+     */
+    private function getCreateIntegrationDataService(): CreateIntegrationDataService
+    {
+        return ServiceRegister::getService(CreateIntegrationDataService::class);
     }
 }
