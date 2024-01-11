@@ -44,7 +44,6 @@
                 url: me.opts.additionalDataUrl + '/isXHR/1',
                 data: additionalData,
                 success: function (response) {
-                    window.location.href = response.nextStepUrl;
                 },
                 error: function () {
                     window.location.href = me.opts.checkoutShippingPaymentUrl;

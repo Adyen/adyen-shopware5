@@ -171,7 +171,7 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
             return;
         }
 
-        if ($response->shouldPresentToShopper() || $response->isRecieved()) {
+        if ($response->shouldPresentToShopper() || $response->isRecieved() || $response->isPending()) {
             $this->saveOrder(
                 $response->getPspReference() ?? $orderReference,
                 $orderReference
@@ -300,18 +300,21 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
     private function handleAdditionalDataAndGetRedirectUrl(array $additionalData): string
     {
         $basketSignature = $this->Request()->get('signature');
-        try {
-            $basket = $this->loadBasketFromSignature($basketSignature);
-            $this->verifyBasketSignature($basketSignature, $basket);
-        } catch (Exception $e) {
-            $this->errorMessageProvider->add(
-                $this->snippets->getNamespace('frontend/adyen/checkout')->get(
-                    'payment/adyen/payment_processing_error',
-                    'Your payment coule not be processed, please resubmit order.'
-                )
-            );
 
-            return Url::getFrontUrl('checkout', 'shippingPayment');
+        if ($basketSignature) {
+            try {
+                $basket = $this->loadBasketFromSignature($basketSignature);
+                $this->verifyBasketSignature($basketSignature, $basket);
+            } catch (Exception $e) {
+                $this->errorMessageProvider->add(
+                    $this->snippets->getNamespace('frontend/adyen/checkout')->get(
+                        'payment/adyen/payment_processing_error',
+                        'Your payment coule not be processed, please resubmit order.'
+                    )
+                );
+
+                return Url::getFrontUrl('checkout', 'shippingPayment');
+            }
         }
 
         $response = CheckoutAPI::get()
