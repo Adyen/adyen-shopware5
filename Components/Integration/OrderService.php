@@ -11,6 +11,7 @@ use AdyenPayment\Repositories\Wrapper\OrderRepository;
 use Adyen\Core\BusinessLogic\Domain\Integration\Order\OrderService as OrderServiceInterface;
 use AdyenPayment\Utilities\Plugin;
 use Doctrine\ORM\OptimisticLockException;
+use Exception;
 use Shopware_Components_Modules;
 use sOrder;
 
@@ -50,12 +51,17 @@ class OrderService implements OrderServiceInterface
 
     /**
      * @inheritDoc
+     * @throws Exception
      */
     public function orderExists(string $merchantReference): bool
     {
         $order = $this->orderRepository->getOrderByTemporaryId($merchantReference);
 
-        return !empty($order) && $order->getShop()->getId() === (int)StoreContext::getInstance()->getStoreId();
+        if (empty($order)) {
+            throw new Exception('Order with cart ID: ' . $merchantReference . ' still not created.');
+        }
+
+        return $order->getShop()->getId() === (int)StoreContext::getInstance()->getStoreId();
     }
 
     /**
