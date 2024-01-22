@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.1.3</version>
+    <version>4.1.4</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -663,6 +663,16 @@
             * Update core to version 1.1.4
             * Include event codes when registrating webhook
             * Fix Webhook test request body
+        </changes>
+    </changelog>
+    <changelog version="4.1.4">
+        <changes lang="en">
+            * Update core to version 1.1.5
+            * Change checkout flow for "Pending" result
+        </changes>
+        <changes lang="de">
+            * Update core to version 1.1.5
+            * Change checkout flow for "Pending" result
         </changes>
     </changelog>
 </plugin>
