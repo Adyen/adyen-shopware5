@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.1.4</version>
+    <version>4.1.5</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -673,6 +673,16 @@
         <changes lang="de">
             * Update core to version 1.1.5
             * Change checkout flow for "Pending" result
+        </changes>
+    </changelog>
+    <changelog version="4.1.5">
+        <changes lang="en">
+            * Update core to version 1.1.6
+            * Update order exist check
+        </changes>
+        <changes lang="de">
+            * Update core to version 1.1.6
+            * Update order exist check
         </changes>
     </changelog>
 </plugin>
