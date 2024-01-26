@@ -42,7 +42,10 @@ class Shopware_Controllers_Backend_AdyenGeneralSettings extends Enlight_Controll
             $requestData['capture'] ?? '',
             $requestData['captureDelay'] ?? 1,
             $requestData['shipmentStatus'] ?? '',
-            $requestData['retentionPeriod'] ?? ''
+            $requestData['retentionPeriod'] ?? '',
+            $requestData['enablePayByLink'] ?? false,
+            $requestData['payByLinkTitle'] ?? '',
+            $requestData['defaultLinkExpirationTime'] ?? '7'
         );
 
         $result = AdminAPI::get()->generalSettings($storeId)->saveGeneralSettings($generalSettingsRequest);

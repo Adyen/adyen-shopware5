@@ -15,16 +15,21 @@ Read our [**contribution guidelines**](https://github.com/Adyen/.github/blob/mas
 
 Note: The Adyen payment plugin is not compatible with the cookie manager plugin (<= 5.6.2), it is however compatible with the Shopware default cookie consent manager (>5.6.2).
 
-## Installation
-Please see our Wiki for the [integration guide](https://github.com/Adyen/adyen-shopware5/wiki) of the plugin to see how to install it.
-
-
 ## Documentation
 Please find the relevant documentation for
- - [Get started with Adyen](https://docs.adyen.com/user-management/get-started-with-adyen)
- - [Shopware 5 plugin integration guide](https://github.com/Adyen/adyen-shopware5/wiki)
+ - [How to start with Adyen](https://docs.adyen.com/user-management/get-started-with-adyen)
+ - [Plugin documentation](https://github.com/Adyen/adyen-shopware5/wiki)
 
-## See [HELP](https://github.com/Adyen/adyen-shopware5/wiki#help) in our Wiki.
+## Support
+
+**Note**: if you are still using an **older version** of the Adyen Shopware 5 integration (**below v4.0**) please refer to [this documentation](https://github.com/Adyen/adyen-shopware5/wiki/Home/2b286ac3ae0a3ddf9dcba1f6fb13e69e0f6d2602).
+
+#### Important information ####
+Support deprecation plan for old plugins Shopware5 (below major release v4.0):
+1. Only critical functionality and security updates until June 2024.
+   Note: the Shopware5 platform will also be [sunset](https://www.shopware.com/en/news/shopware-5-how-it-continues/) from July 2024 onwards.
+2. Only critical security updates from June 2024 until June 2025.
+3. Support will be fully suspended for old Prestashop and Shopware5 plugins from June 2025 onwards.
 
 # For developers
 

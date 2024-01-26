@@ -17,6 +17,7 @@
          }"
          data-checkoutShippingPaymentUrl="{url controller='checkout' action='shippingPayment' sTarget='checkout'}"
          data-additionalActionSelector="#adyen-additional-action"
+         data-skipRedirect="1"
     ></div>
     <script id="adyen-additional-action" type="application/json">{$adyenAction}</script>
     {if $sErrorMessages}

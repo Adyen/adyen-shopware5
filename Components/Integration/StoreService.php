@@ -10,7 +10,6 @@ use Adyen\Core\BusinessLogic\Domain\Stores\Models\StoreOrderStatus;
 use Adyen\Core\Infrastructure\Configuration\ConfigurationManager;
 use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Adyen\Core\Infrastructure\ORM\Interfaces\RepositoryInterface;
-use Adyen\Core\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use Adyen\Webhook\PaymentStates;
 use AdyenPayment\Repositories\Wrapper\OrderRepository;

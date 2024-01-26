@@ -3,9 +3,11 @@
 namespace AdyenPayment\Repositories\Wrapper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Shopware\Models\Order\Order as ShopwareOrder;
 use Shopware\Models\Order\Repository;
+use Shopware\Models\Payment\Payment;
 
 /**
  * Class OrderRepository
@@ -149,5 +151,55 @@ class OrderRepository
         $result = $query->getQuery()->getResult();
 
         return !empty($result) ? $result[0] : null;
+    }
+
+    /**
+     * @param int $idOrder
+     * @param string $temporaryId
+     *
+     * @return ShopwareOrder|null
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function setOrderTemporaryId(int $idOrder, string $temporaryId): ?ShopwareOrder
+    {
+        $query = $this->shopwareRepository->createQueryBuilder('orders');
+        $query->andWhere('orders.id = :id')->setParameter(':id', $idOrder);
+
+        /** @var ShopwareOrder $order */
+        $order = $query->getQuery()->getResult();
+        if (!empty($order)) {
+            $order = $order[0]->setTemporaryId($temporaryId);
+
+            $this->updateOrder($order);
+        }
+
+        return !empty($order) ? $order : null;
+    }
+
+    /**
+     * @param int $idOrder
+     * @param Payment $payment
+     *
+     * @return ShopwareOrder|null
+     *
+     * @throws OptimisticLockException
+     */
+    public function setOrderPayment(int $temporaryId, Payment $payment): ?ShopwareOrder
+    {
+        $query = $this->shopwareRepository->createQueryBuilder('orders');
+        $query->andWhere('orders.temporaryId = :temporaryId')->setParameter(':temporaryId', $temporaryId);
+
+        /** @var ShopwareOrder $order */
+        $order = $query->getQuery()->getResult();
+        if (!empty($order)) {
+            $order = $order[0];
+            $order->setPayment($payment);
+            Shopware()->Models()->persist($order);
+            Shopware()->Models()->flush();
+        }
+
+        return !empty($order) ? $order : null;
     }
 }

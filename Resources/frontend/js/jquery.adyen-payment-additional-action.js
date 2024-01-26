@@ -9,7 +9,8 @@
             checkoutConfigUrl: '',
             additionalDataUrl: '',
             additionalActionSelector: '#adyen-additional-action',
-            checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout'
+            checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
+            skipRedirect: ''
         },
 
         init: function () {
@@ -44,6 +45,10 @@
                 url: me.opts.additionalDataUrl + '/isXHR/1',
                 data: additionalData,
                 success: function (response) {
+                    if (me.opts.skipRedirect) {
+                        return;
+                    }
+
                     window.location.href = response.nextStepUrl;
                 },
                 error: function () {

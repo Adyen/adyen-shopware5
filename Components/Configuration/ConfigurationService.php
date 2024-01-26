@@ -1,8 +1,6 @@
 <?php
 
-
 namespace AdyenPayment\Components\Configuration;
-
 
 use Adyen\Core\BusinessLogic\Domain\Configuration\Configuration;
 use Adyen\Core\Infrastructure\Logger\Logger;
@@ -10,6 +8,11 @@ use AdyenPayment\Components\ShopwareVersionCheck;
 use AdyenPayment\Utilities\Plugin;
 use AdyenPayment\Utilities\Url;
 
+/**
+ * Class ConfigurationService
+ *
+ * @package AdyenPayment\Components\Configuration
+ */
 class ConfigurationService extends Configuration
 {
     private const INTEGRATION_NAME = 'Shopware';
@@ -54,7 +57,7 @@ class ConfigurationService extends Configuration
      */
     public function getPluginName(): string
     {
-        return 'AdyenPayment';
+        return 'Adyen Shopware Plugin';
     }
 
     /**

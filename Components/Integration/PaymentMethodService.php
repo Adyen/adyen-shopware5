@@ -123,7 +123,7 @@ class PaymentMethodService implements ShopPaymentService
     public function updatePaymentMethod(PaymentMethod $method): void
     {
         $store = $this->getCurrentStore();
-        $payment = $this->getPaymentMeanByName(self::ADYEN_NAME_PREFIX . $method->getCode());
+        $payment = $this->getPaymentMeanByName($method->getCode());
 
         if (!$payment && $method->getCode() !== (string)PaymentMethodCode::oney()) {
             throw new PaymentMeanDoesNotExistException(
@@ -228,6 +228,23 @@ class PaymentMethodService implements ShopPaymentService
     }
 
     /**
+     * @param string $name
+     *
+     * @return Payment|null
+     */
+    public function getPaymentMeanByName(string $name): ?Payment
+    {
+        $repository = Shopware()->Models()->getRepository(Payment::class);
+        $query = $repository->createQueryBuilder('paymentmeans');
+        $query->where('paymentmeans.name = :name')
+            ->setParameter('name', self::ADYEN_NAME_PREFIX .  $name);
+
+        $paymentMeans = $query->getQuery()->getResult();
+
+        return $paymentMeans[0] ?? null;
+    }
+
+    /**
      * @return array|Payment[]
      *
      * @throws Exception
@@ -264,23 +281,6 @@ class PaymentMethodService implements ShopPaymentService
     }
 
     /**
-     * @param string $name
-     *
-     * @return Payment|null
-     */
-    private function getPaymentMeanByName(string $name): ?Payment
-    {
-        $repository = Shopware()->Models()->getRepository(Payment::class);
-        $query = $repository->createQueryBuilder('paymentmeans');
-        $query->where('paymentmeans.name = :name')
-            ->setParameter('name', $name);
-
-        $paymentMeans = $query->getQuery()->getResult();
-
-        return $paymentMeans[0] ?? null;
-    }
-
-    /**
      * @param array $names
      *
      * @return Payment[]
@@ -313,7 +313,7 @@ class PaymentMethodService implements ShopPaymentService
             return;
         }
 
-        $payment = $this->getPaymentMeanByName(self::ADYEN_NAME_PREFIX . $method->getCode());
+        $payment = $this->getPaymentMeanByName($method->getCode());
 
         $shops = array_merge([$store], $this->storeRepository->getShopwareLanguageShops([$store->getId()]));
 
@@ -365,7 +365,7 @@ class PaymentMethodService implements ShopPaymentService
         $installments = $additionalData->getSupportedInstallments();
 
         foreach ($installments as $installment) {
-            $payment = $this->getPaymentMeanByName(self::ADYEN_NAME_PREFIX . 'facilypay_' . $installment . 'x');
+            $payment = $this->getPaymentMeanByName( 'facilypay_' . $installment . 'x');
 
             $shops = array_merge([$store], $this->storeRepository->getShopwareLanguageShops([$store->getId()]));
 

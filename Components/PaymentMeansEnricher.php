@@ -9,6 +9,7 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethod
 use Adyen\Core\BusinessLogic\Domain\Payment\Models\PaymentMethod;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Utilities\Plugin;
+use DateTime;
 use Shopware_Components_Snippet_Manager;
 
 /**
@@ -27,43 +28,75 @@ class PaymentMeansEnricher
      */
     private $checkoutConfigProvider;
 
+    /**
+     * @param Shopware_Components_Snippet_Manager $snippets
+     * @param CheckoutConfigProvider $checkoutConfigProvider
+     */
     public function __construct(
-            Shopware_Components_Snippet_Manager $snippets,
-            CheckoutConfigProvider $checkoutConfigProvider
+        Shopware_Components_Snippet_Manager $snippets,
+        CheckoutConfigProvider $checkoutConfigProvider
     ) {
         $this->snippets = $snippets;
         $this->checkoutConfigProvider = $checkoutConfigProvider;
     }
 
+    /**
+     * @param array $paymentMeans
+     *
+     * @return array
+     *
+     * @throws InvalidCurrencyCode
+     */
     public function enrich(array $paymentMeans): array
     {
-        if (AdminAPI::get()->integration(Shopware()->Shop()->getId())->getState()->toArray()!==StateResponse::dashboard(
-                )->toArray()) {
+        if (AdminAPI::get()->integration(Shopware()->Shop()->getId())->getState()->toArray(
+            ) !== StateResponse::dashboard()->toArray()) {
             $this->removeAdyenPaymentMeans($paymentMeans);
 
             return $paymentMeans;
         }
 
         return array_merge(
-                $this->enrichPaymentMeans($paymentMeans),
-                $this->enrichStoredPaymentMeans($paymentMeans)
+            $this->enrichPaymentMeans($paymentMeans),
+            $this->enrichStoredCreditCardPaymentMeans($paymentMeans),
+            $this->enrichRecurringPaymentMeans($paymentMeans)
         );
     }
 
+    /**
+     * @param array $paymentMean
+     * @param string $selectedStoredPaymentMethodId
+     *
+     * @return array
+     * @throws InvalidCurrencyCode
+     */
     public function enrichPaymentMean(array $paymentMean, string $selectedStoredPaymentMethodId = ''): array
     {
         $umbrellaPaymentMean = $this->findUmbrellaPaymentMean([$paymentMean]);
-        if (!empty($umbrellaPaymentMean)) {
-            $enriched = $this->enrichStoredPaymentMeans([$paymentMean], $selectedStoredPaymentMethodId);
+        if (!empty($umbrellaPaymentMean) && $paymentMean['name'] === AdyenPayment::STORED_PAYMENT_UMBRELLA_NAME) {
+            $enriched = $this->enrichStoredCreditCardPaymentMeans([$paymentMean], $selectedStoredPaymentMethodId);
 
-            return !empty($enriched) ? current($enriched):$paymentMean;
+            return !empty($enriched) ? current($enriched) : $paymentMean;
+        }
+
+        if (!empty($selectedStoredPaymentMethodId) && $paymentMean['name'] !== AdyenPayment::STORED_PAYMENT_UMBRELLA_NAME) {
+            $enriched = $this->enrichRecurringPaymentMeans([$paymentMean]);
+
+            return !empty($enriched) ? current($enriched) : $paymentMean;
         }
 
         $enrichedPaymentMeans = $this->enrichPaymentMeans([$paymentMean]);
 
-        return !empty($enrichedPaymentMeans) ? current($enrichedPaymentMeans):[];
+        return !empty($enrichedPaymentMeans) ? current($enrichedPaymentMeans) : [];
     }
 
+    /**
+     * @param array $paymentMeans
+     *
+     * @return array
+     *
+     * @throws InvalidCurrencyCode
+     */
     private function enrichPaymentMeans(array $paymentMeans): array
     {
         $paymentMethodConfigsMap = $this->getPaymentMethodConfigurationMap();
@@ -71,41 +104,48 @@ class PaymentMeansEnricher
         $currencyFactor = Shopware()->Shop()->getCurrency()->getFactor();
 
         return array_map(
-                static function (array $paymentMean) use (
-                        $totalProductsAmount,
-                        $currencyFactor,
-                        $paymentMethodConfigsMap
+            static function (array $paymentMean) use (
+                $totalProductsAmount,
+                $currencyFactor,
+                $paymentMethodConfigsMap
+            ) {
+                $adyenPaymentType = Plugin::getAdyenPaymentType($paymentMean['name']);
+                $paymentMean['isAdyenPaymentMethod'] = Plugin::isAdyenPaymentMean($paymentMean['name']);
+                $paymentMean['isStoredPaymentMethod'] = false;
+                $paymentMean['adyenPaymentType'] = $adyenPaymentType;
+                if (
+                    $paymentMean['isAdyenPaymentMethod'] &&
+                    array_key_exists($paymentMean['adyenPaymentType'], $paymentMethodConfigsMap)
                 ) {
-                    $adyenPaymentType = Plugin::getAdyenPaymentType($paymentMean['name']);
-                    $paymentMean['isAdyenPaymentMethod'] = Plugin::isAdyenPaymentMean($paymentMean['name']);
-                    $paymentMean['isStoredPaymentMethod'] = false;
-                    $paymentMean['adyenPaymentType'] = $adyenPaymentType;
-                    if (
-                            $paymentMean['isAdyenPaymentMethod'] &&
-                            array_key_exists($paymentMean['adyenPaymentType'], $paymentMethodConfigsMap)
-                    ) {
-                        $paymentMethod = $paymentMethodConfigsMap[$paymentMean['adyenPaymentType']];
-                        $paymentMean['image'] = $paymentMethod->getLogo();
-                        $paymentMean['description'] = $paymentMethod->getName();
-                        $paymentMean['additionaldescription'] = $paymentMethod->getDescription();
-                        $paymentMean['surchargeAmount'] = self::calculateSurchargeAmount(
-                                $paymentMethod,
-                                $currencyFactor,
-                                (float)$totalProductsAmount['totalAmount']
-                        );
-                        $paymentMean['surchargeLimit'] = self::calculateSurchargeLimit($paymentMethod);
-                    }
+                    $paymentMethod = $paymentMethodConfigsMap[$paymentMean['adyenPaymentType']];
+                    $paymentMean['image'] = $paymentMethod->getLogo();
+                    $paymentMean['description'] = $paymentMethod->getName();
+                    $paymentMean['additionaldescription'] = $paymentMethod->getDescription();
+                    $paymentMean['surchargeAmount'] = self::calculateSurchargeAmount(
+                        $paymentMethod,
+                        $currencyFactor,
+                        (float)$totalProductsAmount['totalAmount']
+                    );
+                    $paymentMean['surchargeLimit'] = self::calculateSurchargeLimit($paymentMethod);
+                }
 
-                    return $paymentMean;
-                },
-                $this->getOnlyAvailablePaymentMeans($paymentMeans)
+                return $paymentMean;
+            },
+            $this->getOnlyAvailablePaymentMeans($paymentMeans)
         );
     }
 
+    /**
+     * @param PaymentMethod $paymentMethod
+     * @param float $currencyFactor
+     * @param float $productAmount
+     *
+     * @return float
+     */
     private static function calculateSurchargeAmount(
-            PaymentMethod $paymentMethod,
-            float $currencyFactor,
-            float $productAmount
+        PaymentMethod $paymentMethod,
+        float $currencyFactor,
+        float $productAmount
     ): float {
         $surchargeType = $paymentMethod->getSurchargeType();
         $fixedAmount = (float)$paymentMethod->getFixedSurcharge() * $currencyFactor;
@@ -125,12 +165,17 @@ class PaymentMeansEnricher
         if ($surchargeType === 'combined') {
             $amount = ($productAmount + $fixedAmount) / 100 * $percent;
 
-            return $limit ? (min($amount + $fixedAmount, $limit)) : $amount + $fixedAmount ;
+            return $limit ? (min($amount + $fixedAmount, $limit)) : $amount + $fixedAmount;
         }
 
         return 0;
     }
 
+    /**
+     * @param PaymentMethod $paymentMethod
+     *
+     * @return float
+     */
     private static function calculateSurchargeLimit(PaymentMethod $paymentMethod): float
     {
         $surchargeType = $paymentMethod->getSurchargeType();
@@ -146,14 +191,24 @@ class PaymentMeansEnricher
         if ($surchargeType === 'combined') {
             return $paymentMethod->getFixedSurcharge() && $paymentMethod->getSurchargeLimit(
             ) ? $paymentMethod->getSurchargeLimit() - $paymentMethod->getFixedSurcharge(
-                    ) : $paymentMethod->getSurchargeLimit() ?? 0;
+                ) : $paymentMethod->getSurchargeLimit() ?? 0;
         }
 
         return 0;
     }
 
-    private function enrichStoredPaymentMeans(array $paymentMeans, string $selectedStoredPaymentMethodId = ''): array
-    {
+    /**
+     * @param array $paymentMeans
+     * @param string $selectedStoredPaymentMethodId
+     *
+     * @return array
+     *
+     * @throws InvalidCurrencyCode
+     */
+    private function enrichStoredCreditCardPaymentMeans(
+        array $paymentMeans,
+        string $selectedStoredPaymentMethodId = ''
+    ): array {
         $umbrellaPaymentMean = $this->findUmbrellaPaymentMean($paymentMeans);
         if (empty($umbrellaPaymentMean)) {
             return [];
@@ -169,50 +224,115 @@ class PaymentMeansEnricher
         $storedPaymentMethodsResponse = $checkoutConfig->getStoredPaymentMethodResponse();
         if (!empty($selectedStoredPaymentMethodId)) {
             $storedPaymentMethodsResponse = $this->filterSelectedStoredPaymentMethod(
-                    $storedPaymentMethodsResponse,
-                    $selectedStoredPaymentMethodId
+                $storedPaymentMethodsResponse,
+                $selectedStoredPaymentMethodId
             );
         }
 
         return array_map(
-                function (
-                        PaymentMethodResponse $paymentMethodResponse
-                ) use (
-                        $umbrellaPaymentMean,
-                        $paymentMethodConfigsMap
-                ) {
-                    $paymentMean = [
-                            'isAdyenPaymentMethod' => true,
-                            'isStoredPaymentMethod' => true,
-                            'storedPaymentMethodId' => $paymentMethodResponse->getMetaData()['id'],
-                            'adyenPaymentType' => $paymentMethodResponse->getType(),
-                            'description' => $paymentMethodResponse->getName(),
-                            'additionaldescription' => sprintf(
-                                    $this->snippets
-                                            ->getNamespace('frontend/adyen/checkout')
-                                            ->get(
-                                                    'payment/adyen/card_number_ending_on',
-                                                    'Card number ending on: %s',
-                                                    true
-                                            ),
-                                    $paymentMethodResponse->getMetaData()['lastFour']
+            function (
+                PaymentMethodResponse $paymentMethodResponse
+            ) use (
+                $umbrellaPaymentMean,
+                $paymentMethodConfigsMap
+            ) {
+                $paymentMean = [
+                    'isAdyenPaymentMethod' => true,
+                    'isStoredPaymentMethod' => true,
+                    'storedPaymentMethodId' => $paymentMethodResponse->getMetaData()['id'],
+                    'adyenPaymentType' => $paymentMethodResponse->getType(),
+                    'description' => $paymentMethodResponse->getName(),
+                    'additionaldescription' => sprintf(
+                        $this->snippets
+                            ->getNamespace('frontend/adyen/checkout')
+                            ->get(
+                                'payment/adyen/card_number_ending_on',
+                                'Card number ending on: %s',
+                                true
                             ),
-                    ];
+                        $paymentMethodResponse->getMetaData()['lastFour']
+                    ),
+                ];
 
-                    if (array_key_exists($paymentMean['adyenPaymentType'], $paymentMethodConfigsMap)) {
-                        $paymentMethod = $paymentMethodConfigsMap[$paymentMean['adyenPaymentType']];
-                        $paymentMean['image'] = $paymentMethod->getLogo();
-                        $paymentMean['additionaldescription'] = implode(
-                                '. ', [$paymentMethod->getDescription(), $paymentMean['additionaldescription']]
-                        );
-                    }
+                if (array_key_exists($paymentMean['adyenPaymentType'], $paymentMethodConfigsMap)) {
+                    $paymentMethod = $paymentMethodConfigsMap[$paymentMean['adyenPaymentType']];
+                    $paymentMean['image'] = $paymentMethod->getLogo();
+                    $paymentMean['additionaldescription'] = implode(
+                        '. ', [$paymentMethod->getDescription(), $paymentMean['additionaldescription']]
+                    );
+                }
 
-                    return array_merge($umbrellaPaymentMean, $paymentMean);
-                },
-                $storedPaymentMethodsResponse
+                return array_merge($umbrellaPaymentMean, $paymentMean);
+            },
+            $storedPaymentMethodsResponse
         );
     }
 
+    /**
+     * @param array $paymentMeans
+     *
+     * @return array
+     *
+     * @throws InvalidCurrencyCode
+     */
+    private function enrichRecurringPaymentMeans(array $paymentMeans): array
+    {
+        $paymentMethodConfigsMap = $this->getPaymentMethodConfigurationMap();
+        $checkoutConfig = $this->checkoutConfigProvider->getCheckoutConfig();
+
+        if (!$checkoutConfig->isSuccessful()) {
+            return [];
+        }
+
+        $storedPaymentMethodsResponse = $checkoutConfig->getRecurringPaymentMethodResponse();
+
+        return array_map(
+            function (
+                PaymentMethodResponse $paymentMethodResponse
+            ) use ($paymentMethodConfigsMap, $paymentMeans) {
+                $shopwareMean = $this->findStoredPaymentMean($paymentMeans, $paymentMethodResponse->getType());
+                $paymentMean = [
+                    'isAdyenPaymentMethod' => true,
+                    'isStoredPaymentMethod' => true,
+                    'storedPaymentMethodId' => $paymentMethodResponse->getMetaData(
+                    )['RecurringDetail']['recurringDetailReference'],
+                    'adyenPaymentType' => $paymentMethodResponse->getType(),
+                    'description' => $shopwareMean['description'],
+                    'additionaldescription' => sprintf(
+                        $this->snippets
+                            ->getNamespace('frontend/adyen/checkout')
+                            ->get(
+                                'payment/adyen/recurring_methods_title',
+                                'Created on: %s',
+                                true
+                            ),
+                        (new DateTime(
+                            $paymentMethodResponse->getMetaData()['RecurringDetail']['creationDate']
+                        ))->format('Y-m-d')
+                    ),
+                ];
+
+                if (array_key_exists($paymentMean['adyenPaymentType'], $paymentMethodConfigsMap)) {
+                    $paymentMethod = $paymentMethodConfigsMap[$paymentMean['adyenPaymentType']];
+                    $paymentMean['image'] = $paymentMethod->getLogo();
+                    $paymentMean['additionaldescription'] = implode(
+                        '. ', [$paymentMethod->getDescription(), $paymentMean['additionaldescription']]
+                    );
+                }
+
+                return array_merge($shopwareMean, $paymentMean);
+            },
+            $storedPaymentMethodsResponse
+        );
+    }
+
+    /**
+     * @param array $paymentMeans
+     *
+     * @return array
+     *
+     * @throws InvalidCurrencyCode
+     */
     private function getOnlyAvailablePaymentMeans(array $paymentMeans): array
     {
         $checkoutConfig = $this->checkoutConfigProvider->getCheckoutConfig();
@@ -225,15 +345,15 @@ class PaymentMeansEnricher
         }
 
         return array_filter(
-                array_map(static function (array $paymentMean) use ($availablePaymentMethodTypes) {
-                    if (!Plugin::isAdyenPaymentMean($paymentMean['name'])) {
-                        return $paymentMean;
-                    }
+            array_map(static function (array $paymentMean) use ($availablePaymentMethodTypes) {
+                if (!Plugin::isAdyenPaymentMean($paymentMean['name'])) {
+                    return $paymentMean;
+                }
 
-                    $paymentMeanType = Plugin::getAdyenPaymentType($paymentMean['name']);
+                $paymentMeanType = Plugin::getAdyenPaymentType($paymentMean['name']);
 
-                    return in_array($paymentMeanType, $availablePaymentMethodTypes, true) ? $paymentMean:null;
-                }, $paymentMeans)
+                return in_array($paymentMeanType, $availablePaymentMethodTypes, true) ? $paymentMean : null;
+            }, $paymentMeans)
         );
     }
 
@@ -256,10 +376,32 @@ class PaymentMeansEnricher
         return $paymentMethodConfigsMap;
     }
 
+    /**
+     * @param array $paymentMeans
+     *
+     * @return array
+     */
     private function findUmbrellaPaymentMean(array $paymentMeans): array
     {
         foreach ($paymentMeans as $paymentMean) {
-            if ($paymentMean['name']===AdyenPayment::STORED_PAYMENT_UMBRELLA_NAME) {
+            if ($paymentMean['name'] === AdyenPayment::STORED_PAYMENT_UMBRELLA_NAME) {
+                return $paymentMean;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array $paymentMeans
+     * @param string $methodType
+     *
+     * @return array
+     */
+    private function findStoredPaymentMean(array $paymentMeans, string $methodType): array
+    {
+        foreach ($paymentMeans as $paymentMean) {
+            if (str_replace('adyen_', '', $paymentMean['name']) === $methodType) {
                 return $paymentMean;
             }
         }
@@ -270,14 +412,15 @@ class PaymentMeansEnricher
     /**
      * @param PaymentMethodResponse[] $storedPaymentMethodsResponse
      * @param string $selectedStoredPaymentMethodId
+     *
      * @return PaymentMethodResponse[]
      */
     private function filterSelectedStoredPaymentMethod(
-            array $storedPaymentMethodsResponse,
-            string $selectedStoredPaymentMethodId
+        array $storedPaymentMethodsResponse,
+        string $selectedStoredPaymentMethodId
     ): array {
         foreach ($storedPaymentMethodsResponse as $paymentMethodResponse) {
-            if ($paymentMethodResponse->getMetaData()['id']===$selectedStoredPaymentMethodId) {
+            if ($paymentMethodResponse->getMetaData()['id'] === $selectedStoredPaymentMethodId) {
                 return [$paymentMethodResponse];
             }
         }
@@ -285,10 +428,15 @@ class PaymentMeansEnricher
         return [];
     }
 
+    /**
+     * @param array $paymentMeans
+     *
+     * @return void
+     */
     private function removeAdyenPaymentMeans(array &$paymentMeans)
     {
         foreach ($paymentMeans as $key => $paymentMean) {
-            if (strpos($paymentMean['name'], 'adyen')!==false) {
+            if (strpos($paymentMean['name'], 'adyen') !== false) {
                 unset($paymentMeans[$key]);
             }
         }

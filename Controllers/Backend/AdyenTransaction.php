@@ -6,6 +6,7 @@ use Adyen\Core\BusinessLogic\Domain\TransactionHistory\Services\TransactionDetai
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\Controllers\Common\AjaxResponseSetter;
 use AdyenPayment\Models\TransactionLogEntity;
+use AdyenPayment\Repositories\Wrapper\OrderRepository;
 
 class Shopware_Controllers_Backend_AdyenTransaction extends Shopware_Controllers_Backend_ExtJs
 {
@@ -33,7 +34,12 @@ class Shopware_Controllers_Backend_AdyenTransaction extends Shopware_Controllers
      */
     public function getAction(): void
     {
-        $merchantReference = $this->Request()->get('temporaryId');
+        $orderId = $this->Request()->get('id');
+        $temporaryId = $this->Request()->get('temporaryId');
+        $order = $orderId ?
+            $this->getOrderRepository()->getOrderById($orderId) :
+            $this->getOrderRepository()->getOrderByTemporaryId((string)$temporaryId);
+        $merchantReference = $order->getTemporaryId();
         $storeId = $this->Request()->get('storeId');
         $result = StoreContext::doWithStore(
             $storeId,
@@ -58,5 +64,13 @@ class Shopware_Controllers_Backend_AdyenTransaction extends Shopware_Controllers
             [ServiceRegister::getInstance(), 'getService'],
             [TransactionDetailsService::class]
         );
+    }
+
+    /**
+     * @return OrderRepository
+     */
+    private function getOrderRepository(): OrderRepository
+    {
+        return Shopware()->Container()->get(OrderRepository::class);
     }
 }
