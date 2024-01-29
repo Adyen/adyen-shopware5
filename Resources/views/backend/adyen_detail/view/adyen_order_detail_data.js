@@ -13,7 +13,16 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
         ];
 
         me.store.on('datachanged', function (store, records, options) {
-            me.record = store.last();
+            let record = null,
+                dataStore = store.data.items;
+
+            [...dataStore].reverse().forEach(item => {
+                if (item.data.eventCode === 'AUTHORISATION' && record === null) {
+                    record = item;
+                }
+            });
+
+            me.record = record;
             me.detailsPanel.loadRecord(me.record);
             me.query('#adyenPaymentMethod')[0].setSrc(me.record.get('paymentMethod'));
             me.query('#captureCurrency')[0].setValue(me.record.get('amountCurrency'));
