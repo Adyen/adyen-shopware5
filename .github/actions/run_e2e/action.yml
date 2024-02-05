@@ -1,0 +1,183 @@
+﻿name: 'Run E2E Tests'
+description: "Runs Adyen Shopware E2E Tests"
+
+inputs:
+  GH_PAT:
+    description: "Personal access token for the repository"
+    required: true
+  SHOPWARE:
+    description: "The Shopware version that is used to run the tests."
+    required: true
+  PHP:
+    description: "The PHP Version that is used for the Shopware container."
+    required: true
+  API_KEY_TEST:
+    description: "The test api key for adyen."
+    required: true
+  API_KEY_LIVE:
+    description: "The live api key for adyen."
+    required: true
+  MERCHANT_ACCOUNT_TEST:
+    description: "The adyen test account on merchant level."
+    required: true
+  MERCHANT_ACCOUNT_LIVE:
+    description: "The adyen live account on merchant level."
+    required: true
+  PAY_PAL_EMAIL:
+    description: "The email of the payPal test account."
+    required: true
+  PAY_PAL_PASSWORD:
+    description: "The password of the payPal test account."
+    required: true
+  ADMIN_USERNAME:
+    description: "The username for the backoffice."
+    required: true
+  ADMIN_PASSWORD:
+    description: "The password for the backoffice."
+    required: true
+  PORT:
+    description: "The port of the shop."
+    required: true
+  BROWSER:
+    description: "The browser that will be used for tests"
+    required: true
+  DEVICE:
+    description: "The device on which the tests will be run"
+    required: true
+  NGROK:
+    description: "The token of the ngrok."
+    required: true
+  NODE:
+    description: "The Node Version that is used for the E2E Tests."
+    required: true
+  SHOPWARE_TEST_REPO:
+    description: "The repository housing the shopware5 e2e tests"
+    required: true
+  COMMON_TEST_REPO:
+    description: "The repository housing the common part of the e2e tests"
+    required: true
+  _ZIP_FILE:
+    description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
+    default: '~/.build/AdyenPayment.zip'
+    required: false
+runs:
+  using: "composite"
+  steps:
+
+    - name: Download Docker
+      shell: bash
+      run: docker pull -q dockware/play:${{ inputs.SHOPWARE }}
+
+    - name: Start Docker
+      shell: bash
+      run: |
+        docker run -p ${{ inputs.PORT }}:443 -p 80:80  --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
+        sleep 30
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = 'localhost', hosts = '', secure = 0;\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_auth SET localeID = (SELECT id FROM s_core_locales WHERE locale = 'en_GB');\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO s_core_config_values (element_id, shop_id, value) SELECT id, 1, 'b:0;' FROM s_core_config_elements WHERE name LIKE '%installationSurvey%' AND (SELECT COUNT(*) FROM s_core_config_elements WHERE name LIKE '%installationSurvey%') = 1;\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO s_core_config_values (element_id, shop_id, value) SELECT id, 1, 'b:0;' FROM s_core_config_elements WHERE name LIKE '%benchmarkTeaser%' AND (SELECT COUNT(*) FROM s_core_config_elements WHERE name LIKE '%benchmarkTeaser%') = 1;\""
+
+    - name: Upload ZIP File to Docker
+      shell: bash
+      run: |
+        docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/AdyenPayment.zip
+        docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o AdyenPayment.zip'
+
+
+    - name: Install Plugin
+      shell: bash
+      run: |
+        docker exec shop bash -c 'php bin/console sw:plugin:deactivate SwagUpdate'
+        docker exec shop bash -c 'php bin/console sw:plugin:refresh'
+        docker exec shop bash -c 'php bin/console sw:plugin:install --activate AdyenPayment'
+        docker exec shop bash -c 'php bin/console sw:cache:clear'
+
+    - name: Clone Code
+      uses: actions/checkout@v3
+      with:
+        repository: ${{inputs.SHOPWARE_TEST_REPO}}
+        path: tests
+        token: ${{ inputs.GH_PAT }}
+        ref: master
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.NODE }}
+
+    - name: Install Node dependencies
+      working-directory: ./tests
+      run:
+        npm install
+      shell: bash
+
+    - name: Install common
+      shell: bash
+      run: npm install https://${{inputs.GH_PAT}}@github.com/${{inputs.COMMON_TEST_REPO}}#master
+
+    - name: Install Playwright Browsers
+      working-directory: ./tests
+      shell: bash
+      run: npx playwright install --with-deps > /dev/null
+
+    - name: Run Playwright tests
+      shell: bash
+      working-directory: ./tests
+      run: npm run test
+      env:
+        API_KEY_TEST: ${{ inputs.API_KEY_TEST }}
+        API_KEY_LIVE: ${{ inputs.API_KEY_LIVE }}
+        MERCHANT_ACCOUNT_TEST: ${{ inputs.MERCHANT_ACCOUNT_TEST }}
+        MERCHANT_ACCOUNT_LIVE: ${{ inputs.MERCHANT_ACCOUNT_LIVE }}
+        PORT: ${{ inputs.PORT }}
+        ADMIN_USERNAME: ${{ inputs.ADMIN_USERNAME }}
+        ADMIN_PASSWORD: ${{ inputs.ADMIN_PASSWORD }}
+        NGROK: ${{ inputs.NGROK }}
+        TEST_PATH: "/AdyenTest/index"
+        WEBHOOK_PATH: "/AdyenWebhook/index/storeId/1"
+        ADMIN_PATH: "/backend"
+        PAY_PAL_EMAIL: ${{ inputs.PAY_PAL_EMAIL }}
+        PAY_PAL_PASSWORD: ${{ inputs.PAY_PAL_PASSWORD }}
+        BROWSER: ${{ inputs.BROWSER }}
+        DEVICE: ${{ inputs.DEVICE }}
+        
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report-Shopware-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
+        path: ./tests/playwright-report/
+        retention-days: 30
+    - name: Add docker logs to file
+      if: always()
+      shell: bash
+      run: docker logs shop >& ./dockerLogs.log
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: docker-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
+        path: ./dockerLogs.log
+        retention-days: 30
+    - name: Get current date
+      if: always()
+      id: date
+      shell: bash
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+    - name: Add integration logs to file
+      if: always()
+      shell: bash
+      run: docker exec shop bash -c 'cat var/log/adyen_payment_production-${{ steps.date.outputs.date }}.log' >& ./integrationLogs.log
+    - name: Add integration logs to file
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: integration-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
+        path: ./integrationLogs.log
+        retention-days: 30
+    - name: Remove Ayden plugin
+      shell: bash
+      if: always()
+      run: |
+        docker exec shop bash -c 'php bin/console sw:plugin:uninstall AdyenPayment'
+        docker exec shop bash -c 'php bin/console sw:plugin:delete AdyenPayment'
+        docker exec shop bash -c 'php bin/console sw:cache:clear'

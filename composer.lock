@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "068dcd8bad47dbf3f574072c84c84348",
+    "content-hash": "456f50110f25f40278f36daf1b66c857",
     "packages": [
         {
             "name": "adyen/integration-core",
-            "version": "1.1.6",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "git@github.com:Adyen/adyen-php-plugin-core.git",
-                "reference": "f3236056b6ff20bb2cadf4ef3666f646c8d7fd48"
+                "url": "git@github.com:logeecom-dev/adyen-php-plugin-core.git",
+                "reference": "16d03b98fdbb82310ed56b3e4542bded5164b1e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Adyen/adyen-php-plugin-core/zipball/f3236056b6ff20bb2cadf4ef3666f646c8d7fd48",
-                "reference": "f3236056b6ff20bb2cadf4ef3666f646c8d7fd48",
+                "url": "https://api.github.com/repos/logeecom-dev/adyen-php-plugin-core/zipball/16d03b98fdbb82310ed56b3e4542bded5164b1e5",
+                "reference": "16d03b98fdbb82310ed56b3e4542bded5164b1e5",
                 "shasum": ""
             },
             "require": {
@@ -30,6 +30,7 @@
                 "phpunit/phpunit": "^8.5",
                 "symfony/console": "^4.4"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -48,7 +49,7 @@
                 "proprietary"
             ],
             "description": "Core Adyen integration library",
-            "time": "2024-01-22T10:10:15+00:00"
+            "time": "2024-01-30T17:00:06+00:00"
         },
         {
             "name": "adyen/php-webhook-module",
@@ -97,7 +98,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "adyen/integration-core": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
