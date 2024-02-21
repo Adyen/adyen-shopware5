@@ -10,6 +10,7 @@ use Adyen\Core\BusinessLogic\Domain\Payment\Repositories\PaymentMethodConfigRepo
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\PaymentMeansEnricher;
+use AdyenPayment\Utilities\Shop;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
 use Exception;
@@ -83,7 +84,7 @@ final class EnrichPaymentSubscriber implements SubscriberInterface
         $repository = ServiceRegister::getService(PaymentMethodConfigRepository::class);
 
         $cardConfig = StoreContext::doWithStore(
-            '' . Shopware()->Shop()->getId(),
+            '' . Shop::getShopId(),
             [$repository, 'getPaymentMethodByCode'],
             [(string)PaymentMethodCode::scheme()]
         );
