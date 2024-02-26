@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.1.6</version>
+    <version>4.1.7</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -691,6 +691,16 @@
         </changes>
         <changes lang="de">
             * Fix displaying original PSP reference on order details page
+        </changes>
+    </changelog>
+    <changelog version="4.1.7">
+        <changes lang="en">
+            * Add support for language shops
+            * Wake Task runner when Adyen page is opened
+        </changes>
+        <changes lang="de">
+            * Add support for language shops
+            * Wake Task runner when Adyen page is opened
         </changes>
     </changelog>
 </plugin>
