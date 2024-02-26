@@ -2,8 +2,11 @@
 
 use Adyen\Core\BusinessLogic\CheckoutAPI\CheckoutAPI;
 use Adyen\Core\BusinessLogic\CheckoutAPI\Donations\Request\MakeDonationRequest;
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\InvalidCurrencyCode;
+use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ConnectionSettingsNotFountException;
 use AdyenPayment\Components\ErrorMessageProvider;
 use AdyenPayment\Controllers\Common\AjaxResponseSetter;
+use AdyenPayment\Utilities\Shop;
 
 /**
  * Class Shopware_Controllers_Frontend_AdyenDonations
@@ -43,6 +46,7 @@ class Shopware_Controllers_Frontend_AdyenDonations extends Shopware_Controllers_
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     public function preDispatch(): void
@@ -52,23 +56,36 @@ class Shopware_Controllers_Frontend_AdyenDonations extends Shopware_Controllers_
         $this->snippets = $this->get('snippets');
     }
 
+    /**
+     * @return void
+     *
+     * @throws ConnectionSettingsNotFountException
+     * @throws Exception
+     */
     public function getDonationsConfigAction(): void
     {
         $merchantReference = $this->Request()->get('merchantReference');
         $currencyFactor = Shopware()->Shop()->getCurrency()->getFactor();
         $result = CheckoutAPI::get()
-            ->donation(Shopware()->Shop()->getId())
+            ->donation(Shop::getShopId())
             ->getDonationSettings($merchantReference, empty($currencyFactor) ? 1 : $currencyFactor);
 
         $this->returnAPIResponse($result);
     }
 
+    /**
+     * @return void
+     *
+     * @throws ConnectionSettingsNotFountException
+     * @throws InvalidCurrencyCode
+     * @throws Exception
+     */
     public function makeDonationsAction(): void
     {
         $params = $this->Request()->getParams();
 
         $result = CheckoutAPI::get()
-                ->donation(Shopware()->Shop()->getId())
+                ->donation(Shop::getShopId())
                 ->makeDonation(
                         new MakeDonationRequest(
                                 $params['amount']['value'] ?? '',

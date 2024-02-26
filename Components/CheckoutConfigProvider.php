@@ -13,6 +13,7 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Amount\Curren
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Country;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethodCode;
 use Adyen\Core\BusinessLogic\Domain\Payment\Models\MethodAdditionalData\CardConfig;
+use AdyenPayment\Utilities\Shop;
 use Enlight_Components_Session_Namespace;
 use Shopware\Models\Customer\Customer;
 
@@ -41,7 +42,10 @@ class CheckoutConfigProvider
     }
 
     /**
+     * @param Amount|null $forceAmount
+     *
      * @return Response
+     *
      * @throws InvalidCurrencyCode
      */
     public function getCheckoutConfig(?Amount $forceAmount = null): Response
@@ -50,7 +54,7 @@ class CheckoutConfigProvider
 
         $response = $this->getCheckoutConfigResponse($request, false, static function (PaymentCheckoutConfigRequest $request) {
             return CheckoutAPI::get()
-                ->checkoutConfig(Shopware()->Shop()->getId())
+                ->checkoutConfig(Shop::getShopId())
                 ->getPaymentCheckoutConfig($request);
         });
 
@@ -71,7 +75,9 @@ class CheckoutConfigProvider
 
     /**
      * @param Amount|null $forceAmount
+     *
      * @return Response
+     *
      * @throws InvalidCurrencyCode
      */
     public function getExpressCheckoutConfig(Amount $forceAmount): Response
@@ -80,7 +86,7 @@ class CheckoutConfigProvider
 
         return $this->getCheckoutConfigResponse($request, true, static function (PaymentCheckoutConfigRequest $request) {
             return CheckoutAPI::get()
-                ->checkoutConfig(Shopware()->Shop()->getId())
+                ->checkoutConfig(Shop::getShopId())
                 ->getExpressPaymentCheckoutConfig($request);
         });
     }
@@ -109,7 +115,7 @@ class CheckoutConfigProvider
 
         $shop = Shopware()->Shop();
         $userId = (int)$this->session->offsetGet('sUserId');
-        $shopperReference = ($userId !== 0) ? $shop->getHost() . '_' . $shop->getId() . '_' . $userId : null;
+        $shopperReference = ($userId !== 0) ? $shop->getHost() . '_' . Shop::getShopId() . '_' . $userId : null;
 
         return new PaymentCheckoutConfigRequest(
             $this->getAmount($forceAmount),
@@ -123,7 +129,9 @@ class CheckoutConfigProvider
      * Gets the response from cache or makes the response and cache the result by calling $responseCallback
      *
      * @param PaymentCheckoutConfigRequest $request
+     * @param bool $isExpressCheckout
      * @param callable $responseCallback
+     *
      * @return Response|PaymentCheckoutConfigResponse
      */
     private function getCheckoutConfigResponse(

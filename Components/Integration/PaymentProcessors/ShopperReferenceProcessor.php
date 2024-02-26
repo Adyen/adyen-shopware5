@@ -8,6 +8,7 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\ShopperRefere
 use Adyen\Core\BusinessLogic\Domain\Integration\Processors\PaymentLinkRequest\ShopperReferenceProcessor as PaymentLinkShopperReferenceProcessorInterface;
 use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
 use AdyenPayment\Repositories\Wrapper\OrderRepository;
+use AdyenPayment\Utilities\Shop;
 use Exception;
 
 /**
@@ -35,7 +36,7 @@ class ShopperReferenceProcessor implements PaymentLinkShopperReferenceProcessorI
      * @param PaymentLinkRequestContext $context
      *
      * @return void
-     * 
+     *
      * @throws Exception
      */
     public function processPaymentLink(PaymentLinkRequestBuilder $builder, PaymentLinkRequestContext $context): void
@@ -53,7 +54,7 @@ class ShopperReferenceProcessor implements PaymentLinkShopperReferenceProcessorI
 
         $builder->setShopperReference(
             ShopperReference::parse(
-                $shop->getHost() . '_' . $shop->getId() . '_' . $order->getCustomer()->getId()
+                $shop->getHost() . '_' . Shop::getShopId() . '_' . $order->getCustomer()->getId()
             )
         );
     }

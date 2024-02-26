@@ -9,6 +9,7 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethod
 use Adyen\Core\BusinessLogic\Domain\Payment\Models\PaymentMethod;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Utilities\Plugin;
+use AdyenPayment\Utilities\Shop;
 use DateTime;
 use Shopware_Components_Snippet_Manager;
 
@@ -49,8 +50,7 @@ class PaymentMeansEnricher
      */
     public function enrich(array $paymentMeans): array
     {
-        if (AdminAPI::get()->integration(Shopware()->Shop()->getId())->getState()->toArray(
-            ) !== StateResponse::dashboard()->toArray()) {
+        if (AdminAPI::get()->integration(Shop::getShopId())->getState()->toArray() !== StateResponse::dashboard()->toArray()) {
             $this->removeAdyenPaymentMeans($paymentMeans);
 
             return $paymentMeans;
