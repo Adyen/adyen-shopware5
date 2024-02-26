@@ -15,6 +15,11 @@ Read our [**contribution guidelines**](https://github.com/Adyen/.github/blob/mas
 
 Note: The Adyen payment plugin is not compatible with the cookie manager plugin (<= 5.6.2), it is however compatible with the Shopware default cookie consent manager (>5.6.2).
 
+### Current Checkout API version
+##### v69
+### Current Checkout Component version:
+#####  5.31.1
+
 ## Documentation
 Please find the relevant documentation for
  - [How to start with Adyen](https://docs.adyen.com/user-management/get-started-with-adyen)
