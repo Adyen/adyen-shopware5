@@ -2,6 +2,7 @@
 
 namespace AdyenPayment\Components\Integration;
 
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethodCode;
 use Adyen\Core\BusinessLogic\Domain\Integration\Payment\ShopPaymentService;
 use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
 use Adyen\Core\BusinessLogic\Domain\Payment\Services\PaymentService;
@@ -22,6 +23,9 @@ use sOrder;
  */
 class OrderService implements OrderServiceInterface
 {
+    /** @var string */
+    private const APPLE_PAY = 'applepay';
+
     /**
      * @var OrderRepository
      */
@@ -140,7 +144,16 @@ class OrderService implements OrderServiceInterface
         if (in_array($methodName, PaymentService::CREDIT_CARD_BRANDS, true)) {
             $methodName = PaymentService::CREDIT_CARD_CODE;
         }
+
+        if (str_contains($methodName, self::APPLE_PAY)) {
+            $methodName = self::APPLE_PAY;
+        }
+
         $paymentMean = $this->getPaymentMethodService()->getPaymentMeanByName($methodName);
+
+        if (!$paymentMean) {
+            return;
+        }
 
         if (Plugin::isAdyenPaymentMean($orderPaymentMean->getName()) &&
             $paymentMean->getId() === $orderPaymentMean->getId()) {
