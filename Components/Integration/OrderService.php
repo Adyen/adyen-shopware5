@@ -2,7 +2,6 @@
 
 namespace AdyenPayment\Components\Integration;
 
-use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethodCode;
 use Adyen\Core\BusinessLogic\Domain\Integration\Payment\ShopPaymentService;
 use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
 use Adyen\Core\BusinessLogic\Domain\Payment\Services\PaymentService;
