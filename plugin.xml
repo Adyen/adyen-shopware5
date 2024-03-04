@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.1.7</version>
+    <version>4.1.8</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -701,6 +701,16 @@
         <changes lang="de">
             * Add support for language shops
             * Wake Task runner when Adyen page is opened
+        </changes>
+    </changelog>
+    <changelog version="4.1.8">
+        <changes lang="en">
+            * Fix Apple pay payments processing
+            * Update core version to 1.1.10
+        </changes>
+        <changes lang="de">
+            * Fix Apple pay payments processing
+            * Update core version to 1.1.10
         </changes>
     </changelog>
 </plugin>
