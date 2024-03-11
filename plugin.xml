@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.1.8</version>
+    <version>4.1.9</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -711,6 +711,18 @@
         <changes lang="de">
             * Fix Apple pay payments processing
             * Update core version to 1.1.10
+        </changes>
+    </changelog>
+    <changelog version="4.1.9">
+        <changes lang="en">
+            * Remove 'New' and 'Pending' order status from Order status mapping
+            * Update core version to 1.1.11
+            * Fix Adyen button listeners on order details page
+        </changes>
+        <changes lang="de">
+            * Remove 'New' and 'Pending' order status from Order status mapping
+            * Update core version to 1.1.11
+            * Fix Adyen button listeners on order details page
         </changes>
     </changelog>
 </plugin>
