@@ -22,32 +22,39 @@ Ext.define('Shopware.apps.AdyenTransaction.controller.OrderDetailsController', {
         // me.callParent will execute the init function of the overridden controller
         me.callParent(arguments);
 
-        if (cancelBtn !== null && !cancelBtn.hasListener('click')) {
+        if (cancelBtn !== null && !cancelBtn.adyenClickAttached) {
             cancelBtn.on('click', me.cancel.bind(me));
+            cancelBtn.adyenClickAttached = true;
         }
 
-        if (captureBtn !== null && !captureBtn.hasListener('click')) {
+        if (captureBtn !== null && !captureBtn.adyenClickAttached) {
             captureBtn.on('click', me.capture.bind(me));
+            captureBtn.adyenClickAttached = true;
         }
 
-        if (refundBtn !== null && !refundBtn.hasListener('click')) {
+        if (refundBtn !== null && !refundBtn.adyenClickAttached) {
             refundBtn.on('click', me.refund.bind(me));
+            refundBtn.adyenClickAttached = true;
         }
 
-        if (generateLinkBtn !== null && !generateLinkBtn.hasListener('click')) {
+        if (generateLinkBtn !== null && !generateLinkBtn.adyenClickAttached) {
             generateLinkBtn.on('click', me.generatePaymentLink.bind(me));
+            generateLinkBtn.adyenClickAttached = true;
         }
 
-        if (copyLinkBtn !== null && !copyLinkBtn.hasListener('click')) {
+        if (copyLinkBtn !== null && !copyLinkBtn.adyenClickAttached) {
             copyLinkBtn.on('click', me.copyPaymentLink.bind(me));
+            copyLinkBtn.adyenClickAttached = true;
         }
 
-        if (generateLinkNonAdyenOrderBtn !== null && !generateLinkNonAdyenOrderBtn.hasListener('click')) {
+        if (generateLinkNonAdyenOrderBtn !== null && !generateLinkNonAdyenOrderBtn.adyenClickAttached) {
             generateLinkNonAdyenOrderBtn.on('click', me.generateLinkNonAdyenOrder.bind(me));
+            generateLinkNonAdyenOrderBtn.adyenClickAttached = true;
         }
 
-        if (copyLinkNonAdyenOrderBtn !== null && !copyLinkNonAdyenOrderBtn.hasListener('click')) {
+        if (copyLinkNonAdyenOrderBtn !== null && !copyLinkNonAdyenOrderBtn.adyenClickAttached) {
             copyLinkNonAdyenOrderBtn.on('click', me.copyLinkNonAdyenOrder.bind(me));
+            copyLinkNonAdyenOrderBtn.adyenClickAttached = true;
         }
     },
 
