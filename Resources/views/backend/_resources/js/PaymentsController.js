@@ -258,6 +258,8 @@ if (!window.AdyenFE) {
         'directEbanking'
     ];
 
+    const supportsAuthorizationType = ['scheme'];
+
     /**
      * @typedef AdditionalDataConfig
      * @property {boolean?} showLogos
@@ -284,6 +286,7 @@ if (!window.AdyenFE) {
      * @property {boolean} excludeFromPayByLink
      * @property {boolean} enableTokenization
      * @property {string} tokenType
+     * @property {string} authorizationType
      * @property {string} methodId
      * @property {string} code
      * @property {string?} name
@@ -1020,6 +1023,21 @@ if (!window.AdyenFE) {
                             label: 'payments.configure.fields.surchargeLimit.label',
                             description: 'payments.configure.fields.surchargeLimit.description',
                             error: 'payments.configure.fields.surchargeLimit.error'
+                        },
+                        {
+                            name: 'authorizationType',
+                            value: changedMethod.authorizationType,
+                            type: 'dropdown',
+                            label: 'payments.configure.fields.authorizationType.label',
+                            description: 'payments.configure.fields.authorizationType.description',
+                            placeholder: 'payments.configure.fields.authorizationType.placeholder',
+                            options: [
+                                {label: 'payments.configure.fields.authorizationType.preAuthorization', value: 'PreAuth'},
+                                {label: 'payments.configure.fields.authorizationType.finalAuthorization', value: 'FinalAuth'}
+                            ],
+                            className: !supportsAuthorizationType.some((item) => item === changedMethod.code)
+                                ? 'adls--hidden'
+                                : ''
                         },
                         {
                             name: 'excludeFromPayByLink',
