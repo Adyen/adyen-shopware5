@@ -83,6 +83,14 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
                 me.query('#adyenPaymentLinkField')[0].show();
                 me.query('#adyenCopyPaymentLinkBtn')[0].show();
             }
+
+            if (!me.record.get('authorizationAdjustmentAvailable')) {
+                me.query('#adyenExtendAuthorizationPeriodToolbar')[0].hide();
+            }
+
+            if(!me.record.get('authorizationAdjustmentDate') || !me.record.get('authorizationAdjustmentAvailable')) {
+                me.query('#authorizationAdjustmentDateId')[0].hide();
+            }
         });
 
         me.callParent(arguments);
@@ -193,6 +201,23 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
                         text: 'Capture',
                         margin: '10 0 0 0',
                         width: 105
+                    }
+                ]
+            },
+            {
+                xtype: 'toolbar',
+                itemId: 'adyenExtendAuthorizationPeriodToolbar',
+                style: {
+                    'background-color': 'rgb(240, 242, 244)'
+                },
+                items: [
+                    {
+                        action: 'extendAuthorizationPeriod',
+                        xtype: 'button',
+                        itemId: 'adyenExtendAuthorizationBtn',
+                        cls: 'primary',
+                        text: '{s name="payment/adyen/detail/extendauthorization"}Extend authorization expiry period{/s}',
+                        margin: '10 0 0 0'
                     }
                 ]
             },
@@ -333,6 +358,11 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
             { name: 'paidAmount', fieldLabel: '{s name="payment/adyen/detail/paidamount"}Paid amount{/s}'},
             { name: 'refundedAmount', fieldLabel: '{s name="payment/adyen/detail/refundedamount"}Refunded amount{/s}'},
             {
+                name: 'authorizationAdjustmentDate',
+                itemId: 'authorizationAdjustmentDateId',
+                fieldLabel: '{s name="payment/adyen/detail/authorizationadjustmentdata"}Authorization adjustment date{/s}'
+            },
+            {
                 xtype: 'hidden',
                 itemId: 'adyenMerchantReference',
                 name: 'merchantReference'
@@ -346,7 +376,7 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
                 xtype: 'hidden',
                 itemId: 'adyenCurrencyIso',
                 name: 'currencyIso'
-            }
+            },
         ];
     },
 });

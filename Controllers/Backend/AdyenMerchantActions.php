@@ -2,6 +2,11 @@
 
 use Adyen\Core\BusinessLogic\AdminAPI\AdminAPI;
 use Adyen\Core\BusinessLogic\AdminAPI\PaymentLink\Request\CreatePaymentLinkRequest;
+use Adyen\Core\BusinessLogic\Domain\AuthorizationAdjustment\Exceptions\InvalidAuthorizationTypeException;
+use Adyen\Core\BusinessLogic\Domain\AuthorizationAdjustment\Exceptions\InvalidPaymentStateException;
+use Adyen\Core\BusinessLogic\Domain\AuthorizationAdjustment\Exceptions\OrderFullyCapturedException;
+use Adyen\Core\BusinessLogic\Domain\AuthorizationAdjustment\Exceptions\PaymentLinkExistsException;
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\CurrencyMismatchException;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\InvalidCurrencyCode;
 use Adyen\Core\BusinessLogic\Domain\TransactionHistory\Exceptions\InvalidMerchantReferenceException;
 use AdyenPayment\Controllers\Common\AjaxResponseSetter;
@@ -156,12 +161,40 @@ class Shopware_Controllers_Backend_AdyenMerchantActions extends Enlight_Controll
         }
         $response = $response->toArray();
         $response['temporaryId'] = $temporaryId;
-        if(!empty($changed)){
+        if (!empty($changed)) {
             $response['changed'] = $changed;
         }
 
         $this->Response()->setHeader('Content-Type', 'application/json');
         $this->Response()->setBody(json_encode($response));
+    }
+
+    /**
+     * @return void
+     *
+     * @throws InvalidMerchantReferenceException
+     * @throws InvalidAuthorizationTypeException
+     * @throws InvalidPaymentStateException
+     * @throws OrderFullyCapturedException
+     * @throws PaymentLinkExistsException
+     * @throws CurrencyMismatchException
+     */
+    public function extendAuthorizationAction(): void
+    {
+        $merchantReference = $this->Request()->get('merchantReference');
+        $storeId = $this->Request()->get('storeId');
+
+        $response = AdminAPI::get()->authorizationAdjustment($storeId)->handleExtendingAuthorizationPeriod($merchantReference);
+
+        if (!$response->isSuccessful()) {
+            $namespace = Shopware()->Snippets()->getNamespace('backend/adyen/configuration');
+            $translatedString = $namespace->get(
+                'payment/adyen/extendauthorizationfail',
+                'Authorization adjustment request failed. Reason: '
+            );
+            $this->Response()->setHttpResponseCode($response->getStatusCode());
+            $this->Response()->setBody($translatedString . $response->toArray()['errorMessage'] ?? '');
+        }
     }
 
     /**
