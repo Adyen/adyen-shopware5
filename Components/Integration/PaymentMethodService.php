@@ -155,7 +155,7 @@ class PaymentMethodService implements ShopPaymentService
             return;
         }
 
-        $this->disablePaymentMean(self::ADYEN_NAME_PREFIX . $method->getCode());
+        $this->disablePaymentMean($method->getCode());
     }
 
     /**
