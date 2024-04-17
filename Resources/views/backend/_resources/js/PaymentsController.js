@@ -262,6 +262,7 @@ if (!window.AdyenFE) {
      * @typedef AdditionalDataConfig
      * @property {boolean?} showLogos
      * @property {boolean?} singleClickPayment
+     * @property {boolean?} clickToPay
      * @property {boolean?} sendBasket
      * @property {boolean?} installments
      * @property {boolean?} installmentAmounts
@@ -788,6 +789,7 @@ if (!window.AdyenFE) {
                 config.additionalData = {
                     showLogos: true,
                     singleClickPayment: true,
+                    clickToPay: true,
                     sendBasket: true,
                     installments: false,
                     installmentAmounts: false,
@@ -1086,6 +1088,7 @@ if (!window.AdyenFE) {
                 ...generator.createFormFields([
                     getRadioField('creditCardFields', 'showLogos'),
                     getRadioField('creditCardFields', 'singleClickPayment'),
+                    getRadioField('creditCardFields', 'clickToPay'),
                     getRadioField('creditCardFields', 'sendBasket')
                 ])
             );
@@ -1388,6 +1391,7 @@ if (!window.AdyenFE) {
                     'description',
                     'showLogos',
                     'singleClickPayment',
+                    'clickToPay',
                     'merchantName',
                     'sendBasket',
                     'gatewayMerchantId',
@@ -1592,7 +1596,7 @@ if (!window.AdyenFE) {
 
             if (changedMethod.paymentType === 'creditOrDebitCard') {
                 result.push(
-                    ...validateRequiredField(['showLogos', 'singleClickPayment', 'sendBasket', 'installmentAmounts'])
+                    ...validateRequiredField(['showLogos', 'singleClickPayment', 'clickToPay', 'sendBasket', 'installmentAmounts'])
                 );
             } else if (changedMethod.code === 'applepay') {
                 result.push(...validateRequiredField(['merchantId', 'merchantName']));
