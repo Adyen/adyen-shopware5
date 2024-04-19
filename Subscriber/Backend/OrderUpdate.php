@@ -112,7 +112,7 @@ final class OrderUpdate implements SubscriberInterface
             [$this->getService(), 'getTransactionHistory'],
             [$order->getTemporaryId()]
         );
-        $authorisedAmount = $transactionHistory->getTotalAmountForEventCode(EventCodes::AUTHORISATION);
+        $authorisedAmount = $transactionHistory->getAuthorizedAmount();
         $cancelledAmount = $transactionHistory->getTotalAmountForEventCode(EventCodes::CANCELLATION);
         $capturedAmount = $transactionHistory->getCapturedAmount();
 
