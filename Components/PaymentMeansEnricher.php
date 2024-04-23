@@ -294,22 +294,17 @@ class PaymentMeansEnricher
                 $paymentMean = [
                     'isAdyenPaymentMethod' => true,
                     'isStoredPaymentMethod' => true,
-                    'storedPaymentMethodId' => $paymentMethodResponse->getMetaData(
-                    )['RecurringDetail']['recurringDetailReference'],
+                    'storedPaymentMethodId' => $paymentMethodResponse->getMetaData()['id'],
                     'adyenPaymentType' => $paymentMethodResponse->getType(),
                     'description' => $shopwareMean['description'],
-                    'additionaldescription' => sprintf(
+                    'additionaldescription' =>
                         $this->snippets
                             ->getNamespace('frontend/adyen/checkout')
                             ->get(
                                 'payment/adyen/recurring_methods_title',
-                                'Created on: %s',
+                                'Recurring payment method',
                                 true
-                            ),
-                        (new DateTime(
-                            $paymentMethodResponse->getMetaData()['RecurringDetail']['creationDate']
-                        ))->format('Y-m-d')
-                    ),
+                            )
                 ];
 
                 if (array_key_exists($paymentMean['adyenPaymentType'], $paymentMethodConfigsMap)) {
