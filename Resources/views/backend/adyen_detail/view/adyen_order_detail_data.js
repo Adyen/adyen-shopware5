@@ -24,7 +24,13 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
 
             me.record = record;
             me.detailsPanel.loadRecord(me.record);
-            me.query('#adyenPaymentMethod')[0].setSrc(me.record.get('paymentMethod'));
+            let logoUrl = me.record.get('paymentMethod');
+            if (logoUrl && logoUrl.indexOf('clicktopay') !== -1) {
+                logoUrl = logoUrl.replace('visa_clicktopay', 'card');
+                logoUrl = logoUrl.replace('mc_clicktopay', 'card');
+            }
+
+            me.query('#adyenPaymentMethod')[0].setSrc(logoUrl);
             me.query('#captureCurrency')[0].setValue(me.record.get('amountCurrency'));
             me.query('#refundCurrency')[0].setValue(me.record.get('amountCurrency'));
 
