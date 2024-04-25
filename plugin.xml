@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.1.9</version>
+    <version>4.1.10</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -723,6 +723,16 @@
             * Remove 'New' and 'Pending' order status from Order status mapping
             * Update core version to 1.1.11
             * Fix Adyen button listeners on order details page
+        </changes>
+    </changelog>
+    <changelog version="4.1.10">
+        <changes lang="en">
+            * Fix payment method disabling when plugin is uninstalled or payment method is deleted in plugin.
+            * Update core version to 1.1.12
+        </changes>
+        <changes lang="de">
+            * Fix payment method disabling when plugin is uninstalled or payment method is deleted in plugin.
+            * Update core version to 1.1.12
         </changes>
     </changelog>
 </plugin>
