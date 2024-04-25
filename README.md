@@ -35,8 +35,8 @@ Support deprecation plan for old plugins Shopware5 (below major release v4.0):
 
 ## Integration
 The plugin integrates card component (Secured Fields) using Adyen Checkout for all card payments. Currently, the following versions of Web components and Checkout API are utilized in the code:
-* **Checkout API version:** v69
-* **Checkout Web Component version:** 5.31.1
+* **Checkout API version:** v71
+* **Checkout Web Component version:** 5.61.0
 
 ## License
 MIT license. For more information, see the [LICENSE file](LICENSE).

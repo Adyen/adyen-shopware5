@@ -116,12 +116,23 @@ class CheckoutConfigProvider
         $shop = Shopware()->Shop();
         $userId = (int)$this->session->offsetGet('sUserId');
         $shopperReference = ($userId !== 0) ? $shop->getHost() . '_' . Shop::getShopId() . '_' . $userId : null;
+        $shopperEmail = null;
+
+        if (
+            ($sAdmin = Shopware()->Modules()->Admin()) &&
+            ($userData = $sAdmin->sGetUserData()) &&
+            isset($userData['additional']['user']['email'])
+        ) {
+            $shopperEmail = $userData['additional']['user']['email'];
+        }
 
         return new PaymentCheckoutConfigRequest(
             $this->getAmount($forceAmount),
             $country,
             Shopware()->Shop()->getLocale()->getLocale(),
-            $shopperReference
+            $shopperReference,
+            $shopperEmail,
+            $shop->getName()
         );
     }
 
@@ -243,6 +254,7 @@ class CheckoutConfigProvider
                 $method->setAdditionalData(new CardConfig(
                     $additionalData->isShowLogos(),
                     false,
+                    $additionalData->isClickToPay(),
                     $additionalData->isInstallments(),
                     $additionalData->isInstallmentAmounts(),
                     $additionalData->isSendBasket(),

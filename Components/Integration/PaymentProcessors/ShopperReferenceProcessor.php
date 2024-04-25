@@ -54,7 +54,7 @@ class ShopperReferenceProcessor implements PaymentLinkShopperReferenceProcessorI
 
         $builder->setShopperReference(
             ShopperReference::parse(
-                $shop->getHost() . '_' . Shop::getShopId() . '_' . $order->getCustomer()->getId()
+                $shop->getHost() . '_' . $order->getShop()->getId() . '_' . $order->getCustomer()->getId()
             )
         );
     }
