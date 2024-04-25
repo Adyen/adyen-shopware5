@@ -131,7 +131,8 @@ class CheckoutConfigProvider
             $country,
             Shopware()->Shop()->getLocale()->getLocale(),
             $shopperReference,
-            $shopperEmail
+            $shopperEmail,
+            $shop->getName()
         );
     }
 
