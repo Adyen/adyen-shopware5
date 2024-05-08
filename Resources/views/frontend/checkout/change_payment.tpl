@@ -68,6 +68,7 @@
                 data-adyen-payment-method="true" data-adyen-payment-method-type="{$payment_mean.adyenPaymentType}"
                 data-adyen-stored_payment_method_id="{$payment_mean.storedPaymentMethodId}"
                 data-adyen-payment-mean-id="{$payment_mean.originalId}"
+                data-adyen-click-to-pay-label="{$payment_mean.clickToPayLabel}"
                 {if $payment_mean.id eq $sFormData.payment or (!$sFormData && !$smarty.foreach.register_payment_mean.index)} checked="checked"{/if}
         />
     </div>

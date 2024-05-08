@@ -31,7 +31,8 @@
             me.checkoutController = new AdyenComponents.CheckoutController({
                 "checkoutConfigUrl": me.opts.checkoutConfigUrl,
                 "sessionStorage": StorageManager.getStorage('session'),
-                "onStateChange": $.proxy(me.updateFormSubmitButton, me)
+                "onStateChange": $.proxy(me.updateFormSubmitButton, me),
+                "onClickToPay": $.proxy(me.handleClickToPay, me),
             });
 
             $(document).on('submit', me.opts.formSelector, $.proxy(me.onPaymentFormSubmit, me));
@@ -67,8 +68,8 @@
             let adyenPaymentMethodType = selectedPaymentMeanEl.data("adyen-payment-method-type");
 
             let componentContainerEl = selectedPaymentMeanEl
-            .closest(me.opts.paymentMethodBlockSelector)
-            .find(me.opts.paymentMethodComponentContainerSelector);
+                .closest(me.opts.paymentMethodBlockSelector)
+                .find(me.opts.paymentMethodComponentContainerSelector);
 
             if (1 === componentContainerEl.length) {
                 me.checkoutController.mount(
@@ -172,6 +173,18 @@
                 });
 
             componentContainerEl.append(updatePaymentInfoButton);
+        },
+
+        handleClickToPay: function () {
+            let me = this,
+                selectedPaymentMeanEl = $(me.opts.activePaymentMeanSelector).first(),
+                 componentContainerEl = selectedPaymentMeanEl
+                .closest(me.opts.paymentMethodBlockSelector)
+                .find(me.opts.paymentMethodComponentContainerSelector),
+                clickToPayLabel = selectedPaymentMeanEl.attr("data-adyen-click-to-pay-label"),
+                labelElement = $("<p>").text(clickToPayLabel);
+
+            componentContainerEl.prepend(labelElement);
         }
     });
 

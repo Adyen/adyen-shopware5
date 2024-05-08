@@ -60,6 +60,7 @@
      * onStateChange: function|undefined,
      * onAdditionalDetails: function|undefined,
      * onPayButtonClick: function|undefined,
+     * onClickToPay: function|undefined
      * }} config
      */
     function CheckoutController(config) {
@@ -69,9 +70,15 @@
             url.protocol = 'https:';
         }
 
-        config.onStateChange = config.onStateChange || function () {};
-        config.onAdditionalDetails = config.onAdditionalDetails || function () {};
-        config.onPayButtonClick = config.onPayButtonClick || function (resolve, reject) { resolve(); };
+        config.onStateChange = config.onStateChange || function () {
+        };
+        config.onAdditionalDetails = config.onAdditionalDetails || function () {
+        };
+        config.onPayButtonClick = config.onPayButtonClick || function (resolve, reject) {
+            resolve();
+        };
+        config.onClickToPay = config.onClickToPay || function () {
+        };
 
         const handleOnClick = (resolve, reject) => {
             return config.onPayButtonClick(resolve, reject);
@@ -137,11 +144,27 @@
 
         const handleOnChange = (state) => {
             isStateValid = state.isValid;
+
+            if(isStateValid && isClickToPayPaymentMethod(state.data.paymentMethod)) {
+                checkout.remove(activeComponent);
+                activeComponent = null;
+                config.onClickToPay();
+            }
+
             if (isStateValid) {
                 sessionStorage.setItem('adyen-payment-method-state-data', JSON.stringify(state.data));
             }
 
             config.onStateChange();
+        };
+
+        /**
+         * Returns true if Click to Pay is selected.
+         *
+         * @returns {boolean}
+         */
+        const isClickToPayPaymentMethod = (paymentMethod) => {
+            return paymentMethod.type === 'scheme' && !paymentMethod.hasOwnProperty('encryptedSecurityCode');
         };
 
         const handleAdditionalDetails = (state) => {
