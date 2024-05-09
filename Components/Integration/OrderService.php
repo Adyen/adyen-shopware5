@@ -64,7 +64,7 @@ class OrderService implements OrderServiceInterface
         $order = $this->orderRepository->getOrderByTemporaryId($merchantReference);
 
         if (empty($order)) {
-            throw new Exception('Order with cart ID: ' . $merchantReference . ' still not created.');
+            throw new Exception('Order with temporary ID: ' . $merchantReference . ' still not created.');
         }
 
         return $order->getShop()->getId() === (int)StoreContext::getInstance()->getStoreId();
