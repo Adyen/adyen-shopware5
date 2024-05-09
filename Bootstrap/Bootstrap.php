@@ -200,7 +200,8 @@ class Bootstrap extends BootstrapComponent
                 return new TransactionDetailsService(
                     ServiceRegister::getService(ConnectionService::class),
                     ServiceRegister::getService(TransactionHistoryService::class),
-                    ServiceRegister::getService(GeneralSettingsService::class)
+                    ServiceRegister::getService(GeneralSettingsService::class),
+                    ServiceRegister::getService(OrderServiceInterface::class)
                 );
             }
         );
