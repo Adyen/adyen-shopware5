@@ -65,12 +65,14 @@ class StoreService implements StoreServiceInterface
      */
     public function getStoreDomain(): string
     {
-        $domain = Shopware()->Front()->Router()->assemble(['module' => 'frontend']);
+        $domain = str_replace(
+            'http:', 'https:', Shopware()->Front()->Router()->assemble(['module' => 'frontend'])
+        );
 
         // only for test purposes
         $testHostname = $this->getConfigurationManager()->getConfigValue('testHostname');
         if($testHostname){
-            $domain = str_replace(array('localhost', 'http://'), array($testHostname, 'https://'), $domain);
+            $domain = str_replace('localhost', $testHostname, $domain);
         }
 
         return rtrim($domain, '/');
