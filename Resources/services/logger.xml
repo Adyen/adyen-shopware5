@@ -8,7 +8,6 @@
     <services>
         <service id="AdyenPayment\Components\Logger\LoggerService"
                  class="AdyenPayment\Components\Logger\LoggerService" public="true">
-            <argument type="service" id="adyen_payment.logger"/>
         </service>
     </services>
 </container>

@@ -23,11 +23,10 @@ final class SaveStoredMethodPreference implements SubscriberInterface
 
     public function __construct(
         Enlight_Components_Session_Namespace $session,
-        EntityRepository $userPreferenceRepository,
         EntityManager $modelManager
     ) {
         $this->session = $session;
-        $this->userPreferenceRepository = $userPreferenceRepository;
+        $this->userPreferenceRepository = Shopware()->Models()->getRepository(UserPreference::class);
         $this->modelManager = $modelManager;
     }
 

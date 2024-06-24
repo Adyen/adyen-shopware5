@@ -18,12 +18,9 @@ class StoreRepository
      */
     private $shopwareRepository;
 
-    /**
-     * @param Repository $repository
-     */
-    public function __construct(Repository $repository)
+    public function __construct()
     {
-        $this->shopwareRepository = $repository;
+        $this->shopwareRepository = Shopware()->Models()->getRepository(Shop::class);
     }
 
     /**

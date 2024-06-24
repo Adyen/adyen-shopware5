@@ -21,9 +21,9 @@ class OrderRepository
      */
     private $shopwareRepository;
 
-    public function __construct(Repository $repository)
+    public function __construct()
     {
-        $this->shopwareRepository = $repository;
+        $this->shopwareRepository = Shopware()->Models()->getRepository(ShopwareOrder::class);
     }
 
     /**

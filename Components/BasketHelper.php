@@ -29,9 +29,9 @@ class BasketHelper
      */
     private $session;
 
-    public function __construct(sBasket $basket, Connection $connection, Enlight_Components_Session_Namespace $session)
+    public function __construct(Connection $connection, Enlight_Components_Session_Namespace $session)
     {
-        $this->basket = $basket;
+        $this->basket = Shopware()->Modules()->Basket();
         $this->connection = $connection;
         $this->session = $session;
     }

@@ -18,11 +18,10 @@ final class AddStoredMethodUserPreferenceToView implements SubscriberInterface
     private $userPreferenceRepository;
 
     public function __construct(
-        Enlight_Components_Session_Namespace $session,
-        EntityRepository $userPreferenceRepository
+        Enlight_Components_Session_Namespace $session
     ) {
         $this->session = $session;
-        $this->userPreferenceRepository = $userPreferenceRepository;
+        $this->userPreferenceRepository = Shopware()->Models()->getRepository(UserPreference::class);
     }
 
     public static function getSubscribedEvents(): array

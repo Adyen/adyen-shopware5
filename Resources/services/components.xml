@@ -22,20 +22,16 @@
             <argument type="service" id="AdyenPayment\Components\CheckoutConfigProvider"/>
         </service>
         <service id="AdyenPayment\Repositories\Wrapper\OrderRepository" public="true">
-            <argument type="expression">service('models').getRepository('Shopware\\Models\\Order\\Order')</argument>
         </service>
         <service id="AdyenPayment\Repositories\Wrapper\StoreRepository" public="true">
-            <argument type="expression">service('models').getRepository('Shopware\\Models\\Shop\\Shop')</argument>
         </service>
         <service id="AdyenPayment\Repositories\Wrapper\PaymentMeanRepository" public="true">
-            <argument type="expression">service('models').getRepository('Shopware\\Models\\Payment\\Payment')</argument>
         </service>
         <service id="AdyenPayment\Components\Integration\OrderService" public="true">
             <argument type="service" id="AdyenPayment\Repositories\Wrapper\OrderRepository"/>
             <argument type="service" id="modules"/>
         </service>
         <service id="AdyenPayment\Components\BasketHelper" public="true">
-            <argument type="expression">container.get('modules').Basket()</argument>
             <argument type="service" id="dbal_connection"/>
             <argument type="service" id="session"/>
         </service>

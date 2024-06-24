@@ -60,7 +60,8 @@ class Shopware_Controllers_Frontend_AdyenWebhook extends Enlight_Controller_Acti
     public function indexAction(): void
     {
         $payload = $this->Request()->getParams();
-        $result = WebhookAPI::get()->webhookHandler($payload['storeId'] ?? '')->handleRequest($payload);
+        $input = file_get_contents('php://input');
+        $result = WebhookAPI::get()->webhookHandler($payload['storeId'] ?? '')->handleRequest(json_decode($input, true));
 
         $this->returnAPIResponse($result);
     }

@@ -2,6 +2,7 @@
 
 namespace AdyenPayment\Repositories\Wrapper;
 
+use Shopware\Models\Payment\Payment;
 use Shopware\Models\Payment\Repository;
 
 /**
@@ -16,12 +17,9 @@ class PaymentMeanRepository
      */
     private $shopwareRepository;
 
-    /**
-     * @param Repository $repository
-     */
-    public function __construct(Repository $repository)
+    public function __construct()
     {
-        $this->shopwareRepository = $repository;
+        $this->shopwareRepository = Shopware()->Models()->getRepository(Payment::class);
     }
 
     /**

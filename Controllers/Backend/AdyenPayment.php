@@ -127,11 +127,11 @@ class Shopware_Controllers_Backend_AdyenPayment extends Enlight_Controller_Actio
     private function createPaymentMethodRequest(): PaymentMethodRequest
     {
         $requestData = $this->Request()->getParams();
-        $logo = $this->Request()->files->get('logo');
+        $logo = $_FILES['logo'];
         $logoContents = null;
 
         if ($logo) {
-            $filePath = (string)$logo->getRealPath();
+            $filePath = $logo['tmp_name'];
             $stream = fopen($filePath, 'rb');
             $logoContents = stream_get_contents($stream);
         }

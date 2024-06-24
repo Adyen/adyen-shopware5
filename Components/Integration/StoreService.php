@@ -164,14 +164,13 @@ class StoreService implements StoreServiceInterface
      */
     private function transformStoreOrderStatuses(array $shopwareStatuses): array
     {
-        /** @var StateTranslatorServiceInterface $stateTranslator */
-        $stateTranslator = Shopware()->Container()->get('shopware.components.state_translator');
+        $snippets = Shopware()->Snippets()->getNamespace('backend/static/payment_status');
         $storeOrderStatuses = [];
 
         foreach ($shopwareStatuses as $status) {
             $storeOrderStatuses[] = new StoreOrderStatus(
                 (string)$status['id'],
-                $stateTranslator->translateState(StateTranslatorService::STATE_PAYMENT, $status)['description']
+                $snippets->get($status['name'], $status['name'])
             );
         }
 

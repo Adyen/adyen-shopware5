@@ -6,7 +6,7 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\CurrencyM
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\InvalidPaymentMethodCodeException;
 use Adyen\Core\BusinessLogic\Domain\TransactionHistory\Exceptions\InvalidMerchantReferenceException;
 use Adyen\Core\BusinessLogic\Domain\TransactionHistory\Services\TransactionDetailsService as BaseTransactionDetailsService;
-use Symfony\Component\Intl\Currencies;
+use Symfony\Component\Intl\Intl;
 
 /**
  * Class TransactionDetailsService
@@ -30,7 +30,8 @@ class TransactionDetailsService extends BaseTransactionDetailsService
         $result = parent::getTransactionDetails($merchantReference, $storeId);
 
         foreach ($result as $key => $item) {
-            $result[$key]['amountCurrency'] = $item['amountCurrency'] ? Currencies::getSymbol($item['amountCurrency']) : '';
+            $result[$key]['amountCurrency'] = $item['amountCurrency'] ?
+                Intl::getCurrencyBundle()->getCurrencySymbol($item['amountCurrency']) : '';
         }
 
         return $result;

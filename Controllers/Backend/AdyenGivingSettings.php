@@ -81,11 +81,11 @@ class Shopware_Controllers_Backend_AdyenGivingSettings extends Enlight_Controlle
 
     private function saveImages(string $storeId): void
     {
-        $logo = $this->Request()->files->get('logo');
+        $logo = $_FILES['logo'];
         $logoContents = null;
 
         if ($logo) {
-            $filePath = (string)$logo->getRealPath();
+            $filePath = $logo['tmp_name'];
             $stream = fopen($filePath, 'rb');
             $logoContents = stream_get_contents($stream);
         }
@@ -94,11 +94,11 @@ class Shopware_Controllers_Backend_AdyenGivingSettings extends Enlight_Controlle
             $this->fileService->write($logoContents, 'adyen-giving-logo-store-' . $storeId);
         }
 
-        $backgroundImage = $this->Request()->files->get('backgroundImage');
+        $backgroundImage = $_FILES['backgroundImage'];
         $imageContents = null;
 
         if ($backgroundImage) {
-            $filePath = (string)$backgroundImage->getRealPath();
+            $filePath = $backgroundImage['tmp_name'];
             $stream = fopen($filePath, 'rb');
             $imageContents = stream_get_contents($stream);
         }

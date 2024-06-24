@@ -30,9 +30,13 @@ class LoggerService implements ShopLoggerAdapter
      */
     protected $logger;
 
-    public function __construct(ShopwareLogger $logger)
+    public function __construct()
     {
-        $this->logger = $logger;
+        $this->logger = Shopware()->Container()->get('pluginlogger');
+
+        if (Shopware()->Container()->has('adyen_payment.logger')) {
+            $this->logger = Shopware()->Container()->get('adyen_payment.logger');
+        }
     }
 
     /**

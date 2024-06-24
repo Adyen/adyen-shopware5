@@ -53,12 +53,10 @@
         </service>
         <service id="AdyenPayment\Subscriber\AddStoredMethodUserPreferenceToView">
             <argument type="service" id="session"/>
-            <argument type="expression">service('models').getRepository('AdyenPayment\\Models\\UserPreference')</argument>
             <tag name="shopware.event_subscriber"/>
         </service>
         <service id="AdyenPayment\Subscriber\Account\SaveStoredMethodPreference">
             <argument type="service" id="session"/>
-            <argument type="expression">service('models').getRepository('AdyenPayment\\Models\\UserPreference')</argument>
             <argument type="service" id="models"/>
             <tag name="shopware.event_subscriber"/>
         </service>

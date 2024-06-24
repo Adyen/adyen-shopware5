@@ -28,16 +28,15 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
 
     public function getCheckoutConfigAction(): void
     {
-        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
-        $this->Response()->setHeader('Content-Type', 'application/json');
-
         $productNumber = $this->Request()->get('adyen_article_number');
-
-        $this->Response()->setBody(json_encode(
+        $expressCheckoutConfig =
             $this->checkoutConfigProvider->getExpressCheckoutConfig(
                 $this->basketHelper->getTotalAmountFor($this->prepareCheckoutController(), $productNumber)
-            )->toArray()
-        ));
+            );
+
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+        $this->Response()->setHeader('Content-Type', 'application/json');
+        $this->Response()->setBody(json_encode($expressCheckoutConfig->toArray()));
     }
 
     /**
