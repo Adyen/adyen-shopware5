@@ -160,13 +160,13 @@ if (!window.AdyenFE) {
                             )
                         ]
                     ),
-                    generator.createElement(
+                    webhookNotification.details.shopLink !== 'javascript:' ? generator.createElement(
                         'a',
                         'adlp-shop-link',
                         '',
                         { href: webhookNotification.details.shopLink, target: '_blank' },
                         [generator.createElement('span', '', 'notifications.webhook.notificationDetailsModal.shopLink')]
-                    )
+                    ) : ''
                 ],
                 footer: true,
                 canClose: true,
