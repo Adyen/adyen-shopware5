@@ -29,9 +29,18 @@ class TransactionDetailsService extends BaseTransactionDetailsService
     {
         $result = parent::getTransactionDetails($merchantReference, $storeId);
 
+        if (class_exists('\Symfony\Component\Intl\Currencies')) {
+            foreach ($result as $key => $item) {
+                $result[$key]['amountCurrency'] = $item['amountCurrency'] ?
+                    \Symfony\Component\Intl\Currencies::getSymbol($item['amountCurrency']) : '';
+            }
+
+            return $result;
+        }
+
         foreach ($result as $key => $item) {
             $result[$key]['amountCurrency'] = $item['amountCurrency'] ?
-                Intl::getCurrencyBundle()->getCurrencySymbol($item['amountCurrency']) : '';
+                \Symfony\Component\Intl\Intl::getCurrencyBundle()->getCurrencySymbol($item['amountCurrency']) : '';
         }
 
         return $result;
