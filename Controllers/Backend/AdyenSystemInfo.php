@@ -56,11 +56,11 @@ class Shopware_Controllers_Backend_AdyenSystemInfo extends Enlight_Controller_Ac
         $file = $this->createZip();
 
         $response = $this->Response();
-        $response->headers->set('content-description', 'File Transfer');
-        $response->headers->set('content-type', 'application/octet-stream');
-        $response->headers->set('content-disposition', 'attachment; filename=' . self::SYSTEM_INFO_FILE_NAME);
-        $response->headers->set('cache-control', 'public', true);
-        $response->headers->set('content-length', (string)filesize($file));
+        $response->setHeader('content-description', 'File Transfer');
+        $response->setHeader('content-type', 'application/octet-stream');
+        $response->setHeader('content-disposition', 'attachment; filename=' . self::SYSTEM_INFO_FILE_NAME);
+        $response->setHeader('cache-control', 'public', true);
+        $response->setHeader('content-length', (string)filesize($file));
         $response->sendHeaders();
 
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
