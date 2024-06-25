@@ -53,11 +53,6 @@ jobs:
             port: 443
             browser: 'chromium'
             device: 'Desktop Chrome'
-          - shopware: '5.5.0'
-            php: '7.4'
-            port: 443
-            browser: 'chromium'
-            device: 'Desktop Chrome'
 #
 #          - shopware: '5.6.10'
 #            php: '7.4'
