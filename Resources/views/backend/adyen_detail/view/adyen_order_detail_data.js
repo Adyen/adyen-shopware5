@@ -27,6 +27,7 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
             me.query('#adyenPaymentMethod')[0].setSrc(me.record.get('paymentMethod'));
             me.query('#captureCurrency')[0].setValue(me.record.get('amountCurrency'));
             me.query('#refundCurrency')[0].setValue(me.record.get('amountCurrency'));
+            me.query('#authorizationAdjustmentAmount')[0].setValue(me.record.get('authorizationAdjustmentAmount'));
 
             if (!me.record.get('captureSupported') || (parseFloat(me.record.get('capturableAmount')) === 0)) {
                 me.query('#adyenCaptureToolbar')[0].hide();
@@ -90,6 +91,12 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
 
             if(!me.record.get('authorizationAdjustmentDate') || !me.record.get('authorizationAdjustmentAvailable')) {
                 me.query('#authorizationAdjustmentDateId')[0].hide();
+            }
+
+            if(!me.record.get('authorizationAdjustmentAmount') || !me.record.get('authorizationAdjustmentAvailable')) {
+                me.query('#authorizationAdjustmentAmount')[0].hide();
+            } else {
+                me.query('#authorizationAdjustmentAmount')[0].show();
             }
         });
 
@@ -361,6 +368,11 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
                 name: 'authorizationAdjustmentDate',
                 itemId: 'authorizationAdjustmentDateId',
                 fieldLabel: '{s name="payment/adyen/detail/authorizationadjustmentdata"}Authorization adjustment date{/s}'
+            },
+            {
+                name: 'authorizationAdjustmentAmount',
+                itemId: 'authorizationAdjustmentAmount',
+                fieldLabel: '{s name="payment/adyen/detail/authorizationadjustmentamount"}Authorization adjustment amount{/s}'
             },
             {
                 xtype: 'hidden',

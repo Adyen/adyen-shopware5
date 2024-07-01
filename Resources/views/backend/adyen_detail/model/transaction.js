@@ -31,6 +31,7 @@ Ext.define('Shopware.apps.AdyenTransaction.model.Transaction', {
         { name: 'displayPaymentLink', type: 'boolean'},
         { name: 'authorizationAdjustmentAvailable', type: 'boolean'},
         { name: 'authorizationAdjustmentDate', type: 'date'},
+        { name: 'authorizationAdjustmentAmount', type: 'float'},
     ]
 });
 //{/block}
