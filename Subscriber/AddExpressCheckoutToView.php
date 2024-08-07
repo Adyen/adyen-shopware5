@@ -35,7 +35,7 @@ final class AddExpressCheckoutToView implements SubscriberInterface
 
     public function handleProductDetailsPage(Enlight_Event_EventArgs $args): void
     {
-        if (!$this->isUserLoggedIn() || $args->getRequest()->getActionName() !== 'index') {
+        if ($args->getRequest()->getActionName() !== 'index') {
             return;
         }
 
@@ -46,7 +46,7 @@ final class AddExpressCheckoutToView implements SubscriberInterface
 
     public function handleCartPage(Enlight_Event_EventArgs $args): void
     {
-        if (!$this->isUserLoggedIn() || $args->getRequest()->getActionName() !== 'cart') {
+        if ($args->getRequest()->getActionName() !== 'cart') {
             return;
         }
 

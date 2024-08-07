@@ -11,6 +11,7 @@
             checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
             adyenPaymentMethodType: '',
             stateDataInputSelector: 'input[name=adyenExpressPaymentMethodStateData]',
+            shippingAddressInputSelector: 'input[name=adyenShippingAddress]',
             confirmFormSelector: 'form[data-adyen-express-checkout-form]',
         },
 
@@ -26,7 +27,9 @@
                 "showPayButton": true,
                 "sessionStorage": StorageManager.getStorage('session'),
                 "onStateChange": $.proxy(me.submitOrder, me),
-                "onAdditionalDetails": $.proxy(me.onAdditionalDetails, me)
+                "onAdditionalDetails": $.proxy(me.onAdditionalDetails, me),
+                "onPaymentAuthorized": $.proxy(me.onPaymentAuthorized, me),
+                "onPaymentDataChanged": $.proxy(me.onPaymentDataChanged, me),
             });
 
             me.mountExpressCheckoutButtons();
@@ -106,6 +109,25 @@
                     window.location.href = me.opts.checkoutShippingPaymentUrl;
                 }
             });
-        }
+        },
+
+        onPaymentAuthorized: function (paymentData) {
+            return new Promise(function(resolve, reject){
+                console.log(paymentData);
+            });
+        },
+
+        onPaymentDataChanged: function (intermediatePaymentData) {
+            return new Promise(async resolve => {
+                const { callbackTrigger, shippingAddress } = intermediatePaymentData;
+                const paymentDataRequestUpdate = {};
+
+                let me = this;
+                let expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
+                expressCheckoutForm.find(me.opts.shippingAddressInputSelector).val(JSON.stringify(shippingAddress));
+
+                resolve(paymentDataRequestUpdate);
+            });
+        },
     });
 })(jQuery);

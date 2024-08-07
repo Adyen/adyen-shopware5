@@ -59,6 +59,8 @@
      * sessionStorage: sessionStorage,
      * onStateChange: function|undefined,
      * onAdditionalDetails: function|undefined,
+     * onPaymentAuthorized: function|undefined,
+     * onPaymentDataChanged: function|undefined,
      * onPayButtonClick: function|undefined,
      * onClickToPay: function|undefined
      * }} config
@@ -74,6 +76,10 @@
         };
         config.onAdditionalDetails = config.onAdditionalDetails || function () {
         };
+        config.onAuthorized = config.onAuthorized || function () {
+        };
+        config.onPaymentDataChanged = config.onPaymentDataChanged || function () {
+        };
         config.onPayButtonClick = config.onPayButtonClick || function (resolve, reject) {
             resolve();
         };
@@ -83,6 +89,14 @@
         const handleOnClick = (resolve, reject) => {
             return config.onPayButtonClick(resolve, reject);
         };
+
+        const handlePaymentDataChanged = (intermediatePaymentData) => {
+            return config.onPaymentDataChanged(intermediatePaymentData);
+        };
+
+        const handlePaymentAuthorized = (paymentData) => {
+            return config.onPaymentAuthorized(paymentData);
+        }
 
         let checkout,
             activeComponent,
@@ -98,8 +112,34 @@
                     "returnUrl": url.href,
                     "cancelUrl": url.href
                 },
-                "paywithgoogle": { "onClick": handleOnClick, "buttonSizeMode": "fill" },
-                "googlepay": { "onClick": handleOnClick, "buttonSizeMode": "fill" },
+                "paywithgoogle": {
+                    onClick: handleOnClick,
+                    callbackIntents: ['SHIPPING_ADDRESS'],
+                    shippingAddressRequired: true,
+                    shippingAddressParameters: {
+                        allowedCountryCodes: [],
+                        phoneNumberRequired: true
+                    },
+                    shippingOptionRequired: false,
+                    buttonSizeMode: "fill",
+                    paymentDataCallbacks: {
+                        onPaymentDataChanged: handlePaymentDataChanged
+                    }
+                },
+                "googlepay": {
+                    onClick: handleOnClick,
+                    callbackIntents: ['SHIPPING_ADDRESS'],
+                    shippingAddressRequired: true,
+                    shippingAddressParameters: {
+                        allowedCountryCodes: [],
+                        phoneNumberRequired: true
+                    },
+                    shippingOptionRequired: false,
+                    buttonSizeMode: "fill",
+                    paymentDataCallbacks: {
+                        onPaymentDataChanged: handlePaymentDataChanged
+                    }
+                },
                 "paypal": {
                     "blockPayPalCreditButton": true,
                     "blockPayPalPayLaterButton": true,
@@ -132,6 +172,8 @@
                 checkoutConfig.onChange = handleOnChange;
                 checkoutConfig.onSubmit = handleOnChange;
                 checkoutConfig.onAdditionalDetails = handleAdditionalDetails;
+                checkoutConfig.onPaymentDataChanged = handlePaymentDataChanged;
+                checkoutConfig.onPaymentAuthorized = handlePaymentAuthorized;
                 if (config.showPayButton) {
                     checkoutConfig.showPayButton = true;
                 }
