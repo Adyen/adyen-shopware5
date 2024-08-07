@@ -61,6 +61,8 @@
      * onAdditionalDetails: function|undefined,
      * onPaymentAuthorized: function|undefined,
      * onPaymentDataChanged: function|undefined,
+     * onShippingAddressChange: function|undefined,
+     * onShopperDetails: function|undefined,
      * onPayButtonClick: function|undefined,
      * onClickToPay: function|undefined
      * }} config
@@ -76,9 +78,11 @@
         };
         config.onAdditionalDetails = config.onAdditionalDetails || function () {
         };
-        config.onAuthorized = config.onAuthorized || function () {
-        };
         config.onPaymentDataChanged = config.onPaymentDataChanged || function () {
+        };
+        config.onShippingAddressChange = config.onShippingAddressChange || function () {
+        };
+        config.onShopperDetails = config.onShopperDetails || function () {
         };
         config.onPayButtonClick = config.onPayButtonClick || function (resolve, reject) {
             resolve();
@@ -90,12 +94,22 @@
             return config.onPayButtonClick(resolve, reject);
         };
 
+        /* GooglePay callbacks */
         const handlePaymentDataChanged = (intermediatePaymentData) => {
             return config.onPaymentDataChanged(intermediatePaymentData);
         };
 
         const handlePaymentAuthorized = (paymentData) => {
             return config.onPaymentAuthorized(paymentData);
+        }
+
+        /* PayPal's callbacks */
+        const handleShippingAddressChange = (data, actions, component) => {
+            return config.onShippingAddressChange(data, actions, component);
+        }
+
+        const handleShopperDetails = (shopperDetails, rawData, actions) => {
+            return config.onShopperDetails(shopperDetails, rawData, actions);
         }
 
         let checkout,
@@ -141,9 +155,12 @@
                     }
                 },
                 "paypal": {
-                    "blockPayPalCreditButton": true,
-                    "blockPayPalPayLaterButton": true,
-                    "onClick": (source, event, self) => {
+                    isExpress: true,
+                    onShippingAddressChange: handleShippingAddressChange,
+                    onShopperDetails: handleShopperDetails,
+                    blockPayPalCreditButton: true,
+                    blockPayPalPayLaterButton: true,
+                    onClick: (source, event, self) => {
                         return handleOnClick(event.resolve, event.reject);
                     }
                 }

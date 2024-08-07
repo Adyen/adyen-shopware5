@@ -30,6 +30,8 @@
                 "onAdditionalDetails": $.proxy(me.onAdditionalDetails, me),
                 "onPaymentAuthorized": $.proxy(me.onPaymentAuthorized, me),
                 "onPaymentDataChanged": $.proxy(me.onPaymentDataChanged, me),
+                "onShippingAddressChange": $.proxy(me.onShippingAddressChange, me),
+                "onShopperDetails": $.proxy(me.onShopperDetails, me),
             });
 
             me.mountExpressCheckoutButtons();
@@ -129,5 +131,15 @@
                 resolve(paymentDataRequestUpdate);
             });
         },
+
+        onShippingAddressChange: function (data, actions, component) {
+            const currentPaymentData = component.paymentData;
+            console.log(currentPaymentData);
+        },
+
+        onShopperDetails: function (shopperDetails, rawData, actions) {
+            actions.resolve();
+            console.log(shopperDetails);
+        }
     });
 })(jQuery);
