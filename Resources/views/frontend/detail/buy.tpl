@@ -13,6 +13,8 @@
                     <input type="hidden" name="adyen_article_number" value="{$sArticle.ordernumber}"/>
                     <input type="hidden" name="adyenExpressPaymentMethodStateData">
                     <input type="hidden" name="adyenShippingAddress">
+                    <input type="hidden" name="adyenBillingAddress">
+                    <input type="hidden" name="adyenEmail">
 
                     <div
                             data-checkoutConfigUrl="{url
