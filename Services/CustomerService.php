@@ -32,7 +32,8 @@ class CustomerService
      * Creates a new customer.
      *
      * @param $email
-     * @param $sourceAddress
+     * @param $sourceBillingAddress
+     * @param $sourceShippingAddress
      *
      * @return Customer
      *
@@ -40,13 +41,40 @@ class CustomerService
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function createCustomer($email, $sourceAddress)
+    public function createCustomer($email, $sourceBillingAddress, $sourceShippingAddress)
     {
         $customer = new Customer();
         $customer->setEmail($email);
         $customer->setPassword('secure_password');
         $customer->setActive(true);
 
+        $billingAddress = $this->createAddress($sourceBillingAddress);
+        $shippingAddress = $this->createAddress($sourceShippingAddress);
+
+        $customer->setDefaultBillingAddress($billingAddress);
+        $customer->setDefaultShippingAddress($shippingAddress);
+        $billingAddress->setCustomer($customer);
+
+        // Set customer group (default group here)
+        $customerGroup = $this->modelManager->getRepository(Group::class)->findOneBy(['key' => 'EK']);
+        $customer->setGroup($customerGroup);
+
+        $this->modelManager->persist($customer);
+        $this->modelManager->persist($billingAddress);
+        $this->modelManager->flush();
+
+        return $customer;
+    }
+
+    /**
+     * Creates a Shopware 5 address entity from the source address.
+     *
+     * @param $sourceAddress
+     *
+     * @return Address
+     */
+    private function createAddress($sourceAddress)
+    {
         $address = new Address();
         $address->setFirstName($sourceAddress->firstName);
         $address->setLastName($sourceAddress->lastName);
@@ -56,18 +84,6 @@ class CustomerService
         $address->setCity($sourceAddress->city);
         $address->setCountry($this->modelManager->getRepository(Country::class)->findOneBy(['iso' => $sourceAddress->country]));
 
-        $customer->setDefaultBillingAddress($address);
-        $customer->setDefaultShippingAddress($address);
-        $address->setCustomer($customer);
-
-        // Set customer group (default group here)
-        $customerGroup = $this->modelManager->getRepository(Group::class)->findOneBy(['key' => 'EK']);
-        $customer->setGroup($customerGroup);
-
-        $this->modelManager->persist($customer);
-        $this->modelManager->persist($address);
-        $this->modelManager->flush();
-
-        return $customer;
+        return $address;
     }
 }

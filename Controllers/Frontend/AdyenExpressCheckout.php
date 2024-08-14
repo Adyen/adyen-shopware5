@@ -119,15 +119,16 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
     private function initializeCustomer()
     {
         $email = str_replace(['"', "'"], '', $this->Request()->getParam('adyenEmail'));
-        $address = json_decode($this->Request()->getParam('adyenAddress'));
+        $billingAddress = json_decode($this->Request()->getParam('adyenBillingAddress'));
+        $shippingAddress = json_decode($this->Request()->getParam('adyenShippingAddress'));
 
-        if ($email && $address) {
+        if ($email && $billingAddress && $shippingAddress) {
             /* @var CustomerService $customerService */
             $customerService = ServiceRegister::getService(CustomerService::class);
             $customer = $customerService->getCustomerByEmail($email);
 
             if (!$customer) {
-                $customer = $customerService->createCustomer($email, $address);
+                $customer = $customerService->createCustomer($email, $billingAddress, $shippingAddress);
             }
 
             $this->front->Request()->setPost('email', $customer->getEmail());
