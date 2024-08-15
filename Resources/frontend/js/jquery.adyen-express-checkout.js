@@ -103,6 +103,14 @@
 
             if (me.paymentData) {
                 additionalData.paymentData = me.paymentData
+
+                if (additionalData.details.paymentSource === 'paypal') {
+                    let expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
+
+                    additionalData.adyenShippingAddress = expressCheckoutForm.find(me.opts.shippingAddressInputSelector).val();
+                    additionalData.adyenBillingAddress = expressCheckoutForm.find(me.opts.billingAddressInputSelector).val();
+                    additionalData.adyenEmail = expressCheckoutForm.find(me.opts.emailInputSelector).val();
+                }
             }
             $.ajax({
                 method: 'POST',
@@ -162,7 +170,8 @@
         },
 
         onShopperDetails: function (shopperDetails, rawData, actions) {
-            let expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
+            let me = this,
+                expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
 
             me.opts.shippingAddress = {
                 firstName: shopperDetails.shopperName.firstName,

@@ -9,10 +9,12 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Amount\Curren
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\ShopperReference;
 use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ConnectionSettingsNotFountException;
 use Adyen\Core\Infrastructure\Logger\Logger;
+use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\AdyenPayment;
 use AdyenPayment\Components\CheckoutConfigProvider;
 use AdyenPayment\Components\ErrorMessageProvider;
 use AdyenPayment\Components\PaymentMeansEnricher;
+use AdyenPayment\Services\CustomerService;
 use AdyenPayment\Utilities\Plugin;
 use AdyenPayment\Utilities\Url;
 use AdyenPayment\Utilities\Shop;
@@ -332,7 +334,9 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
         if ($basketSignature) {
             try {
                 $basket = $this->loadBasketFromSignature($basketSignature);
-                $this->verifyBasketSignature($basketSignature, $basket);
+                if (!empty($this->get('session')->get('sUserId'))) {
+                    $this->verifyBasketSignature($basketSignature, $basket);
+                }
             } catch (Exception $e) {
                 $this->errorMessageProvider->add(
                     $this->snippets->getNamespace('frontend/adyen/checkout')->get(
@@ -343,6 +347,33 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
 
                 return Url::getFrontUrl('checkout', 'shippingPayment');
             }
+        }
+
+        /* @var CustomerService $customerService */
+        $customerService = ServiceRegister::getService(CustomerService::class);
+
+        if (!$customerService->isUserLoggedIn() && !empty($this->Request()->getParam('adyenEmail'))) {
+            $customer = $customerService->initializeCustomer($this->Request());
+
+            $this->front->Request()->setPost('email', $customer->getEmail());
+            $this->front->Request()->setPost('passwordMD5', $customer->getPassword());
+            Shopware()->Modules()->Admin()->sLogin(true);
+
+            Shopware()->Session()->offsetSet('sUserId', $customer->getId());
+            Shopware()->Session()->offsetSet('sUserMail', $customer->getEmail());
+            Shopware()->Session()->offsetSet('sUserGroup', $customer->getGroup()->getKey());
+            Shopware()->Session()->offsetSet('sUserPasswordChangeDate', $customer->getPasswordChangeDate()->format('Y-m-d H:i:s'));
+
+            /** @var Shopware_Controllers_Frontend_Checkout $checkoutController */
+            $checkoutController = Enlight_Class::Instance(Shopware_Controllers_Frontend_Checkout::class, [$this->request, $this->response]);
+            $checkoutController->init();
+            $checkoutController->setView($this->View());
+            $checkoutController->setContainer($this->container);
+            $checkoutController->setFront($this->front);
+            $checkoutController->setRequest($this->request);
+            $checkoutController->setResponse($this->response);
+            $checkoutController->preDispatch();
+            $checkoutController->confirmAction();
         }
 
         $response = CheckoutAPI::get()

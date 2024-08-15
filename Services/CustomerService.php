@@ -5,6 +5,8 @@ namespace AdyenPayment\Services;
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Enlight_Controller_Request_RequestHttp;
+use http\Exception\InvalidArgumentException;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Country\Country;
 use Shopware\Models\Customer\Address;
@@ -21,11 +23,61 @@ class CustomerService
     }
 
     /**
+     * Returns a customer by email.
+     *
      * @throws NotSupported
      */
     public function getCustomerByEmail($email)
     {
         return $this->modelManager->getRepository(Customer::class)->findOneBy(['email' => $email]);
+    }
+
+    /**
+     * Checks whether there is a user logged in at the moment.
+     *
+     * @return bool
+     */
+    public function isUserLoggedIn(): bool
+    {
+        if (!(bool)Shopware()->Session()->get('sUserId')) {
+            return false;
+        }
+
+        $userData = Shopware()->Modules()->Admin()->sGetUserData();
+        if (
+            !empty($userData['additional']['user']['accountmode']) &&
+            (int)$userData['additional']['user']['accountmode'] === Customer::ACCOUNT_MODE_FAST_LOGIN
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Initializes a customer on the storefront.
+     *
+     * @throws OptimisticLockException
+     * @throws NotSupported
+     * @throws ORMException
+     */
+    public function initializeCustomer(Enlight_Controller_Request_RequestHttp $request)
+    {
+        $email = str_replace(['"', "'"], '', $request->getParam('adyenEmail'));
+        $billingAddress = json_decode($request->getParam('adyenBillingAddress'));
+        $shippingAddress = json_decode($request->getParam('adyenShippingAddress'));
+
+        if ($email && $billingAddress && $shippingAddress) {
+            $customer = $this->getCustomerByEmail($email);
+
+            if (!$customer) {
+                $customer = $this->createCustomer($email, $billingAddress, $shippingAddress);
+            }
+
+            return $customer;
+        }
+
+        throw new InvalidArgumentException('Required customer information missing from the request.');
     }
 
     /**
@@ -45,7 +97,7 @@ class CustomerService
     {
         $customer = new Customer();
         $customer->setEmail($email);
-        $customer->setPassword('secure_password');
+        $customer->setPassword(md5(time()));
         $customer->setActive(true);
 
         $billingAddress = $this->createAddress($sourceBillingAddress);
@@ -67,13 +119,15 @@ class CustomerService
     }
 
     /**
-     * Creates a Shopware 5 address entity from the source address.
+     * Creates a customer address.
      *
      * @param $sourceAddress
      *
      * @return Address
+     *
+     * @throws NotSupported
      */
-    private function createAddress($sourceAddress)
+    private function createAddress($sourceAddress): Address
     {
         $address = new Address();
         $address->setFirstName($sourceAddress->firstName);
