@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.1.10</version>
+    <version>4.1.11</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -733,6 +733,18 @@
         <changes lang="de">
             * Fix payment method disabling when plugin is uninstalled or payment method is deleted in plugin.
             * Update core version to 1.1.12
+        </changes>
+    </changelog>
+    <changelog version="4.1.11">
+        <changes lang="en">
+            * Fix to always use https for the store domain
+            * Update core version to 1.1.13
+            * Fix order status transition when failed authorization webhook is received
+        </changes>
+        <changes lang="de">
+            * Fix to always use https for the store domain
+            * Update core version to 1.1.13
+            * Fix order status transition when failed authorization webhook is received
         </changes>
     </changelog>
 </plugin>
