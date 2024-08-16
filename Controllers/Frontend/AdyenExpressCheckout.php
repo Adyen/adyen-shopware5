@@ -146,7 +146,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
                 $basket = Shopware()->Modules()->Basket()->sGetBasket();
                 /** @var BasketSignatureGeneratorInterface $signatureGenerator */
                 $signatureGenerator = $this->get('basket_signature_generator');
-                $basketSignature = $signatureGenerator->generateSignature($basket, 0);
+                $basketSignature = $signatureGenerator->generateSignature($basket,  uniqid('adyen_guest', true));
 
                 /** @var BasketPersister $persister */
                 $persister = $this->get('basket_persister');
