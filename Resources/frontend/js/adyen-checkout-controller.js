@@ -87,7 +87,8 @@
         };
         config.onShippingAddressChange = config.onShippingAddressChange || function () {
         };
-        config.onShopperDetails = config.onShopperDetails || function () {
+        config.onShopperDetails = config.onShopperDetails || function (shopperDetails, rawData, actions) {
+            actions.resolve();
         };
         config.onPayButtonClick = config.onPayButtonClick || function (resolve, reject) {
             resolve();
