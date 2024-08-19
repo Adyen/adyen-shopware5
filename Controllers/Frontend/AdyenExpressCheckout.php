@@ -1,18 +1,14 @@
 <?php
 
-use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentRequest;
-use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Proxies\PaymentsProxy;
-use Adyen\Core\BusinessLogic\Domain\Connection\Services\ConnectionService;
-use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
+use Adyen\Core\BusinessLogic\CheckoutAPI\CheckoutAPI;
+use Adyen\Core\BusinessLogic\CheckoutAPI\PaymentRequest\Request\StartTransactionRequest;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\Components\BasketHelper;
 use AdyenPayment\Components\CheckoutConfigProvider;
+use AdyenPayment\Utilities\Shop;
 use AdyenPayment\Utilities\Url;
-use Shopware\Bundle\CartBundle\CheckoutKey;
-use Shopware\Bundle\StoreFrontBundle\Service\ContextServiceInterface;
 use Shopware\Components\BasketSignature\BasketPersister;
 use Shopware\Components\BasketSignature\BasketSignatureGeneratorInterface;
-use Shopware\Models\Customer\Customer;
 use AdyenPayment\Services\CustomerService;
 use AdyenPayment\Utilities\Plugin;
 
@@ -133,64 +129,51 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
      */
     private function startGuestPayPalPaymentTransaction()
     {
-        $shopContext = Shopware()->Container()->get(ContextServiceInterface::class)->getShopContext();
+        $basket = Shopware()->Modules()->Basket()->sGetBasket();
+        /** @var BasketSignatureGeneratorInterface $signatureGenerator */
+        $signatureGenerator = $this->get('basket_signature_generator');
+        $basketSignature = $signatureGenerator->generateSignature($basket,  uniqid('adyen_guest', true));
 
-        StoreContext::doWithStore(
-            $shopContext->getShop()->getId(),
-            function () {
-                /** @var ConnectionService $connectionService */
-                $connectionService = ServiceRegister::getService(ConnectionService::class);
-                /** @var PaymentsProxy $paymentsProxy */
-                $paymentsProxy = ServiceRegister::getService(PaymentsProxy::class);
+        /** @var BasketPersister $persister */
+        $persister = $this->get('basket_persister');
+        $persister->persist($basketSignature, $basket);
 
-                $basket = Shopware()->Modules()->Basket()->sGetBasket();
-                /** @var BasketSignatureGeneratorInterface $signatureGenerator */
-                $signatureGenerator = $this->get('basket_signature_generator');
-                $basketSignature = $signatureGenerator->generateSignature($basket,  uniqid('adyen_guest', true));
+        $reference = md5(uniqid("{$basketSignature}_"));
 
-                /** @var BasketPersister $persister */
-                $persister = $this->get('basket_persister');
-                $persister->persist($basketSignature, $basket);
-
-                $amount = $this->basketHelper->getTotalAmountFor(
-                    $this->prepareCheckoutController(),
-                    !empty($productNumber) ? $productNumber : null
-                );
-                $connectionSettings = $connectionService->getConnectionData();
-                $reference = md5(uniqid("{$basketSignature}_"));
-                $returnUrl = Url::getFrontUrl(
-                    'AdyenPaymentProcess',
-                    'handleRedirect',
-                    ['signature' => $basketSignature, 'reference' => $reference]
-                );
-                $paymentMethod = [
-                    'type' => 'paypal',
-                    'subtype' => 'express',
-                ];
-
-                $request = new PaymentRequest(
-                    $amount,
-                    $connectionSettings->getActiveConnectionData()->getMerchantId(),
+        $response = CheckoutAPI::get()
+            ->paymentRequest(Shop::getShopId())
+            ->startTransaction(
+                new StartTransactionRequest(
+                    'paypal',
+                    $this->basketHelper->getTotalAmountFor(
+                        $this->prepareCheckoutController(),
+                        !empty($productNumber) ? $productNumber : null
+                    ),
                     $reference,
-                    $returnUrl,
-                    $paymentMethod
-                );
+                    Url::getFrontUrl(
+                        'AdyenPaymentProcess',
+                        'handleRedirect',
+                        ['signature' => $basketSignature, 'reference' => $reference]
+                    ),
+                    (array)json_decode(Shopware()->Session()->offsetGet('adyenPaymentMethodStateData'), true),
+                    [
+                        'basket' => $this->getBasket(),
+                    ]
+                )
+            );
 
-                $response = $paymentsProxy->startPaymentTransaction($request);
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+        $this->Response()->setHeader('Content-Type', 'application/json');
 
-                $this->Front()->Plugins()->ViewRenderer()->setNoRender();
-                $this->Response()->setHeader('Content-Type', 'application/json');
-
-                $this->Response()->setBody(
-                    json_encode([
-                        'action' => $response->getAction(),
-                        'signature' => $basketSignature,
-                        'reference' => $reference,
-                    ])
-                );
-            }
+        $this->Response()->setBody(
+            json_encode([
+                'action' => $response->getAction(),
+                'signature' => $basketSignature,
+                'reference' => $reference,
+            ])
         );
     }
+
     private function prepareCheckoutController(): Shopware_Controllers_Frontend_Checkout
     {
         /** @var Shopware_Controllers_Frontend_Checkout $checkoutController */
