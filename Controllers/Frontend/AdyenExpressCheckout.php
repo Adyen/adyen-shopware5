@@ -2,6 +2,7 @@
 
 use Adyen\Core\BusinessLogic\CheckoutAPI\CheckoutAPI;
 use Adyen\Core\BusinessLogic\CheckoutAPI\PaymentRequest\Request\StartTransactionRequest;
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethodCode;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\Components\BasketHelper;
 use AdyenPayment\Components\CheckoutConfigProvider;
@@ -104,7 +105,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
 
         if (
             !$customerService->isUserLoggedIn()
-            && $paymentMean['name'] === 'adyen_paypal'
+            && PaymentMethodCode::payPal()->equals($this->Request()->getParam('adyen_payment_method'))
             && empty($this->Request()->getParam('adyenEmail'))
         ) {
             $this->startGuestPayPalPaymentTransaction();
@@ -139,6 +140,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         $persister->persist($basketSignature, $basket);
 
         $reference = md5(uniqid("{$basketSignature}_"));
+        $productNumber = $this->Request()->get('adyen_article_number');
 
         $response = CheckoutAPI::get()
             ->paymentRequest(Shop::getShopId())
