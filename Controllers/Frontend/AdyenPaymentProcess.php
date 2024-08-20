@@ -374,6 +374,8 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
             $checkoutController->setResponse($this->response);
             $checkoutController->preDispatch();
             $checkoutController->confirmAction();
+        } elseif (!empty($this->Request()->getParam('adyenEmail'))) {
+            $customerService->initializeCustomer($this->Request());
         }
 
         $response = CheckoutAPI::get()

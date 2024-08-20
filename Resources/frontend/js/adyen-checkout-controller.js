@@ -56,6 +56,8 @@
      * @param {{
      * checkoutConfigUrl: string,
      * showPayButton: boolean,
+     * requireAddress: boolean,
+     * requireEmail: boolean,
      * sessionStorage: sessionStorage,
      * onStateChange: function|undefined,
      * onAdditionalDetails: function|undefined,
@@ -74,6 +76,10 @@
             url.hostname = devOnlyConfig.globalReplacementDomain;
             url.protocol = 'https:';
         }
+
+        config.requireAddress = config.requireAddress || false;
+
+        config.requireEmail = config.requireEmail || false;
 
         config.onStateChange = config.onStateChange || function () {
         };
@@ -126,61 +132,64 @@
             activeComponent,
             isStateValid = true,
             sessionStorage = config.sessionStorage || window.sessionStorage,
-            amazonCheckoutSessionId = url.searchParams.get('amazonCheckoutSessionId'),
-            paymentMethodSpecificConfig = {
-                "amazonpay": {
-                    "productType": 'PayOnly',
-                    "checkoutMode": 'ProcessOrder',
-                    "chargePermissionType": 'OneTime',
-                    "onClick": handleOnClick,
-                    "returnUrl": url.href,
-                    "cancelUrl": url.href
-                },
-                "paywithgoogle": {
-                    onClick: handleOnClick,
-                    callbackIntents: ['SHIPPING_ADDRESS', 'PAYMENT_AUTHORIZATION'],
-                    shippingAddressRequired: true,
-                    emailRequired: true,
-                    shippingAddressParameters: {
-                        allowedCountryCodes: [],
-                        phoneNumberRequired: true
-                    },
-                    shippingOptionRequired: false,
-                    buttonSizeMode: "fill",
-                    onAuthorized: handleAuthorized,
-                    paymentDataCallbacks: {
-                        onPaymentDataChanged: handlePaymentDataChanged,
-                        onPaymentAuthorized: handlePaymentAuthorized,
-                    }
-                },
-                "googlepay": {
-                    onClick: handleOnClick,
-                    callbackIntents: ['SHIPPING_ADDRESS', 'PAYMENT_AUTHORIZATION'],
-                    shippingAddressRequired: true,
-                    emailRequired: true,
-                    shippingAddressParameters: {
-                        allowedCountryCodes: [],
-                        phoneNumberRequired: true
-                    },
-                    shippingOptionRequired: false,
-                    buttonSizeMode: "fill",
-                    onAuthorized: handleAuthorized,
-                    paymentDataCallbacks: {
-                        onPaymentDataChanged: handlePaymentDataChanged,
-                        onPaymentAuthorized: handlePaymentAuthorized,
-                    }
-                },
-                "paypal": {
-                    isExpress: true,
-                    onShippingAddressChange: handleShippingAddressChange,
-                    onShopperDetails: handleShopperDetails,
-                    blockPayPalCreditButton: true,
-                    blockPayPalPayLaterButton: true,
-                    onClick: (source, event, self) => {
-                        return handleOnClick(event.resolve, event.reject);
-                    }
-                }
+            amazonCheckoutSessionId = url.searchParams.get('amazonCheckoutSessionId');
+
+        let googlePaymentDataCallbacks = {};
+        if (config.requireAddress) {
+            googlePaymentDataCallbacks = {
+                onPaymentDataChanged: handlePaymentDataChanged,
+                onPaymentAuthorized: handlePaymentAuthorized,
             };
+        }
+
+        let paymentMethodSpecificConfig = {
+            "amazonpay": {
+                "productType": 'PayOnly',
+                "checkoutMode": 'ProcessOrder',
+                "chargePermissionType": 'OneTime',
+                "onClick": handleOnClick,
+                "returnUrl": url.href,
+                "cancelUrl": url.href
+            },
+            "paywithgoogle": {
+                onClick: handleOnClick,
+                callbackIntents: config.requireAddress ? ['SHIPPING_ADDRESS', 'PAYMENT_AUTHORIZATION']  : [],
+                shippingAddressRequired: config.requireAddress,
+                emailRequired: config.requireEmail,
+                shippingAddressParameters: {
+                    allowedCountryCodes: [],
+                    phoneNumberRequired: true
+                },
+                shippingOptionRequired: false,
+                buttonSizeMode: "fill",
+                onAuthorized: handleAuthorized,
+                paymentDataCallbacks: googlePaymentDataCallbacks
+            },
+            "googlepay": {
+                onClick: handleOnClick,
+                callbackIntents: config.requireAddress ? ['SHIPPING_ADDRESS', 'PAYMENT_AUTHORIZATION']  : [],
+                shippingAddressRequired: config.requireAddress,
+                emailRequired: config.requireEmail,
+                shippingAddressParameters: {
+                    allowedCountryCodes: [],
+                    phoneNumberRequired: true
+                },
+                shippingOptionRequired: false,
+                buttonSizeMode: "fill",
+                onAuthorized: handleAuthorized,
+                paymentDataCallbacks: googlePaymentDataCallbacks
+            },
+            "paypal": {
+                isExpress: true,
+                onShippingAddressChange: handleShippingAddressChange,
+                onShopperDetails: handleShopperDetails,
+                blockPayPalCreditButton: true,
+                blockPayPalPayLaterButton: true,
+                onClick: (source, event, self) => {
+                    return handleOnClick(event.resolve, event.reject);
+                }
+            }
+        };
 
         if (config.amount) {
             paymentMethodSpecificConfig['amazonpay']['amount'] = config.amount;

@@ -17,6 +17,7 @@
             billingAddress: [],
             emailInputSelector: 'input[name=adyenEmail]',
             confirmFormSelector: 'form[data-adyen-express-checkout-form]',
+            userLoggedIn: $('input[name=adyenLoggedIn]').length
         },
 
         checkoutController: null,
@@ -29,6 +30,8 @@
             me.checkoutController = new AdyenComponents.CheckoutController({
                 "checkoutConfigUrl": me.opts.checkoutConfigUrl,
                 "showPayButton": true,
+                "requireAddress": !me.opts.userLoggedIn,
+                "requireEmail": !me.opts.userLoggedIn,
                 "sessionStorage": StorageManager.getStorage('session'),
                 "onStateChange": $.proxy(me.submitOrder, me),
                 "onAdditionalDetails": $.proxy(me.onAdditionalDetails, me),
@@ -127,6 +130,7 @@
         },
 
         onAuthorized: function (paymentData) {
+            console.log('Shopper details', paymentData);
         },
 
         onPaymentAuthorized: function (paymentData) {

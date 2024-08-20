@@ -28,6 +28,10 @@
                                 <input type="hidden" name="adyenBillingAddress">
                                 <input type="hidden" name="adyenEmail">
 
+                                {if $userLoggedIn}
+                                    <input type="hidden" name="adyenLoggedIn">
+                                {/if}
+
                                 <div
                                         data-checkoutConfigUrl="{url
                                         module='frontend'

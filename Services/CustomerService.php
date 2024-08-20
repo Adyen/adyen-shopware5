@@ -64,15 +64,27 @@ class CustomerService
     public function initializeCustomer(Enlight_Controller_Request_RequestHttp $request)
     {
         $email = str_replace(['"', "'"], '', $request->getParam('adyenEmail'));
-        $billingAddress = json_decode($request->getParam('adyenBillingAddress'));
-        $shippingAddress = json_decode($request->getParam('adyenShippingAddress'));
+        $sourceBillingAddress = json_decode($request->getParam('adyenBillingAddress'));
+        $sourceShippingAddress = json_decode($request->getParam('adyenShippingAddress'));
 
-        if ($email && $billingAddress && $shippingAddress) {
+        if ($email && $sourceBillingAddress && $sourceShippingAddress) {
             $customer = $this->getCustomerByEmail($email);
 
             if (!$customer) {
-                $customer = $this->createCustomer($email, $billingAddress, $shippingAddress);
+                $customer = $this->createCustomer($email);
             }
+
+            $billingAddress = $this->createAddress($sourceBillingAddress);
+            $shippingAddress = $this->createAddress($sourceShippingAddress);
+            $customer->setDefaultBillingAddress($billingAddress);
+            $customer->setDefaultShippingAddress($shippingAddress);
+            $billingAddress->setCustomer($customer);
+            $shippingAddress->setCustomer($customer);
+
+            $this->modelManager->persist($billingAddress);
+            $this->modelManager->persist($shippingAddress);
+            $this->modelManager->persist($customer);
+            $this->modelManager->flush();
 
             return $customer;
         }
@@ -93,26 +105,18 @@ class CustomerService
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function createCustomer($email, $sourceBillingAddress, $sourceShippingAddress)
+    public function createCustomer($email)
     {
         $customer = new Customer();
         $customer->setEmail($email);
         $customer->setPassword(md5(time()));
         $customer->setActive(true);
 
-        $billingAddress = $this->createAddress($sourceBillingAddress);
-        $shippingAddress = $this->createAddress($sourceShippingAddress);
-
-        $customer->setDefaultBillingAddress($billingAddress);
-        $customer->setDefaultShippingAddress($shippingAddress);
-        $billingAddress->setCustomer($customer);
-
         // Set customer group (default group here)
         $customerGroup = $this->modelManager->getRepository(Group::class)->findOneBy(['key' => 'EK']);
         $customer->setGroup($customerGroup);
 
         $this->modelManager->persist($customer);
-        $this->modelManager->persist($billingAddress);
         $this->modelManager->flush();
 
         return $customer;
@@ -137,6 +141,8 @@ class CustomerService
         $address->setPhone($sourceAddress->phone);
         $address->setCity($sourceAddress->city);
         $address->setCountry($this->modelManager->getRepository(Country::class)->findOneBy(['iso' => $sourceAddress->country]));
+
+        $this->modelManager->persist($address);
 
         return $address;
     }

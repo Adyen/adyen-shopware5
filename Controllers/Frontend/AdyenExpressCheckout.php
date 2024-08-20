@@ -76,6 +76,8 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
             Shopware()->Session()->offsetSet('sUserMail', $customer->getEmail());
             Shopware()->Session()->offsetSet('sUserGroup', $customer->getGroup()->getKey());
             Shopware()->Session()->offsetSet('sUserPasswordChangeDate', $customer->getPasswordChangeDate()->format('Y-m-d H:i:s'));
+        } elseif (!empty($this->Request()->getParam('adyenEmail'))) {
+            $customerService->initializeCustomer($this->Request());
         }
 
         $productNumber = $this->Request()->get('adyen_article_number');
