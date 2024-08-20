@@ -65,6 +65,11 @@ class AddressProcessor implements BaseAddressProcessor, PaymentLinkAddressProces
             /** @var Country[] $country */
             $country = $this->countryRepository->getCountryQuery($userData['billingaddress']['countryId'])->getResult();
 
+            if (empty($country)) {
+                /** @var Country[] $country */
+                $country = $this->countryRepository->getCountryQuery($userData['billingaddress']['countryID'])->getResult();
+            }
+
             $this->setBillingAddress($billingAddressRawData, $country[0] ?: null, $userData, $builder);
             $this->setCountryCode($stateDataCountry, $country[0] ?: null, $builder);
         }
@@ -72,6 +77,11 @@ class AddressProcessor implements BaseAddressProcessor, PaymentLinkAddressProces
         if (!empty($userData['shippingaddress']) && empty($deliveryAddressRawData)) {
             /** @var Country[] $country */
             $country = $this->countryRepository->getCountryQuery($userData['shippingaddress']['countryId'])->getResult();
+            if (empty($country)) {
+                /** @var Country[] $country */
+                $country = $this->countryRepository->getCountryQuery($userData['shippingaddress']['countryID'])->getResult();
+            }
+
             $state = null;
 
             if (!empty($userData['shippingaddress']['stateID'])) {
