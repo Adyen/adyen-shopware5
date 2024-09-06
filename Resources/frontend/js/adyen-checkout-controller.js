@@ -230,14 +230,14 @@
         const handleOnChange = (state) => {
             isStateValid = state.isValid;
 
+            if (isStateValid) {
+                sessionStorage.setItem('adyen-payment-method-state-data', JSON.stringify(state.data));
+            }
+
             if(isStateValid && isClickToPayPaymentMethod(state.data.paymentMethod)) {
                 checkout.remove(activeComponent);
                 activeComponent = null;
                 config.onClickToPay();
-            }
-
-            if (isStateValid) {
-                sessionStorage.setItem('adyen-payment-method-state-data', JSON.stringify(state.data));
             }
 
             config.onStateChange();

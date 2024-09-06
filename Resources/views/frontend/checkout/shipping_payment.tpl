@@ -18,4 +18,8 @@
     <div id="shipping_payment_wrapper" class="adyen-hidden--all">
         {$smarty.block.parent}
     </div>
+    <input type="hidden" id="adyenClickToPayUrl" value="{url
+    module='frontend'
+    controller='AdyenExpressCheckout'
+    action='finish'}">
 {/block}

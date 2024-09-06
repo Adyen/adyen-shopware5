@@ -162,6 +162,20 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
             return;
         }
 
+        if ($this->isAjaxRequest() && $paymentMethodType === 'scheme') {
+            $this->session->offsetSet('adyen_action', $response->getAction());
+            $this->session->offsetSet('signature', $basketSignature);
+            $this->session->offsetSet('orderReference', $orderReference);
+
+            $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+            $this->Response()->setHeader('Content-Type', 'application/json');
+
+            $this->Response()->setBody(json_encode([
+                'nextStepUrl' =>  Url::getFrontUrl('AdyenClickToPay', 'index')
+            ]));
+
+            return;
+        }
 
         if ($this->isAjaxRequest()) {
             $this->Front()->Plugins()->ViewRenderer()->setNoRender();

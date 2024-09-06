@@ -17,7 +17,8 @@
             paymentMethodBlockSelector: '.payment--method.block',
             paymentMethodComponentContainerSelector: '.method--bankdata',
             updatePaymentInfoButtonClass: 'method--change-info',
-            updatePaymentInfoButtonText: 'Update your payment information'
+            updatePaymentInfoButtonText: 'Update your payment information',
+            clickToPayUrl: '#adyenClickToPayUrl'
         },
 
         checkoutController: null,
@@ -176,15 +177,38 @@
         },
 
         handleClickToPay: function () {
-            let me = this,
-                selectedPaymentMeanEl = $(me.opts.activePaymentMeanSelector).first(),
-                 componentContainerEl = selectedPaymentMeanEl
-                .closest(me.opts.paymentMethodBlockSelector)
-                .find(me.opts.paymentMethodComponentContainerSelector),
-                clickToPayLabel = selectedPaymentMeanEl.attr("data-adyen-click-to-pay-label"),
-                labelElement = $("<p>").text(clickToPayLabel);
+            let me = this;
 
-            componentContainerEl.prepend(labelElement);
+            var url = $(me.opts.clickToPayUrl)[0].value;
+            $.ajax({
+                type: "POST",
+                url: url + '?isXHR=1',
+                data: {
+                    adyen_payment_method: 'scheme',
+                    adyenExpressPaymentMethodStateData: me.checkoutController.getPaymentMethodStateData()
+                },
+                success: function(data) {
+                    if (data.nextStepUrl) {
+                        window.location.href = data.nextStepUrl;
+                        return;
+                    }
+
+                    if (!data.action) {
+                        window.location.href = me.opts.checkoutShippingPaymentUrl;
+                        return;
+                    }
+
+                    me.paymentData = null;
+                    if (data.action.paymentData) {
+                        me.paymentData = data.action.paymentData
+                    }
+
+                    me.checkoutController.handleAction(data.action);
+                },
+                error: function(data) {
+                    window.location.href = me.opts.checkoutShippingPaymentUrl;
+                }
+            });
         }
     });
 
