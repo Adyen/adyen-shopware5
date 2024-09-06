@@ -30,6 +30,7 @@ class ControllerPath implements SubscriberInterface
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_AdyenPaymentProcess' => 'onGetControllerPromotion',
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_AdyenDonations' => 'onGetControllerPromotion',
             'Shopware_Controllers_Frontend_AdyenExpressCheckout' => 'onGetControllerPromotion',
+            'Shopware_Controllers_Frontend_AdyenClickToPay' => 'onGetControllerPromotion',
         ];
     }
 
