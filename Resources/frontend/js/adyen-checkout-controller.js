@@ -63,6 +63,8 @@
      * onAdditionalDetails: function|undefined,
      * onAuthorized: function|undefined,
      * onPaymentAuthorized: function|undefined,
+     * onApplePayPaymentAuthorized: function|undefined,
+     * onShippingContactSelected: function|undefined,
      * onPaymentDataChanged: function|undefined,
      * onShippingAddressChange: function|undefined,
      * onShopperDetails: function|undefined,
@@ -93,6 +95,10 @@
         };
         config.onPaymentAuthorized = config.onPaymentAuthorized || function () {
         };
+        config.onApplePayPaymentAuthorized = config.onApplePayPaymentAuthorized || function () {
+        };
+        config.onShippingContactSelected = config.onShippingContactSelected || function () {
+        };
         config.onShippingAddressChange = config.onShippingAddressChange || function () {
         };
         config.onShopperDetails = config.onShopperDetails || function (shopperDetails, rawData, actions) {
@@ -119,6 +125,14 @@
 
         const handlePaymentAuthorized = (paymentData) => {
             return config.onPaymentAuthorized(paymentData);
+        }
+
+        const handleApplePayPaymentAuthorized = (resolve, reject, event) => {
+            return config.onApplePayPaymentAuthorized(resolve, reject, event);
+        }
+
+        const handleOnShippingContactSelected = (resolve, reject, event) => {
+            return config.onShippingContactSelected(resolve, reject, event);
         }
 
         /* PayPal's callbacks */
@@ -193,6 +207,17 @@
             }
         };
 
+        if (config.requireAddress) {
+            paymentMethodSpecificConfig.applepay = {
+                countryCode: 'US',
+                isExpress: true,
+                requiredBillingContactFields: ['postalAddress'],
+                requiredShippingContactFields: ['postalAddress', 'name', 'phoneticName', 'phone', 'email'],
+                onAuthorized: handleApplePayPaymentAuthorized,
+                onShippingContactSelected: handleOnShippingContactSelected
+            }
+        }
+
         if (config.amount) {
             paymentMethodSpecificConfig['amazonpay']['amount'] = config.amount;
             paymentMethodSpecificConfig['amazonpay']['currency'] = config.amount.currency;
@@ -219,6 +244,8 @@
                 checkoutConfig.onAuthorized = handleAuthorized;
                 checkoutConfig.onPaymentDataChanged = handlePaymentDataChanged;
                 checkoutConfig.onPaymentAuthorized = handlePaymentAuthorized;
+                checkoutConfig.onApplePayPaymentAuthorized = handleApplePayPaymentAuthorized;
+                checkoutConfig.onShippingContactSelected = handleOnShippingContactSelected;
                 if (config.showPayButton) {
                     checkoutConfig.showPayButton = true;
                 }

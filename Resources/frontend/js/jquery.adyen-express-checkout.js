@@ -37,6 +37,8 @@
                 "onAdditionalDetails": $.proxy(me.onAdditionalDetails, me),
                 "onAuthorized": $.proxy(me.onAuthorized, me),
                 "onPaymentAuthorized": $.proxy(me.onPaymentAuthorized, me),
+                "onApplePayPaymentAuthorized": $.proxy(me.onApplePayPaymentAuthorized, me),
+                "onShippingContactSelected": $.proxy(me.onShippingContactSelected, me),
                 "onPaymentDataChanged": $.proxy(me.onPaymentDataChanged, me),
                 "onShippingAddressChange": $.proxy(me.onShippingAddressChange, me),
                 "onShopperDetails": $.proxy(me.onShopperDetails, me),
@@ -57,6 +59,10 @@
             if (!me.checkoutController.getPaymentMethodStateData()) {
                 me.checkoutController.forceFetchingComponentStateData();
 
+                return;
+            }
+
+            if (me.opts.adyenPaymentMethodType === 'applepay' && !me.opts.userLoggedIn) {
                 return;
             }
 
@@ -171,6 +177,106 @@
         },
 
         onShippingAddressChange: function (data, actions, component) {
+        },
+
+        onApplePayPaymentAuthorized: function (resolve, reject, event) {
+            let me = this;
+
+            let expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
+            let shippingContact = event.payment.shippingContact;
+            me.opts.shippingAddress = {
+                firstName: shippingContact.givenName,
+                lastName: shippingContact.familyName,
+                street: shippingContact.addressLines[0],
+                city: shippingContact.locality,
+                country: shippingContact.countryCode,
+                zipCode: shippingContact.postalCode,
+                phone: shippingContact.phoneNumber,
+            };
+
+            expressCheckoutForm.find(me.opts.shippingAddressInputSelector).val(JSON.stringify(me.opts.shippingAddress));
+            expressCheckoutForm.find(me.opts.billingAddressInputSelector).val(JSON.stringify(me.opts.shippingAddress));
+            expressCheckoutForm.find(me.opts.emailInputSelector).val(JSON.stringify(shippingContact.emailAddress));
+
+            if (!me.checkoutController.getPaymentMethodStateData()) {
+                return;
+            }
+
+            expressCheckoutForm.find(me.opts.stateDataInputSelector).val(me.checkoutController.getPaymentMethodStateData());
+            var url = expressCheckoutForm.attr('action');
+            $.ajax({
+                type: "POST",
+                url: url + '/isXHR/1',
+                data: expressCheckoutForm.serialize(),
+                success: function (response) {
+                    if (response.nextStepUrl.includes('checkout/finish')) {
+                        resolve(window.ApplePaySession.STATUS_SUCCESS);
+                        window.location.href = response.nextStepUrl;
+                    } else {
+                        reject(window.ApplePaySession.STATUS_FAILURE);
+                        window.location.href = response.nextStepUrl;
+                    }
+                },
+                error: function () {
+                    reject(window.ApplePaySession.STATUS_FAILURE);
+                    window.location.reload();
+                }
+            });
+        },
+
+        onShippingContactSelected: function (resolve, reject, event) {
+            let me = this;
+
+            let expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
+            let address = event.shippingContact;
+            let amount = 0;
+
+            me.opts.shippingAddress = {
+                firstName: 'Temp',
+                lastName: 'Temp',
+                street: 'Street 123',
+                city: address.locality,
+                country: address.countryCode,
+                zipCode: address.postalCode,
+                phone: '',
+            };
+
+            expressCheckoutForm.find(me.opts.shippingAddressInputSelector).val(JSON.stringify(me.opts.shippingAddress));
+            expressCheckoutForm.find(me.opts.billingAddressInputSelector).val(JSON.stringify(me.opts.shippingAddress));
+
+            var url = me.opts.checkoutConfigUrl;
+            $.ajax({
+                type: "POST",
+                url: url + '/isXHR/1',
+                data: expressCheckoutForm.serialize(),
+                success: function (response) {
+                    amount = parseInt(response.amount) / 100;
+                    let applePayShippingMethodUpdate = {};
+
+                    applePayShippingMethodUpdate.newTotal = {
+                        type: 'final',
+                        label: 'LogeecomEcom',
+                        amount: (amount).toString()
+                    };
+
+                    resolve(applePayShippingMethodUpdate);
+                },
+                error: function (response) {
+                    let update = {
+                        newTotal: {
+                            type: 'final',
+                            label: 'LogeecomEcom',
+                            amount: (amount).toString()
+                        },
+                        errors: [new ApplePayError(
+                            'shippingContactInvalid',
+                            'countryCode',
+                            response.message ?? 'Error')
+                        ]
+                    };
+                    resolve(update);
+                }
+            });
         },
 
         onShopperDetails: function (shopperDetails, rawData, actions) {
