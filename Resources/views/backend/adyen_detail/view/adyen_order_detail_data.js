@@ -372,7 +372,7 @@ Ext.define('Shopware.apps.AdyenTransaction.AdyenOrderDetailData', {
             {
                 name: 'authorizationAdjustmentAmount',
                 itemId: 'authorizationAdjustmentAmount',
-                fieldLabel: '{s name="payment/adyen/detail/authorizationadjustmentamount"}Authorization adjustment amount{/s}'
+                fieldLabel: '{s name="payment/adyen/detail/authorizationadjustmentamount"}Initial authorization amount{/s}'
             },
             {
                 xtype: 'hidden',
