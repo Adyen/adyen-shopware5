@@ -193,17 +193,7 @@
                         return;
                     }
 
-                    if (!data.action) {
-                        window.location.href = me.opts.checkoutShippingPaymentUrl;
-                        return;
-                    }
-
-                    me.paymentData = null;
-                    if (data.action.paymentData) {
-                        me.paymentData = data.action.paymentData
-                    }
-
-                    me.checkoutController.handleAction(data.action);
+                    window.location.href = me.opts.checkoutShippingPaymentUrl;
                 },
                 error: function(data) {
                     window.location.href = me.opts.checkoutShippingPaymentUrl;
