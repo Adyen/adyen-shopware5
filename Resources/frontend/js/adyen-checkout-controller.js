@@ -66,7 +66,6 @@
      * onApplePayPaymentAuthorized: function|undefined,
      * onShippingContactSelected: function|undefined,
      * onPaymentDataChanged: function|undefined,
-     * onShippingAddressChange: function|undefined,
      * onShopperDetails: function|undefined,
      * onPayButtonClick: function|undefined,
      * onClickToPay: function|undefined
@@ -90,16 +89,22 @@
         config.onAdditionalDetails = config.onAdditionalDetails || function () {
         };
         config.onPaymentDataChanged = config.onPaymentDataChanged || function () {
+            return new Promise(async resolve => {
+                resolve({});
+            });
         };
         config.onAuthorized = config.onAuthorized || function () {
         };
         config.onPaymentAuthorized = config.onPaymentAuthorized || function () {
+            return new Promise(function (resolve, reject) {
+                resolve({transactionState: 'SUCCESS'});
+            });
         };
-        config.onApplePayPaymentAuthorized = config.onApplePayPaymentAuthorized || function () {
+        config.onApplePayPaymentAuthorized = config.onApplePayPaymentAuthorized || function (resolve, reject, event) {
+            resolve(window.ApplePaySession.STATUS_SUCCESS);
         };
-        config.onShippingContactSelected = config.onShippingContactSelected || function () {
-        };
-        config.onShippingAddressChange = config.onShippingAddressChange || function () {
+        config.onShippingContactSelected = config.onShippingContactSelected || function (resolve, reject, event) {
+            resolve({});
         };
         config.onShopperDetails = config.onShopperDetails || function (shopperDetails, rawData, actions) {
             actions.resolve();
@@ -135,11 +140,6 @@
             return config.onShippingContactSelected(resolve, reject, event);
         }
 
-        /* PayPal's callbacks */
-        const handleShippingAddressChange = (data, actions, component) => {
-            return config.onShippingAddressChange(data, actions, component);
-        }
-
         const handleShopperDetails = (shopperDetails, rawData, actions) => {
             return config.onShopperDetails(shopperDetails, rawData, actions);
         }
@@ -169,7 +169,7 @@
             },
             "paywithgoogle": {
                 onClick: handleOnClick,
-                callbackIntents: config.requireAddress ? ['SHIPPING_ADDRESS', 'PAYMENT_AUTHORIZATION']  : [],
+                callbackIntents: config.requireAddress ? ['SHIPPING_ADDRESS', 'PAYMENT_AUTHORIZATION'] : [],
                 shippingAddressRequired: config.requireAddress,
                 emailRequired: config.requireEmail,
                 shippingAddressParameters: {
@@ -183,7 +183,7 @@
             },
             "googlepay": {
                 onClick: handleOnClick,
-                callbackIntents: config.requireAddress ? ['SHIPPING_ADDRESS', 'PAYMENT_AUTHORIZATION']  : [],
+                callbackIntents: config.requireAddress ? ['SHIPPING_ADDRESS', 'PAYMENT_AUTHORIZATION'] : [],
                 shippingAddressRequired: config.requireAddress,
                 emailRequired: config.requireEmail,
                 shippingAddressParameters: {
@@ -197,7 +197,6 @@
             },
             "paypal": {
                 isExpress: true,
-                onShippingAddressChange: handleShippingAddressChange,
                 onShopperDetails: handleShopperDetails,
                 blockPayPalCreditButton: true,
                 blockPayPalPayLaterButton: true,

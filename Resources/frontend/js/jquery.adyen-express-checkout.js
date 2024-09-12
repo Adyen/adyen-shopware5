@@ -40,7 +40,6 @@
                 "onApplePayPaymentAuthorized": $.proxy(me.onApplePayPaymentAuthorized, me),
                 "onShippingContactSelected": $.proxy(me.onShippingContactSelected, me),
                 "onPaymentDataChanged": $.proxy(me.onPaymentDataChanged, me),
-                "onShippingAddressChange": $.proxy(me.onShippingAddressChange, me),
                 "onShopperDetails": $.proxy(me.onShopperDetails, me),
             });
 
@@ -174,9 +173,6 @@
 
                 resolve(paymentDataRequestUpdate);
             });
-        },
-
-        onShippingAddressChange: function (data, actions, component) {
         },
 
         onApplePayPaymentAuthorized: function (resolve, reject, event) {
