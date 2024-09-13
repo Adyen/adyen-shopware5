@@ -42,26 +42,36 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         $this->basketHelper = $this->get(BasketHelper::class);
     }
 
+    /**
+     * @throws Enlight_Exception
+     * @throws InvalidCurrencyCode
+     * @throws \Doctrine\ORM\Exception\NotSupported
+     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
     public function getCheckoutConfigAction(): void
     {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
         $this->Response()->setHeader('Content-Type', 'application/json');
 
         $productNumber = $this->Request()->get('adyen_article_number');
+        $shippingAddress = $this->Request()->get('adyenShippingAddress');
 
-        if ($this->Request()->get('adyenShippingAddress')) {
-            $config = $this->getConfigForNewAddress($productNumber);
+        if ($shippingAddress) {
+            $config = $this->getConfigForNewAddress(json_decode($shippingAddress, false), $productNumber);
 
             $this->Response()->setBody(json_encode(
                 ['amount' => $config->toArray()['amount']['value']]
             ));
-        } else {
-            $this->Response()->setBody(json_encode(
-                $this->checkoutConfigProvider->getExpressCheckoutConfig(
-                    $this->basketHelper->getTotalAmountFor($this->prepareCheckoutController(), $productNumber)
-                )->toArray()
-            ));
+
+            return;
         }
+
+        $this->Response()->setBody(json_encode(
+            $this->checkoutConfigProvider->getExpressCheckoutConfig(
+                $this->basketHelper->getTotalAmountFor($this->prepareCheckoutController(), $productNumber)
+            )->toArray()
+        ));
     }
 
     /**
@@ -72,7 +82,23 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
      */
     public function finishAction(): void
     {
-        $this->initializeCustomer();
+        /* @var CustomerService $customerService */
+        $customerService = ServiceRegister::getService(CustomerService::class);
+
+        if (!$customerService->isUserLoggedIn() && !empty($this->Request()->getParam('adyenEmail'))) {
+            $customer = $customerService->initializeCustomer($this->Request());
+
+            $this->front->Request()->setPost('email', $customer->getEmail());
+            $this->front->Request()->setPost('passwordMD5', $customer->getPassword());
+            Shopware()->Modules()->Admin()->sLogin(true);
+
+            Shopware()->Session()->offsetSet('sUserId', $customer->getId());
+            Shopware()->Session()->offsetSet('sUserMail', $customer->getEmail());
+            Shopware()->Session()->offsetSet('sUserGroup', $customer->getGroup()->getKey());
+            Shopware()->Session()->offsetSet('sUserPasswordChangeDate', $customer->getPasswordChangeDate()->format('Y-m-d H:i:s'));
+        } elseif (!empty($this->Request()->getParam('adyenEmail'))) {
+            $customerService->initializeCustomer($this->Request());
+        }
 
         $productNumber = $this->Request()->get('adyen_article_number');
         if (!empty($productNumber)) {
@@ -121,38 +147,22 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         $coController->paymentAction();
     }
 
-    private function initializeCustomer()
-    {
-        /* @var CustomerService $customerService */
-        $customerService = ServiceRegister::getService(CustomerService::class);
-
-        if (!$customerService->isUserLoggedIn() && !empty($this->Request()->getParam('adyenEmail'))) {
-            $customer = $customerService->initializeCustomer($this->Request());
-
-            $this->front->Request()->setPost('email', $customer->getEmail());
-            $this->front->Request()->setPost('passwordMD5', $customer->getPassword());
-            Shopware()->Modules()->Admin()->sLogin(true);
-
-            Shopware()->Session()->offsetSet('sUserId', $customer->getId());
-            Shopware()->Session()->offsetSet('sUserMail', $customer->getEmail());
-            Shopware()->Session()->offsetSet('sUserGroup', $customer->getGroup()->getKey());
-            Shopware()->Session()->offsetSet('sUserPasswordChangeDate', $customer->getPasswordChangeDate()->format('Y-m-d H:i:s'));
-        } elseif (!empty($this->Request()->getParam('adyenEmail'))) {
-            $customerService->initializeCustomer($this->Request());
-        }
-    }
-
     /**
-     * @param string $productNumber
+     * @param $shippingAddress
+     * @param string|null $productNumber
+     *
      * @return Response
+     *
      * @throws InvalidCurrencyCode
      */
-    private function getConfigForNewAddress(?string $productNumber = null)
+    private function getConfigForNewAddress($shippingAddress, ?string $productNumber = null)
     {
-        $this->initializeCustomer();
-
         return $this->checkoutConfigProvider->getExpressCheckoutConfig(
-            $this->basketHelper->getTotalAmountFor($this->prepareCheckoutController(), $productNumber)
+            $this->basketHelper->getTotalAmountFor(
+                $this->prepareCheckoutController(),
+                $productNumber,
+                $shippingAddress
+            )
         );
     }
 
@@ -166,7 +176,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         $basket = Shopware()->Modules()->Basket()->sGetBasket();
         /** @var BasketSignatureGeneratorInterface $signatureGenerator */
         $signatureGenerator = $this->get('basket_signature_generator');
-        $basketSignature = $signatureGenerator->generateSignature($basket,  uniqid('adyen_guest', true));
+        $basketSignature = $signatureGenerator->generateSignature($basket, uniqid('adyen_guest', true));
 
         /** @var BasketPersister $persister */
         $persister = $this->get('basket_persister');
@@ -222,5 +232,4 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
 
         return $checkoutController;
     }
-
 }
