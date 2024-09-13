@@ -95,9 +95,8 @@
         };
         config.onPaymentAuthorized = config.onPaymentAuthorized || function () {
         };
-        config.onApplePayPaymentAuthorized = config.onApplePayPaymentAuthorized || function () {
-        };
-        config.onShippingContactSelected = config.onShippingContactSelected || function () {
+        config.onApplePayPaymentAuthorized = config.onApplePayPaymentAuthorized || function (resolve, reject, event) {
+            resolve(window.ApplePaySession.STATUS_SUCCESS);
         };
         config.onShippingAddressChange = config.onShippingAddressChange || function () {
         };
@@ -214,7 +213,10 @@
                 requiredBillingContactFields: ['postalAddress'],
                 requiredShippingContactFields: ['postalAddress', 'name', 'phoneticName', 'phone', 'email'],
                 onAuthorized: handleApplePayPaymentAuthorized,
-                onShippingContactSelected: handleOnShippingContactSelected
+            }
+
+            if(config.onShippingContactSelected){
+                paymentMethodSpecificConfig.applepay.onShippingContactSelected = handleOnShippingContactSelected
             }
         }
 
@@ -245,7 +247,10 @@
                 checkoutConfig.onPaymentDataChanged = handlePaymentDataChanged;
                 checkoutConfig.onPaymentAuthorized = handlePaymentAuthorized;
                 checkoutConfig.onApplePayPaymentAuthorized = handleApplePayPaymentAuthorized;
-                checkoutConfig.onShippingContactSelected = handleOnShippingContactSelected;
+                if(config.onShippingContactSelected){
+                    checkoutConfig.onShippingContactSelected = handleOnShippingContactSelected;
+                }
+
                 if (config.showPayButton) {
                     checkoutConfig.showPayButton = true;
                 }
