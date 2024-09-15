@@ -60,6 +60,10 @@ class BasketHelper
     ): Amount
     {
         if (!$articleOrderNumber) {
+            if ($address) {
+                $this->setDispatchForAddress($address);
+            }
+
             return $this->getCurrentCartAmount($coController);
         }
 
@@ -67,17 +71,8 @@ class BasketHelper
         $this->forceBasketContentFor($articleOrderNumber);
 
         if ($address) {
-            $countryData = $this->getCountryData($address);
-            $dispatches = Shopware()->Modules()->Admin()->sGetPremiumDispatches(
-                $countryData['id'],
-                null,
-                $countryData['areaId']
-            );
-            $dispatch = reset($dispatches);
-            $this->session['sDispatch'] = $dispatch ? (int)$dispatch['id'] : 0;
-        }
-
-        if (empty($this->session['sDispatch'])) {
+            $this->setDispatchForAddress($address);
+        } elseif (empty($this->session['sDispatch'])) {
             $coController->getSelectedCountry();
             $userData = Shopware()->Modules()->Admin()->sGetUserData();
             $dispatches = Shopware()->Modules()->Admin()->sGetPremiumDispatches(
@@ -127,6 +122,25 @@ class BasketHelper
         );
 
         $this->basket->sRefreshBasket();
+    }
+
+    /**
+     * Sets dispatch for given address country.
+     *
+     * @param $address
+     *
+     * @return void
+     */
+    private function setDispatchForAddress($address)
+    {
+        $countryData = $this->getCountryData($address);
+        $dispatches = Shopware()->Modules()->Admin()->sGetPremiumDispatches(
+            $countryData['id'],
+            null,
+            $countryData['areaId']
+        );
+        $dispatch = reset($dispatches);
+        $this->session['sDispatch'] = $dispatch ? (int)$dispatch['id'] : 0;
     }
 
     /**

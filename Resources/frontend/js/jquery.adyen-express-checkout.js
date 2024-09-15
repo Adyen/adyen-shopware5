@@ -37,9 +37,9 @@
                 "onAdditionalDetails": $.proxy(me.onAdditionalDetails, me),
                 "onAuthorized": $.proxy(me.onAuthorized, me),
                 "onPaymentAuthorized": $.proxy(me.onPaymentAuthorized, me),
+                "onPaymentDataChanged": $.proxy(me.onPaymentDataChanged, me),
                 "onApplePayPaymentAuthorized": $.proxy(me.onApplePayPaymentAuthorized, me),
                 "onShippingContactSelected": $.proxy(me.onShippingContactSelected, me),
-                "onPaymentDataChanged": $.proxy(me.onPaymentDataChanged, me),
                 "onShopperDetails": $.proxy(me.onShopperDetails, me),
             });
 
@@ -78,9 +78,9 @@
             var url = expressCheckoutForm.attr('action');
             $.ajax({
                 type: "POST",
-                url: url+'/isXHR/1',
+                url: url + '/isXHR/1',
                 data: expressCheckoutForm.serialize(),
-                success: function(data) {
+                success: function (data) {
                     if (data.nextStepUrl) {
                         window.location.href = data.nextStepUrl;
                         return;
@@ -100,7 +100,7 @@
 
                     me.checkoutController.handleAction(data.action);
                 },
-                error: function(data) {
+                error: function (data) {
                     window.location.href = me.opts.checkoutShippingPaymentUrl;
                 }
             });
@@ -141,7 +141,7 @@
         onPaymentAuthorized: function (paymentData) {
             let me = this;
 
-            return new Promise(function(resolve, reject){
+            return new Promise(function (resolve, reject) {
                 let expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
 
                 me.opts.shippingAddress = {
@@ -165,13 +165,44 @@
             let me = this;
 
             return new Promise(async resolve => {
-                const { callbackTrigger, shippingAddress } = intermediatePaymentData;
+                const { shippingAddress } = intermediatePaymentData;
                 const paymentDataRequestUpdate = {};
+                let amount = 0,
+                    expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
 
-                let expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
-                expressCheckoutForm.find(me.opts.shippingAddressInputSelector).val(JSON.stringify(shippingAddress));
+                me.opts.shippingAddress = {
+                    zipCode: shippingAddress.postalCode,
+                    city: shippingAddress.locality,
+                    country: shippingAddress.countryCode,
+                };
+                expressCheckoutForm.find(me.opts.shippingAddressInputSelector).val(JSON.stringify(me.opts.shippingAddress));
 
-                resolve(paymentDataRequestUpdate);
+                var url = me.opts.checkoutConfigUrl;
+                $.ajax({
+                    type: "POST",
+                    url: url + '/isXHR/1',
+                    data: expressCheckoutForm.serialize(),
+                    success: function (response) {
+                        amount = parseInt(response.amount) / 100;
+
+                        paymentDataRequestUpdate.newTransactionInfo = {
+                            currencyCode: response.currency,
+                            totalPriceStatus: "FINAL",
+                            totalPrice: (amount).toString(),
+                            totalPriceLabel: "Total",
+                            countryCode: response.country,
+                        };
+                        resolve(paymentDataRequestUpdate);
+                    },
+                    error: function (response) {
+                        paymentDataRequestUpdate.error = {
+                            reason: "SHIPPING_ADDRESS_UNSERVICEABLE",
+                            message: response.message ?? "Cannot ship to the selected address",
+                            intent: "SHIPPING_ADDRESS"
+                        };
+                        resolve(paymentDataRequestUpdate);
+                    }
+                });
             });
         },
 

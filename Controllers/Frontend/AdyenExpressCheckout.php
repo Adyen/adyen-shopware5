@@ -61,7 +61,11 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
             $config = $this->getConfigForNewAddress(json_decode($shippingAddress, false), $productNumber);
 
             $this->Response()->setBody(json_encode(
-                ['amount' => $config->toArray()['amount']['value']]
+                [
+                    'amount' => $config->toArray()['amount']['value'],
+                    'currency' => $config->toArray()['amount']['currency'],
+                    'country' => $config->toArray()['countryCode']
+                ]
             ));
 
             return;

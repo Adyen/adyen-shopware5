@@ -88,16 +88,16 @@
         };
         config.onAdditionalDetails = config.onAdditionalDetails || function () {
         };
-        config.onPaymentDataChanged = config.onPaymentDataChanged || function () {
-            return new Promise(async resolve => {
-                resolve({});
-            });
-        };
         config.onAuthorized = config.onAuthorized || function () {
         };
         config.onPaymentAuthorized = config.onPaymentAuthorized || function () {
             return new Promise(function (resolve, reject) {
                 resolve({transactionState: 'SUCCESS'});
+            });
+        };
+        config.onPaymentDataChanged = config.onPaymentDataChanged || function () {
+            return new Promise(async resolve => {
+                resolve({});
             });
         };
         config.onApplePayPaymentAuthorized = config.onApplePayPaymentAuthorized || function (resolve, reject, event) {
@@ -169,6 +169,7 @@
             },
             "paywithgoogle": {
                 onClick: handleOnClick,
+                isExpress: true,
                 callbackIntents: config.requireAddress ? ['SHIPPING_ADDRESS', 'PAYMENT_AUTHORIZATION'] : [],
                 shippingAddressRequired: config.requireAddress,
                 emailRequired: config.requireEmail,
@@ -183,6 +184,7 @@
             },
             "googlepay": {
                 onClick: handleOnClick,
+                isExpress: true,
                 callbackIntents: config.requireAddress ? ['SHIPPING_ADDRESS', 'PAYMENT_AUTHORIZATION'] : [],
                 shippingAddressRequired: config.requireAddress,
                 emailRequired: config.requireEmail,
