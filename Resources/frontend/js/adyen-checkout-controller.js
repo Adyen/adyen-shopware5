@@ -210,14 +210,13 @@
 
         if (config.requireAddress) {
             paymentMethodSpecificConfig.applepay = {
-                countryCode: 'US',
                 isExpress: true,
                 requiredBillingContactFields: ['postalAddress'],
                 requiredShippingContactFields: ['postalAddress', 'name', 'phoneticName', 'phone', 'email'],
                 onAuthorized: handleApplePayPaymentAuthorized,
             }
 
-            if(config.onShippingContactSelected){
+            if (config.onShippingContactSelected) {
                 paymentMethodSpecificConfig.applepay.onShippingContactSelected = handleOnShippingContactSelected
             }
         }
@@ -249,7 +248,7 @@
                 checkoutConfig.onPaymentDataChanged = handlePaymentDataChanged;
                 checkoutConfig.onPaymentAuthorized = handlePaymentAuthorized;
                 checkoutConfig.onApplePayPaymentAuthorized = handleApplePayPaymentAuthorized;
-                if(config.onShippingContactSelected){
+                if (config.onShippingContactSelected) {
                     checkoutConfig.onShippingContactSelected = handleOnShippingContactSelected;
                 }
 
@@ -334,6 +333,14 @@
                 // Configuration on the checkout instance level does not work for amazonpay, copy it on component level
                 if ('amazonpay' === paymentType && checkoutInstance.options.paymentMethodsConfiguration[paymentType]) {
                     paymentMethodConfig['configuration'] = checkoutInstance.options.paymentMethodsConfiguration[paymentType].configuration;
+                }
+
+                // If there is applepay specific configuration then set country code to configuration
+                if ('applepay' === paymentType &&
+                    checkoutInstance.options.paymentMethodsConfiguration[paymentType] &&
+                    paymentMethodConfig)
+                {
+                    paymentMethodConfig.countryCode = checkoutInstance.options.countryCode;
                 }
 
                 activeComponent = checkoutInstance.create(

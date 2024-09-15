@@ -214,7 +214,7 @@
             me.opts.shippingAddress = {
                 firstName: shippingContact.givenName,
                 lastName: shippingContact.familyName,
-                street: shippingContact.addressLines[0],
+                street: shippingContact.addressLines.length > 0 ? shippingContact.addressLines[0] : '',
                 city: shippingContact.locality,
                 country: shippingContact.countryCode,
                 zipCode: shippingContact.postalCode,
@@ -259,13 +259,9 @@
             let amount = 0;
 
             me.opts.shippingAddress = {
-                firstName: 'Temp',
-                lastName: 'Temp',
-                street: 'Street 123',
                 city: address.locality,
                 country: address.countryCode,
                 zipCode: address.postalCode,
-                phone: '',
             };
 
             expressCheckoutForm.find(me.opts.shippingAddressInputSelector).val(JSON.stringify(me.opts.shippingAddress));
@@ -282,7 +278,7 @@
 
                     applePayShippingMethodUpdate.newTotal = {
                         type: 'final',
-                        label: 'LogeecomEcom',
+                        label: 'Total amount',
                         amount: (amount).toString()
                     };
 
@@ -292,7 +288,7 @@
                     let update = {
                         newTotal: {
                             type: 'final',
-                            label: 'LogeecomEcom',
+                            label: 'Total amount',
                             amount: (amount).toString()
                         },
                         errors: [new ApplePayError(
