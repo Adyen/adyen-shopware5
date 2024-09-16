@@ -27,6 +27,12 @@
                             action='getCheckoutConfig'
                             adyen_article_number="{$sArticle.ordernumber}"
                             }"
+                            data-paypalUpdateOrder="{url
+                            module='frontend'
+                            controller='AdyenExpressCheckout'
+                            action='paypalUpdateOrder'
+                            adyen_article_number="{$sArticle.ordernumber}"
+                            }"
                             data-additionalDataUrl="{url module='frontend' controller='AdyenPaymentProcess' action='handleAdditionalData'}"
                             data-adyenPaymentMethodType="{$adyenPpaymentMethodType}"
                             data-adyen-express-checkout>

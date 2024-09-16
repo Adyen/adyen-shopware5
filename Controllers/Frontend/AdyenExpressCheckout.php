@@ -78,6 +78,38 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         ));
     }
 
+    public function paypalUpdateOrderAction(): void
+    {
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+        $this->Response()->setHeader('Content-Type', 'application/json');
+
+        $paymentData = $this->Request()->get('paymentData');
+        $shippingAddress = $this->Request()->get('shippingAddress');
+        $productNumber = $this->Request()->get('adyen_article_number');
+        $pspReference = $this->Request()->get('pspReference');
+
+        if ($shippingAddress) {
+            $amount = $this->basketHelper->getTotalAmountFor(
+                $this->prepareCheckoutController(),
+                $productNumber,
+                $shippingAddress
+            );
+
+            $response = CheckoutAPI::get()
+                ->paymentRequest(Shop::getShopId())->paypalUpdateOrder(
+                    [
+                        'amount' => $amount,
+                        'paymentData' => $paymentData,
+                        'pspReference' => $pspReference
+                    ]
+                );
+
+            if ($response->getStatus() === 'success') {
+                $this->Response()->setBody(json_encode(['paymentData' => $response->getPaymentData()]));
+            }
+        }
+    }
+
     /**
      * Main entry point for express checkout processing when Adyen express checkout payment is confirmed on frontend
      *
@@ -219,6 +251,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
                 'action' => $response->getAction(),
                 'signature' => $basketSignature,
                 'reference' => $reference,
+                'pspReference' => $response->getPspReference()
             ])
         );
     }

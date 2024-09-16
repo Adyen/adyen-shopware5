@@ -40,7 +40,9 @@
                                         }"
                                         data-additionalDataUrl="{url module='frontend' controller='AdyenPaymentProcess' action='handleAdditionalData'}"
                                         data-adyenPaymentMethodType="{$adyenPaymentMethodType}"
-                                        data-adyen-express-checkout>
+                                        data-adyen-express-checkout
+                                        data-paypalUpdateOrder="{url module='frontend' controller='AdyenExpressCheckout' action='paypalUpdateOrder'}"
+                                >
                                 </div>
                             </form>
                         {/foreach}

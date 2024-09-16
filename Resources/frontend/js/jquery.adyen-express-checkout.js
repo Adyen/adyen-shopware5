@@ -8,6 +8,7 @@
         defaults: {
             checkoutConfigUrl: '',
             additionalDataUrl: '',
+            paypalUpdateOrder: '',
             checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
             adyenPaymentMethodType: '',
             stateDataInputSelector: 'input[name=adyenExpressPaymentMethodStateData]',
@@ -41,6 +42,7 @@
                 "onApplePayPaymentAuthorized": $.proxy(me.onApplePayPaymentAuthorized, me),
                 "onShippingContactSelected": $.proxy(me.onShippingContactSelected, me),
                 "onShopperDetails": $.proxy(me.onShopperDetails, me),
+                "onShippingAddressChanged": $.proxy(me.onShippingAddressChanged, me),
             });
 
             me.mountExpressCheckoutButtons();
@@ -93,6 +95,11 @@
 
                     me.signature = data.signature;
                     me.reference = data.reference;
+
+                    if (data.pspReference) {
+                        me.pspReference = data.pspReference;
+                    }
+
                     me.paymentData = null;
                     if (data.action.paymentData) {
                         me.paymentData = data.action.paymentData
@@ -165,7 +172,7 @@
             let me = this;
 
             return new Promise(async resolve => {
-                const { shippingAddress } = intermediatePaymentData;
+                const {shippingAddress} = intermediatePaymentData;
                 const paymentDataRequestUpdate = {};
                 let amount = 0,
                     expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
@@ -330,6 +337,28 @@
             expressCheckoutForm.find(me.opts.emailInputSelector).val(JSON.stringify(shopperDetails.shopperEmail));
 
             actions.resolve();
+        },
+
+        onShippingAddressChanged: function (data, actions, component) {
+            let me = this;
+            var url = me.opts.paypalUpdateOrder;
+
+            $.ajax({
+                type: "POST",
+                url: url + '/isXHR/1',
+                data: {
+                    shippingAddress: data.shippingAddress,
+                    paymentData: component.paymentData,
+                    pspReference: me.pspReference
+                },
+                success: function (response) {
+                    component.updatePaymentData(response.paymentData);
+                    actions.resolve();
+                },
+                error: function (response) {
+                    actions.reject(new Error('fail'));
+                }
+            });
         }
     });
 })(jQuery);
