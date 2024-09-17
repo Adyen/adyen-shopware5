@@ -191,7 +191,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         $customerService = ServiceRegister::getService(CustomerService::class);
         if (!$customerService->verifyIfCountryIsActive($shippingAddress->country)) {
             $this->Response()->setHttpResponseCode(400);
-            $this->Response()->setBody(json_encode(["message" => "Invalid country code"]));
+            $this->Response()->setBody(json_encode(["message" => "This country is not active"]));
 
             return;
         }
