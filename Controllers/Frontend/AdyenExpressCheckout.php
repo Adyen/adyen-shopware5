@@ -58,15 +58,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         $shippingAddress = $this->Request()->get('adyenShippingAddress');
 
         if ($shippingAddress) {
-            $config = $this->getConfigForNewAddress(json_decode($shippingAddress, false), $productNumber);
-
-            $this->Response()->setBody(json_encode(
-                [
-                    'amount' => $config->toArray()['amount']['value'],
-                    'currency' => $config->toArray()['amount']['currency'],
-                    'country' => $config->toArray()['countryCode']
-                ]
-            ));
+            $this->handleNewShippingAddress($shippingAddress, $productNumber);
 
             return;
         }
@@ -187,19 +179,37 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
      * @param $shippingAddress
      * @param string|null $productNumber
      *
-     * @return Response
+     * @return void
      *
      * @throws InvalidCurrencyCode
      */
-    private function getConfigForNewAddress($shippingAddress, ?string $productNumber = null)
+    private function handleNewShippingAddress($shippingAddress, ?string $productNumber = null): void
     {
-        return $this->checkoutConfigProvider->getExpressCheckoutConfig(
+        $shippingAddress = json_decode($shippingAddress, false);
+
+        /* @var CustomerService $customerService */
+        $customerService = ServiceRegister::getService(CustomerService::class);
+        if (!$customerService->verifyIfCountryIsActive($shippingAddress->country)) {
+            $this->Response()->setHttpResponseCode(400);
+            $this->Response()->setBody(json_encode(["message" => "Invalid country code"]));
+
+            return;
+        }
+
+        $config = $this->checkoutConfigProvider->getExpressCheckoutConfig(
             $this->basketHelper->getTotalAmountFor(
                 $this->prepareCheckoutController(),
                 $productNumber,
                 $shippingAddress
             )
         );
+        $this->Response()->setBody(json_encode(
+            [
+                'amount' => $config->toArray()['amount']['value'],
+                'currency' => $config->toArray()['amount']['currency'],
+                'country' => $config->toArray()['countryCode']
+            ]
+        ));
     }
 
     /**

@@ -204,7 +204,7 @@
                     error: function (response) {
                         paymentDataRequestUpdate.error = {
                             reason: "SHIPPING_ADDRESS_UNSERVICEABLE",
-                            message: response.message ?? "Cannot ship to the selected address",
+                            message: response.responseJSON.message ?? "Cannot ship to the selected address",
                             intent: "SHIPPING_ADDRESS"
                         };
                         resolve(paymentDataRequestUpdate);
@@ -301,7 +301,7 @@
                         errors: [new ApplePayError(
                             'shippingContactInvalid',
                             'countryCode',
-                            response.message ?? 'Error')
+                            response.responseJSON.message ?? 'Error')
                         ]
                     };
                     resolve(update);

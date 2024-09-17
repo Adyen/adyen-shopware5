@@ -33,6 +33,20 @@ class CustomerService
     }
 
     /**
+     *  Checks if given county is active.
+     *
+     * @param string $countryIso
+     *
+     * @return bool
+     */
+    public function verifyIfCountryIsActive($countryIso)
+    {
+        $country = $this->modelManager->getRepository(Country::class)->findOneBy(['iso' => $countryIso]);
+
+        return $country ? $country->getActive() : false;
+    }
+
+    /**
      * Checks whether there is a user logged in at the moment.
      *
      * @return bool
