@@ -351,12 +351,18 @@
                     paymentData: component.paymentData,
                     pspReference: me.pspReference
                 },
-                success: function (response) {
-                    component.updatePaymentData(response.paymentData);
-                    actions.resolve();
+                success:  function (response) {
+                    if (response.paymentData) {
+                        component.updatePaymentData(response.paymentData);
+                        actions.resolve();
+
+                        return;
+                    }
+
+                    actions.reject();
                 },
                 error: function (response) {
-                    actions.reject(new Error('fail'));
+                    actions.reject();
                 }
             });
         }
