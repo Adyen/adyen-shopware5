@@ -4,6 +4,9 @@ namespace AdyenPayment\Components;
 
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Amount\Amount;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Amount\Currency;
+use Adyen\Core\BusinessLogic\Domain\Integration\Payment\ShopPaymentService;
+use Adyen\Core\Infrastructure\ServiceRegister;
+use AdyenPayment\Components\Integration\PaymentMethodService;
 use Shopware\Components\Model\ModelManager;
 use Doctrine\DBAL\Connection;
 use Enlight_Components_Session_Namespace;
@@ -56,12 +59,13 @@ class BasketHelper
     public function getTotalAmountFor(
         Shopware_Controllers_Frontend_Checkout $coController,
         ?string                                $articleOrderNumber = null,
-                                               $address = null
+                                               $address = null,
+        ?string                                $paymentMethod = null
     ): Amount
     {
         if (!$articleOrderNumber) {
             if ($address) {
-                $this->setDispatchForAddress($address);
+                $this->setDispatchForAddress($address, $paymentMethod);
             }
 
             return $this->getCurrentCartAmount($coController);
@@ -71,7 +75,7 @@ class BasketHelper
         $this->forceBasketContentFor($articleOrderNumber);
 
         if ($address) {
-            $this->setDispatchForAddress($address);
+            $this->setDispatchForAddress($address, $paymentMethod);
         } elseif (empty($this->session['sDispatch'])) {
             $coController->getSelectedCountry();
             $userData = Shopware()->Modules()->Admin()->sGetUserData();
@@ -128,15 +132,25 @@ class BasketHelper
      * Sets dispatch for given address country.
      *
      * @param $address
+     * @param string|null $paymentMethod
      *
      * @return void
      */
-    private function setDispatchForAddress($address)
+    private function setDispatchForAddress($address, ?string $paymentMethod = null)
     {
+        $id = null;
+
+        if ($paymentMethod) {
+            /** @var PaymentMethodService $service */
+            $service = ServiceRegister::getService(ShopPaymentService::class);
+            $paymentMean = $service->getPaymentMeanByName($paymentMethod);
+            $id = $paymentMean->getId();
+        }
+
         $countryData = $this->getCountryData($address);
         $dispatches = Shopware()->Modules()->Admin()->sGetPremiumDispatches(
             $countryData['id'],
-            null,
+            $id,
             $countryData['areaId']
         );
         $dispatch = reset($dispatches);

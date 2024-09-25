@@ -141,14 +141,6 @@
             return config.onShippingContactSelected(resolve, reject, event);
         }
 
-        const handleShopperDetails = (shopperDetails, rawData, actions) => {
-            return config.onShopperDetails(shopperDetails, rawData, actions);
-        }
-
-        const shippingAddressChanged = (data, actions, component) => {
-            return config.onShippingAddressChanged(data, actions, component);
-        }
-
         let checkout,
             activeComponent,
             isStateValid = true,
@@ -203,8 +195,6 @@
                 paymentDataCallbacks: googlePaymentDataCallbacks
             },
             "paypal": {
-                isExpress: true,
-                onShopperDetails: handleShopperDetails,
                 blockPayPalCreditButton: true,
                 blockPayPalPayLaterButton: true,
                 onClick: (source, event, self) => {
@@ -212,10 +202,6 @@
                 }
             }
         };
-
-        if (config.onShippingAddressChanged) {
-            paymentMethodSpecificConfig.paypal.onShippingAddressChange = shippingAddressChanged
-        }
 
         if (config.requireAddress) {
             paymentMethodSpecificConfig.applepay = {

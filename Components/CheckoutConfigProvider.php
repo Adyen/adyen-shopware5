@@ -99,6 +99,8 @@ class CheckoutConfigProvider
     private function buildConfigRequest(?Amount $forceAmount = null): PaymentCheckoutConfigRequest
     {
         $country = null;
+        $isGuest = false;
+
         if ($this->getUser() && isset($this->getUser()['additional']['country']['countryiso'])) {
             $country = Country::fromIsoCode($this->getUser()['additional']['country']['countryiso']);
         }
@@ -118,6 +120,10 @@ class CheckoutConfigProvider
         $shopperReference = ($userId !== 0) ? $shop->getHost() . '_' . Shop::getShopId() . '_' . $userId : null;
         $shopperEmail = null;
 
+        if (!$userId) {
+            $isGuest = true;
+        }
+
         if (
             ($sAdmin = Shopware()->Modules()->Admin()) &&
             ($userData = $sAdmin->sGetUserData()) &&
@@ -132,7 +138,8 @@ class CheckoutConfigProvider
             Shopware()->Shop()->getLocale()->getLocale(),
             $shopperReference,
             $shopperEmail,
-            $shop->getName()
+            $shop->getName(),
+            $isGuest
         );
     }
 

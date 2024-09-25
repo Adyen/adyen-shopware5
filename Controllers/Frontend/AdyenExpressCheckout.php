@@ -56,16 +56,17 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
 
         $productNumber = $this->Request()->get('adyen_article_number');
         $shippingAddress = $this->Request()->get('adyenShippingAddress');
+        $paymentMethod = $this->Request()->get('adyen_payment_method');
 
         if ($shippingAddress) {
-            $this->handleNewShippingAddress($shippingAddress, $productNumber);
+            $this->handleNewShippingAddress($shippingAddress, $productNumber, $paymentMethod);
 
             return;
         }
 
         $this->Response()->setBody(json_encode(
             $this->checkoutConfigProvider->getExpressCheckoutConfig(
-                $this->basketHelper->getTotalAmountFor($this->prepareCheckoutController(), $productNumber)
+                $this->basketHelper->getTotalAmountFor($this->prepareCheckoutController(), $productNumber, $paymentMethod)
             )->toArray()
         ));
     }
@@ -84,7 +85,8 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
             $amount = $this->basketHelper->getTotalAmountFor(
                 $this->prepareCheckoutController(),
                 $productNumber,
-                $shippingAddress
+                $shippingAddress,
+                'paypal'
             );
 
             $response = CheckoutAPI::get()
@@ -183,7 +185,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
      *
      * @throws InvalidCurrencyCode
      */
-    private function handleNewShippingAddress($shippingAddress, ?string $productNumber = null): void
+    private function handleNewShippingAddress($shippingAddress, ?string $productNumber = null, ?string $paymentMethod = null): void
     {
         $shippingAddress = json_decode($shippingAddress, false);
 
@@ -200,7 +202,8 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
             $this->basketHelper->getTotalAmountFor(
                 $this->prepareCheckoutController(),
                 $productNumber,
-                $shippingAddress
+                $shippingAddress,
+                $paymentMethod
             )
         );
         $this->Response()->setBody(json_encode(
@@ -238,7 +241,8 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
                     'paypal',
                     $this->basketHelper->getTotalAmountFor(
                         $this->prepareCheckoutController(),
-                        !empty($productNumber) ? $productNumber : null
+                        !empty($productNumber) ? $productNumber : null,
+                        'paypal'
                     ),
                     $reference,
                     Url::getFrontUrl(
