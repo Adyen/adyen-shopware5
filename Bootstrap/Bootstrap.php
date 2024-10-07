@@ -99,7 +99,6 @@ use Shopware\Models\Country\Country;
  */
 class Bootstrap extends BootstrapComponent
 {
-    // test komentar
     /**
      * @inheritDoc
      */
