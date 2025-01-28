@@ -61,6 +61,8 @@ class LineItemsProcessor implements BaseLineItemsProcessor, PaymentLinkLineItems
             $articles = $this->articleRepository->getArticleQuery($item['additional_details']['articleID'])->getResult(
             );
             $article = $articles[0] ?? null;
+            $description = $item['additional_details']['description'] !== '' ? $item['additional_details']['description']
+                : $item['additional_details']['description_long'];
 
             $lineItems[] = new LineItem(
                 $item['articleID'] ?? '',
@@ -69,8 +71,7 @@ class LineItemsProcessor implements BaseLineItemsProcessor, PaymentLinkLineItems
                 $taxAmount * 100,
                 $taxPercentage * 100,
                 substr(
-                    $item['additional_details']['description'] !== '' ? $item['additional_details']['description']
-                        : $item['additional_details']['description_long'],
+                    !empty($description) ? $description : $item['articlename'],
                     0,
                     124
                 ),
