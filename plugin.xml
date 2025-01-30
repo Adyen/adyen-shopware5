@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>4.2.0</version>
+    <version>4.2.1</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -757,6 +757,14 @@
             * Add support for authorization adjustment
             * Add support for click to pay
             * Add support for GooglePay and ApplePay guest express checkout
+        </changes>
+    </changelog>
+    <changelog version="4.2.1">
+        <changes lang="en">
+            * Fix ordering with voucher code
+        </changes>
+        <changes lang="de">
+            * Fix ordering with voucher code
         </changes>
     </changelog>
 </plugin>
