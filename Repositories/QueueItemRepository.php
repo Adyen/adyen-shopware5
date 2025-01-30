@@ -3,6 +3,7 @@
 namespace AdyenPayment\Repositories;
 
 use Adyen\Core\Infrastructure\ORM\Configuration\Index;
+use Adyen\Core\Infrastructure\ORM\Configuration\IndexColumn;
 use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Adyen\Core\BusinessLogic\ORM\Interfaces\QueueItemRepository as BaseItemRepository;
 use Adyen\Core\Infrastructure\ORM\QueryFilter\Operators;
@@ -143,7 +144,7 @@ class QueueItemRepository extends BaseRepositoryWithConditionalDeletes implement
             ->where("queue.$statusColumn = :status")
             ->andWhere("queue.$priorityColumn = :priority")
             ->setParameter(':status', $queuedStatus)
-            ->setParameter(':priority', IndexHelper::castFieldValue($priority, Index::INTEGER))
+            ->setParameter(':priority', IndexHelper::castFieldValue($priority, IndexColumn::INTEGER))
             ->groupBy("queue.$nameColumn");
 
         if (!empty($runningQueueNames)) {
