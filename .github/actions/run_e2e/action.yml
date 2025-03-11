@@ -142,7 +142,7 @@ runs:
         BROWSER: ${{ inputs.BROWSER }}
         DEVICE: ${{ inputs.DEVICE }}
         
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report-Shopware-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
@@ -152,7 +152,7 @@ runs:
       if: always()
       shell: bash
       run: docker logs shop >& ./dockerLogs.log
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       if: always()
       with:
         name: docker-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
@@ -168,7 +168,7 @@ runs:
       shell: bash
       run: docker exec shop bash -c 'cat var/log/adyen_payment_production-${{ steps.date.outputs.date }}.log' >& ./integrationLogs.log
     - name: Add integration logs to file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: integration-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
