@@ -81,11 +81,14 @@ class CustomerService
         $sourceBillingAddress = json_decode($request->getParam('adyenBillingAddress'));
         $sourceShippingAddress = json_decode($request->getParam('adyenShippingAddress'));
 
+        $firstName = !empty($sourceBillingAddress->firstName) ? htmlspecialchars($sourceBillingAddress->firstName) : 'Guest';
+        $lastName = !empty($sourceBillingAddress->lastName) ? htmlspecialchars($sourceBillingAddress->lastName) : 'Guest';
+
         if ($email && $sourceBillingAddress && $sourceShippingAddress) {
             $customer = $this->getCustomerByEmail($email);
 
             if (!$customer) {
-                $customer = $this->createCustomer($email);
+                $customer = $this->createCustomer($email, $firstName, $lastName);
             }
 
             $billingAddress = $this->createAddress($sourceBillingAddress);
@@ -119,10 +122,14 @@ class CustomerService
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function createCustomer($email)
+    public function createCustomer($email, $firstName, $lastName)
     {
         $customer = new Customer();
         $customer->setEmail($email);
+        $customer->setFirstName($firstName);
+        $customer->setLastName($lastName);
+        $shop = $this->modelManager->getRepository(\Shopware\Models\Shop\Shop::class)->find(Shopware()->Shop()->getId());
+        $customer->setShop($shop);
         $customer->setPassword(md5(time()));
         $customer->setActive(true);
 
