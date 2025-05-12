@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>5.0.0</version>
+    <version>5.0.1</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -779,6 +779,14 @@
             * In TEST environment, if you already have iDEAL added as a payment method, you are probably using the acquirer account iDealSim. This is the simulator for the old flow and will break with this new feature.
             * Solution: add iDEAL in Customer Area again and make sure the acquirer account added this time is AdyenIdeal. This is the acquirer account for the new flow.
             * Note: in LIVE, the change to the new flow works out of the box, no change in payment method setup in Customer Area required.
+        </changes>
+    </changelog>
+    <changelog version="5.0.1">
+        <changes lang="en">
+            * Fix customer creation for guest express checkout
+        </changes>
+        <changes lang="de">
+            * Fix customer creation for guest express checkout
         </changes>
     </changelog>
 </plugin>
