@@ -2,7 +2,7 @@
 on:
   push:
     branches:
-      [ "master", "develop" ]
+      [ "master", "develop", "testpipeline" ]
 jobs:
   build:
     permissions:

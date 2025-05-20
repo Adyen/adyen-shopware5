@@ -162,7 +162,7 @@ runs:
       if: always()
       id: date
       shell: bash
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
     - name: Add integration logs to file
       if: always()
       shell: bash
