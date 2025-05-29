@@ -47,7 +47,8 @@ class LegacyMerchantReferenceNormalizationWebhookHandler extends WebhookHandler
                 $webhook->isSuccess(),
                 $webhook->getOriginalReference(),
                 $webhook->getRiskScore(),
-                $webhook->isLive()
+                $webhook->isLive(),
+                $webhook->getAdditionalData()
             );
         }
 
