@@ -66,7 +66,10 @@ runs:
 
     - name: Download Docker
       shell: bash
-      run: docker pull -q dockware/play:${{ inputs.SHOPWARE }}
+      env:
+        SHOPWARE_VERSION: ${{ inputs.SHOPWARE }}
+      run: docker pull -q "dockware/play:${SHOPWARE_VERSION}"
+
 
     - name: Start Docker
       shell: bash
