@@ -90,7 +90,8 @@ runs:
       env:
         ZIP_FILE: ${{ inputs._ZIP_FILE }}
       run: |
-        docker cp "$ZIP_FILE" shop:/var/www/html/custom/plugins/AdyenPayment.zip
+        ZIP_RESOLVED="${ZIP_FILE/#~/$HOME}"
+        docker cp "$ZIP_RESOLVED" shop:/var/www/html/custom/plugins/AdyenPayment.zip
         docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o AdyenPayment.zip'
     
 
