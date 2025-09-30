@@ -73,8 +73,12 @@ runs:
 
     - name: Start Docker
       shell: bash
+      env:
+        PORT: ${{ inputs.PORT }}
+        PHP_VERSION: ${{ inputs.PHP }}
+        SHOPWARE_VERSION: ${{ inputs.SHOPWARE }}
       run: |
-        docker run -p ${{ inputs.PORT }}:443 -p 80:80  --name shop --env PHP_VERSION=${{ inputs.PHP }} -d dockware/play:${{ inputs.SHOPWARE }}
+        docker run -p "${PORT}:443" -p 80:80 --name shop --env PHP_VERSION="${PHP_VERSION}" -d "dockware/play:${SHOPWARE_VERSION}"
         sleep 30
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_shops SET host = 'localhost', hosts = '', secure = 0;\""
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_auth SET localeID = (SELECT id FROM s_core_locales WHERE locale = 'en_GB');\""
@@ -83,10 +87,12 @@ runs:
 
     - name: Upload ZIP File to Docker
       shell: bash
+      env:
+        ZIP_FILE: ${{ inputs._ZIP_FILE }}
       run: |
-        docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/AdyenPayment.zip
+        docker cp "$ZIP_FILE" shop:/var/www/html/custom/plugins/AdyenPayment.zip
         docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o AdyenPayment.zip'
-
+    
 
     - name: Install Plugin
       shell: bash
@@ -117,7 +123,11 @@ runs:
 
     - name: Install common
       shell: bash
-      run: npm install https://${{inputs.GH_PAT}}@github.com/${{inputs.COMMON_TEST_REPO}}#main
+      env:
+        GH_PAT: ${{ inputs.GH_PAT }}
+        COMMON_TEST_REPO: ${{ inputs.COMMON_TEST_REPO }}
+      run: |
+        npm install "https://${GH_PAT}@github.com/${COMMON_TEST_REPO}#main"
 
     - name: Install Playwright Browsers
       working-directory: ./tests
