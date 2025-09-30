@@ -31,8 +31,6 @@ jobs:
         uses: ./.github/actions/build_plugin
 
   run:
-    permissions:
-      contents: read
     name: E2E | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}, Browser ${{matrix.browser}}
     needs: build
     runs-on: ubuntu-latest
