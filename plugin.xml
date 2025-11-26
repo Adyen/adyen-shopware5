@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>5.0.1</version>
+    <version>5.0.2</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -787,6 +787,14 @@
         </changes>
         <changes lang="de">
             * Fix customer creation for guest express checkout
+        </changes>
+    </changelog>
+    <changelog version="5.0.2">
+        <changes lang="en">
+            * Fix Klarna payment processing
+        </changes>
+        <changes lang="de">
+            * Fix Klarna payment processing
         </changes>
     </changelog>
 </plugin>
