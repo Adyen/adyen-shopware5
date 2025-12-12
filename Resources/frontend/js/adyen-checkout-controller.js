@@ -333,8 +333,8 @@
 
                     let conf = checkoutInstance.options.paymentMethodsConfiguration.googlepay ?? checkoutInstance.options.paymentMethodsConfiguration.paywithgoogle;
 
-                    paymentMethodConfig['configuration']['merchantId'] = conf.merchantId;
-                    paymentMethodConfig['configuration']['gatewayMerchantId'] = conf.gatewayMerchantId;
+                    paymentMethodConfig['configuration']['merchantId'] = conf.merchantId ?? '';
+                    paymentMethodConfig['configuration']['gatewayMerchantId'] = conf.gatewayMerchantId ?? '';
                 }
 
                 // Configuration on the checkout instance level does not work for amazonpay, copy it on component level
