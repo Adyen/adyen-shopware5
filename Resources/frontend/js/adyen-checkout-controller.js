@@ -325,6 +325,18 @@
                 let paymentMethodConfig = findSpecificPaymentMethodConfig(paymentType) ||
                     findStoredPaymentMethodConfig(checkoutInstance, storedPaymentMethodId);
 
+                if ('googlepay' === paymentType || 'paywithgoogle' === paymentType) {
+
+                    if (!paymentMethodConfig.configuration) {
+                        paymentMethodConfig.configuration = {};
+                    }
+
+                    let conf = checkoutInstance.options.paymentMethodsConfiguration.googlepay ?? checkoutInstance.options.paymentMethodsConfiguration.paywithgoogle;
+
+                    paymentMethodConfig['configuration']['merchantId'] = conf.merchantId;
+                    paymentMethodConfig['configuration']['gatewayMerchantId'] = conf.gatewayMerchantId;
+                }
+
                 // Configuration on the checkout instance level does not work for amazonpay, copy it on component level
                 if ('amazonpay' === paymentType && checkoutInstance.options.paymentMethodsConfiguration[paymentType]) {
                     paymentMethodConfig['configuration'] = checkoutInstance.options.paymentMethodsConfiguration[paymentType].configuration;
