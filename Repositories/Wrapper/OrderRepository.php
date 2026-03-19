@@ -125,6 +125,24 @@ class OrderRepository
     }
 
     /**
+     * @param string $transactionId
+     *
+     * @return ShopwareOrder | null
+     */
+    public function getOrderByPspReference(string $transactionId): ?ShopwareOrder
+    {
+        $query = $this->shopwareRepository
+            ->createQueryBuilder('orders')
+            ->andWhere('orders.transactionId = :transactionId')
+            ->setParameter(':transactionId', $transactionId)
+            ->orderBy('orders.id', 'DESC');
+
+        $result = $query->getQuery()->getResult();
+
+        return !empty($result) ? $result[0] : null;
+    }
+
+    /**
      * @param ShopwareOrder $order
      *
      * @return void

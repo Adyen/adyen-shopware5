@@ -180,6 +180,22 @@ class OrderService implements OrderServiceInterface
     }
 
     /**
+     * @param string $pspReference
+     * @return bool
+     * @throws Exception
+     */
+    public function orderExistsByPspReference(string $pspReference): bool
+    {
+        $order = $this->orderRepository->getOrderByPspReference($pspReference);
+
+        if (empty($order)) {
+            throw new Exception('Order with PSP reference: ' . $pspReference . ' still not created.');
+        }
+
+        return $order->getShop()->getId() === (int)StoreContext::getInstance()->getStoreId();
+    }
+
+    /**
      * @return ShopPaymentService
      */
     private function getPaymentMethodService(): ShopPaymentService

@@ -20,13 +20,24 @@ class LegacyMerchantReferenceNormalizationWebhookHandler extends WebhookHandler
      */
     private $orderRepository;
 
+    /**
+     * @var WebhookSynchronizationService
+     */
+    private $synchronizationService;
+
+    /**
+     * @var QueueService
+     */
+    private $queueService;
+
     public function __construct(
         OrderRepository $orderRepository,
         WebhookSynchronizationService $synchronizationService,
         QueueService $queueService
     ) {
         $this->orderRepository = $orderRepository;
-
+        $this->synchronizationService = $synchronizationService;
+        $this->queueService = $queueService;
         parent::__construct($synchronizationService, $queueService);
     }
 
@@ -52,6 +63,8 @@ class LegacyMerchantReferenceNormalizationWebhookHandler extends WebhookHandler
             );
         }
 
-        parent::handle($webhook);
+        if ($this->synchronizationService->isSynchronizationNeeded($webhook)) {
+            $this->queueService->enqueue('OrderUpdate', new OrderUpdateTask($webhook));
+        }
     }
 }
