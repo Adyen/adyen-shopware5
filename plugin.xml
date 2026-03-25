@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>5.0.4</version>
+    <version>5.0.5</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -811,6 +811,14 @@
         </changes>
         <changes lang="de">
             * Fix Google Pay express checkout
+        </changes>
+    </changelog>
+    <changelog version="5.0.5">
+        <changes lang="en">
+            * Add PSP reference fallback when checking order existence
+        </changes>
+        <changes lang="de">
+            * Add PSP reference fallback when checking order existence
         </changes>
     </changelog>
 </plugin>
