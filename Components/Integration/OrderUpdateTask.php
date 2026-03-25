@@ -288,8 +288,11 @@ class OrderUpdateTask extends TransactionalTask
         try {
             return $orderService->orderExists($this->webhook->getMerchantReference());
         } catch (Exception $e) {
-            return $orderService->orderExistsByPspReference($this->webhook->getPspReference());
-        }
+            $pspReference = $this->webhook->getOriginalReference() !== ''
+                ? $this->webhook->getOriginalReference()
+                : $this->webhook->getPspReference();
+
+            return $orderService->orderExistsByPspReference($pspReference);        }
     }
 
     /**
