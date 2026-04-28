@@ -148,7 +148,7 @@ class AdyenPayment extends Plugin
     }
 
     /**
-     * Remove widget and remove database schema.
+     * Remove widget and remove database  schema.
      *
      * @param Plugin\Context\UninstallContext $uninstallContext
      *
