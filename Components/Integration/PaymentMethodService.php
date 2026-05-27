@@ -35,6 +35,7 @@ use Shopware\Models\Shop\Shop as ShopwareStore;
 class PaymentMethodService implements ShopPaymentService
 {
     public const ADYEN_NAME_PREFIX = 'adyen_';
+    public const GOOGLE_PAY_CODES = ['googlepay', 'paywithgoogle'];
 
     /**
      * @var StoreContext
@@ -225,6 +226,21 @@ class PaymentMethodService implements ShopPaymentService
         }
 
         $this->entityManager->flush();
+    }
+
+    /**
+     * @param string $code
+     *
+     * @return Payment|null
+     */
+    public function resolvePaymentMeanByCode(string $code): ?Payment
+    {
+        if (in_array($code, self::GOOGLE_PAY_CODES, true)) {
+            return $this->getPaymentMeanByName('googlepay')
+                ?? $this->getPaymentMeanByName('paywithgoogle');
+        }
+
+        return $this->getPaymentMeanByName($code);
     }
 
     /**

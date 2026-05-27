@@ -1,19 +1,22 @@
 <?php
 
-use Adyen\Core\BusinessLogic\AdminAPI\Response\Response;
 use Adyen\Core\BusinessLogic\CheckoutAPI\CheckoutAPI;
 use Adyen\Core\BusinessLogic\CheckoutAPI\PaymentRequest\Request\StartTransactionRequest;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\InvalidCurrencyCode;
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\MissingActiveApiConnectionData;
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\MissingClientKeyConfiguration;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethodCode;
+use Adyen\Core\BusinessLogic\Domain\Integration\Payment\ShopPaymentService;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\Components\BasketHelper;
 use AdyenPayment\Components\CheckoutConfigProvider;
+use AdyenPayment\Components\Integration\PaymentMethodService;
+use AdyenPayment\Exceptions\PaymentMeanDoesNotExistException;
 use AdyenPayment\Utilities\Shop;
 use AdyenPayment\Utilities\Url;
 use Shopware\Components\BasketSignature\BasketPersister;
 use Shopware\Components\BasketSignature\BasketSignatureGeneratorInterface;
 use AdyenPayment\Services\CustomerService;
-use AdyenPayment\Utilities\Plugin;
 
 /**
  * Class Shopware_Controllers_Frontend_AdyenExpressCheckout
@@ -35,6 +38,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\Exception\NotSupported
      * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws Exception
      */
     public function preDispatch(): void
     {
@@ -45,9 +49,9 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
     /**
      * @throws Enlight_Exception
      * @throws InvalidCurrencyCode
-     * @throws \Doctrine\ORM\Exception\NotSupported
-     * @throws \Doctrine\ORM\Exception\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws MissingActiveApiConnectionData
+     * @throws MissingClientKeyConfiguration
+     * @throws Exception
      */
     public function getCheckoutConfigAction(): void
     {
@@ -64,13 +68,33 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
             return;
         }
 
-        $this->Response()->setBody(json_encode(
-            $this->checkoutConfigProvider->getExpressCheckoutConfig(
-                $this->basketHelper->getTotalAmountFor($this->prepareCheckoutController(), $productNumber, $paymentMethod)
-            )->toArray()
-        ));
+        try {
+            $config = $this->checkoutConfigProvider->getExpressCheckoutConfig(
+                $this->basketHelper->getTotalAmountFor(
+                    $this->prepareCheckoutController(),
+                    $productNumber,
+                    null,
+                    $paymentMethod
+                )
+            );
+        } catch (PaymentMeanDoesNotExistException $e) {
+            $this->Response()->setHttpResponseCode(400);
+            $this->Response()->setBody(json_encode([
+                "message" => "This payment method is currently unavailable. " .
+                    "Please contact support or try a different payment option."
+            ]));
+            return;
+        }
+
+        $this->Response()->setBody(json_encode($config->toArray()));
     }
 
+    /**
+     * @throws Enlight_Exception
+     * @throws InvalidCurrencyCode
+     * @throws PaymentMeanDoesNotExistException
+     * @throws Exception
+     */
     public function paypalUpdateOrderAction(): void
     {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
@@ -82,12 +106,21 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         $pspReference = $this->Request()->get('pspReference');
 
         if ($shippingAddress) {
-            $amount = $this->basketHelper->getTotalAmountFor(
-                $this->prepareCheckoutController(),
-                $productNumber,
-                $shippingAddress,
-                'paypal'
-            );
+            try {
+                $amount = $this->basketHelper->getTotalAmountFor(
+                    $this->prepareCheckoutController(),
+                    $productNumber,
+                    $shippingAddress,
+                    'paypal'
+                );
+            } catch (PaymentMeanDoesNotExistException $e) {
+                $this->Response()->setHttpResponseCode(400);
+                $this->Response()->setBody(json_encode([
+                    "message" => "PayPal is currently unavailable. Please try again later."
+                ]));
+
+                return;
+            }
 
             $response = CheckoutAPI::get()
                 ->paymentRequest(Shop::getShopId())->paypalUpdateOrder(
@@ -125,7 +158,8 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
             Shopware()->Session()->offsetSet('sUserId', $customer->getId());
             Shopware()->Session()->offsetSet('sUserMail', $customer->getEmail());
             Shopware()->Session()->offsetSet('sUserGroup', $customer->getGroup()->getKey());
-            Shopware()->Session()->offsetSet('sUserPasswordChangeDate', $customer->getPasswordChangeDate()->format('Y-m-d H:i:s'));
+            Shopware()->Session()->offsetSet('sUserPasswordChangeDate',
+                $customer->getPasswordChangeDate()->format('Y-m-d H:i:s'));
         } elseif (!empty($this->Request()->getParam('adyenEmail'))) {
             $customerService->initializeCustomer($this->Request());
         }
@@ -136,11 +170,13 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         }
 
         // Finish express checkout with forced payment mean and fresh basket
-        $paymentMean = Shopware()->Modules()->Admin()->sGetPaymentMean(
-            Plugin::getPaymentMeanName($this->Request()->getParam('adyen_payment_method'))
+        /** @var PaymentMethodService $paymentMethodService */
+        $paymentMethodService = ServiceRegister::getService(ShopPaymentService::class);
+        $paymentMean = $paymentMethodService->resolvePaymentMeanByCode(
+            $this->Request()->getParam('adyen_payment_method')
         );
         Shopware()->Modules()->Admin()->sUpdatePayment(
-            $paymentMean['id'] ?? ''
+            $paymentMean ? $paymentMean->getId() : ''
         );
 
         Shopware()->Session()->offsetSet(
@@ -180,13 +216,20 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
     /**
      * @param $shippingAddress
      * @param string|null $productNumber
+     * @param string|null $paymentMethod
      *
      * @return void
      *
      * @throws InvalidCurrencyCode
+     * @throws MissingActiveApiConnectionData
+     * @throws MissingClientKeyConfiguration
+     * @throws ReflectionException
      */
-    private function handleNewShippingAddress($shippingAddress, ?string $productNumber = null, ?string $paymentMethod = null): void
-    {
+    private function handleNewShippingAddress(
+        $shippingAddress,
+        ?string $productNumber = null,
+        ?string $paymentMethod = null
+    ): void {
         $shippingAddress = json_decode($shippingAddress, false);
 
         /* @var CustomerService $customerService */
@@ -198,14 +241,24 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
             return;
         }
 
-        $config = $this->checkoutConfigProvider->getExpressCheckoutConfig(
-            $this->basketHelper->getTotalAmountFor(
-                $this->prepareCheckoutController(),
-                $productNumber,
-                $shippingAddress,
-                $paymentMethod
-            )
-        );
+        try {
+            $config = $this->checkoutConfigProvider->getExpressCheckoutConfig(
+                $this->basketHelper->getTotalAmountFor(
+                    $this->prepareCheckoutController(),
+                    $productNumber,
+                    $shippingAddress,
+                    $paymentMethod
+                )
+            );
+        } catch (PaymentMeanDoesNotExistException $e) {
+            $this->Response()->setHttpResponseCode(400);
+            $this->Response()->setBody(json_encode([
+                "message" => "This payment method is currently unavailable. " .
+                    "Please contact support or try a different payment option."
+            ]));
+            return;
+        }
+
         $this->Response()->setBody(json_encode(
             [
                 'amount' => $config->toArray()['amount']['value'],
@@ -270,10 +323,15 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         );
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws Exception
+     */
     private function prepareCheckoutController(): Shopware_Controllers_Frontend_Checkout
     {
         /** @var Shopware_Controllers_Frontend_Checkout $checkoutController */
-        $checkoutController = Enlight_Class::Instance(Shopware_Controllers_Frontend_Checkout::class, [$this->request, $this->response]);
+        $checkoutController = Enlight_Class::Instance(Shopware_Controllers_Frontend_Checkout::class,
+            [$this->request, $this->response]);
         $checkoutController->init();
         $checkoutController->setView($this->View());
         $checkoutController->setContainer($this->container);
