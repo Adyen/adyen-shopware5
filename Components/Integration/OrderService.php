@@ -9,6 +9,7 @@ use Adyen\Core\BusinessLogic\Domain\Integration\Payment\ShopPaymentService;
 use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
 use Adyen\Core\BusinessLogic\Domain\Payment\Services\PaymentService;
 use Adyen\Core\BusinessLogic\Domain\Webhook\Models\Webhook;
+use Adyen\Core\Infrastructure\Logger\Logger;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\Repositories\Wrapper\OrderRepository;
 use Adyen\Core\BusinessLogic\Domain\Integration\Order\OrderService as OrderServiceInterface;
@@ -154,6 +155,14 @@ class OrderService implements OrderServiceInterface
         $paymentMean = $this->getPaymentMethodService()->getPaymentMeanByName($methodName);
 
         if (!$paymentMean) {
+            Logger::logError(sprintf(
+                'Adyen webhook: cannot map payment method "%s" (raw: "%s") to a Shopware ' .
+                'payment mean for merchant reference "%s".',
+                $methodName,
+                $webhook->getPaymentMethod(),
+                $webhook->getMerchantReference(),
+            ));
+
             return;
         }
 

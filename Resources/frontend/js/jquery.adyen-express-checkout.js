@@ -204,7 +204,8 @@
                     error: function (response) {
                         paymentDataRequestUpdate.error = {
                             reason: "SHIPPING_ADDRESS_UNSERVICEABLE",
-                            message: response.responseJSON.message ?? "Cannot ship to the selected address",
+                            message: (response.responseJSON && response.responseJSON.message)
+                                || "Cannot ship to the selected address",
                             intent: "SHIPPING_ADDRESS"
                         };
                         resolve(paymentDataRequestUpdate);
@@ -351,7 +352,7 @@
                     paymentData: component.paymentData,
                     pspReference: me.pspReference
                 },
-                success:  function (response) {
+                success: function (response) {
                     if (response.paymentData) {
                         component.updatePaymentData(response.paymentData);
                         actions.resolve();

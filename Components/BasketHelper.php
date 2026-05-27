@@ -2,11 +2,16 @@
 
 namespace AdyenPayment\Components;
 
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\InvalidCurrencyCode;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Amount\Amount;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Amount\Currency;
 use Adyen\Core\BusinessLogic\Domain\Integration\Payment\ShopPaymentService;
+use Adyen\Core\Infrastructure\Logger\Logger;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\Components\Integration\PaymentMethodService;
+use AdyenPayment\Exceptions\PaymentMeanDoesNotExistException;
+use Doctrine\DBAL\Exception;
+use Doctrine\ORM\Exception\NotSupported;
 use Shopware\Components\Model\ModelManager;
 use Doctrine\DBAL\Connection;
 use Enlight_Components_Session_Namespace;
@@ -21,6 +26,7 @@ use Shopware_Controllers_Frontend_Checkout;
  */
 class BasketHelper
 {
+    const ADYEN_NAME_PREFIX = 'adyen_';
     /**
      * @var sBasket
      */
@@ -38,17 +44,25 @@ class BasketHelper
     private $modelManager;
 
     public function __construct(
-        sBasket                              $basket,
-        Connection                           $connection,
+        sBasket $basket,
+        Connection $connection,
         Enlight_Components_Session_Namespace $session
-    )
-    {
+    ) {
         $this->basket = $basket;
         $this->connection = $connection;
         $this->session = $session;
         $this->modelManager = Shopware()->Container()->get('models');
     }
 
+    /**
+     * @param string $articleOrderNumber
+     *
+     * @return void
+     *
+     * @throws \Enlight_Event_Exception
+     * @throws \Enlight_Exception
+     * @throws \Zend_Db_Adapter_Exception
+     */
     public function forceBasketContentFor(string $articleOrderNumber): void
     {
         $this->basket->sDeleteBasket();
@@ -56,13 +70,29 @@ class BasketHelper
         $this->basket->sRefreshBasket();
     }
 
+
+    /**
+     * @param Shopware_Controllers_Frontend_Checkout $coController
+     * @param string|null $articleOrderNumber
+     * @param $address
+     * @param string|null $paymentMethod
+     *
+     * @return Amount
+     *
+     * @throws Exception
+     * @throws InvalidCurrencyCode
+     * @throws NotSupported
+     * @throws PaymentMeanDoesNotExistException
+     * @throws \Enlight_Event_Exception
+     * @throws \Enlight_Exception
+     * @throws \Zend_Db_Adapter_Exception
+     */
     public function getTotalAmountFor(
         Shopware_Controllers_Frontend_Checkout $coController,
-        ?string                                $articleOrderNumber = null,
-                                               $address = null,
-        ?string                                $paymentMethod = null
-    ): Amount
-    {
+        ?string $articleOrderNumber = null,
+        $address = null,
+        ?string $paymentMethod = null
+    ): Amount {
         if (!$articleOrderNumber) {
             if ($address) {
                 $this->setDispatchForAddress($address, $paymentMethod);
@@ -94,6 +124,13 @@ class BasketHelper
         return $totalAmount;
     }
 
+    /**
+     * @param Shopware_Controllers_Frontend_Checkout $coController
+     *
+     * @return Amount
+     *
+     * @throws InvalidCurrencyCode
+     */
     private function getCurrentCartAmount(Shopware_Controllers_Frontend_Checkout $coController): Amount
     {
         $basket = $coController->getBasket();
@@ -106,6 +143,11 @@ class BasketHelper
         );
     }
 
+    /**
+     * @return void
+     *
+     * @throws Exception
+     */
     private function backupCurrentBasket(): void
     {
         $this->connection->update(
@@ -115,6 +157,14 @@ class BasketHelper
         );
     }
 
+    /**
+     * @return void
+     *
+     * @throws Exception
+     * @throws \Enlight_Event_Exception
+     * @throws \Enlight_Exception
+     * @throws \Zend_Db_Adapter_Exception
+     */
     private function restoreBasketFromBackup(): void
     {
         $this->basket->sDeleteBasket();
@@ -135,6 +185,9 @@ class BasketHelper
      * @param string|null $paymentMethod
      *
      * @return void
+     *
+     * @throws NotSupported
+     * @throws PaymentMeanDoesNotExistException
      */
     private function setDispatchForAddress($address, ?string $paymentMethod = null)
     {
@@ -144,6 +197,20 @@ class BasketHelper
             /** @var PaymentMethodService $service */
             $service = ServiceRegister::getService(ShopPaymentService::class);
             $paymentMean = $service->getPaymentMeanByName($paymentMethod);
+            if (!$paymentMean) {
+                Logger::logError(sprintf(
+                    'Adyen express checkout: payment mean not found for "%s%s". ' .
+                    'Verify that the payment method exists in s_core_paymentmeans ' .
+                    'and that the "name" column has not been modified.',
+                    PaymentMethodService::ADYEN_NAME_PREFIX,
+                    $paymentMethod
+                ));
+
+                throw new PaymentMeanDoesNotExistException(
+                    'Payment mean with name ' . self::ADYEN_NAME_PREFIX
+                    . $paymentMethod . ' does not exist.'
+                );
+            }
             $id = $paymentMean->getId();
         }
 
@@ -158,13 +225,14 @@ class BasketHelper
     }
 
     /**
-     * Returns county id and area id
+     * Returns country id and area id
      *
      * @param $address
      *
-     * @return array
+     * @return array|null[]
+     * @throws NotSupported
      */
-    private function getCountryData($address)
+    private function getCountryData($address): array
     {
         /** @var Country $country */
         $country = $this->modelManager->getRepository(Country::class)->findOneBy(['iso' => $address->country]);
