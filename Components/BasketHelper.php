@@ -196,21 +196,14 @@ class BasketHelper
         if ($paymentMethod) {
             /** @var PaymentMethodService $service */
             $service = ServiceRegister::getService(ShopPaymentService::class);
-            $paymentMean = $service->getPaymentMeanByName($paymentMethod);
-            if (!$paymentMean) {
-                Logger::logError(sprintf(
-                    'Adyen express checkout: payment mean not found for "%s%s". ' .
-                    'Verify that the payment method exists in s_core_paymentmeans ' .
-                    'and that the "name" column has not been modified.',
-                    PaymentMethodService::ADYEN_NAME_PREFIX,
-                    $paymentMethod
-                ));
+            $paymentMean = $service->resolvePaymentMeanByCode($paymentMethod);
 
+            if (!$paymentMean) {
                 throw new PaymentMeanDoesNotExistException(
-                    'Payment mean with name ' . self::ADYEN_NAME_PREFIX
-                    . $paymentMethod . ' does not exist.'
+                    'Payment mean with name ' . self::ADYEN_NAME_PREFIX . $paymentMethod . ' does not exist.'
                 );
             }
+
             $id = $paymentMean->getId();
         }
 

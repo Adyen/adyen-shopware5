@@ -6,16 +6,17 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\InvalidCu
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\MissingActiveApiConnectionData;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\MissingClientKeyConfiguration;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethodCode;
+use Adyen\Core\BusinessLogic\Domain\Integration\Payment\ShopPaymentService;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\Components\BasketHelper;
 use AdyenPayment\Components\CheckoutConfigProvider;
+use AdyenPayment\Components\Integration\PaymentMethodService;
 use AdyenPayment\Exceptions\PaymentMeanDoesNotExistException;
 use AdyenPayment\Utilities\Shop;
 use AdyenPayment\Utilities\Url;
 use Shopware\Components\BasketSignature\BasketPersister;
 use Shopware\Components\BasketSignature\BasketSignatureGeneratorInterface;
 use AdyenPayment\Services\CustomerService;
-use AdyenPayment\Utilities\Plugin;
 
 /**
  * Class Shopware_Controllers_Frontend_AdyenExpressCheckout
@@ -169,11 +170,13 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         }
 
         // Finish express checkout with forced payment mean and fresh basket
-        $paymentMean = Shopware()->Modules()->Admin()->sGetPaymentMean(
-            Plugin::getPaymentMeanName($this->Request()->getParam('adyen_payment_method'))
+        /** @var PaymentMethodService $paymentMethodService */
+        $paymentMethodService = ServiceRegister::getService(ShopPaymentService::class);
+        $paymentMean = $paymentMethodService->resolvePaymentMeanByCode(
+            $this->Request()->getParam('adyen_payment_method')
         );
         Shopware()->Modules()->Admin()->sUpdatePayment(
-            $paymentMean['id'] ?? ''
+            $paymentMean ? $paymentMean->getId() : ''
         );
 
         Shopware()->Session()->offsetSet(
