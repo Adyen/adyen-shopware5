@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>5.1.1</version>
+    <version>5.1.2</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -839,4 +839,13 @@
             * Update core plugin version
         </changes>
     </changelog>
+    <changelog version="5.1.2">
+        <changes lang="en">
+            * Fix Google Pay Express checkout
+        </changes>
+        <changes lang="de">
+            * Fix Google Pay Express checkout
+        </changes>
+    </changelog>
+
 </plugin>
