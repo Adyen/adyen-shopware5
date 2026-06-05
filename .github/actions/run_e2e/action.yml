@@ -124,11 +124,12 @@ runs:
 
     - name: Install common
       shell: bash
+      working-directory: ./tests
       env:
         GH_PAT: ${{ inputs.GH_PAT }}
         COMMON_TEST_REPO: ${{ inputs.COMMON_TEST_REPO }}
       run: |
-        npm install "https://${GH_PAT}@github.com/${COMMON_TEST_REPO}#main"
+        npm install "https://${GH_PAT}@github.com/${COMMON_TEST_REPO}#fix-tests"
 
     - name: Install Playwright Browsers
       working-directory: ./tests
