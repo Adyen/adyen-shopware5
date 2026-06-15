@@ -60,6 +60,7 @@
      * requireEmail: boolean,
      * sessionStorage: sessionStorage,
      * onStateChange: function|undefined,
+     * onSubmit: function|undefined,
      * onAdditionalDetails: function|undefined,
      * onAuthorized: function|undefined,
      * onPaymentAuthorized: function|undefined,
@@ -87,9 +88,31 @@
 
         config.onStateChange = config.onStateChange || function () {
         };
+        config.onSubmit = config.onSubmit || function (state, component, actions) {
+            if (!actions || typeof actions.resolve !== 'function') {
+                return;
+            }
+
+            const paymentMethod = state && state.data && state.data.paymentMethod;
+            const type = paymentMethod && paymentMethod.type;
+            if (type === 'googlepay' || type === 'paywithgoogle') {
+                actions.resolve({resultCode: 'Authorised'});
+                return;
+            }
+
+            actions.resolve();
+        };
         config.onAdditionalDetails = config.onAdditionalDetails || function () {
         };
-        config.onAuthorized = config.onAuthorized || function () {
+        config.onAuthorized = config.onAuthorized || function (paymentData, actions) {
+            if (actions && typeof actions.resolve === 'function') {
+                actions.resolve({transactionState: 'SUCCESS'});
+            }
+        };
+        config.onShippingAddressChanged = config.onShippingAddressChanged || function (data, actions) {
+            if (actions && typeof actions.resolve === 'function') {
+                actions.resolve();
+            }
         };
         config.onPaymentAuthorized = config.onPaymentAuthorized || function () {
             return new Promise(function (resolve, reject) {
@@ -120,9 +143,16 @@
             return config.onPayButtonClick(resolve, reject);
         };
 
-        /* GooglePay callbacks */
-        const handleAuthorized = (paymentData) => {
-            return config.onAuthorized(paymentData);
+        const handleAuthorized = (paymentData, actions) => {
+            return config.onAuthorized(paymentData, actions);
+        }
+
+        const handleShopperDetails = (shopperDetails, rawData, actions) => {
+            return config.onShopperDetails(shopperDetails, rawData, actions);
+        }
+
+        const handleShippingAddressChanged = (data, actions, component) => {
+            return config.onShippingAddressChanged(data, actions, component);
         }
 
         const handlePaymentDataChanged = (intermediatePaymentData) => {
@@ -144,6 +174,9 @@
         let checkout,
             activeComponent,
             isStateValid = true,
+            paymentMethodsConfiguration = {},
+            paymentMethodsResponse = {paymentMethods: [], storedPaymentMethods: []},
+            checkoutCountryCode = '',
             sessionStorage = config.sessionStorage || window.sessionStorage,
             amazonCheckoutSessionId = url.searchParams.get('amazonCheckoutSessionId');
 
@@ -214,6 +247,10 @@
             if (config.onShippingContactSelected) {
                 paymentMethodSpecificConfig.applepay.onShippingContactSelected = handleOnShippingContactSelected
             }
+
+            paymentMethodSpecificConfig.paypal.isExpress = true;
+            paymentMethodSpecificConfig.paypal.onAuthorized = handleShopperDetails;
+            paymentMethodSpecificConfig.paypal.onShippingAddressChange = handleShippingAddressChanged;
         }
 
         if (config.amount) {
@@ -237,20 +274,29 @@
                 let checkoutConfig = await AdyenComponents.CheckoutConfigProvider.getConfiguration(config.checkoutConfigUrl);
 
                 checkoutConfig.onChange = handleOnChange;
-                checkoutConfig.onSubmit = handleOnChange;
+                checkoutConfig.onSubmit = handleOnSubmit;
                 checkoutConfig.onAdditionalDetails = handleAdditionalDetails;
-                checkoutConfig.onAuthorized = handleAuthorized;
-                checkoutConfig.onPaymentDataChanged = handlePaymentDataChanged;
-                checkoutConfig.onPaymentAuthorized = handlePaymentAuthorized;
-                checkoutConfig.onApplePayPaymentAuthorized = handleApplePayPaymentAuthorized;
-                if (config.onShippingContactSelected) {
-                    checkoutConfig.onShippingContactSelected = handleOnShippingContactSelected;
-                }
 
                 if (config.showPayButton) {
                     checkoutConfig.showPayButton = true;
                 }
 
+                if (!checkoutConfig.countryCode) {
+                    checkoutConfig.countryCode = checkoutConfig.locale.split('-')[1] || 'NL';
+                }
+                checkoutCountryCode = checkoutConfig.countryCode;
+
+                paymentMethodsConfiguration = checkoutConfig.paymentMethodsConfiguration || {};
+                paymentMethodsResponse = checkoutConfig.paymentMethodsResponse ||
+                    {paymentMethods: [], storedPaymentMethods: []};
+
+                if (paymentMethodsConfiguration.card) {
+                    delete paymentMethodsConfiguration.card.showBrandsUnderCardNumber;
+                }
+
+                delete checkoutConfig.paymentMethodsConfiguration;
+
+                const { AdyenCheckout } = window.AdyenWeb;
                 checkout = await AdyenCheckout(checkoutConfig);
             }
 
@@ -281,8 +327,13 @@
             return paymentMethod.type === 'scheme' && !paymentMethod.hasOwnProperty('encryptedSecurityCode');
         };
 
-        const handleAdditionalDetails = (state) => {
-            config.onAdditionalDetails(state.data);
+        const handleOnSubmit = (state, component, actions) => {
+            handleOnChange(state);
+            config.onSubmit(state, component, actions);
+        };
+
+        const handleAdditionalDetails = (state, component, actions) => {
+            config.onAdditionalDetails(state.data, actions);
         };
 
         /**
@@ -326,31 +377,49 @@
                     findStoredPaymentMethodConfig(checkoutInstance, storedPaymentMethodId);
 
                 if ('googlepay' === paymentType || 'paywithgoogle' === paymentType) {
+                    let responsePaymentMethod = findPaymentMethodConfig(checkoutInstance, paymentType) || {};
+                    let responseConfiguration = responsePaymentMethod.configuration || {};
+                    let conf = paymentMethodsConfiguration.googlepay ?? paymentMethodsConfiguration.paywithgoogle ?? {};
 
-                    if (!paymentMethodConfig.configuration) {
-                        paymentMethodConfig.configuration = {};
+                    let mergedConfiguration = Object.assign(
+                        {},
+                        responseConfiguration,
+                        paymentMethodConfig.configuration || {}
+                    );
+                    if (conf.merchantId) {
+                        mergedConfiguration.merchantId = conf.merchantId;
+                    }
+                    if (conf.gatewayMerchantId) {
+                        mergedConfiguration.gatewayMerchantId = conf.gatewayMerchantId;
                     }
 
-                    let conf = checkoutInstance.options.paymentMethodsConfiguration.googlepay ?? checkoutInstance.options.paymentMethodsConfiguration.paywithgoogle;
-
-                    paymentMethodConfig['configuration']['merchantId'] = conf.merchantId ?? '';
-                    paymentMethodConfig['configuration']['gatewayMerchantId'] = conf.gatewayMerchantId ?? '';
+                    paymentMethodConfig.configuration = mergedConfiguration;
                 }
 
                 // Configuration on the checkout instance level does not work for amazonpay, copy it on component level
-                if ('amazonpay' === paymentType && checkoutInstance.options.paymentMethodsConfiguration[paymentType]) {
-                    paymentMethodConfig['configuration'] = checkoutInstance.options.paymentMethodsConfiguration[paymentType].configuration;
+                if ('amazonpay' === paymentType && paymentMethodsConfiguration[paymentType]) {
+                    paymentMethodConfig['configuration'] = paymentMethodsConfiguration[paymentType].configuration;
                 }
 
                 // If there is applepay specific configuration then set country code to configuration
                 if ('applepay' === paymentType &&
-                    checkoutInstance.options.paymentMethodsConfiguration[paymentType] &&
+                    paymentMethodsConfiguration[paymentType] &&
                     paymentMethodConfig) {
-                    paymentMethodConfig.countryCode = checkoutInstance.options.countryCode;
+                    paymentMethodConfig.countryCode = checkoutCountryCode;
                 }
 
-                activeComponent = checkoutInstance.create(
+                // Adyen Web v6 no longer applies the global paymentMethodsConfiguration; pass the
+                // backend per-method config straight to the component. Card config is keyed under
+                // 'card'; co-badged card scheme selection is rendered automatically by v6.
+                if (paymentType === 'scheme') {
+                    paymentMethodConfig = Object.assign({}, paymentMethodsConfiguration.card || {}, paymentMethodConfig || {});
+                } else if (!wallets.includes(paymentType) && paymentMethodsConfiguration[paymentType]) {
+                    paymentMethodConfig = Object.assign({}, paymentMethodsConfiguration[paymentType], paymentMethodConfig || {});
+                }
+
+                activeComponent = window.AdyenWeb.createComponent(
                     giftCards.includes(paymentType) ? 'giftcard' : paymentType,
+                    checkoutInstance,
                     paymentMethodConfig
                 ).mount(mountElement);
 
@@ -450,7 +519,7 @@
                 return null;
             }
 
-            for (const paymentMethod of checkoutInstance.options.paymentMethodsResponse.storedPaymentMethods) {
+            for (const paymentMethod of paymentMethodsResponse.storedPaymentMethods) {
                 if (paymentMethod.id === storedPaymentMethodId) {
                     return {
                         ...paymentMethod,
@@ -469,7 +538,7 @@
 
             let isGiftCard = giftCards.includes(paymentMethodType);
 
-            for (const paymentMethod of checkoutInstance.options.paymentMethodsResponse.paymentMethods) {
+            for (const paymentMethod of paymentMethodsResponse.paymentMethods) {
                 if (paymentMethod.type === paymentMethodType) {
                     return paymentMethod;
                 }
