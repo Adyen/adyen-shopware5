@@ -160,7 +160,7 @@ class OrderService implements OrderServiceInterface
                 'payment mean for merchant reference "%s".',
                 $methodName,
                 $webhook->getPaymentMethod(),
-                $webhook->getMerchantReference(),
+                $webhook->getMerchantReference()
             ));
 
             return;
