@@ -135,12 +135,23 @@ class CheckoutConfigProvider
         return new PaymentCheckoutConfigRequest(
             $this->getAmount($forceAmount),
             $country,
-            Shopware()->Shop()->getLocale()->getLocale(),
+            $this->normalizeLocale(Shopware()->Shop()->getLocale()->getLocale()),
             $shopperReference,
             $shopperEmail,
             $shop->getName(),
             $isGuest
         );
+    }
+
+    private function normalizeLocale(string $locale): string
+    {
+        $locale = str_replace('_', '-', $locale);
+
+        if (!preg_match('/^[a-z]{2}-[A-Z]{2}$/', $locale)) {
+            return 'en-US';
+        }
+
+        return $locale;
     }
 
     /**

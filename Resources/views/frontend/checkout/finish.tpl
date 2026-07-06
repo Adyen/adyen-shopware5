@@ -36,6 +36,7 @@
 
 {block name='frontend_checkout_finish_teaser_actions'}
     <div id='donation-container'
+         data-countryCode="{$adyenCountryCode}"
          data-donationsConfigUrl="{url
          module='frontend'
          controller='AdyenDonations'

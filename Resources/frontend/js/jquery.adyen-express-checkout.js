@@ -141,8 +141,12 @@
             });
         },
 
-        onAuthorized: function (paymentData) {
+        onAuthorized: function (paymentData, actions) {
             console.log('Shopper details', paymentData);
+
+            if (actions && typeof actions.resolve === 'function') {
+                actions.resolve({transactionState: 'SUCCESS'});
+            }
         },
 
         onPaymentAuthorized: function (paymentData) {
