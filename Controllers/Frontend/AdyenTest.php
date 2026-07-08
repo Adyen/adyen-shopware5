@@ -205,17 +205,15 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
         /** @var QueueService $queueService */
         $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
 
-        // Loop so tasks enqueued by a running task are also processed
+        // Loop so tasks enqueued by a running task are also processed.
         for ($iteration = 0; $iteration < 20; $iteration++) {
-            // A stalled async runner can leave a task stuck IN_PROGRESS.
-            // findOldestQueuedItems() skips any queue that has a running task, so such an item is
-            // invisible below - requeue it first so it can run. Only requeue items that have been
-            // in progress for a while, to avoid disrupting a runner that is genuinely processing one.
-            $now = time();
+            // The async task runner is halted in E2E (see CreateInitialDataService), so nothing else
+            // claims queued tasks and this drain is the sole processor - there is no live runner to
+            // disrupt. Requeue any IN_PROGRESS item unconditionally as a safety net (a task can only
+            // be stuck IN_PROGRESS from a process that already died), because findOldestQueuedItems()
+            // skips any queue that has a running task and would otherwise hide it.
             foreach ($queueService->findRunningItems() as $runningItem) {
-                if (($now - (int) $runningItem->getLastUpdateTimestamp()) >= 10) {
-                    $queueService->requeue($runningItem);
-                }
+                $queueService->requeue($runningItem);
             }
 
             $queuedItems = $queueService->findOldestQueuedItems(10);
