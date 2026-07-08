@@ -46,7 +46,6 @@ class CreateInitialDataService extends BaseCreateSeedDataService
         /** @var Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
         $configService->setAsyncRequestTimeout(5000);
-        $configService->setTaskRunnerHalted(true);
     }
 
     /**
