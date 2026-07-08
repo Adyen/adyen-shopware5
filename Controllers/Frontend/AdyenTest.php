@@ -24,6 +24,8 @@ use Adyen\Core\Infrastructure\Http\Exceptions\HttpRequestException;
 use Adyen\Core\Infrastructure\Http\HttpClient;
 use Adyen\Core\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Adyen\Core\Infrastructure\ServiceRegister;
+use Adyen\Core\Infrastructure\TaskExecution\QueueItemStarter;
+use Adyen\Core\Infrastructure\TaskExecution\QueueService;
 use Adyen\Webhook\Receiver\HmacSignature;
 use AdyenPayment\Controllers\Common\AjaxResponseSetter;
 use AdyenPayment\E2ETest\Exception\InvalidDataException;
@@ -183,11 +185,36 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
      */
     private function verifyWebhookStatus(string $merchantReference, string $eventCode): void
     {
+        $this->runQueuedTasksSynchronously();
+
         $transactionLogService = new TransactionLogService();
 
         die(json_encode(array_merge(
             ['finished' => $transactionLogService->findLogsByMerchantReference($merchantReference, $eventCode)]
         )));
+    }
+
+    /**
+     * Drains the task queue in-process instead of relying on the asynchronous task-runner wake-up.
+     *
+     * @return void
+     */
+    private function runQueuedTasksSynchronously(): void
+    {
+        /** @var QueueService $queueService */
+        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
+
+        // Loop so tasks enqueued by a running task are also processed
+        for ($iteration = 0; $iteration < 20; $iteration++) {
+            $queuedItems = $queueService->findOldestQueuedItems(10);
+            if (empty($queuedItems)) {
+                return;
+            }
+
+            foreach ($queuedItems as $queuedItem) {
+                (new QueueItemStarter($queuedItem->getId()))->run();
+            }
+        }
     }
 
     /**
