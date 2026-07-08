@@ -198,6 +198,7 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
      * Drains the task queue in-process instead of relying on the asynchronous task-runner wake-up.
      *
      * @return void
+     * @throws \Adyen\Core\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     private function runQueuedTasksSynchronously(): void
     {
@@ -206,6 +207,13 @@ class Shopware_Controllers_Frontend_AdyenTest extends Enlight_Controller_Action 
 
         // Loop so tasks enqueued by a running task are also processed
         for ($iteration = 0; $iteration < 20; $iteration++) {
+            // A stalled async runner can leave a task stuck IN_PROGRESS.
+            // findOldestQueuedItems() skips any queue that has a running task,
+            // so such an item is invisible below - requeue it first so it can run.
+            foreach ($queueService->findRunningItems() as $runningItem) {
+                $queueService->requeue($runningItem);
+            }
+
             $queuedItems = $queueService->findOldestQueuedItems(10);
             if (empty($queuedItems)) {
                 return;
