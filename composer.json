@@ -32,7 +32,7 @@
         "php": "^7.2|^7.4|^8.0",
         "ext-json": "*",
         "ext-zip": "*",
-        "adyen/integration-core": "dev-fix/CS-8270",
+        "adyen/integration-core": "1.2.9",
         "ext-simplexml": "*"
     },
     "minimum-stability": "dev",
