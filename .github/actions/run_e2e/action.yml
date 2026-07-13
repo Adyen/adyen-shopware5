@@ -84,6 +84,8 @@ runs:
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE s_core_auth SET localeID = (SELECT id FROM s_core_locales WHERE locale = 'en_GB');\""
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO s_core_config_values (element_id, shop_id, value) SELECT id, 1, 'b:0;' FROM s_core_config_elements WHERE name LIKE '%installationSurvey%' AND (SELECT COUNT(*) FROM s_core_config_elements WHERE name LIKE '%installationSurvey%') = 1;\""
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO s_core_config_values (element_id, shop_id, value) SELECT id, 1, 'b:0;' FROM s_core_config_elements WHERE name LIKE '%benchmarkTeaser%' AND (SELECT COUNT(*) FROM s_core_config_elements WHERE name LIKE '%benchmarkTeaser%') = 1;\""
+        # Disable backend CSRF protection for E2E tests
+        docker exec shop php -r '$f="/var/www/html/config.php"; $c=require $f; $c["csrfProtection"]=["frontend"=>true,"backend"=>false]; file_put_contents($f,"<?php return ".var_export($c,true).";");'
 
     - name: Upload ZIP File to Docker
       shell: bash
@@ -124,11 +126,12 @@ runs:
 
     - name: Install common
       shell: bash
+      working-directory: ./tests
       env:
         GH_PAT: ${{ inputs.GH_PAT }}
         COMMON_TEST_REPO: ${{ inputs.COMMON_TEST_REPO }}
       run: |
-        npm install "https://${GH_PAT}@github.com/${COMMON_TEST_REPO}#main"
+        npm install "https://${GH_PAT}@github.com/${COMMON_TEST_REPO}#fix-tests"
 
     - name: Install Playwright Browsers
       working-directory: ./tests
