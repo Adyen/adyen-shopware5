@@ -114,7 +114,8 @@ class AdyenPayment extends Plugin
             $this->container->get('snippets'),
             $this->container->get('cron'),
             ServiceRegister::getService(QueueService::class),
-            ServiceRegister::getService(ConnectionSettingsRepository::class)
+            ServiceRegister::getService(ConnectionSettingsRepository::class),
+            $this->container->get(FileService::class)
         );
         $updater->update();
 

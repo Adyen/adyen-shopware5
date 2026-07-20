@@ -88,13 +88,6 @@ final class EnrichUserAdditionalPaymentSubscriber implements SubscriberInterface
 
         $userData['additional']['payment'] = $enrichedPaymentMean;
 
-        // Make sure that redirection from Amazon with session id has all confirmations checked
-        if ($args->getRequest()->getParam('amazonCheckoutSessionId')) {
-            $args->getRequest()->setParam('sAGB', true);
-            $args->getRequest()->setParam('esdAgreementChecked', true);
-            $args->getRequest()->setParam('serviceAgreementChecked', true);
-        }
-
         $subject->View()->assign('sUserData', $userData);
         $subject->View()->assign('sPayment', $userData['additional']['payment']);
     }

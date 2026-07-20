@@ -6,7 +6,7 @@
 
     {if $adyenShowExpressCheckout && (!$sArticle.sConfigurator || ($sArticle.sConfigurator && $activeConfiguratorSelection)) }
         {block name='adyen_frontend_detail_express_buy_button'}
-            {assign var="adyenExpressCheckoutPaymentTypes" value=['applepay', 'amazonpay', 'paywithgoogle', 'paypal']}
+            {assign var="adyenExpressCheckoutPaymentTypes" value=['applepay', 'paywithgoogle', 'paypal']}
             {foreach $adyenExpressCheckoutPaymentTypes as $adyenPpaymentMethodType}
                 <form data-adyen-express-checkout-form method="post" action="{url controller=AdyenExpressCheckout action=finish}" class="buybox--form">
                     <input type="hidden" name="adyen_payment_method" value="{$adyenPpaymentMethodType}"/>

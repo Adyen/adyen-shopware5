@@ -15,7 +15,7 @@
             stateDataInputSelector: 'input[name=adyenPaymentMethodStateData]'
         },
 
-        submitButtonReplacingComponents: ['applepay', 'amazonpay', 'paywithgoogle', 'googlepay', 'paypal'],
+        submitButtonReplacingComponents: ['applepay', 'paywithgoogle', 'googlepay', 'paypal'],
         checkoutController: null,
 
         init: function () {
