@@ -186,6 +186,7 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
                     'action' => $response->getAction(),
                     'signature' => $basketSignature,
                     'reference' => $orderReference,
+                    'pspReference' => $response->getPspReference()
                 ])
             );
 

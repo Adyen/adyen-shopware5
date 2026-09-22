@@ -25,11 +25,32 @@ class FinishPageSubscriber implements SubscriberInterface
             $temporaryId = $args->getRequest()->get('sUniqueID');
 
             $subject->View()->assign('merchantReference', $temporaryId);
+            $subject->View()->assign('adyenCountryCode', $this->resolveCountryCode());
 
             if (Shopware()->Session()->offsetExists('adyenAction')) {
                 $subject->View()->assign('adyenAction', Shopware()->Session()->offsetGet('adyenAction'));
                 Shopware()->Session()->offsetUnset('adyenAction');
             }
         }
+    }
+
+    /**
+     * Resolves the billing country ISO code (alpha-2) for the current user, used as a fallback
+     * countryCode for the Adyen Giving (donations) checkout configuration.
+     *
+     * @return string
+     */
+    private function resolveCountryCode(): string
+    {
+        if (
+            Shopware()->Modules() &&
+            ($sAdmin = Shopware()->Modules()->Admin()) &&
+            ($userData = $sAdmin->sGetUserData()) &&
+            isset($userData['additional']['country']['countryiso'])
+        ) {
+            return (string)$userData['additional']['country']['countryiso'];
+        }
+
+        return '';
     }
 }

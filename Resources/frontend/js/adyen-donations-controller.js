@@ -8,13 +8,15 @@
      *
      * @param {{
      *     donationsConfigUrl : string,
+     *     countryCode: string,
      *     makeDonation: function
      * }} config
      */
     function AdyenDonationsController(config) {
         let donations,
             activeComponent,
-            isStateValid = true;
+            isStateValid = true,
+            donationComponentConfig = {};
 
         const getDonationsInstance = async () => {
             if (!donations) {
@@ -32,6 +34,32 @@
                     throw 'Donations configuration error';
                 }
 
+                const coreDonation = (donationsConfig.paymentMethodsConfiguration &&
+                    donationsConfig.paymentMethodsConfiguration.donation) || {};
+                const coreAmounts = coreDonation.amounts || {};
+                delete donationsConfig.paymentMethodsConfiguration;
+
+                donationComponentConfig = {
+                    donation: {
+                        type: 'fixedAmounts',
+                        currency: coreAmounts.currency,
+                        values: coreAmounts.values || []
+                    },
+                    nonprofitName: coreDonation.name,
+                    nonprofitDescription: coreDonation.description,
+                    nonprofitUrl: coreDonation.url,
+                    logoUrl: coreDonation.logoUrl,
+                    bannerUrl: coreDonation.backgroundUrl
+                };
+
+                if (!donationsConfig.countryCode && config.countryCode) {
+                    donationsConfig.countryCode = config.countryCode;
+                }
+                if (!donationsConfig.countryCode) {
+                    throw new Error('Donation checkout countryCode is missing');
+                }
+
+                const { AdyenCheckout } = window.AdyenWeb;
                 donations = await AdyenCheckout(donationsConfig);
             }
 
@@ -61,10 +89,14 @@
 
                 unmount();
 
-                activeComponent = donationInstance.create('donation', {
-                    'onDonate': handleOnDonate,
-                    'onCancel': handleOnCancel
-                })
+                activeComponent = window.AdyenWeb.createComponent('donation', donationInstance, Object.assign(
+                    {},
+                    donationComponentConfig,
+                    {
+                        'onDonate': handleOnDonate,
+                        'onCancel': handleOnCancel
+                    }
+                ))
                     .mount(mountingElement);
             })
         }

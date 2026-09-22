@@ -7,7 +7,8 @@
          */
         defaults: {
             donationsConfigUrl: '',
-            makeDonationsUrl: ''
+            makeDonationsUrl: '',
+            countryCode: ''
         },
 
         donationsController : null,
@@ -19,6 +20,7 @@
 
             me.donationsController = new AdyenComponents.DonationsController({
                 "donationsConfigUrl": me.opts.donationsConfigUrl,
+                "countryCode": me.opts.countryCode,
                 "makeDonation": $.proxy(me.makeDonation, me)
             });
 
