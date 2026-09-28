@@ -101,40 +101,54 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         $this->Response()->setHeader('Content-Type', 'application/json');
 
         $paymentData = $this->Request()->get('paymentData');
-        $shippingAddress = $this->Request()->get('shippingAddress');
+        $shippingAddress = $this->normalizePayPalShippingAddress($this->Request()->get('shippingAddress'));
         $productNumber = $this->Request()->get('adyen_article_number');
         $pspReference = $this->Request()->get('pspReference');
 
-        if ($shippingAddress) {
-            try {
-                $amount = $this->basketHelper->getTotalAmountFor(
-                    $this->prepareCheckoutController(),
-                    $productNumber,
-                    $shippingAddress,
-                    'paypal'
-                );
-            } catch (PaymentMeanDoesNotExistException $e) {
-                $this->Response()->setHttpResponseCode(400);
-                $this->Response()->setBody(json_encode([
-                    "message" => "PayPal is currently unavailable. Please try again later."
-                ]));
+        if (!$shippingAddress) {
+            $this->Response()->setHttpResponseCode(400);
+            $this->Response()->setBody(json_encode(["message" => "Shipping address is missing"]));
 
-                return;
-            }
-
-            $response = CheckoutAPI::get()
-                ->paymentRequest(Shop::getShopId())->paypalUpdateOrder(
-                    [
-                        'amount' => $amount,
-                        'paymentData' => $paymentData,
-                        'pspReference' => $pspReference
-                    ]
-                );
-
-            if ($response->getStatus() === 'success') {
-                $this->Response()->setBody(json_encode(['paymentData' => $response->getPaymentData()]));
-            }
+            return;
         }
+
+        if (!$this->isCountryActive($shippingAddress->country)) {
+            return;
+        }
+
+        try {
+            $amount = $this->basketHelper->getTotalAmountFor(
+                $this->prepareCheckoutController(),
+                $productNumber,
+                $shippingAddress,
+                'paypal'
+            );
+        } catch (PaymentMeanDoesNotExistException $e) {
+            $this->Response()->setHttpResponseCode(400);
+            $this->Response()->setBody(json_encode([
+                "message" => "PayPal is currently unavailable. Please try again later."
+            ]));
+
+            return;
+        }
+
+        $response = CheckoutAPI::get()
+            ->paymentRequest(Shop::getShopId())->paypalUpdateOrder(
+                [
+                    'amount' => $amount,
+                    'paymentData' => $paymentData,
+                    'pspReference' => $pspReference
+                ]
+            );
+
+        if ($response->getStatus() !== 'success') {
+            $this->Response()->setHttpResponseCode(400);
+            $this->Response()->setBody(json_encode(["message" => "PayPal order could not be updated"]));
+
+            return;
+        }
+
+        $this->Response()->setBody(json_encode(['paymentData' => $response->getPaymentData()]));
     }
 
     /**
@@ -232,12 +246,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
     ): void {
         $shippingAddress = json_decode($shippingAddress, false);
 
-        /* @var CustomerService $customerService */
-        $customerService = ServiceRegister::getService(CustomerService::class);
-        if (!$customerService->verifyIfCountryIsActive($shippingAddress->country)) {
-            $this->Response()->setHttpResponseCode(400);
-            $this->Response()->setBody(json_encode(["message" => "This country is not active"]));
-
+        if (!$this->isCountryActive(!empty($shippingAddress->country) ? $shippingAddress->country : null)) {
             return;
         }
 
@@ -269,6 +278,58 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
     }
 
     /**
+     * Checks that the given country is active in the shop; writes a 400 response and returns false otherwise.
+     *
+     * @param string|null $countryIso
+     *
+     * @return bool
+     */
+    private function isCountryActive($countryIso): bool
+    {
+        /* @var CustomerService $customerService */
+        $customerService = ServiceRegister::getService(CustomerService::class);
+        if ($countryIso && $customerService->verifyIfCountryIsActive($countryIso)) {
+            return true;
+        }
+
+        $this->Response()->setHttpResponseCode(400);
+        $this->Response()->setBody(json_encode(["message" => "This country is not active"]));
+
+        return false;
+    }
+
+    /**
+     * Converts the shipping address sent by the PayPal onShippingAddressChange callback
+     * ({city, state, postalCode, countryCode}) into the address format used by the plugin ({country, city, zipCode}),
+     * so that the dispatch (shipping cost) can be resolved for the selected country.
+     *
+     * @param array|string|null $shippingAddress
+     *
+     * @return object|null
+     */
+    private function normalizePayPalShippingAddress($shippingAddress)
+    {
+        if (is_string($shippingAddress)) {
+            $shippingAddress = json_decode($shippingAddress, true);
+        }
+
+        if (empty($shippingAddress) || !is_array($shippingAddress)) {
+            return null;
+        }
+
+        $country = $shippingAddress['countryCode'] ?? $shippingAddress['country'] ?? null;
+        if (empty($country)) {
+            return null;
+        }
+
+        return (object)[
+            'country' => strtoupper((string)$country),
+            'city' => $shippingAddress['city'] ?? '',
+            'zipCode' => $shippingAddress['postalCode'] ?? $shippingAddress['zipCode'] ?? '',
+        ];
+    }
+
+    /**
      * Starts a basic PayPal guest payment transaction with no customer data.
      *
      * @throws Exception
@@ -276,13 +337,27 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
     private function startGuestPayPalPaymentTransaction()
     {
         $basket = Shopware()->Modules()->Basket()->sGetBasket();
+
+        // Sign the basket with the session user, exactly like Shopware's persistBasket() does, so that
+        // verifyBasketSignature() in handleAdditionalData passes for fast-login (guest) sessions that
+        // already have an sUserId. Anonymous sessions skip the verification, so a unique id is used
+        // there to avoid signature collisions between concurrent shoppers with identical baskets.
+        $customerId = Shopware()->Session()->get('sUserId') ?: uniqid('adyen_guest', true);
+
         /** @var BasketSignatureGeneratorInterface $signatureGenerator */
         $signatureGenerator = $this->get('basket_signature_generator');
-        $basketSignature = $signatureGenerator->generateSignature($basket, uniqid('adyen_guest', true));
+        $basketSignature = $signatureGenerator->generateSignature($basket, $customerId);
+
+        // Shopware's loadBasketFromSignature() replaces the session order variables with the persisted data and
+        // verifyBasketSignature() reads the basket from its 'sBasket' key, so persist the current order variables
+        // (like Shopware's persistBasket() does) with the fresh basket.
+        $orderVariables = Shopware()->Session()->offsetGet('sOrderVariables');
+        $orderVariables = $orderVariables instanceof ArrayObject ? $orderVariables->getArrayCopy() : [];
+        $orderVariables['sBasket'] = $basket;
 
         /** @var BasketPersister $persister */
         $persister = $this->get('basket_persister');
-        $persister->persist($basketSignature, $basket);
+        $persister->persist($basketSignature, $orderVariables);
 
         $reference = md5(uniqid("{$basketSignature}_"));
         $productNumber = $this->Request()->get('adyen_article_number');
@@ -295,6 +370,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
                     $this->basketHelper->getTotalAmountFor(
                         $this->prepareCheckoutController(),
                         !empty($productNumber) ? $productNumber : null,
+                        null,
                         'paypal'
                     ),
                     $reference,

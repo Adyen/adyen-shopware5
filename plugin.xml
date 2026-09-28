@@ -863,5 +863,13 @@
             * Fix Oney payment method adn E2E tests
         </changes>
     </changelog>
+    <changelog version="5.2.0">
+        <changes lang="en">
+            * Fix PayPal express checkout redirecting guest sessions to the payment selection page after a successful payment
+        </changes>
+        <changes lang="de">
+            * Behebt die Weiterleitung von Gastsitzungen zur Zahlungsauswahl nach erfolgreicher Zahlung im PayPal Express Checkout
+        </changes>
+    </changelog>
 
 </plugin>

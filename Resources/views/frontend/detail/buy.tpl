@@ -16,7 +16,7 @@
                     <input type="hidden" name="adyenBillingAddress">
                     <input type="hidden" name="adyenEmail">
 
-                    {if $userLoggedIn}
+                    {if $adyenUserLoggedIn}
                         <input type="hidden" name="adyenLoggedIn">
                     {/if}
 

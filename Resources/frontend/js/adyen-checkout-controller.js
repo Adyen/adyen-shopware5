@@ -130,8 +130,10 @@
         config.onShippingContactSelected = config.onShippingContactSelected || function (resolve, reject, event) {
             resolve({});
         };
-        config.onShopperDetails = config.onShopperDetails || function (shopperDetails, rawData, actions) {
-            actions.resolve();
+        config.onShopperDetails = config.onShopperDetails || function (data, actions) {
+            if (actions && typeof actions.resolve === 'function') {
+                actions.resolve();
+            }
         };
         config.onPayButtonClick = config.onPayButtonClick || function (resolve, reject) {
             resolve();
@@ -147,8 +149,14 @@
             return config.onAuthorized(paymentData, actions);
         }
 
-        const handleShopperDetails = (shopperDetails, rawData, actions) => {
-            return config.onShopperDetails(shopperDetails, rawData, actions);
+        /**
+         * PayPal express onAuthorized callback (Adyen Web v6 signature).
+         *
+         * @param data {authorizedEvent: object, billingAddress: object|undefined, deliveryAddress: object|undefined}
+         * @param actions {resolve: function, reject: function}
+         */
+        const handleShopperDetails = (data, actions) => {
+            return config.onShopperDetails(data, actions);
         }
 
         const handleShippingAddressChanged = (data, actions, component) => {
@@ -256,7 +264,8 @@
             if (!checkout) {
                 let checkoutConfig = await AdyenComponents.CheckoutConfigProvider.getConfiguration(config.checkoutConfigUrl);
 
-                checkoutConfig.onChange = handleOnChange;
+                // Adyen Web calls onChange(state, component); only the submit path may flag isSubmit
+                checkoutConfig.onChange = (state) => handleOnChange(state, false);
                 checkoutConfig.onSubmit = handleOnSubmit;
                 checkoutConfig.onAdditionalDetails = handleAdditionalDetails;
 
@@ -286,7 +295,12 @@
             return Promise.resolve(checkout);
         };
 
-        const handleOnChange = (state) => {
+        /**
+         * @param state Web component state
+         * @param isSubmit True when the state change is caused by the component submit (pay button click),
+         *                 false when it is caused by any other component state change.
+         */
+        const handleOnChange = (state, isSubmit = false) => {
             isStateValid = state.isValid;
 
             if (isStateValid) {
@@ -298,7 +312,7 @@
                 config.onClickToPay();
             }
 
-            config.onStateChange();
+            config.onStateChange(isSubmit);
         };
 
         /**
@@ -311,7 +325,7 @@
         };
 
         const handleOnSubmit = (state, component, actions) => {
-            handleOnChange(state);
+            handleOnChange(state, true);
             config.onSubmit(state, component, actions);
         };
 

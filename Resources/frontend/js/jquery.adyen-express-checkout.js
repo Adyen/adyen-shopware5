@@ -54,7 +54,11 @@
             me.checkoutController.mount(me.opts.adyenPaymentMethodType, me.$el[0]);
         },
 
-        submitOrder: function () {
+        /**
+         * @param isSubmit True when triggered by the web component submit (pay button click), false for any other
+         *                 component state change.
+         */
+        submitOrder: function (isSubmit) {
             let me = this;
 
             if (!me.checkoutController.getPaymentMethodStateData()) {
@@ -64,6 +68,12 @@
             }
 
             if (me.opts.adyenPaymentMethodType === 'applepay' && !me.opts.userLoggedIn) {
+                return;
+            }
+
+            // PayPal starts the transaction only on the button click (submit). The PayPal component also updates its
+            // state (and triggers onChange) while the shopper approves the payment; that must not start a new one.
+            if (me.opts.adyenPaymentMethodType === 'paypal' && isSubmit !== true) {
                 return;
             }
 
@@ -314,32 +324,58 @@
             });
         },
 
-        onShopperDetails: function (shopperDetails, rawData, actions) {
+        /**
+         * PayPal express onAuthorized callback (Adyen Web v6).
+         *
+         * @param data {authorizedEvent: object, billingAddress: object|undefined, deliveryAddress: object|undefined}
+         *             authorizedEvent is the raw PayPal order; billingAddress and deliveryAddress are in Adyen address
+         *             format (street, city, postalCode, country, ...). PayPal usually provides only the country of the
+         *             payer, so the billing address falls back to the delivery address.
+         * @param actions {resolve: function, reject: function}
+         */
+        onShopperDetails: function (data, actions) {
             let me = this,
-                expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector);
+                expressCheckoutForm = me.$el.closest(me.opts.confirmFormSelector),
+                order = (data && data.authorizedEvent) || {},
+                payer = order.payer || {},
+                payerName = payer.name || {},
+                phone = payer.phone && payer.phone.phone_number ? (payer.phone.phone_number.national_number || '') : '',
+                deliveryAddress = (data && data.deliveryAddress) || (data && data.billingAddress) || {},
+                billingAddress = data && data.billingAddress && data.billingAddress.street ? data.billingAddress : deliveryAddress,
+                firstName = payerName.given_name || '',
+                lastName = payerName.surname || '';
 
-            me.opts.shippingAddress = {
-                firstName: shopperDetails.shopperName.firstName,
-                lastName: shopperDetails.shopperName.lastName,
-                street: shopperDetails.shippingAddress.street,
-                zipCode: shopperDetails.shippingAddress.postalCode,
-                city: shopperDetails.shippingAddress.city,
-                country: shopperDetails.shippingAddress.country,
-                phone: shopperDetails.telephoneNumber
+            if (!firstName && deliveryAddress.firstName) {
+                let nameParts = String(deliveryAddress.firstName).trim().split(' ');
+                firstName = nameParts.shift();
+                lastName = nameParts.join(' ');
+            }
+
+            // Without an email and a shippable address the server cannot create the guest customer
+            if (!payer.email_address || !deliveryAddress.country || !deliveryAddress.street) {
+                actions.reject();
+
+                return;
+            }
+
+            let toAddress = function (address) {
+                return {
+                    firstName: firstName,
+                    lastName: lastName,
+                    street: address.street || '',
+                    zipCode: address.postalCode || '',
+                    city: address.city || '',
+                    country: address.country || '',
+                    phone: phone
+                };
             };
-            me.opts.billingAddress = {
-                firstName: shopperDetails.shopperName.firstName,
-                lastName: shopperDetails.shopperName.lastName,
-                street: shopperDetails.billingAddress.street,
-                zipCode: shopperDetails.billingAddress.postalCode,
-                city: shopperDetails.billingAddress.city,
-                country: shopperDetails.billingAddress.country,
-                phone: shopperDetails.telephoneNumber
-            };
+
+            me.opts.shippingAddress = toAddress(deliveryAddress);
+            me.opts.billingAddress = toAddress(billingAddress);
 
             expressCheckoutForm.find(me.opts.shippingAddressInputSelector).val(JSON.stringify(me.opts.shippingAddress));
             expressCheckoutForm.find(me.opts.billingAddressInputSelector).val(JSON.stringify(me.opts.billingAddress));
-            expressCheckoutForm.find(me.opts.emailInputSelector).val(JSON.stringify(shopperDetails.shopperEmail));
+            expressCheckoutForm.find(me.opts.emailInputSelector).val(JSON.stringify(payer.email_address));
 
             actions.resolve();
         },
