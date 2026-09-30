@@ -1,4 +1,4 @@
-﻿name: 'Run E2E Tests'
+name: 'Run E2E Tests'
 description: "Runs Adyen Shopware E2E Tests"
 
 inputs:
@@ -56,6 +56,14 @@ inputs:
   COMMON_TEST_REPO:
     description: "The repository housing the common part of the e2e tests"
     required: true
+  SHOPWARE_TEST_REPO_REF:
+    description: "Git ref of SHOPWARE_TEST_REPO to test with. Pin to a commit SHA, a branch name is a moving target."
+    required: false
+    default: 'main'
+  COMMON_TEST_REPO_REF:
+    description: "Git ref of COMMON_TEST_REPO to install. Pin to a commit SHA, a branch name is a moving target."
+    required: false
+    default: 'fix-tests'
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
     default: '~/.build/AdyenPayment.zip'
@@ -106,23 +114,29 @@ runs:
         docker exec shop bash -c 'php bin/console sw:cache:clear'
 
     - name: Clone Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
-        repository: ${{inputs.SHOPWARE_TEST_REPO}}
+        repository: ${{ inputs.SHOPWARE_TEST_REPO }}
         path: tests
         token: ${{ inputs.GH_PAT }}
-        ref: main
+        ref: ${{ inputs.SHOPWARE_TEST_REPO_REF }}
+        persist-credentials: false
 
     - name: Setup Node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
       with:
         node-version: ${{ inputs.NODE }}
 
     - name: Install Node dependencies
       working-directory: ./tests
-      run:
-        npm install
       shell: bash
+      run: |
+        if [ -f package-lock.json ]; then
+          npm ci
+        else
+          echo "::warning::No package-lock.json in the test repository, falling back to npm install. Commit a lock file there so CI installs are reproducible."
+          npm install
+        fi
 
     - name: Install common
       shell: bash
@@ -130,8 +144,14 @@ runs:
       env:
         GH_PAT: ${{ inputs.GH_PAT }}
         COMMON_TEST_REPO: ${{ inputs.COMMON_TEST_REPO }}
+        COMMON_TEST_REPO_REF: ${{ inputs.COMMON_TEST_REPO_REF }}
       run: |
-        npm install "https://${GH_PAT}@github.com/${COMMON_TEST_REPO}#fix-tests"
+        # Authenticate git to github.com through an HTTP header for this step only, so the token
+        # never appears in the package URL, package-lock.json or the npm log.
+        AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_PAT" | base64 -w0)"
+        git config --global "http.https://github.com/.extraheader" "$AUTH_HEADER"
+        trap 'git config --global --unset-all "http.https://github.com/.extraheader"' EXIT
+        npm install "git+https://github.com/${COMMON_TEST_REPO}.git#${COMMON_TEST_REPO_REF}"
 
     - name: Install Playwright Browsers
       working-directory: ./tests
@@ -158,8 +178,8 @@ runs:
         PAY_PAL_PASSWORD: ${{ inputs.PAY_PAL_PASSWORD }}
         BROWSER: ${{ inputs.BROWSER }}
         DEVICE: ${{ inputs.DEVICE }}
-        
-    - uses: actions/upload-artifact@v4
+
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       if: always()
       with:
         name: playwright-report-Shopware-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
@@ -169,7 +189,7 @@ runs:
       if: always()
       shell: bash
       run: docker logs shop >& ./dockerLogs.log
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       if: always()
       with:
         name: docker-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}
@@ -185,7 +205,7 @@ runs:
       shell: bash
       run: docker exec shop bash -c 'cat var/log/adyen_payment_production-${{ steps.date.outputs.date }}.log' >& ./integrationLogs.log
     - name: Add integration logs to file
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       if: always()
       with:
         name: integration-error-log-${{ inputs.SHOPWARE }}-PHP-${{ inputs.PHP }}-Browser-${{inputs.BROWSER}}

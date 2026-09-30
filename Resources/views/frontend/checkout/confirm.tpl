@@ -45,12 +45,3 @@
     {/if}
 
 {/block}
-
-{block name="frontend_index_after_body"}
-    {$smarty.block.parent}
-
-    {if $sPayment.adyenPaymentType == 'googlepay' || $sPayment.adyenPaymentType == 'paywithgoogle'}
-        <script src="https://pay.google.com/gp/p/js/pay.js"></script>
-    {/if}
-
-{/block}
