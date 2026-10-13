@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AdyenPayment\Subscriber;
 
+use Adyen\Core\Infrastructure\ServiceRegister;
+use AdyenPayment\Services\CustomerService;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Components_Session_Namespace;
 use Enlight_Event_EventArgs;
@@ -38,9 +40,7 @@ final class AddExpressCheckoutToView implements SubscriberInterface
             return;
         }
 
-        $args->getSubject()->View()->assign(
-            'adyenShowExpressCheckout', true
-        );
+        $this->assignExpressCheckoutViewData($args);
     }
 
     public function handleCartPage(Enlight_Event_EventArgs $args): void
@@ -49,8 +49,20 @@ final class AddExpressCheckoutToView implements SubscriberInterface
             return;
         }
 
-        $args->getSubject()->View()->assign(
-            'adyenShowExpressCheckout', true
-        );
+        $this->assignExpressCheckoutViewData($args);
+    }
+
+    /**
+     * Shopware's own $userLoggedIn view variable is true for fast-login (guest) sessions as well, while the
+     * plugin treats those sessions as guests (see CustomerService::isUserLoggedIn()). Expose a plugin-owned flag
+     * so that the express checkout components request address and email in the same cases the server expects them.
+     */
+    private function assignExpressCheckoutViewData(Enlight_Event_EventArgs $args): void
+    {
+        /** @var CustomerService $customerService */
+        $customerService = ServiceRegister::getService(CustomerService::class);
+
+        $args->getSubject()->View()->assign('adyenShowExpressCheckout', true);
+        $args->getSubject()->View()->assign('adyenUserLoggedIn', $customerService->isUserLoggedIn());
     }
 }

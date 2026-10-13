@@ -18,7 +18,7 @@
             <div class="table--actions">
                 <div class="main--actions">
                     <div class="btn--checkout-proceed right">
-                        {assign var="adyenExpressCheckoutPaymentTypes" value=['applepay', 'amazonpay', 'paywithgoogle', 'paypal']}
+                        {assign var="adyenExpressCheckoutPaymentTypes" value=['applepay', 'paywithgoogle', 'paypal']}
                         {foreach $adyenExpressCheckoutPaymentTypes as $adyenPaymentMethodType}
                             <form data-adyen-express-checkout-form method="post" action="{url controller=AdyenExpressCheckout action=finish}" class="buybox--form">
                                 <input type="hidden" name="adyen_payment_method" value="{$adyenPaymentMethodType}"/>
@@ -27,7 +27,7 @@
                                 <input type="hidden" name="adyenBillingAddress">
                                 <input type="hidden" name="adyenEmail">
 
-                                {if $userLoggedIn}
+                                {if $adyenUserLoggedIn}
                                     <input type="hidden" name="adyenLoggedIn">
                                 {/if}
 
