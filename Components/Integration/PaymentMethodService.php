@@ -18,6 +18,7 @@ use AdyenPayment\Repositories\Wrapper\StoreRepository;
 use Adyen\Core\BusinessLogic\Domain\Integration\Store\StoreService as StoreServiceInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Exception;
@@ -213,16 +214,10 @@ class PaymentMethodService implements ShopPaymentService
      */
     public function enableAllPaymentMethods(): void
     {
-        $paymentMeans = $this->getConfiguredPaymentMeans();
-
-        if (empty($paymentMeans)) {
-            return;
-        }
-
-        foreach ($paymentMeans as $paymentMean) {
-            $paymentMean->setHide(false);
-            $paymentMean->setActive(true);
-            $this->entityManager->persist($paymentMean);
+        foreach ($this->storeService->getConnectedStores() as $storeId) {
+            StoreContext::doWithStore((string)$storeId, function () use ($storeId) {
+                $this->enablePaymentMeansForStore((string)$storeId);
+            });
         }
 
         $this->entityManager->flush();
@@ -309,6 +304,42 @@ class PaymentMethodService implements ShopPaymentService
             ->setParameter('names', $names, Connection::PARAM_STR_ARRAY);
 
         return $query->getQuery()->getResult();
+    }
+
+    /**
+     * Activates payment means configured for the store and assigns them to the store and its language shops.
+     *
+     * @param string $storeId
+     *
+     * @return void
+     *
+     * @throws ORMException
+     * @throws Exception
+     */
+    private function enablePaymentMeansForStore(string $storeId): void
+    {
+        $store = $this->storeRepository->getStoreById($storeId);
+
+        if (!$store) {
+            return;
+        }
+
+        $shops = array_merge([$store], $this->storeRepository->getShopwareLanguageShops([$store->getId()]));
+
+        foreach ($this->getConfiguredPaymentMeans() as $paymentMean) {
+            $assignedShops = $paymentMean->getShops();
+
+            foreach ($shops as $shop) {
+                if (!$assignedShops->contains($shop)) {
+                    $assignedShops->add($shop);
+                }
+            }
+
+            $paymentMean->setShops($assignedShops);
+            $paymentMean->setHide(false);
+            $paymentMean->setActive(true);
+            $this->entityManager->persist($paymentMean);
+        }
     }
 
     /**
@@ -532,9 +563,14 @@ class PaymentMethodService implements ShopPaymentService
     private function disableMean(Payment $paymentMean)
     {
         $stores = $paymentMean->getShops();
+        $currentStoreId = StoreContext::getInstance()->getStoreId();
 
-        foreach ($stores as $store) {
-            if ($store->getId() . '' === StoreContext::getInstance()->getStoreId()) {
+        /** @var ShopwareStore $store */
+        foreach ($stores->toArray() as $store) {
+            $mainStore = $store->getMain();
+
+            if ($store->getId() . '' === $currentStoreId
+                || ($mainStore && $mainStore->getId() . '' === $currentStoreId)) {
                 $stores->removeElement($store);
             }
         }
@@ -550,6 +586,8 @@ class PaymentMethodService implements ShopPaymentService
 
     /**
      * @return ArrayCollection
+     *
+     * @throws NotSupported
      */
     private function getCountries(): ArrayCollection
     {
@@ -583,18 +621,29 @@ class PaymentMethodService implements ShopPaymentService
     }
 
     /**
-     * @return array
+     * Returns connected stores together with their language shops.
+     *
+     * @return ShopwareStore[]
      */
     private function getStoresForRemoval(): array
     {
         $stores = $this->storeService->getConnectedStores();
+
+        if (empty($stores)) {
+            return [];
+        }
+
         $shopwareStores = [];
 
         foreach ($stores as $store){
-            $shopwareStores[] = $this->storeRepository->getStoreById($store);
+            $shopwareStore = $this->storeRepository->getStoreById($store);
+
+            if ($shopwareStore) {
+                $shopwareStores[] = $shopwareStore;
+            }
         }
 
-        return $shopwareStores;
+        return array_merge($shopwareStores, $this->storeRepository->getShopwareLanguageShops($stores));
     }
 
     /**

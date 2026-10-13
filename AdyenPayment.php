@@ -90,7 +90,7 @@ class AdyenPayment extends Plugin
         );
 
         $this->updateSchema();
-        $this->installStoredPaymentUmbrella();
+        $this->installStoredPaymentUmbrella(false);
 
         $installContext->scheduleClearCache(InstallContext::CACHE_LIST_FRONTEND);
     }
