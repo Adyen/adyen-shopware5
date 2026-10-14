@@ -63,7 +63,7 @@ inputs:
   COMMON_TEST_REPO_REF:
     description: "Git ref of COMMON_TEST_REPO to install. Pin to a commit SHA, a branch name is a moving target."
     required: false
-    default: 'fix-tests'
+    default: 'main'
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
     default: '~/.build/AdyenPayment.zip'
@@ -146,17 +146,19 @@ runs:
         COMMON_TEST_REPO: ${{ inputs.COMMON_TEST_REPO }}
         COMMON_TEST_REPO_REF: ${{ inputs.COMMON_TEST_REPO_REF }}
       run: |
-        # Authenticate git to github.com through an HTTP header passed only to the npm process, so the
-        # token never appears in the package URL, package-lock.json, the npm log or a git config file.
-        # npm falls back to SSH when HTTPS fails; insteadOf rewrites that fallback to HTTPS as well.
-        AUTH_B64="$(printf 'x-access-token:%s' "$GH_PAT" | base64 -w0)"
-        echo "::add-mask::$AUTH_B64"
+        # git rewrites github.com URLs to carry the token, through config passed only to the npm process,
+        # so the token never appears in the package URL, package-lock.json or a git config file.
+        # The SSH form is rewritten too, because npm falls back to SSH when HTTPS fails.
+        # The secret may hold "owner/repo" or "owner/repo.git", with stray whitespace.
+        REPO="$(printf '%s' "$COMMON_TEST_REPO" | tr -d '[:space:]')"
+        REPO="${REPO%.git}"
+        echo "::add-mask::$REPO"
         GIT_CONFIG_COUNT=2 \
-        GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
-        GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $AUTH_B64" \
-        GIT_CONFIG_KEY_1="url.https://github.com/.insteadOf" \
+        GIT_CONFIG_KEY_0="url.https://${GH_PAT}@github.com/.insteadOf" \
+        GIT_CONFIG_VALUE_0="https://github.com/" \
+        GIT_CONFIG_KEY_1="url.https://${GH_PAT}@github.com/.insteadOf" \
         GIT_CONFIG_VALUE_1="ssh://git@github.com/" \
-        npm install "git+https://github.com/${COMMON_TEST_REPO}.git#${COMMON_TEST_REPO_REF}"
+        npm install "git+https://github.com/${REPO}.git#${COMMON_TEST_REPO_REF}"
 
     - name: Install Playwright Browsers
       working-directory: ./tests
