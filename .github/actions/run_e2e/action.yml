@@ -146,11 +146,16 @@ runs:
         COMMON_TEST_REPO: ${{ inputs.COMMON_TEST_REPO }}
         COMMON_TEST_REPO_REF: ${{ inputs.COMMON_TEST_REPO_REF }}
       run: |
-        # Authenticate git to github.com through an HTTP header for this step only, so the token
-        # never appears in the package URL, package-lock.json or the npm log.
-        AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_PAT" | base64 -w0)"
-        git config --global "http.https://github.com/.extraheader" "$AUTH_HEADER"
-        trap 'git config --global --unset-all "http.https://github.com/.extraheader"' EXIT
+        # Authenticate git to github.com through an HTTP header passed only to the npm process, so the
+        # token never appears in the package URL, package-lock.json, the npm log or a git config file.
+        # npm falls back to SSH when HTTPS fails; insteadOf rewrites that fallback to HTTPS as well.
+        AUTH_B64="$(printf 'x-access-token:%s' "$GH_PAT" | base64 -w0)"
+        echo "::add-mask::$AUTH_B64"
+        GIT_CONFIG_COUNT=2 \
+        GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
+        GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $AUTH_B64" \
+        GIT_CONFIG_KEY_1="url.https://github.com/.insteadOf" \
+        GIT_CONFIG_VALUE_1="ssh://git@github.com/" \
         npm install "git+https://github.com/${COMMON_TEST_REPO}.git#${COMMON_TEST_REPO_REF}"
 
     - name: Install Playwright Browsers
