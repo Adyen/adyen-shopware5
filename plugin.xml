@@ -4,7 +4,7 @@
 
     <label>Adyen Shopware Plugin</label>
     <label lang="de">Adyen Shopware Plugin</label>
-    <version>5.1.4</version>
+    <version>5.2.0</version>
     <copyright>Adyen</copyright>
     <author>Adyen</author>
     <link>https://adyen.com</link>
@@ -861,6 +861,20 @@
         </changes>
         <changes lang="de">
             * Fix Oney payment method adn E2E tests
+        </changes>
+    </changelog>
+    <changelog version="5.2.0">
+        <changes lang="en">
+            * Remove Amazon Pay payment method
+            * Fix PayPal express checkout redirecting guest sessions to the payment selection page after a successful payment
+            * Fix payment method visibility on plugin reactivation
+            * Build and publish release archives via GitHub Actions
+        </changes>
+        <changes lang="de">
+            * Entfernt die Zahlungsart Amazon Pay
+            * Behebt die Weiterleitung von Gastsitzungen zur Zahlungsauswahl nach erfolgreicher Zahlung im PayPal Express Checkout
+            * Behebt die Sichtbarkeit der Zahlungsarten nach erneuter Aktivierung des Plugins
+            * Release-Archive werden über GitHub Actions erstellt und veröffentlicht
         </changes>
     </changelog>
 

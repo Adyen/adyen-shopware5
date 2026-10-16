@@ -25,7 +25,6 @@ if (!window.AdyenFE) {
     const methodMap = {
         ach: 'ach-direct-debit',
         alipay: 'alipay',
-        amazonpay: 'amazon-pay',
         applepay: 'apple-pay',
         blik: 'blik',
         directEbanking: 'cards',
@@ -829,14 +828,6 @@ if (!window.AdyenFE) {
                         displayButtonOn: true
                     };
                     break;
-                case 'amazonpay':
-                    config.additionalData = {
-                        publicKeyId: '',
-                        merchantId: '',
-                        storeId: '',
-                        displayButtonOn: true
-                    };
-                    break;
                 case 'googlepay':
                 case 'paywithgoogle':
                     config.additionalData = {
@@ -934,9 +925,6 @@ if (!window.AdyenFE) {
                                 break;
                             case 'applepay':
                                 renderApplePayForm();
-                                break;
-                            case 'amazonpay':
-                                renderAmazonPayForm();
                                 break;
                             case 'googlepay':
                             case 'paywithgoogle':
@@ -1123,20 +1111,6 @@ if (!window.AdyenFE) {
                     getTextField('applePayFields', 'merchantId'),
                     getTextField('applePayFields', 'merchantName'),
                     getRadioField('applePayFields', 'displayButtonOn')
-                ])
-            );
-        };
-
-        /**
-         * Renders the Amazon Pay config form.
-         */
-        const renderAmazonPayForm = () => {
-            page.append(
-                ...generator.createFormFields([
-                    getTextField('amazonPayFields', 'publicKeyId', 'adl-amazon-pay-public-key-id'),
-                    getTextField('amazonPayFields', 'merchantId', 'adl-amazon-pay-merchant-id'),
-                    getTextField('amazonPayFields', 'storeId', 'adl-amazon-pay-store-id'),
-                    getRadioField('amazonPayFields', 'displayButtonOn', 'adl-amazon-pay-display-button')
                 ])
             );
         };
@@ -1620,8 +1594,6 @@ if (!window.AdyenFE) {
                 );
             } else if (changedMethod.code === 'applepay') {
                 result.push(...validateRequiredField(['merchantId', 'merchantName']));
-            } else if (changedMethod.code === 'amazonpay') {
-                result.push(...validateRequiredField(['publicKeyId', 'merchantId', 'storeId']));
             } else if (changedMethod.code === 'googlepay' || changedMethod.code === 'paywithgoogle') {
                 result.push(...validateRequiredField(['gatewayMerchantId', 'merchantId']));
             } else if (changedMethod.code === 'oney') {

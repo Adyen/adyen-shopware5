@@ -31,13 +31,13 @@
 
 (function () {
     'use strict';
-    // Use for local testing only, Amazon pay requires globally accessible URL
+    // Use for local testing only
     const devOnlyConfig = {
         localShopDomain: '',
         globalReplacementDomain: ''
     };
 
-    const wallets = ['applepay', 'amazonpay', 'paywithgoogle', 'googlepay', 'paypal'],
+    const wallets = ['applepay', 'paywithgoogle', 'googlepay', 'paypal'],
         giftCards = [
             'auriga', 'babygiftcard', 'bloemengiftcard', 'cashcomgiftcard', 'eagleeye_voucher', 'entercard',
             'expertgiftcard', 'fashioncheque', 'fijncadeau', 'valuelink', 'fleuropbloemenbon', 'fonqgiftcard',
@@ -130,8 +130,10 @@
         config.onShippingContactSelected = config.onShippingContactSelected || function (resolve, reject, event) {
             resolve({});
         };
-        config.onShopperDetails = config.onShopperDetails || function (shopperDetails, rawData, actions) {
-            actions.resolve();
+        config.onShopperDetails = config.onShopperDetails || function (data, actions) {
+            if (actions && typeof actions.resolve === 'function') {
+                actions.resolve();
+            }
         };
         config.onPayButtonClick = config.onPayButtonClick || function (resolve, reject) {
             resolve();
@@ -147,8 +149,14 @@
             return config.onAuthorized(paymentData, actions);
         }
 
-        const handleShopperDetails = (shopperDetails, rawData, actions) => {
-            return config.onShopperDetails(shopperDetails, rawData, actions);
+        /**
+         * PayPal express onAuthorized callback (Adyen Web v6 signature).
+         *
+         * @param data {authorizedEvent: object, billingAddress: object|undefined, deliveryAddress: object|undefined}
+         * @param actions {resolve: function, reject: function}
+         */
+        const handleShopperDetails = (data, actions) => {
+            return config.onShopperDetails(data, actions);
         }
 
         const handleShippingAddressChanged = (data, actions, component) => {
@@ -177,8 +185,7 @@
             paymentMethodsConfiguration = {},
             paymentMethodsResponse = {paymentMethods: [], storedPaymentMethods: []},
             checkoutCountryCode = '',
-            sessionStorage = config.sessionStorage || window.sessionStorage,
-            amazonCheckoutSessionId = url.searchParams.get('amazonCheckoutSessionId');
+            sessionStorage = config.sessionStorage || window.sessionStorage;
 
         let googlePaymentDataCallbacks = {};
         if (config.requireAddress) {
@@ -189,14 +196,6 @@
         }
 
         let paymentMethodSpecificConfig = {
-            "amazonpay": {
-                "productType": 'PayOnly',
-                "checkoutMode": 'ProcessOrder',
-                "chargePermissionType": 'OneTime',
-                "onClick": handleOnClick,
-                "returnUrl": url.href,
-                "cancelUrl": url.href
-            },
             "paywithgoogle": {
                 onClick: handleOnClick,
                 isExpress: true,
@@ -254,15 +253,7 @@
         }
 
         if (config.amount) {
-            paymentMethodSpecificConfig['amazonpay']['amount'] = config.amount;
-            paymentMethodSpecificConfig['amazonpay']['currency'] = config.amount.currency;
-
             paymentMethodSpecificConfig['paypal']['amount'] = config.amount;
-        }
-
-        if (amazonCheckoutSessionId) {
-            paymentMethodSpecificConfig['amazonpay']['amazonCheckoutSessionId'] = amazonCheckoutSessionId;
-            paymentMethodSpecificConfig['amazonpay']['showOrderButton'] = false;
         }
 
         /**
@@ -273,7 +264,8 @@
             if (!checkout) {
                 let checkoutConfig = await AdyenComponents.CheckoutConfigProvider.getConfiguration(config.checkoutConfigUrl);
 
-                checkoutConfig.onChange = handleOnChange;
+                // Adyen Web calls onChange(state, component); only the submit path may flag isSubmit
+                checkoutConfig.onChange = (state) => handleOnChange(state, false);
                 checkoutConfig.onSubmit = handleOnSubmit;
                 checkoutConfig.onAdditionalDetails = handleAdditionalDetails;
 
@@ -303,7 +295,12 @@
             return Promise.resolve(checkout);
         };
 
-        const handleOnChange = (state) => {
+        /**
+         * @param state Web component state
+         * @param isSubmit True when the state change is caused by the component submit (pay button click),
+         *                 false when it is caused by any other component state change.
+         */
+        const handleOnChange = (state, isSubmit = false) => {
             isStateValid = state.isValid;
 
             if (isStateValid) {
@@ -315,7 +312,7 @@
                 config.onClickToPay();
             }
 
-            config.onStateChange();
+            config.onStateChange(isSubmit);
         };
 
         /**
@@ -328,7 +325,7 @@
         };
 
         const handleOnSubmit = (state, component, actions) => {
-            handleOnChange(state);
+            handleOnChange(state, true);
             config.onSubmit(state, component, actions);
         };
 
@@ -396,11 +393,6 @@
                     paymentMethodConfig.configuration = mergedConfiguration;
                 }
 
-                // Configuration on the checkout instance level does not work for amazonpay, copy it on component level
-                if ('amazonpay' === paymentType && paymentMethodsConfiguration[paymentType]) {
-                    paymentMethodConfig['configuration'] = paymentMethodsConfiguration[paymentType].configuration;
-                }
-
                 // If there is applepay specific configuration then set country code to configuration
                 if ('applepay' === paymentType &&
                     paymentMethodsConfiguration[paymentType] &&
@@ -426,10 +418,6 @@
                 isStateValid = !!activeComponent.isValid && activeComponent.isValid;
 
                 config.onStateChange();
-
-                if (amazonCheckoutSessionId) {
-                    activeComponent.submit();
-                }
             });
         };
 

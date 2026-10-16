@@ -1,20 +1,17 @@
-﻿name: 'Build Plugin'
-description: "Builds the Plugin"
+name: 'Build Plugin'
+description: "Builds the E2E variant of the plugin ZIP (keeps the AdyenTest controller). Not a release artifact."
 runs:
   using: "composite"
   steps:
-    - name: Change access rights
-      shell: bash
-      run: sudo chmod 755 -R ./tools
     - name: Build plugin
       shell: bash
       run: ./tools/deploy-test.sh
     - name: Copy to build cache
       shell: bash
-      run: cp -R ./tools/AdyenPayment.zip ~/.build
+      run: cp ./tools/AdyenPayment.zip ~/.build
     - name: Store ZIP file in Github
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
-        name: AdyenPayment-Shopware
+        name: AdyenPayment-e2e
         retention-days: 4
         path: ~/.build

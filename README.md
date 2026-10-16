@@ -38,5 +38,12 @@ The plugin integrates card component (Secured Fields) using Adyen Checkout for a
 * **Checkout API version:** v71
 * **Checkout Web Component version:** 6.37.0
 
+## Building and releasing
+
+* `./tools/deploy.sh` builds the production archive `tools/AdyenPayment.zip` from the committed `composer.lock` (runtime dependencies only, E2E test code stripped).
+* `./tools/deploy-test.sh` builds the same archive but keeps the `AdyenTest` controller and the `E2ETest` services for the CI end-to-end tests. Never publish that archive.
+* Releases are built by CI, not on a workstation: push a bare semver tag equal to `<version>` in `plugin.xml` (for example `5.1.5`) on the `develop` -> `master` merge commit. The `Release` workflow builds the ZIP, verifies it, and attaches `AdyenPayment-<version>.zip`, its `.sha256` checksum, a CycloneDX SBOM and a build provenance attestation to the GitHub Release.
+* Verify a downloaded release with `sha256sum -c AdyenPayment-<version>.zip.sha256` and `gh attestation verify AdyenPayment-<version>.zip --repo Adyen/adyen-shopware5`.
+
 ## License
 MIT license. For more information, see the [LICENSE file](LICENSE).

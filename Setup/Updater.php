@@ -20,6 +20,7 @@ use Adyen\Core\BusinessLogic\Domain\Payment\Repositories\PaymentMethodConfigRepo
 use Adyen\Core\Infrastructure\Logger\Logger;
 use Adyen\Core\Infrastructure\TaskExecution\QueueService;
 use AdyenPayment\AdyenPayment;
+use AdyenPayment\Components\Integration\FileService;
 use AdyenPayment\Repositories\Wrapper\StoreRepository;
 use AdyenPayment\Utilities\Plugin;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -75,6 +76,10 @@ class Updater
      * @var ConnectionSettingsRepository
      */
     private $connectionSettingsRepository;
+    /**
+     * @var FileService
+     */
+    private $fileService;
 
     /**
      * Updater constructor.
@@ -88,6 +93,7 @@ class Updater
      * @param Enlight_Components_Cron_Manager $cronManager
      * @param QueueService $queueService
      * @param ConnectionSettingsRepository $connectionSettingsRepository
+     * @param FileService $fileService
      */
     public function __construct(
         UpdateContext                       $context,
@@ -98,7 +104,8 @@ class Updater
         Shopware_Components_Snippet_Manager $snippets,
         Enlight_Components_Cron_Manager     $cronManager,
         QueueService                        $queueService,
-        ConnectionSettingsRepository        $connectionSettingsRepository
+        ConnectionSettingsRepository        $connectionSettingsRepository,
+        FileService                         $fileService
     )
     {
         $this->context = $context;
@@ -110,6 +117,7 @@ class Updater
         $this->cronManager = $cronManager;
         $this->queueService = $queueService;
         $this->connectionSettingsRepository = $connectionSettingsRepository;
+        $this->fileService = $fileService;
     }
 
     public function update(): void
@@ -118,6 +126,64 @@ class Updater
         if (version_compare($oldVersion, '4.0.0', '<')) {
             $this->updateTo400();
         }
+
+        if (version_compare($oldVersion, '5.2.0', '<')) {
+            $this->updateTo520();
+        }
+    }
+
+    /**
+     * Removes the configured Amazon Pay payment method for all shops and disables its payment mean.
+     *
+     * @return void
+     */
+    private function updateTo520(): void
+    {
+        foreach ($this->storeRepository->getShopwareSubShops() as $shop) {
+            try {
+                StoreContext::doWithStore(
+                    (string)$shop->getId(),
+                    function () {
+                        $amazonPay = $this->paymentMethodConfigRepository->getPaymentMethodByCode('amazonpay');
+
+                        if ($amazonPay === null) {
+                            return;
+                        }
+
+                        $this->fileService->delete($amazonPay->getMethodId());
+                        $this->paymentMethodConfigRepository->deletePaymentMethodById($amazonPay->getMethodId());
+                    }
+                );
+            } catch (Exception $e) {
+                Logger::logWarning(
+                    'Failed to remove Amazon Pay payment method for shop ' . $shop->getId()
+                    . ' because ' . $e->getMessage()
+                );
+            }
+        }
+
+        $this->disableAmazonPayPaymentMean();
+    }
+
+    /**
+     * Disables the Amazon Pay payment mean. The payment mean is kept in s_core_paymentmeans
+     * because existing orders and customers reference it.
+     *
+     * @return void
+     */
+    private function disableAmazonPayPaymentMean(): void
+    {
+        $paymentMean = Shopware()->Models()->getRepository(Payment::class)
+            ->findOneBy(['name' => Plugin::getPaymentMeanName('amazonpay')]);
+
+        if ($paymentMean === null) {
+            return;
+        }
+
+        $paymentMean->setActive(false);
+        $paymentMean->setShops(new ArrayCollection());
+        Shopware()->Models()->persist($paymentMean);
+        Shopware()->Models()->flush();
     }
 
     private function updateTo400(): void

@@ -5,7 +5,6 @@
 
     {if $adyenShowExpressCheckout }
         {include file="frontend/checkout/adyen_libaries.tpl"}
-        <script src="https://pay.google.com/gp/p/js/pay.js"></script>
     {/if}
 
 {/block}
