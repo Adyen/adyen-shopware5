@@ -28,6 +28,7 @@ use Adyen\Core\Infrastructure\Serializer\Interfaces\Serializable;
 use Adyen\Core\Infrastructure\Serializer\Serializer;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use Adyen\Webhook\EventCodes;
+use AdyenPayment\Components\Checkout\WebhookOrderCreator;
 use AdyenPayment\Components\Integration\OrderService as AdyenPaymentOrderService;
 use Exception;
 
@@ -168,7 +169,7 @@ class OrderUpdateTask extends TransactionalTask
      */
     private function doExecute(): void
     {
-        if ($this->checkIfOrderExists()) {
+        if ($this->orderExistsOrCreate()) {
             $event = $this->getEventFromWebhook();
 
             if ($event) {
@@ -236,6 +237,37 @@ class OrderUpdateTask extends TransactionalTask
         }
 
         return null;
+    }
+
+    /**
+     * Falls back to creating the order from the stored checkout snapshot when a successful authorisation
+     * arrives for a supported method and the order is still missing after every retry.
+     *
+     * @return bool
+     *
+     * @throws Exception The original "order not found" exception when no order could be created either.
+     */
+    private function orderExistsOrCreate(): bool
+    {
+        try {
+            return $this->checkIfOrderExists();
+        } catch (Exception $exception) {
+            if ($this->canCreateOrderFromWebhook() && $this->getWebhookOrderCreator()->create($this->webhook)) {
+                return true;
+            }
+
+            throw $exception;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function canCreateOrderFromWebhook(): bool
+    {
+        return $this->webhook->getEventCode() === EventCodes::AUTHORISATION
+            && $this->webhook->isSuccess()
+            && $this->getWebhookOrderCreator()->supports($this->webhook);
     }
 
     /**
@@ -317,5 +349,13 @@ class OrderUpdateTask extends TransactionalTask
     private function getSynchronizationService(): WebhookSynchronizationService
     {
         return ServiceRegister::getService(WebhookSynchronizationService::class);
+    }
+
+    /**
+     * @return WebhookOrderCreator
+     */
+    private function getWebhookOrderCreator(): WebhookOrderCreator
+    {
+        return Shopware()->Container()->get(WebhookOrderCreator::class);
     }
 }

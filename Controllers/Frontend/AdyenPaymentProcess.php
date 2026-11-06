@@ -11,6 +11,8 @@ use Adyen\Core\BusinessLogic\Domain\Connection\Exceptions\ConnectionSettingsNotF
 use Adyen\Core\Infrastructure\Logger\Logger;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\AdyenPayment;
+use AdyenPayment\Components\Checkout\CheckoutSnapshotRepository;
+use AdyenPayment\Components\Checkout\OrderCreationLock;
 use AdyenPayment\Components\CheckoutConfigProvider;
 use AdyenPayment\Components\ErrorMessageProvider;
 use AdyenPayment\Components\PaymentMeansEnricher;
@@ -26,6 +28,12 @@ use AdyenPayment\Utilities\Shop;
  */
 class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Controllers_Frontend_Payment
 {
+    /**
+     * Results after which no authorisation can follow. Error is deliberately absent: it is technical and
+     * indeterminate, and a payment behind it may still be authorised.
+     */
+    private const FINAL_NEGATIVE_RESULT_CODES = ['Refused', 'Cancelled'];
+
     /**
      * @var ErrorMessageProvider
      */
@@ -46,6 +54,14 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
      * @var PaymentMeansEnricher
      */
     private $paymentMeansEnricher;
+    /**
+     * @var CheckoutSnapshotRepository
+     */
+    private $checkoutSnapshotRepository;
+    /**
+     * @var OrderCreationLock
+     */
+    private $orderCreationLock;
 
     /**
      * @inheritDoc
@@ -71,6 +87,8 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
         $this->session = $this->get('session');
         $this->checkoutConfigProvider = $this->get(CheckoutConfigProvider::class);
         $this->paymentMeansEnricher = $this->get(PaymentMeansEnricher::class);
+        $this->checkoutSnapshotRepository = $this->get(CheckoutSnapshotRepository::class);
+        $this->orderCreationLock = $this->get(OrderCreationLock::class);
     }
 
     /**
@@ -102,8 +120,22 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
             return;
         }
 
-        $basketSignature = $this->persistBasket();
+        $basketSignature = $this->generateBasketSignature();
         $orderReference = $this->generateOrderReference($basketSignature);
+
+        if (!$this->storeCheckoutSnapshot($orderReference, $basketSignature)) {
+            // Without the checkout recorded, neither the returning browser nor the webhook could build an order.
+            $this->errorMessageProvider->add(
+                $this->snippets->getNamespace('frontend/adyen/checkout')->get(
+                    'payment/adyen/payment_processing_error',
+                    'Your payment could not be processed, please resubmit order.'
+                )
+            );
+
+            $this->setupRedirectResponse(Url::getFrontUrl('checkout', 'shippingPayment'));
+
+            return;
+        }
         $paymentMethodType = Plugin::getAdyenPaymentType($paymentMeanName);
         if ($paymentMeanName === AdyenPayment::STORED_PAYMENT_UMBRELLA_NAME) {
             $paymentMean = $this->paymentMeansEnricher->enrichPaymentMean(
@@ -139,6 +171,8 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
             );
 
         if (!$response->isSuccessful()) {
+            $this->releaseSnapshotOnFinalResult($orderReference, $response->toArray());
+
             $this->errorMessageProvider->add(
                 $this->snippets->getNamespace('frontend/adyen/checkout')->get(
                     'payment/adyen/payment_processing_error',
@@ -152,10 +186,7 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
         }
 
         if (!$response->isAdditionalActionRequired()) {
-            $this->saveOrder(
-                $response->getPspReference(),
-                $orderReference
-            );
+            $this->saveOrderOnce($orderReference, $response->getPspReference());
 
             $this->setupRedirectResponse(Url::getFrontUrl('checkout', 'finish', ['sUniqueID' => $orderReference]));
 
@@ -193,11 +224,8 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
             return;
         }
 
-        if ($response->shouldPresentToShopper() || $response->isRecieved() || $response->isPending()) {
-            $this->saveOrder(
-                $response->getPspReference() ?? $orderReference,
-                $orderReference
-            );
+        if ($response->shouldPresentToShopper() || $response->isRecieved()) {
+            $this->saveOrderOnce($orderReference, $response->getPspReference());
 
             Shopware()->Session()->offsetSet('adyenAction', json_encode($response->getAction()));
 
@@ -209,6 +237,7 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
         $this->view->assign('action', $response->getAction());
         $this->view->assign('basketSignature', $basketSignature);
         $this->view->assign('orderReference', $orderReference);
+        $this->view->assign('displayCancelButton', $response->isPending());
     }
 
     /**
@@ -344,11 +373,12 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
      */
     private function handleAdditionalDataAndGetRedirectUrl(array $additionalData): string
     {
-        $basketSignature = $this->Request()->get('signature');
+        $basketSignature = (string)$this->Request()->get('signature');
+        $orderReference = (string)$this->Request()->get('reference');
 
-        if ($basketSignature) {
+        if ($orderReference) {
             try {
-                $basket = $this->loadBasketFromSignature($basketSignature);
+                $basket = $this->restoreCheckoutSnapshot($orderReference, $basketSignature);
                 if (!empty($this->get('session')->get('sUserId'))) {
                     $this->verifyBasketSignature($basketSignature, $basket);
                 }
@@ -398,6 +428,8 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
             ->updatePaymentDetails(array_key_exists('details', $additionalData) ? $additionalData : ['details' => $additionalData]);
 
         if (!$response->isSuccessful()) {
+            $this->releaseSnapshotOnFinalResult($orderReference, $response->toArray());
+
             $this->errorMessageProvider->add(
                 $this->snippets->getNamespace('frontend/adyen/checkout')->get(
                     'payment/adyen/payment_processing_error',
@@ -408,12 +440,7 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
             return Url::getFrontUrl('checkout', 'shippingPayment');
         }
 
-        $orderReference = $this->Request()->get('reference');
-
-        $this->saveOrder(
-            $response->getPspReference(),
-            $orderReference
-        );
+        $this->saveOrderOnce($orderReference, $response->getPspReference());
 
         return Url::getFrontUrl('checkout', 'finish', ['sUniqueID' => $orderReference]);
     }
@@ -446,6 +473,152 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
     private function isAjaxRequest(): bool
     {
         return $this->Request()->getParam('isXHR') || $this->session->offsetGet('adyenIsXHR');
+    }
+
+    /**
+     * Keeps a copy of the checkout state under the Adyen order reference. When the shopper never returns from
+     * the payment method, the AUTHORISATION webhook creates the order from this copy.
+     *
+     * @param string $orderReference
+     * @param string $basketSignature
+     *
+     * @return bool False when the snapshot could not be written, in which case the payment must not start.
+     */
+    private function storeCheckoutSnapshot(string $orderReference, string $basketSignature): bool
+    {
+        $orderVariables = $this->session->offsetGet('sOrderVariables');
+
+        if (!$orderVariables instanceof ArrayObject || $basketSignature === '') {
+            return false;
+        }
+
+        // The same values saveOrder() reads outside sOrderVariables, plus the shop the shopper is checking out in:
+        // s_user.language holds the shop they registered in, which Shopware does not update on login.
+        $orderInputs = [
+            CheckoutSnapshotRepository::INPUT_SHOP_ID => (int)Shopware()->Shop()->getId(),
+            CheckoutSnapshotRepository::INPUT_COMMENT => (string)$this->session->offsetGet('sComment'),
+            CheckoutSnapshotRepository::INPUT_DISPATCH_ID => (int)$this->session->offsetGet('sDispatch'),
+            CheckoutSnapshotRepository::INPUT_DEVICE_TYPE => (string)$this->Request()->getDeviceType(),
+        ];
+
+        try {
+            $this->checkoutSnapshotRepository->store(
+                $orderReference,
+                $orderVariables->getArrayCopy(),
+                $basketSignature,
+                $orderInputs
+            );
+        } catch (Exception $exception) {
+            Logger::logError(
+                'Storing the checkout snapshot for order reference ' . $orderReference . ' failed: ' .
+                $exception->getMessage(),
+                'Integration'
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $orderReference
+     * @param array $responseData
+     *
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function releaseSnapshotOnFinalResult(string $orderReference, array $responseData): void
+    {
+        $resultCode = (string)($responseData['resultCode'] ?? '');
+
+        if (in_array($resultCode, self::FINAL_NEGATIVE_RESULT_CODES, true)) {
+            $this->checkoutSnapshotRepository->release($orderReference);
+        }
+    }
+
+    /**
+     * Generates the basket signature without persisting a row for it. The signature is still handed to the
+     * shopper and verified on the way back, but the checkout is stored under the order reference instead, so a
+     * single row covers one payment attempt.
+     *
+     * @return string
+     * @throws Exception
+     */
+    private function generateBasketSignature(): string
+    {
+        $orderVariables = $this->session->offsetGet('sOrderVariables');
+        $orderVariables = $orderVariables instanceof ArrayObject ? $orderVariables->getArrayCopy() : [];
+
+        return $this->get('basket_signature_generator')->generateSignature(
+            $orderVariables['sBasket'] ?? [],
+            $this->session->offsetGet('sUserId')
+        );
+    }
+
+    /**
+     * Puts the stored checkout back into the session so the rest of the flow behaves as it does for a shopper
+     * who never left.
+     *
+     * @param string $orderReference
+     * @param string $basketSignature
+     *
+     * @return ArrayObject
+     *
+     * @throws RuntimeException|\Doctrine\DBAL\Exception
+     */
+    private function restoreCheckoutSnapshot(string $orderReference, string $basketSignature): ArrayObject
+    {
+        $snapshot = $this->checkoutSnapshotRepository->load($orderReference);
+
+        if (!$snapshot) {
+            // Payments started before the snapshot was introduced persisted the basket under the signature only.
+            // Shopware's loader throws when that row is missing too.
+            return $this->loadBasketFromSignature($basketSignature);
+        }
+
+        // The reference travels in URLs and in the order record, so it is not a secret and cannot be the only
+        // thing standing between a request and somebody else's checkout. Nothing is put into the session until
+        // the request has also presented the signature this checkout was stored with.
+        if (!hash_equals(CheckoutSnapshotRepository::signatureOf($snapshot), $basketSignature)) {
+            throw new RuntimeException(
+                sprintf('Checkout snapshot for reference %s does not match the presented signature', $orderReference)
+            );
+        }
+
+        $basket = new ArrayObject(
+            CheckoutSnapshotRepository::orderVariablesOf($snapshot),
+            ArrayObject::ARRAY_AS_PROPS
+        );
+
+        $this->session->offsetSet('sOrderVariables', $basket);
+
+        return $basket;
+    }
+
+    /**
+     * Creates the order unless it is already there, and gives up the snapshot afterwards. The lock keeps this
+     * out of step with the webhook, which runs the same check against the same reference from its own
+     * connection, so the two can never both decide the order is missing.
+     *
+     * @param string $orderReference
+     * @param string|null $pspReference
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
+    private function saveOrderOnce(string $orderReference, ?string $pspReference): void
+    {
+        $this->orderCreationLock->synchronized($orderReference, function () use ($orderReference, $pspReference) {
+            // saveOrder() returns false without creating anything when the transaction id is empty, and the
+            // PSP reference is nullable on both responses.
+            if ($this->orderCreationLock->orderExists($orderReference)
+                || $this->saveOrder($pspReference ?: $orderReference, $orderReference)
+            ) {
+                $this->checkoutSnapshotRepository->release($orderReference);
+            }
+        });
     }
 
     /**

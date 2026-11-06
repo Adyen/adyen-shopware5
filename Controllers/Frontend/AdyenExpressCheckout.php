@@ -9,12 +9,12 @@ use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethod
 use Adyen\Core\BusinessLogic\Domain\Integration\Payment\ShopPaymentService;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use AdyenPayment\Components\BasketHelper;
+use AdyenPayment\Components\Checkout\CheckoutSnapshotRepository;
 use AdyenPayment\Components\CheckoutConfigProvider;
 use AdyenPayment\Components\Integration\PaymentMethodService;
 use AdyenPayment\Exceptions\PaymentMeanDoesNotExistException;
 use AdyenPayment\Utilities\Shop;
 use AdyenPayment\Utilities\Url;
-use Shopware\Components\BasketSignature\BasketPersister;
 use Shopware\Components\BasketSignature\BasketSignatureGeneratorInterface;
 use AdyenPayment\Services\CustomerService;
 
@@ -338,7 +338,7 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
     {
         $basket = Shopware()->Modules()->Basket()->sGetBasket();
 
-        // Sign the basket with the session user, exactly like Shopware's persistBasket() does, so that
+        // Sign the basket with the session user, the same way Shopware's basket signature does, so that
         // verifyBasketSignature() in handleAdditionalData passes for fast-login (guest) sessions that
         // already have an sUserId. Anonymous sessions skip the verification, so a unique id is used
         // there to avoid signature collisions between concurrent shoppers with identical baskets.
@@ -348,18 +348,16 @@ class Shopware_Controllers_Frontend_AdyenExpressCheckout extends Shopware_Contro
         $signatureGenerator = $this->get('basket_signature_generator');
         $basketSignature = $signatureGenerator->generateSignature($basket, $customerId);
 
-        // Shopware's loadBasketFromSignature() replaces the session order variables with the persisted data and
-        // verifyBasketSignature() reads the basket from its 'sBasket' key, so persist the current order variables
-        // (like Shopware's persistBasket() does) with the fresh basket.
+        // restoreCheckoutSnapshot() replaces the session order variables with the stored data and
+        // verifyBasketSignature() reads the basket from its 'sBasket' key, so store the current order variables
+        // with the fresh basket.
         $orderVariables = Shopware()->Session()->offsetGet('sOrderVariables');
         $orderVariables = $orderVariables instanceof ArrayObject ? $orderVariables->getArrayCopy() : [];
         $orderVariables['sBasket'] = $basket;
 
-        /** @var BasketPersister $persister */
-        $persister = $this->get('basket_persister');
-        $persister->persist($basketSignature, $orderVariables);
-
         $reference = md5(uniqid("{$basketSignature}_"));
+
+        $this->get(CheckoutSnapshotRepository::class)->store($reference, $orderVariables, $basketSignature);
         $productNumber = $this->Request()->get('adyen_article_number');
 
         $response = CheckoutAPI::get()

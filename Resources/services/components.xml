@@ -30,6 +30,21 @@
         <service id="AdyenPayment\Repositories\Wrapper\PaymentMeanRepository" public="true">
             <argument type="expression">service('models').getRepository('Shopware\\Models\\Payment\\Payment')</argument>
         </service>
+        <service id="AdyenPayment\Components\Checkout\CheckoutSnapshotRepository" public="true">
+            <argument type="service" id="basket_persister"/>
+            <argument type="service" id="dbal_connection"/>
+        </service>
+        <service id="AdyenPayment\Components\Checkout\OrderCreationLock" public="true">
+            <argument type="service" id="dbal_connection"/>
+        </service>
+        <service id="AdyenPayment\Components\Checkout\WebhookOrderCreator" public="true">
+            <argument type="service" id="AdyenPayment\Components\Checkout\CheckoutSnapshotRepository"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="modules"/>
+            <argument type="service" id="dbal_connection"/>
+            <argument type="service" id="AdyenPayment\Components\Checkout\OrderCreationLock"/>
+            <argument type="service" id="shopware.components.shop_registration_service"/>
+        </service>
         <service id="AdyenPayment\Components\Integration\OrderService" public="true">
             <argument type="service" id="AdyenPayment\Repositories\Wrapper\OrderRepository"/>
             <argument type="service" id="modules"/>

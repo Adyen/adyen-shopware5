@@ -14,20 +14,28 @@
 
 {* Main content *}
 {block name="frontend_index_content"}
-    <div id="payment" class="grid_20 adyen-additional-action-container"
-         data-adyen-payment-additional-action
-         data-checkoutConfigUrl="{url module='frontend' controller='AdyenPaymentProcess' action='getCheckoutConfig'}"
-         data-additionalDataUrl="{url
-            module='frontend'
-            controller='AdyenPaymentProcess'
-            action='handleAdditionalData'
-            signature="{$basketSignature}"
-            reference="{$orderReference}"
-         }"
-         data-checkoutShippingPaymentUrl="{url controller='checkout' action='shippingPayment' sTarget='checkout'}"
-         data-additionalActionSelector="#adyen-additional-action"
-    ></div>
-    <script id="adyen-additional-action" type="application/json">{$action|json_encode}</script>
+    <div class="adyen-additional-action-page">
+        <div id="payment" class="adyen-additional-action-container"
+             data-adyen-payment-additional-action
+             data-checkoutConfigUrl="{url module='frontend' controller='AdyenPaymentProcess' action='getCheckoutConfig'}"
+             data-additionalDataUrl="{url
+                module='frontend'
+                controller='AdyenPaymentProcess'
+                action='handleAdditionalData'
+                signature="{$basketSignature}"
+                reference="{$orderReference}"
+             }"
+             data-checkoutShippingPaymentUrl="{url controller='checkout' action='shippingPayment' sTarget='checkout'}"
+             data-additionalActionSelector="#adyen-additional-action"
+        ></div>
+        <script id="adyen-additional-action" type="application/json">{$action|json_encode}</script>
 
-    <div class="doublespace">&nbsp;</div>
+        {if $displayCancelButton}
+            <div class="adyen-cancel-payment">
+                <button type="button" id="adyen-cancel-button" class="btn is--secondary">
+                    {s namespace="frontend/adyen/checkout" name="payment/adyen/cancel"}Cancel{/s}
+                </button>
+            </div>
+        {/if}
+    </div>
 {/block}
