@@ -11,6 +11,7 @@
             additionalActionSelector: '#adyen-additional-action',
             cancelButtonSelector: '#adyen-cancel-button',
             checkoutShippingPaymentUrl: '/checkout/shippingPayment/sTarget/checkout',
+            cancelUrl: '',
             skipRedirect: ''
         },
 
@@ -19,7 +20,7 @@
 
             me.applyDataAttributes();
 
-            $(document).on('click', me.opts.cancelButtonSelector, $.proxy(me.redirectToCheckout, me));
+            $(document).on('click', me.opts.cancelButtonSelector, $.proxy(me.cancelPayment, me));
 
             if ($(me.opts.additionalActionSelector).html() === '' ||
                 $(me.opts.additionalActionSelector).html() === 'undefined') {
@@ -61,6 +62,10 @@
                     me.redirectToCheckout();
                 }
             });
+        },
+
+        cancelPayment: function () {
+            window.location.href = this.opts.cancelUrl || this.opts.checkoutShippingPaymentUrl;
         },
 
         redirectToCheckout: function () {

@@ -2,7 +2,6 @@
 
 namespace AdyenPayment\Components\Checkout;
 
-use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethodCode;
 use Adyen\Core\BusinessLogic\Domain\Webhook\Models\Webhook;
 use Adyen\Core\Infrastructure\Logger\Logger;
 use Doctrine\DBAL\Connection;
@@ -16,9 +15,8 @@ use Shopware_Components_Modules;
 /**
  * Class WebhookOrderCreator
  *
- * Creates the Shopware order from the stored checkout snapshot when the AUTHORISATION webhook finds no order.
- * Mirrors Shopware_Controllers_Frontend_Payment::saveOrder(), which cannot be reused because it reads the
- * shopper session and the HTTP request, neither of which exists in a webhook.
+ * Creates the order from the checkout snapshot when the AUTHORISATION webhook finds none.
+ * Mirrors Shopware_Controllers_Frontend_Payment::saveOrder(), which needs the shopper session.
  *
  * @package AdyenPayment\Components\Checkout
  */
@@ -79,29 +77,9 @@ class WebhookOrderCreator
     }
 
     /**
-     * Only payment methods that return Pending with an action the shopper completes in another app are created
-     * from the webhook. For every other method the order is created by the shopper's own request, as before.
-     *
-     * The constant is checked directly rather than through PaymentMethodCode::parse(), which throws for codes
-     * outside the supported set, such as the card brands notifications carry.
-     *
      * @param Webhook $webhook
      *
-     * @return bool
-     */
-    public function supports(Webhook $webhook): bool
-    {
-        return in_array(
-            $webhook->getPaymentMethod(),
-            PaymentMethodCode::WEBHOOK_ORDER_CREATION_SUPPORTED,
-            true
-        );
-    }
-
-    /**
-     * @param Webhook $webhook
-     *
-     * @return bool True when the order exists afterwards, whether it was created here or by the checkout.
+     * @return bool True when the order exists afterwards.
      */
     public function create(Webhook $webhook): bool
     {
@@ -120,8 +98,7 @@ class WebhookOrderCreator
         }
 
         if ($snapshot === null) {
-            // The checkout releases the snapshot as soon as it has created the order, so a missing snapshot most
-            // often means the order is already there.
+            // The checkout releases the snapshot once it has created the order.
             if ($this->lock->orderExists($orderReference)) {
                 return true;
             }
@@ -158,7 +135,7 @@ class WebhookOrderCreator
                         return true;
                     }
 
-                    $this->registerShop($orderInputs);
+                    $this->registerShop($orderInputs, $basket);
 
                     return $this->saveOrder($webhook, $orderVariables, $orderInputs, $user, $basket);
                 },
@@ -193,12 +170,9 @@ class WebhookOrderCreator
             'Integration'
         );
 
-        $this->cleanUpCheckoutLeftovers($user, $basket);
+        $this->cleanUpCheckoutLeftovers($user, $basket, $orderInputs);
 
-        // The snapshot is deliberately left in place. A browser tab that was suspended while the shopper
-        // approved the payment needs it to restore its session and reach the confirmation page for this order.
-        // The checkout path removes it once it runs, and CheckoutSnapshotRepository purges it after the retention
-        // period if nobody ever returns.
+        // The snapshot stays, so a returning browser can still reach the confirmation page.
 
         return true;
     }
@@ -243,14 +217,15 @@ class WebhookOrderCreator
     }
 
     /**
-     * sSaveOrder() writes the registered shop into s_order.language and its main shop into s_order.subshopID.
+     * sSaveOrder() takes language and subshop from the registered shop, and the mail takes its currency.
      *
      * @param array $orderInputs
+     * @param array $basket
      *
      * @return void
      * @throws NotSupported
      */
-    private function registerShop(array $orderInputs): void
+    private function registerShop(array $orderInputs, array $basket): void
     {
         $shopId = (int)($orderInputs[CheckoutSnapshotRepository::INPUT_SHOP_ID] ?? 0);
         $shop = $this->modelManager->getRepository(Shop::class)->getActiveById($shopId);
@@ -261,38 +236,46 @@ class WebhookOrderCreator
             return;
         }
 
+        $currencyId = (int)($basket['sCurrencyId'] ?? 0);
+        foreach ($shop->getCurrencies() as $currency) {
+            if ($currency->getId() === $currencyId) {
+                $shop->setCurrency($currency);
+                break;
+            }
+        }
+
         $this->shopRegistrationService->registerShop($shop);
     }
 
     /**
-     * sSaveOrder() empties the cart and removes the cancelled placeholder order through the session id of the
-     * request it runs in. A webhook does not have the shopper session, so both are done here with the session id
-     * recorded in the snapshot.
+     * Does what sSaveOrder() does through the shopper session: empties the cart and removes the placeholder order.
      *
      * @param array $user
      * @param array $basket
+     * @param array $orderInputs
      *
      * @return void
      */
-    private function cleanUpCheckoutLeftovers(array $user, array $basket): void
+    private function cleanUpCheckoutLeftovers(array $user, array $basket, array $orderInputs): void
     {
         $sessionId = (string)($user['additional']['user']['sessionID'] ?? '');
 
-        if ($sessionId === '') {
-            return;
-        }
+        // Only the items of this order, not ones added since.
+        $basketIds = array_values(array_filter(array_map(
+            static function ($item) {
+                return (int)($item['id'] ?? 0);
+            },
+            $basket['content'] ?? []
+        )));
+
+        // Only the placeholders from when this payment started, not one from a newer checkout.
+        $temporaryOrderIds = array_values(array_filter(array_map(
+            'intval',
+            (array)($orderInputs[CheckoutSnapshotRepository::INPUT_TEMPORARY_ORDER_IDS] ?? [])
+        )));
 
         try {
-            // Only the rows that went into this order. The shopper may have put new items in the cart since,
-            // in the same session, and those must survive.
-            $basketIds = array_values(array_filter(array_map(
-                static function ($item) {
-                    return (int)($item['id'] ?? 0);
-                },
-                $basket['content'] ?? []
-            )));
-
-            if (!empty($basketIds)) {
+            if ($sessionId !== '' && !empty($basketIds)) {
                 $this->connection->executeUpdate(
                     'DELETE FROM s_order_basket WHERE sessionID = :sessionId AND id IN (:basketIds)',
                     [':sessionId' => $sessionId, ':basketIds' => $basketIds],
@@ -300,15 +283,19 @@ class WebhookOrderCreator
                 );
             }
 
-            $this->connection->executeUpdate(
-                'DELETE d FROM s_order_details d INNER JOIN s_order o ON o.id = d.orderID
-                 WHERE o.temporaryID = :sessionId AND o.status = -1',
-                [':sessionId' => $sessionId]
-            );
-            $this->connection->executeUpdate(
-                'DELETE FROM s_order WHERE temporaryID = :sessionId AND status = -1',
-                [':sessionId' => $sessionId]
-            );
+            if (!empty($temporaryOrderIds)) {
+                $this->connection->executeUpdate(
+                    'DELETE d FROM s_order_details d INNER JOIN s_order o ON o.id = d.orderID
+                     WHERE o.id IN (:orderIds) AND o.status = -1',
+                    [':orderIds' => $temporaryOrderIds],
+                    [':orderIds' => Connection::PARAM_INT_ARRAY]
+                );
+                $this->connection->executeUpdate(
+                    'DELETE FROM s_order WHERE id IN (:orderIds) AND status = -1',
+                    [':orderIds' => $temporaryOrderIds],
+                    [':orderIds' => Connection::PARAM_INT_ARRAY]
+                );
+            }
         } catch (Exception $exception) {
             Logger::logWarning(
                 'Cleaning up the checkout leftovers failed: ' . $exception->getMessage(),

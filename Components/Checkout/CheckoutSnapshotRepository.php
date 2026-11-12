@@ -27,6 +27,7 @@ class CheckoutSnapshotRepository
     public const INPUT_COMMENT = 'comment';
     public const INPUT_DISPATCH_ID = 'dispatchId';
     public const INPUT_DEVICE_TYPE = 'deviceType';
+    public const INPUT_TEMPORARY_ORDER_IDS = 'temporaryOrderIds';
 
     /**
      * Webhooks for a payment can arrive days after the attempt (Adyen keeps retrying failed deliveries), so the
@@ -174,6 +175,24 @@ class CheckoutSnapshotRepository
     public static function orderInputsOf(array $snapshot): array
     {
         return (array)($snapshot[self::ORDER_INPUTS_KEY] ?? []);
+    }
+
+    /**
+     * @param string $sessionId
+     *
+     * @return int[]
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function findTemporaryOrderIds(string $sessionId): array
+    {
+        if ($sessionId === '') {
+            return [];
+        }
+
+        return array_map('intval', $this->connection->executeQuery(
+            'SELECT id FROM s_order WHERE temporaryID = :sessionId AND status = -1',
+            [':sessionId' => $sessionId]
+        )->fetchAll(\PDO::FETCH_COLUMN));
     }
 
     /**

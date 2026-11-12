@@ -36,6 +36,7 @@
         </service>
         <service id="AdyenPayment\Components\Checkout\OrderCreationLock" public="true">
             <argument type="service" id="dbal_connection"/>
+            <argument type="service" id="AdyenPayment\Repositories\Wrapper\OrderRepository"/>
         </service>
         <service id="AdyenPayment\Components\Checkout\WebhookOrderCreator" public="true">
             <argument type="service" id="AdyenPayment\Components\Checkout\CheckoutSnapshotRepository"/>
@@ -48,6 +49,7 @@
         <service id="AdyenPayment\Components\Integration\OrderService" public="true">
             <argument type="service" id="AdyenPayment\Repositories\Wrapper\OrderRepository"/>
             <argument type="service" id="modules"/>
+            <argument type="service" id="AdyenPayment\Components\Checkout\WebhookOrderCreator"/>
         </service>
         <service id="AdyenPayment\Components\BasketHelper" public="true">
             <argument type="expression">container.get('modules').Basket()</argument>

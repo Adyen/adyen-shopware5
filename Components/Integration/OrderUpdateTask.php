@@ -5,6 +5,7 @@ namespace AdyenPayment\Components\Integration;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Exceptions\InvalidCurrencyCode;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Amount\Amount;
 use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\Amount\Currency;
+use Adyen\Core\BusinessLogic\Domain\Checkout\PaymentRequest\Models\PaymentMethodCode;
 use Adyen\Core\BusinessLogic\Domain\Integration\Order\OrderService;
 use Adyen\Core\BusinessLogic\Domain\Multistore\StoreContext;
 use Adyen\Core\BusinessLogic\Domain\ShopNotifications\Models\Events\Authorization\FailedPaymentAuthorizationEvent;
@@ -28,7 +29,6 @@ use Adyen\Core\Infrastructure\Serializer\Interfaces\Serializable;
 use Adyen\Core\Infrastructure\Serializer\Serializer;
 use Adyen\Core\Infrastructure\ServiceRegister;
 use Adyen\Webhook\EventCodes;
-use AdyenPayment\Components\Checkout\WebhookOrderCreator;
 use AdyenPayment\Components\Integration\OrderService as AdyenPaymentOrderService;
 use Exception;
 
@@ -252,7 +252,7 @@ class OrderUpdateTask extends TransactionalTask
         try {
             return $this->checkIfOrderExists();
         } catch (Exception $exception) {
-            if ($this->canCreateOrderFromWebhook() && $this->getWebhookOrderCreator()->create($this->webhook)) {
+            if ($this->canCreateOrderFromWebhook() && $this->getOrderService()->createOrderFromWebhook($this->webhook)) {
                 return true;
             }
 
@@ -267,7 +267,7 @@ class OrderUpdateTask extends TransactionalTask
     {
         return $this->webhook->getEventCode() === EventCodes::AUTHORISATION
             && $this->webhook->isSuccess()
-            && $this->getWebhookOrderCreator()->supports($this->webhook);
+            && PaymentMethodCode::isWebhookOrderCreationSupported($this->webhook->getPaymentMethod());
     }
 
     /**
@@ -349,13 +349,5 @@ class OrderUpdateTask extends TransactionalTask
     private function getSynchronizationService(): WebhookSynchronizationService
     {
         return ServiceRegister::getService(WebhookSynchronizationService::class);
-    }
-
-    /**
-     * @return WebhookOrderCreator
-     */
-    private function getWebhookOrderCreator(): WebhookOrderCreator
-    {
-        return Shopware()->Container()->get(WebhookOrderCreator::class);
     }
 }

@@ -11,6 +11,7 @@ use Adyen\Core\BusinessLogic\Domain\Payment\Services\PaymentService;
 use Adyen\Core\BusinessLogic\Domain\Webhook\Models\Webhook;
 use Adyen\Core\Infrastructure\Logger\Logger;
 use Adyen\Core\Infrastructure\ServiceRegister;
+use AdyenPayment\Components\Checkout\WebhookOrderCreator;
 use AdyenPayment\Repositories\Wrapper\OrderRepository;
 use Adyen\Core\BusinessLogic\Domain\Integration\Order\OrderService as OrderServiceInterface;
 use AdyenPayment\Utilities\Plugin;
@@ -45,15 +46,23 @@ class OrderService implements OrderServiceInterface
     private $paymentMethodService;
 
     /**
+     * @var WebhookOrderCreator|null
+     */
+    private $webhookOrderCreator;
+
+    /**
      * @param OrderRepository $orderRepository
      * @param Shopware_Components_Modules $modules
+     * @param WebhookOrderCreator|null $webhookOrderCreator
      */
     public function __construct(
         OrderRepository $orderRepository,
-        Shopware_Components_Modules $modules
+        Shopware_Components_Modules $modules,
+        ?WebhookOrderCreator $webhookOrderCreator = null
     ) {
         $this->orderRepository = $orderRepository;
         $this->modules = $modules;
+        $this->webhookOrderCreator = $webhookOrderCreator;
     }
 
     /**
@@ -69,6 +78,14 @@ class OrderService implements OrderServiceInterface
         }
 
         return $order->getShop()->getId() === (int)StoreContext::getInstance()->getStoreId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createOrderFromWebhook(Webhook $webhook): bool
+    {
+        return $this->webhookOrderCreator !== null && $this->webhookOrderCreator->create($webhook);
     }
 
     /**

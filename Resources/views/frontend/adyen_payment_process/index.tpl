@@ -26,6 +26,13 @@
                 reference="{$orderReference}"
              }"
              data-checkoutShippingPaymentUrl="{url controller='checkout' action='shippingPayment' sTarget='checkout'}"
+             data-cancelUrl="{url
+                module='frontend'
+                controller='AdyenPaymentProcess'
+                action='cancel'
+                signature="{$basketSignature}"
+                reference="{$orderReference}"
+             }"
              data-additionalActionSelector="#adyen-additional-action"
         ></div>
         <script id="adyen-additional-action" type="application/json">{$action|json_encode}</script>

@@ -245,6 +245,39 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
      *
      * @throws Exception
      */
+    public function cancelAction(): void
+    {
+        $orderReference = (string)$this->Request()->get('reference');
+        $basketSignature = (string)$this->Request()->get('signature');
+
+        try {
+            $snapshot = $this->checkoutSnapshotRepository->load($orderReference);
+
+            if ($snapshot !== null
+                && hash_equals(CheckoutSnapshotRepository::signatureOf($snapshot), $basketSignature)
+            ) {
+                $this->orderCreationLock->synchronized($orderReference, function () use ($orderReference) {
+                    if (!$this->orderCreationLock->orderExists($orderReference)) {
+                        $this->checkoutSnapshotRepository->release($orderReference);
+                    }
+                });
+            }
+        } catch (Exception $exception) {
+            Logger::logWarning(
+                'Releasing the checkout snapshot for cancelled order reference ' . $orderReference . ' failed: ' .
+                $exception->getMessage(),
+                'Integration'
+            );
+        }
+
+        $this->redirect(Url::getFrontUrl('checkout', 'shippingPayment', ['sTarget' => 'checkout']));
+    }
+
+    /**
+     * @return void
+     *
+     * @throws Exception
+     */
     public function handleAdditionalDataAction(): void
     {
         $this->setupRedirectResponse(
@@ -502,6 +535,9 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
         ];
 
         try {
+            $orderInputs[CheckoutSnapshotRepository::INPUT_TEMPORARY_ORDER_IDS] =
+                $this->checkoutSnapshotRepository->findTemporaryOrderIds((string)$this->session->offsetGet('sessionId'));
+
             $this->checkoutSnapshotRepository->store(
                 $orderReference,
                 $orderVariables->getArrayCopy(),
