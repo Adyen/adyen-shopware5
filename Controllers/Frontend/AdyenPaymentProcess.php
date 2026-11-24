@@ -241,6 +241,9 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
     }
 
     /**
+     * Records the cancellation and returns the shopper to payment selection. The snapshot is kept, so an order
+     * can still be created if the shopper approves the payment in their app afterwards.
+     *
      * @return void
      *
      * @throws Exception
@@ -258,13 +261,13 @@ class Shopware_Controllers_Frontend_AdyenPaymentProcess extends Shopware_Control
             ) {
                 $this->orderCreationLock->synchronized($orderReference, function () use ($orderReference) {
                     if (!$this->orderCreationLock->orderExists($orderReference)) {
-                        $this->checkoutSnapshotRepository->release($orderReference);
+                        $this->checkoutSnapshotRepository->markCancelled($orderReference);
                     }
                 });
             }
         } catch (Exception $exception) {
             Logger::logWarning(
-                'Releasing the checkout snapshot for cancelled order reference ' . $orderReference . ' failed: ' .
+                'Recording the cancellation for order reference ' . $orderReference . ' failed: ' .
                 $exception->getMessage(),
                 'Integration'
             );

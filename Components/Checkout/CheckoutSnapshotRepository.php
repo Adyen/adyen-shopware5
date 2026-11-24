@@ -22,6 +22,7 @@ class CheckoutSnapshotRepository
     private const SIGNATURE_KEY = 'signature';
     private const VARIABLES_KEY = 'orderVariables';
     private const ORDER_INPUTS_KEY = 'orderInputs';
+    private const CANCELLED_AT_KEY = 'cancelledAt';
 
     public const INPUT_SHOP_ID = 'shopId';
     public const INPUT_COMMENT = 'comment';
@@ -193,6 +194,39 @@ class CheckoutSnapshotRepository
             'SELECT id FROM s_order WHERE temporaryID = :sessionId AND status = -1',
             [':sessionId' => $sessionId]
         )->fetchAll(\PDO::FETCH_COLUMN));
+    }
+
+    /**
+     * Records that the shopper left the payment page with Cancel. The snapshot is kept, because a payment that is
+     * still pending cannot be reliably cancelled at Adyen and may be approved afterwards, and the AUTHORISATION
+     * webhook then needs it to create the order.
+     *
+     * @param string $orderReference
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function markCancelled(string $orderReference): void
+    {
+        $snapshot = $this->load($orderReference);
+
+        if ($snapshot === null || self::isCancelled($snapshot)) {
+            return;
+        }
+
+        $snapshot[self::CANCELLED_AT_KEY] = (new DateTime())->format(DateTime::ATOM);
+
+        $this->persister->persist(self::KEY_PREFIX . $orderReference, $snapshot);
+    }
+
+    /**
+     * @param array $snapshot
+     *
+     * @return bool
+     */
+    public static function isCancelled(array $snapshot): bool
+    {
+        return !empty($snapshot[self::CANCELLED_AT_KEY]);
     }
 
     /**

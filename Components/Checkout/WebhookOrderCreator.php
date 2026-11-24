@@ -9,6 +9,7 @@ use Doctrine\ORM\Exception\NotSupported;
 use Exception;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Components\ShopRegistrationServiceInterface;
+use Shopware\Models\Order\Status;
 use Shopware\Models\Shop\Shop;
 use Shopware_Components_Modules;
 
@@ -172,6 +173,12 @@ class WebhookOrderCreator
 
         $this->cleanUpCheckoutLeftovers($user, $basket, $orderInputs);
 
+        // Re-read after saving: Cancel marks the snapshot under the same lock and only while no order exists, so
+        // a mark that is not visible now was never written.
+        if ($this->wasCancelledByShopper($orderReference)) {
+            $this->flagForClarification((string)$result, $orderReference);
+        }
+
         // The snapshot stays, so a returning browser can still reach the confirmation page.
 
         return true;
@@ -245,6 +252,77 @@ class WebhookOrderCreator
         }
 
         $this->shopRegistrationService->registerShop($shop);
+    }
+
+    /**
+     * @param string $orderReference
+     *
+     * @return bool
+     */
+    private function wasCancelledByShopper(string $orderReference): bool
+    {
+        try {
+            $snapshot = $this->snapshotRepository->load($orderReference);
+        } catch (Exception $exception) {
+            Logger::logWarning(
+                'Reading the cancellation mark for merchant reference ' . $orderReference . ' failed: ' .
+                $exception->getMessage(),
+                'Integration'
+            );
+
+            return false;
+        }
+
+        return $snapshot !== null && CheckoutSnapshotRepository::isCancelled($snapshot);
+    }
+
+    /**
+     * The shopper may have paid the same cart again with another method after Cancel, so the order is held for
+     * the merchant to check for a duplicate before it is shipped.
+     *
+     * @param string $orderNumber
+     * @param string $orderReference
+     *
+     * @return void
+     */
+    private function flagForClarification(string $orderNumber, string $orderReference): void
+    {
+        $comment = 'The payment was approved after the shopper cancelled the payment page. '
+            . 'Check for a duplicate order from the same customer before shipping.';
+
+        try {
+            $orderId = (int)$this->connection->fetchColumn(
+                'SELECT id FROM s_order WHERE ordernumber = :orderNumber',
+                [':orderNumber' => $orderNumber]
+            );
+
+            if ($orderId === 0) {
+                return;
+            }
+
+            $this->connection->executeUpdate(
+                'UPDATE s_order SET internalcomment = :comment WHERE id = :orderId',
+                [':comment' => $comment, ':orderId' => $orderId]
+            );
+
+            $this->modules->Order()->setOrderStatus(
+                $orderId,
+                Status::ORDER_STATE_CLARIFICATION_REQUIRED,
+                false,
+                $comment
+            );
+
+            Logger::logWarning(
+                'Order ' . $orderNumber . ' for merchant reference ' . $orderReference .
+                ' was paid after the shopper cancelled and is marked as clarification required.',
+                'Integration'
+            );
+        } catch (Exception $exception) {
+            Logger::logWarning(
+                'Marking order ' . $orderNumber . ' as clarification required failed: ' . $exception->getMessage(),
+                'Integration'
+            );
+        }
     }
 
     /**
